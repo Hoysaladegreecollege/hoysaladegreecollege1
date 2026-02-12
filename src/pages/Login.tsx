@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { GraduationCap, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 type AuthMode = "login" | "signup";
 type Role = "student" | "teacher" | "principal" | "admin";
@@ -17,6 +19,44 @@ export default function Login() {
   const [mode, setMode] = useState<AuthMode>("login");
   const [role, setRole] = useState<Role>("student");
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { signIn, signUp } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    setLoading(true);
+
+    if (mode === "login") {
+      const { error } = await signIn(email, password);
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success("Signed in successfully!");
+        navigate("/dashboard");
+      }
+    } else {
+      if (!fullName) {
+        toast.error("Please enter your full name");
+        setLoading(false);
+        return;
+      }
+      const { error } = await signUp(email, password, fullName, role);
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success("Account created! Please check your email to verify your account.");
+      }
+    }
+    setLoading(false);
+  };
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -51,43 +91,59 @@ export default function Login() {
             </p>
           </div>
 
-          {/* Role Selection */}
-          <div className="mb-6">
-            <label className="font-body text-sm font-medium text-foreground block mb-2">Select Role</label>
-            <div className="grid grid-cols-4 gap-2">
-              {roles.map((r) => (
-                <button
-                  key={r.value}
-                  onClick={() => setRole(r.value)}
-                  className={`p-3 rounded-lg border text-center transition-all font-body text-xs ${
-                    role === r.value
-                      ? "border-primary bg-primary/5 text-primary font-semibold"
-                      : "border-border text-muted-foreground hover:bg-muted"
-                  }`}
-                >
-                  <div className="text-xl mb-1">{r.icon}</div>
-                  {r.label}
-                </button>
-              ))}
+          {/* Role Selection (signup only) */}
+          {mode === "signup" && (
+            <div className="mb-6">
+              <label className="font-body text-sm font-medium text-foreground block mb-2">Select Role</label>
+              <div className="grid grid-cols-4 gap-2">
+                {roles.map((r) => (
+                  <button
+                    key={r.value}
+                    type="button"
+                    onClick={() => setRole(r.value)}
+                    className={`p-3 rounded-lg border text-center transition-all font-body text-xs ${
+                      role === r.value
+                        ? "border-primary bg-primary/5 text-primary font-semibold"
+                        : "border-border text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    <div className="text-xl mb-1">{r.icon}</div>
+                    {r.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-4" onSubmit={handleSubmit}>
             {mode === "signup" && (
               <div>
                 <label className="font-body text-sm font-medium text-foreground block mb-1">Full Name</label>
-                <input className="w-full border border-border rounded-lg px-4 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Enter your full name" />
+                <input
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className="w-full border border-border rounded-lg px-4 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  placeholder="Enter your full name"
+                />
               </div>
             )}
             <div>
               <label className="font-body text-sm font-medium text-foreground block mb-1">Email</label>
-              <input type="email" className="w-full border border-border rounded-lg px-4 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="you@example.com" />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full border border-border rounded-lg px-4 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
+                placeholder="you@example.com"
+              />
             </div>
             <div>
               <label className="font-body text-sm font-medium text-foreground block mb-1">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full border border-border rounded-lg px-4 py-2.5 pr-10 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
                   placeholder="••••••••"
                 />
@@ -100,8 +156,8 @@ export default function Login() {
                 </button>
               </div>
             </div>
-            <Button className="w-full font-body bg-primary text-primary-foreground" type="submit">
-              {mode === "login" ? "Sign In" : "Create Account"}
+            <Button className="w-full font-body bg-primary text-primary-foreground" type="submit" disabled={loading}>
+              {loading ? "Please wait..." : mode === "login" ? "Sign In" : "Create Account"}
             </Button>
           </form>
 
