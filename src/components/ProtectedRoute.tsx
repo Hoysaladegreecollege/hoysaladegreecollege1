@@ -9,7 +9,7 @@ interface Props {
 }
 
 export default function ProtectedRoute({ children, allowedRoles }: Props) {
-  const { user, role, loading } = useAuth();
+  const { user, role, loading, profile } = useAuth();
 
   if (loading) {
     return (
@@ -24,6 +24,13 @@ export default function ProtectedRoute({ children, allowedRoles }: Props) {
 
   if (!user) return <Navigate to="/login" replace />;
   if (role && !allowedRoles.includes(role)) return <Navigate to="/dashboard" replace />;
+
+  // Admin access restricted to specific email
+  if (allowedRoles.includes("admin") && allowedRoles.length === 1 && role === "admin") {
+    if (profile?.email !== "pavanaofficial05@gmail.com") {
+      return <Navigate to="/" replace />;
+    }
+  }
 
   return <>{children}</>;
 }

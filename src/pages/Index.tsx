@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import SectionHeading from "@/components/SectionHeading";
 import heroImage from "@/assets/hero-college.jpg";
 import principalImage from "@/assets/principal.jpg";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const courses = [
   { name: "BCA", full: "Bachelor of Computer Applications", icon: "🖥️", desc: "Master programming, databases, networking and emerging technologies.", duration: "3 Years" },
@@ -11,21 +13,49 @@ const courses = [
   { name: "BBA", full: "Bachelor of Business Administration", icon: "💼", desc: "Develop leadership, management, and entrepreneurial skills.", duration: "3 Years" },
 ];
 
-const stats = [
-  { label: "Students Enrolled", value: "1200+", icon: Users },
-  { label: "Expert Faculty", value: "50+", icon: BookOpen },
-  { label: "Years of Excellence", value: "15+", icon: Award },
-  { label: "Placement Rate", value: "90%", icon: Star },
-];
-
-const announcements = [
-  { date: "Feb 10, 2026", title: "Admission Open for 2026-27 Academic Year", type: "Admission" },
-  { date: "Feb 5, 2026", title: "Annual Sports Day – March 15, 2026", type: "Event" },
-  { date: "Jan 28, 2026", title: "Semester End Exam Schedule Released", type: "Exam" },
-  { date: "Jan 20, 2026", title: "Workshop on AI & Machine Learning", type: "Workshop" },
-];
-
 export default function Index() {
+  const { data: liveStats } = useQuery({
+    queryKey: ["homepage-stats"],
+    queryFn: async () => {
+      const [students, teachers, events] = await Promise.all([
+        supabase.from("students").select("id", { count: "exact", head: true }).eq("is_active", true),
+        supabase.from("teachers").select("id", { count: "exact", head: true }).eq("is_active", true),
+        supabase.from("events").select("id", { count: "exact", head: true }).eq("is_active", true),
+      ]);
+      return {
+        students: students.count || 0,
+        faculty: teachers.count || 0,
+        events: events.count || 0,
+      };
+    },
+  });
+
+  const { data: recentNotices = [] } = useQuery({
+    queryKey: ["homepage-notices"],
+    queryFn: async () => {
+      const { data } = await supabase.from("notices").select("title, type, created_at").eq("is_active", true).order("created_at", { ascending: false }).limit(4);
+      return data || [];
+    },
+  });
+
+  const stats = [
+    { label: "Students Enrolled", value: liveStats ? `${liveStats.students}+` : "—", icon: Users },
+    { label: "Expert Faculty", value: liveStats ? `${liveStats.faculty}+` : "—", icon: BookOpen },
+    { label: "Years of Excellence", value: "15+", icon: Award },
+    { label: "Placement Rate", value: "90%", icon: Star },
+  ];
+
+  const announcements = recentNotices.length > 0
+    ? recentNotices.map((n: any) => ({
+        date: new Date(n.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+        title: n.title,
+        type: n.type,
+      }))
+    : [
+        { date: "Feb 10, 2026", title: "Admission Open for 2026-27 Academic Year", type: "Admission" },
+        { date: "Feb 5, 2026", title: "Annual Sports Day – March 15, 2026", type: "Event" },
+      ];
+
   return (
     <div>
       {/* Hero */}

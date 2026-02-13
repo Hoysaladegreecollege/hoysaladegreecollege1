@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { GraduationCap, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
-type AuthMode = "login" | "signup";
 type Role = "student" | "teacher" | "principal" | "admin";
 
 const roles: { value: Role; label: string; icon: string }[] = [
@@ -16,15 +15,20 @@ const roles: { value: Role; label: string; icon: string }[] = [
 ];
 
 export default function Login() {
-  const [mode, setMode] = useState<AuthMode>("login");
+  const [searchParams] = useSearchParams();
+  const isSignupMode = searchParams.get("mode") === "signup";
+  const [mode, setMode] = useState<"login" | "signup">(isSignupMode ? "signup" : "login");
   const [role, setRole] = useState<Role>("student");
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, role: currentUserRole } = useAuth();
   const navigate = useNavigate();
+
+  // Only admins can access signup mode
+  const canSignup = isSignupMode && currentUserRole === "admin";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,8 +47,13 @@ export default function Login() {
         navigate("/dashboard");
       }
     } else {
+      if (!canSignup) {
+        toast.error("Only admins can create new accounts");
+        setLoading(false);
+        return;
+      }
       if (!fullName) {
-        toast.error("Please enter your full name");
+        toast.error("Please enter the full name");
         setLoading(false);
         return;
       }
@@ -52,7 +61,7 @@ export default function Login() {
       if (error) {
         toast.error(error.message);
       } else {
-        toast.success("Account created! Please check your email to verify your account.");
+        toast.success("Account created! The user can now sign in after email verification.");
       }
     }
     setLoading(false);
@@ -84,15 +93,15 @@ export default function Login() {
               <span className="font-display text-lg font-bold text-primary">Hoysala Degree College</span>
             </div>
             <h1 className="font-display text-2xl font-bold text-foreground">
-              {mode === "login" ? "Welcome Back" : "Create Account"}
+              {canSignup ? "Create New Account" : "Welcome Back"}
             </h1>
             <p className="font-body text-sm text-muted-foreground mt-1">
-              {mode === "login" ? "Sign in to your account" : "Register for a new account"}
+              {canSignup ? "Admin: Register a new user account" : "Sign in to your account"}
             </p>
           </div>
 
           {/* Role Selection (signup only) */}
-          {mode === "signup" && (
+          {canSignup && (
             <div className="mb-6">
               <label className="font-body text-sm font-medium text-foreground block mb-2">Select Role</label>
               <div className="grid grid-cols-4 gap-2">
@@ -116,14 +125,14 @@ export default function Login() {
           )}
 
           <form className="space-y-4" onSubmit={handleSubmit}>
-            {mode === "signup" && (
+            {canSignup && (
               <div>
                 <label className="font-body text-sm font-medium text-foreground block mb-1">Full Name</label>
                 <input
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   className="w-full border border-border rounded-lg px-4 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  placeholder="Enter your full name"
+                  placeholder="Enter full name"
                 />
               </div>
             )}
@@ -157,17 +166,11 @@ export default function Login() {
               </div>
             </div>
             <Button className="w-full font-body bg-primary text-primary-foreground" type="submit" disabled={loading}>
-              {loading ? "Please wait..." : mode === "login" ? "Sign In" : "Create Account"}
+              {loading ? "Please wait..." : canSignup ? "Create Account" : "Sign In"}
             </Button>
           </form>
 
-          <p className="text-center font-body text-sm text-muted-foreground mt-6">
-            {mode === "login" ? "Don't have an account? " : "Already have an account? "}
-            <button onClick={() => setMode(mode === "login" ? "signup" : "login")} className="text-primary font-semibold hover:underline">
-              {mode === "login" ? "Sign Up" : "Sign In"}
-            </button>
-          </p>
-
+          {/* No signup link for regular users */}
           <div className="text-center mt-4">
             <Link to="/" className="font-body text-xs text-muted-foreground hover:text-primary">
               ← Back to Home

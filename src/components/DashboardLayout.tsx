@@ -4,7 +4,7 @@ import {
   LayoutDashboard, User, BookOpen, Calendar, FileText,
   Bell, Clock, LogOut, GraduationCap, Users, Upload,
   BarChart3, Settings, Award, Image, Megaphone, Shield,
-  Database, UserCog, Menu, X
+  UserCog, Menu, X
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -49,6 +49,7 @@ const principalNav: NavItem[] = [
 const adminNav: NavItem[] = [
   { label: "Dashboard", path: "/dashboard/admin", icon: LayoutDashboard },
   { label: "Users", path: "/dashboard/admin/users", icon: Users },
+  { label: "Applications", path: "/dashboard/admin/applications", icon: FileText },
   { label: "Roles", path: "/dashboard/admin/roles", icon: Shield },
   { label: "Settings", path: "/dashboard/admin/settings", icon: Settings },
 ];
