@@ -147,6 +147,36 @@ export type Database = {
           },
         ]
       }
+      contact_submissions: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          status: string
+          subject: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          message?: string
+          name: string
+          status?: string
+          subject?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          status?: string
+          subject?: string
+        }
+        Relationships: []
+      }
       courses: {
         Row: {
           code: string
@@ -498,6 +528,56 @@ export type Database = {
             columns: ["department_id"]
             isOneToOne: false
             referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      timetables: {
+        Row: {
+          course_id: string | null
+          created_at: string
+          day_of_week: string
+          id: string
+          period: string
+          room: string | null
+          semester: number | null
+          subject: string
+          teacher_name: string | null
+          title: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string
+          day_of_week: string
+          id?: string
+          period: string
+          room?: string | null
+          semester?: number | null
+          subject: string
+          teacher_name?: string | null
+          title: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string
+          day_of_week?: string
+          id?: string
+          period?: string
+          room?: string | null
+          semester?: number | null
+          subject?: string
+          teacher_name?: string | null
+          title?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "timetables_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
             referencedColumns: ["id"]
           },
         ]

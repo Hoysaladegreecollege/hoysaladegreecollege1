@@ -22,6 +22,9 @@ import Support from "./pages/Support";
 import Login from "./pages/Login";
 import StudentAbsent from "./pages/StudentAbsent";
 import NotFound from "./pages/NotFound";
+import Management from "./pages/Management";
+import Committees from "./pages/Committees";
+import AddOnCourses from "./pages/AddOnCourses";
 
 // Student Dashboard
 import StudentDashboard from "./pages/dashboard/StudentDashboard";
@@ -57,6 +60,10 @@ import AdminUsers from "./pages/dashboard/admin/AdminUsers";
 import AdminRoles from "./pages/dashboard/admin/AdminRoles";
 import AdminSettings from "./pages/dashboard/admin/AdminSettings";
 import AdminApplications from "./pages/dashboard/admin/AdminApplications";
+import AdminContacts from "./pages/dashboard/admin/AdminContacts";
+import AdminTopRankers from "./pages/dashboard/admin/AdminTopRankers";
+import AdminTimetable from "./pages/dashboard/admin/AdminTimetable";
+import AdminEvents from "./pages/dashboard/admin/AdminEvents";
 
 const queryClient = new QueryClient();
 
@@ -94,20 +101,21 @@ const App = () => (
               <Route path="/achievements" element={<Achievements />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/support" element={<Support />} />
+              <Route path="/management" element={<Management />} />
+              <Route path="/committees" element={<Committees />} />
+              <Route path="/addon-courses" element={<AddOnCourses />} />
               <Route path="/student-absent" element={<StudentAbsent />} />
             </Route>
 
-            {/* Auth */}
             <Route path="/login" element={<Login />} />
 
-            {/* Dashboard redirect */}
             <Route path="/dashboard" element={
               <ProtectedRoute allowedRoles={["student", "teacher", "principal", "admin"]}>
                 <DashboardRedirect />
               </ProtectedRoute>
             } />
 
-            {/* Student Dashboard */}
+            {/* Student */}
             <Route path="/dashboard/student" element={<StudentRoute><StudentDashboard /></StudentRoute>} />
             <Route path="/dashboard/student/profile" element={<StudentRoute><StudentProfile /></StudentRoute>} />
             <Route path="/dashboard/student/attendance" element={<StudentRoute><StudentAttendance /></StudentRoute>} />
@@ -116,7 +124,7 @@ const App = () => (
             <Route path="/dashboard/student/notices" element={<StudentRoute><StudentNotices /></StudentRoute>} />
             <Route path="/dashboard/student/materials" element={<StudentRoute><StudentMaterials /></StudentRoute>} />
 
-            {/* Teacher Dashboard */}
+            {/* Teacher */}
             <Route path="/dashboard/teacher" element={<TeacherRoute><TeacherDashboard /></TeacherRoute>} />
             <Route path="/dashboard/teacher/students" element={<TeacherRoute><TeacherStudents /></TeacherRoute>} />
             <Route path="/dashboard/teacher/attendance" element={<TeacherRoute><TeacherAttendance /></TeacherRoute>} />
@@ -125,7 +133,7 @@ const App = () => (
             <Route path="/dashboard/teacher/materials" element={<TeacherRoute><TeacherMaterials /></TeacherRoute>} />
             <Route path="/dashboard/teacher/notices" element={<TeacherRoute><TeacherNotices /></TeacherRoute>} />
 
-            {/* Principal Dashboard */}
+            {/* Principal */}
             <Route path="/dashboard/principal" element={<PrincipalRoute><PrincipalDashboard /></PrincipalRoute>} />
             <Route path="/dashboard/principal/top-students" element={<PrincipalRoute><PrincipalTopStudents /></PrincipalRoute>} />
             <Route path="/dashboard/principal/events" element={<PrincipalRoute><PrincipalEvents /></PrincipalRoute>} />
@@ -135,12 +143,16 @@ const App = () => (
             <Route path="/dashboard/principal/teachers" element={<PrincipalRoute><PrincipalTeachers /></PrincipalRoute>} />
             <Route path="/dashboard/principal/students" element={<PrincipalRoute><PrincipalStudents /></PrincipalRoute>} />
 
-            {/* Admin Dashboard */}
+            {/* Admin */}
             <Route path="/dashboard/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
             <Route path="/dashboard/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+            <Route path="/dashboard/admin/applications" element={<AdminRoute><AdminApplications /></AdminRoute>} />
+            <Route path="/dashboard/admin/contacts" element={<AdminRoute><AdminContacts /></AdminRoute>} />
+            <Route path="/dashboard/admin/top-rankers" element={<AdminRoute><AdminTopRankers /></AdminRoute>} />
+            <Route path="/dashboard/admin/timetable" element={<AdminRoute><AdminTimetable /></AdminRoute>} />
+            <Route path="/dashboard/admin/events" element={<AdminRoute><AdminEvents /></AdminRoute>} />
             <Route path="/dashboard/admin/roles" element={<AdminRoute><AdminRoles /></AdminRoute>} />
             <Route path="/dashboard/admin/settings" element={<AdminRoute><AdminSettings /></AdminRoute>} />
-            <Route path="/dashboard/admin/applications" element={<AdminRoute><AdminApplications /></AdminRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

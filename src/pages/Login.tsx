@@ -27,80 +27,53 @@ export default function Login() {
   const { signIn, signUp, role: currentUserRole } = useAuth();
   const navigate = useNavigate();
 
-  // Only admins can access signup mode
   const canSignup = isSignupMode && currentUserRole === "admin";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      toast.error("Please fill in all fields");
-      return;
-    }
+    if (!email || !password) { toast.error("Please fill in all fields"); return; }
     setLoading(true);
-
     if (mode === "login") {
       const { error } = await signIn(email, password);
-      if (error) {
-        toast.error(error.message);
-      } else {
-        toast.success("Signed in successfully!");
-        navigate("/dashboard");
-      }
+      if (error) toast.error(error.message);
+      else { toast.success("Signed in successfully!"); navigate("/dashboard"); }
     } else {
-      if (!canSignup) {
-        toast.error("Only admins can create new accounts");
-        setLoading(false);
-        return;
-      }
-      if (!fullName) {
-        toast.error("Please enter the full name");
-        setLoading(false);
-        return;
-      }
+      if (!canSignup) { toast.error("Only admins can create new accounts"); setLoading(false); return; }
+      if (!fullName) { toast.error("Please enter the full name"); setLoading(false); return; }
       const { error } = await signUp(email, password, fullName, role);
-      if (error) {
-        toast.error(error.message);
-      } else {
-        toast.success("Account created! The user can now sign in after email verification.");
-      }
+      if (error) toast.error(error.message);
+      else toast.success("Account created! The user can now sign in after email verification.");
     }
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Left Panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-primary items-center justify-center p-12">
-        <div className="text-center text-primary-foreground max-w-md">
-          <div className="w-16 h-16 mx-auto rounded-full bg-secondary flex items-center justify-center mb-6">
-            <GraduationCap className="w-9 h-9 text-primary" />
-          </div>
-          <h2 className="font-display text-3xl font-bold mb-4">Hoysala Degree College</h2>
-          <p className="font-body text-sm opacity-70 leading-relaxed">
-            Access your personalized dashboard to manage academic activities, view attendance, marks, and stay updated with college announcements.
-          </p>
-        </div>
-      </div>
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
+      {/* Animated gradient background */}
+      <div className="absolute inset-0 animate-gradient" style={{
+        background: "linear-gradient(135deg, hsl(217 72% 18%), hsl(217 72% 25%), hsl(217 60% 22%), hsl(217 72% 18%))",
+        backgroundSize: "200% 200%",
+      }} />
+      <div className="absolute inset-0 opacity-20" style={{
+        backgroundImage: "radial-gradient(circle at 20% 50%, hsla(42, 87%, 55%, 0.3), transparent 50%), radial-gradient(circle at 80% 50%, hsla(42, 87%, 55%, 0.2), transparent 50%)",
+      }} />
 
-      {/* Right Panel */}
-      <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-md">
+      <div className="relative z-10 w-full max-w-md mx-4">
+        <div className="glass-card rounded-2xl p-8">
           <div className="text-center mb-8">
-            <div className="lg:hidden flex items-center justify-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-                <GraduationCap className="w-6 h-6 text-secondary" />
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
+                <GraduationCap className="w-7 h-7 text-secondary" />
               </div>
-              <span className="font-display text-lg font-bold text-primary">Hoysala Degree College</span>
             </div>
             <h1 className="font-display text-2xl font-bold text-foreground">
               {canSignup ? "Create New Account" : "Welcome Back"}
             </h1>
             <p className="font-body text-sm text-muted-foreground mt-1">
-              {canSignup ? "Admin: Register a new user account" : "Sign in to your account"}
+              {canSignup ? "Admin: Register a new user account" : "Sign in to your portal"}
             </p>
           </div>
 
-          {/* Role Selection (signup only) */}
           {canSignup && (
             <div className="mb-6">
               <label className="font-body text-sm font-medium text-foreground block mb-2">Select Role</label>
@@ -111,9 +84,7 @@ export default function Login() {
                     type="button"
                     onClick={() => setRole(r.value)}
                     className={`p-3 rounded-lg border text-center transition-all font-body text-xs ${
-                      role === r.value
-                        ? "border-primary bg-primary/5 text-primary font-semibold"
-                        : "border-border text-muted-foreground hover:bg-muted"
+                      role === r.value ? "border-primary bg-primary/5 text-primary font-semibold" : "border-border text-muted-foreground hover:bg-muted"
                     }`}
                   >
                     <div className="text-xl mb-1">{r.icon}</div>
@@ -126,12 +97,12 @@ export default function Login() {
 
           <form className="space-y-4" onSubmit={handleSubmit}>
             {canSignup && (
-              <div>
+              <div className="group">
                 <label className="font-body text-sm font-medium text-foreground block mb-1">Full Name</label>
                 <input
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full border border-border rounded-lg px-4 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full border border-border rounded-lg px-4 py-2.5 font-body text-sm bg-background/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
                   placeholder="Enter full name"
                 />
               </div>
@@ -142,7 +113,7 @@ export default function Login() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full border border-border rounded-lg px-4 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className="w-full border border-border rounded-lg px-4 py-2.5 font-body text-sm bg-background/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
                 placeholder="you@example.com"
               />
             </div>
@@ -153,26 +124,21 @@ export default function Login() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full border border-border rounded-lg px-4 py-2.5 pr-10 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full border border-border rounded-lg px-4 py-2.5 pr-10 font-body text-sm bg-background/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
                   placeholder="••••••••"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                >
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
-            <Button className="w-full font-body bg-primary text-primary-foreground" type="submit" disabled={loading}>
+            <Button className="w-full font-body bg-primary text-primary-foreground hover:bg-navy-light transition-all" type="submit" disabled={loading}>
               {loading ? "Please wait..." : canSignup ? "Create Account" : "Sign In"}
             </Button>
           </form>
 
-          {/* No signup link for regular users */}
           <div className="text-center mt-4">
-            <Link to="/" className="font-body text-xs text-muted-foreground hover:text-primary">
+            <Link to="/" className="font-body text-xs text-muted-foreground hover:text-primary transition-colors">
               ← Back to Home
             </Link>
           </div>
