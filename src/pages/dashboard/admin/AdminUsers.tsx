@@ -46,7 +46,6 @@ export default function AdminUsers() {
 
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
-      // Delete from user_roles and profiles (auth user stays but has no access)
       await supabase.from("user_roles").delete().eq("user_id", userId);
       await supabase.from("students").delete().eq("user_id", userId);
       await supabase.from("teachers").delete().eq("user_id", userId);
@@ -69,23 +68,67 @@ export default function AdminUsers() {
   });
 
   return (
-    <div className="space-y-6">
-      <div className="bg-gradient-to-r from-primary/5 to-secondary/5 border border-border rounded-2xl p-6">
-        <div className="flex items-center justify-between flex-wrap gap-4">
+    <div className="space-y-5 sm:space-y-6">
+      <div className="bg-gradient-to-r from-primary/5 to-secondary/5 border border-border rounded-2xl p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
           <div>
-            <h2 className="font-display text-xl font-bold text-foreground flex items-center gap-2">
+            <h2 className="font-display text-lg sm:text-xl font-bold text-foreground flex items-center gap-2">
               <Users className="w-5 h-5 text-primary" /> User Management
             </h2>
-            <p className="font-body text-sm text-muted-foreground mt-1">{users.length} registered users</p>
+            <p className="font-body text-xs sm:text-sm text-muted-foreground mt-1">{users.length} registered users</p>
           </div>
-          <div className="relative w-64">
+          <div className="relative w-full sm:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input placeholder="Search users..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 rounded-xl" />
           </div>
         </div>
       </div>
 
-      <div className="bg-card border border-border rounded-2xl overflow-hidden">
+      {/* Mobile Cards */}
+      <div className="sm:hidden space-y-3">
+        {isLoading ? (
+          <p className="text-center py-8 font-body text-sm text-muted-foreground animate-pulse">Loading...</p>
+        ) : filtered.map((u: any) => (
+          <div key={u.id} className="bg-card border border-border rounded-xl p-4">
+            {editingId === u.user_id ? (
+              <div className="space-y-2">
+                <Input value={editForm.full_name} onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })} className="h-8 text-sm" placeholder="Name" />
+                <Input value={editForm.phone} onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })} className="h-8 text-sm" placeholder="Phone" />
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={() => updateProfileMutation.mutate({ userId: u.user_id, ...editForm })} className="flex-1 text-xs"><Save className="w-3 h-3 mr-1" /> Save</Button>
+                  <Button size="sm" variant="outline" onClick={() => setEditingId(null)} className="text-xs"><X className="w-3 h-3" /></Button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-body text-sm font-bold text-foreground">{u.full_name || "—"}</span>
+                  <select
+                    value={u.role}
+                    onChange={(e) => updateRoleMutation.mutate({ userId: u.user_id, newRole: e.target.value })}
+                    className="text-[10px] rounded-md border border-input bg-background px-1.5 py-0.5 font-body"
+                  >
+                    <option value="student">Student</option>
+                    <option value="teacher">Teacher</option>
+                    <option value="principal">Principal</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+                <p className="font-body text-xs text-muted-foreground">{u.email}</p>
+                <p className="font-body text-xs text-muted-foreground">{u.phone || "—"}</p>
+                <div className="flex gap-2 mt-2">
+                  <button onClick={() => startEdit(u)} className="text-xs font-body text-primary hover:underline flex items-center gap-1"><Edit3 className="w-3 h-3" /> Edit</button>
+                  <button onClick={() => { if (confirm("Delete this user?")) deleteUserMutation.mutate(u.user_id); }} className="text-xs font-body text-destructive hover:underline flex items-center gap-1"><Trash2 className="w-3 h-3" /> Delete</button>
+                </div>
+              </>
+            )}
+          </div>
+        ))}
+        {!isLoading && filtered.length === 0 && <p className="text-center py-8 font-body text-sm text-muted-foreground">No users found.</p>}
+      </div>
+
+      {/* Desktop Table */}
+      <div className="hidden sm:block bg-card border border-border rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[700px]">
             <thead>
@@ -137,7 +180,7 @@ export default function AdminUsers() {
                       ) : (
                         <>
                           <button onClick={() => startEdit(u)} className="p-1.5 rounded-lg hover:bg-primary/10 text-primary transition-colors" title="Edit"><Edit3 className="w-4 h-4" /></button>
-                          <button onClick={() => { if (confirm("Are you sure you want to delete this user?")) deleteUserMutation.mutate(u.user_id); }} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors" title="Delete"><Trash2 className="w-4 h-4" /></button>
+                          <button onClick={() => { if (confirm("Delete this user?")) deleteUserMutation.mutate(u.user_id); }} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors" title="Delete"><Trash2 className="w-4 h-4" /></button>
                         </>
                       )}
                     </div>
