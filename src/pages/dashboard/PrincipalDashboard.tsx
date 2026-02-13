@@ -1,24 +1,44 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Users, GraduationCap, Award, Megaphone, Image, BookOpen, Settings, TrendingUp } from "lucide-react";
-
-const stats = [
-  { label: "Total Students", value: "350", icon: Users, color: "bg-primary/10 text-primary" },
-  { label: "Faculty Members", value: "18", icon: GraduationCap, color: "bg-secondary/10 text-secondary" },
-  { label: "Active Courses", value: "3", icon: BookOpen, color: "bg-primary/10 text-primary" },
-  { label: "Placement Rate", value: "90%", icon: TrendingUp, color: "bg-secondary/10 text-secondary" },
-];
-
-const actions = [
-  { icon: Award, label: "Top Students", desc: "Update homepage top rank students" },
-  { icon: Image, label: "Events & Gallery", desc: "Post new events and upload photos" },
-  { icon: Megaphone, label: "Notices", desc: "Publish announcements" },
-  { icon: BookOpen, label: "Courses & Fees", desc: "Update course fees and details" },
-  { icon: GraduationCap, label: "Departments", desc: "Manage departments" },
-  { icon: Settings, label: "Website Settings", desc: "Enable/disable sections" },
-];
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function PrincipalDashboard() {
   const { profile } = useAuth();
+
+  const { data: counts } = useQuery({
+    queryKey: ["principal-stats"],
+    queryFn: async () => {
+      const [students, teachers, courses, notices] = await Promise.all([
+        supabase.from("students").select("id", { count: "exact", head: true }).eq("is_active", true),
+        supabase.from("teachers").select("id", { count: "exact", head: true }).eq("is_active", true),
+        supabase.from("courses").select("id", { count: "exact", head: true }).eq("is_active", true),
+        supabase.from("notices").select("id", { count: "exact", head: true }).eq("is_active", true),
+      ]);
+      return {
+        students: students.count || 0,
+        teachers: teachers.count || 0,
+        courses: courses.count || 0,
+        notices: notices.count || 0,
+      };
+    },
+  });
+
+  const stats = [
+    { label: "Total Students", value: String(counts?.students ?? "—"), icon: Users, color: "bg-primary/10 text-primary" },
+    { label: "Faculty Members", value: String(counts?.teachers ?? "—"), icon: GraduationCap, color: "bg-secondary/10 text-secondary" },
+    { label: "Active Courses", value: String(counts?.courses ?? "—"), icon: BookOpen, color: "bg-primary/10 text-primary" },
+    { label: "Active Notices", value: String(counts?.notices ?? "—"), icon: Megaphone, color: "bg-secondary/10 text-secondary" },
+  ];
+
+  const actions = [
+    { icon: Award, label: "Top Students", desc: "Update homepage top rank students" },
+    { icon: Image, label: "Events & Gallery", desc: "Post new events and upload photos" },
+    { icon: Megaphone, label: "Notices", desc: "Publish announcements" },
+    { icon: BookOpen, label: "Courses & Fees", desc: "Update course fees and details" },
+    { icon: GraduationCap, label: "Departments", desc: "Manage departments" },
+    { icon: Settings, label: "Teachers", desc: "Add & manage faculty" },
+  ];
 
   return (
     <div className="space-y-6">

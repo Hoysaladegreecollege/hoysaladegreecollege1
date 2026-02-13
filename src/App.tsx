@@ -56,6 +56,7 @@ import AdminDashboard from "./pages/dashboard/AdminDashboard";
 import AdminUsers from "./pages/dashboard/admin/AdminUsers";
 import AdminRoles from "./pages/dashboard/admin/AdminRoles";
 import AdminSettings from "./pages/dashboard/admin/AdminSettings";
+import AdminApplications from "./pages/dashboard/admin/AdminApplications";
 
 const queryClient = new QueryClient();
 
@@ -139,6 +140,7 @@ const App = () => (
             <Route path="/dashboard/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
             <Route path="/dashboard/admin/roles" element={<AdminRoute><AdminRoles /></AdminRoute>} />
             <Route path="/dashboard/admin/settings" element={<AdminRoute><AdminSettings /></AdminRoute>} />
+            <Route path="/dashboard/admin/applications" element={<AdminRoute><AdminApplications /></AdminRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

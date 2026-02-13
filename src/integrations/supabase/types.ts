@@ -52,6 +52,63 @@ export type Database = {
           },
         ]
       }
+      admission_applications: {
+        Row: {
+          address: string | null
+          course: string
+          created_at: string
+          date_of_birth: string | null
+          email: string
+          father_name: string | null
+          full_name: string
+          gender: string | null
+          id: string
+          mother_name: string | null
+          percentage_12th: string | null
+          phone: string
+          previous_school: string | null
+          review_notes: string | null
+          reviewed_by: string | null
+          status: string
+        }
+        Insert: {
+          address?: string | null
+          course: string
+          created_at?: string
+          date_of_birth?: string | null
+          email: string
+          father_name?: string | null
+          full_name: string
+          gender?: string | null
+          id?: string
+          mother_name?: string | null
+          percentage_12th?: string | null
+          phone: string
+          previous_school?: string | null
+          review_notes?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Update: {
+          address?: string | null
+          course?: string
+          created_at?: string
+          date_of_birth?: string | null
+          email?: string
+          father_name?: string | null
+          full_name?: string
+          gender?: string | null
+          id?: string
+          mother_name?: string | null
+          percentage_12th?: string | null
+          phone?: string
+          previous_school?: string | null
+          review_notes?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       attendance: {
         Row: {
           created_at: string
