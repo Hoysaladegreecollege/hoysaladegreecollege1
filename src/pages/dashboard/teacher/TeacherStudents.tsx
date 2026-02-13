@@ -31,23 +31,45 @@ export default function TeacherStudents() {
   });
 
   return (
-    <div className="space-y-6">
-      <div className="bg-gradient-to-r from-primary/5 to-secondary/5 border border-border rounded-2xl p-6">
-        <div className="flex items-center justify-between flex-wrap gap-4">
+    <div className="space-y-5 sm:space-y-6">
+      <div className="bg-gradient-to-r from-primary/5 to-secondary/5 border border-border rounded-2xl p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
           <div>
-            <h2 className="font-display text-xl font-bold text-foreground flex items-center gap-2">
+            <h2 className="font-display text-lg sm:text-xl font-bold text-foreground flex items-center gap-2">
               <Users className="w-5 h-5 text-primary" /> Students
             </h2>
-            <p className="font-body text-sm text-muted-foreground mt-1">{students.length} active students</p>
+            <p className="font-body text-xs sm:text-sm text-muted-foreground mt-1">{students.length} active students</p>
           </div>
-          <div className="relative w-64">
+          <div className="relative w-full sm:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input placeholder="Search students..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 rounded-xl" />
+            <Input placeholder="Search students..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 rounded-xl text-sm" />
           </div>
         </div>
       </div>
 
-      <div className="bg-card border border-border rounded-2xl overflow-hidden">
+      {/* Mobile Card View */}
+      <div className="sm:hidden space-y-3">
+        {isLoading ? (
+          <div className="text-center py-12"><p className="font-body text-sm text-muted-foreground animate-pulse">Loading students...</p></div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-12"><p className="font-body text-sm text-muted-foreground">No students found.</p></div>
+        ) : (
+          filtered.map((s: any) => (
+            <div key={s.id} className="bg-card border border-border rounded-xl p-4 hover:shadow-md transition-all">
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-body text-sm font-bold text-primary">{s.roll_number}</span>
+                <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">Sem {s.semester}</span>
+              </div>
+              <p className="font-body text-sm font-medium text-foreground">{s.profile?.full_name || "—"}</p>
+              <p className="font-body text-xs text-muted-foreground mt-1">{s.courses?.name || "—"}</p>
+              <p className="font-body text-xs text-muted-foreground">{s.profile?.phone || s.parent_phone || "—"}</p>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden sm:block bg-card border border-border rounded-2xl overflow-hidden">
         {isLoading ? (
           <div className="text-center py-12"><p className="font-body text-sm text-muted-foreground animate-pulse">Loading students...</p></div>
         ) : (
