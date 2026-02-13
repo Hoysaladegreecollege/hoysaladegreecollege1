@@ -4,16 +4,11 @@ import {
   LayoutDashboard, User, BookOpen, Calendar, FileText,
   Bell, Clock, LogOut, GraduationCap, Users, Upload,
   BarChart3, Settings, Award, Image, Megaphone, Shield,
-  UserCog, Menu, X
+  UserCog, Menu, X, Mail, Trophy
 } from "lucide-react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 
-interface NavItem {
-  label: string;
-  path: string;
-  icon: React.ElementType;
-}
+interface NavItem { label: string; path: string; icon: React.ElementType; }
 
 const studentNav: NavItem[] = [
   { label: "Dashboard", path: "/dashboard/student", icon: LayoutDashboard },
@@ -48,9 +43,12 @@ const principalNav: NavItem[] = [
 
 const adminNav: NavItem[] = [
   { label: "Dashboard", path: "/dashboard/admin", icon: LayoutDashboard },
-  { label: "Users", path: "/dashboard/admin/users", icon: Users },
   { label: "Applications", path: "/dashboard/admin/applications", icon: FileText },
-  { label: "Roles", path: "/dashboard/admin/roles", icon: Shield },
+  { label: "Contact Messages", path: "/dashboard/admin/contacts", icon: Mail },
+  { label: "Users", path: "/dashboard/admin/users", icon: Users },
+  { label: "Top Rankers", path: "/dashboard/admin/top-rankers", icon: Trophy },
+  { label: "Timetable", path: "/dashboard/admin/timetable", icon: Calendar },
+  { label: "Events", path: "/dashboard/admin/events", icon: Image },
   { label: "Settings", path: "/dashboard/admin/settings", icon: Settings },
 ];
 
@@ -67,22 +65,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const roleLabel = role ? role.charAt(0).toUpperCase() + role.slice(1) : "";
 
-  const handleLogout = async () => {
-    await signOut();
-    navigate("/");
-  };
+  const handleLogout = async () => { await signOut(); navigate("/"); };
 
   return (
     <div className="min-h-screen flex bg-muted/30">
-      {/* Mobile overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 bg-foreground/30 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Sidebar */}
       <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-primary text-primary-foreground transform transition-transform lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="flex flex-col h-full">
-          {/* Header */}
           <div className="p-4 border-b border-primary-foreground/10">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -94,27 +86,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <p className="text-[10px] font-body opacity-60">{roleLabel} Portal</p>
                 </div>
               </div>
-              <button className="lg:hidden" onClick={() => setSidebarOpen(false)}>
-                <X className="w-5 h-5" />
-              </button>
+              <button className="lg:hidden" onClick={() => setSidebarOpen(false)}><X className="w-5 h-5" /></button>
             </div>
           </div>
 
-          {/* Nav */}
           <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
             {navItems.map((item) => {
               const active = location.pathname === item.path;
               return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg font-body text-sm transition-colors ${
-                    active
-                      ? "bg-secondary text-secondary-foreground font-semibold"
-                      : "text-primary-foreground/70 hover:bg-primary-foreground/10 hover:text-primary-foreground"
-                  }`}
-                >
+                <Link key={item.path} to={item.path} onClick={() => setSidebarOpen(false)}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg font-body text-sm transition-all ${
+                    active ? "bg-secondary text-secondary-foreground font-semibold" : "text-primary-foreground/70 hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                  }`}>
                   <item.icon className="w-4 h-4 shrink-0" />
                   {item.label}
                 </Link>
@@ -122,7 +105,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             })}
           </nav>
 
-          {/* Footer */}
           <div className="p-4 border-t border-primary-foreground/10">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-8 h-8 rounded-full bg-primary-foreground/10 flex items-center justify-center">
@@ -133,35 +115,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <p className="font-body text-[10px] opacity-60 truncate">{profile?.email}</p>
               </div>
             </div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm font-body text-primary-foreground/70 hover:bg-destructive/20 hover:text-primary-foreground transition-colors"
-            >
+            <button onClick={handleLogout} className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm font-body text-primary-foreground/70 hover:bg-destructive/20 hover:text-primary-foreground transition-colors">
               <LogOut className="w-4 h-4" /> Sign Out
             </button>
           </div>
         </div>
       </aside>
 
-      {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top bar */}
         <header className="bg-card border-b border-border px-4 py-3 flex items-center justify-between sticky top-0 z-30">
           <div className="flex items-center gap-3">
-            <button className="lg:hidden" onClick={() => setSidebarOpen(true)}>
-              <Menu className="w-5 h-5 text-foreground" />
-            </button>
+            <button className="lg:hidden" onClick={() => setSidebarOpen(true)}><Menu className="w-5 h-5 text-foreground" /></button>
             <h1 className="font-display text-lg font-bold text-foreground">{roleLabel} Dashboard</h1>
           </div>
-          <Link to="/" className="font-body text-xs text-muted-foreground hover:text-primary">
-            ← Back to Website
-          </Link>
+          <Link to="/" className="font-body text-xs text-muted-foreground hover:text-primary transition-colors">← Back to Website</Link>
         </header>
-
-        {/* Content */}
-        <main className="flex-1 p-4 md:p-6 overflow-auto">
-          {children}
-        </main>
+        <main className="flex-1 p-4 md:p-6 overflow-auto">{children}</main>
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ const navLinks = [
   { label: "Events & Gallery", path: "/events" },
   { label: "Notices", path: "/notices" },
   { label: "Achievements", path: "/achievements" },
+  { label: "Committees", path: "/committees" },
   { label: "Contact", path: "/contact" },
 ];
 
@@ -25,10 +26,11 @@ export default function Navbar() {
       {/* Top bar */}
       <div className="bg-primary text-primary-foreground text-xs py-1.5">
         <div className="container flex justify-between items-center">
-          <span className="font-body">📍 Nelamangala, Bangalore – 562123</span>
+          <span className="font-body font-semibold">ಶ್ರೀಶಿರಡಿ ಸಾಯಿ ಎಜುಕೇಷನಲ್ ಟ್ರಸ್ಟ್ (ರಿ.)</span>
           <div className="hidden sm:flex items-center gap-4">
-            <span>📧 info@hoysalacollege.edu</span>
-            <span>📞 +91 80 XXXX XXXX</span>
+            <span className="text-secondary font-semibold">✅ Recognized by Government of Karnataka</span>
+            <a href="tel:7676272167" className="hover:text-secondary transition-colors">📞 7676272167</a>
+            <a href="mailto:principal.hoysaladegreecollege@gmail.com" className="hover:text-secondary transition-colors">📧 Mail Us</a>
           </div>
         </div>
       </div>
@@ -43,19 +45,19 @@ export default function Navbar() {
             <span className="font-display text-lg font-bold text-primary leading-tight block">
               Hoysala Degree College
             </span>
-            <span className="text-[10px] text-muted-foreground font-body tracking-wide">
-              Excellence in Education
+            <span className="text-[9px] text-muted-foreground font-body tracking-wide leading-tight block">
+              Affiliated To Bangalore University | College Code: BU 26
             </span>
           </div>
         </Link>
 
         {/* Desktop links */}
-        <div className="hidden lg:flex items-center gap-1">
+        <div className="hidden lg:flex items-center gap-0.5">
           {navLinks.map((link) => (
             <Link
               key={link.path}
               to={link.path}
-              className={`px-3 py-2 text-sm font-medium font-body rounded-md transition-colors ${
+              className={`px-2.5 py-2 text-[13px] font-medium font-body rounded-md transition-all duration-200 ${
                 location.pathname === link.path
                   ? "text-secondary bg-primary/5"
                   : "text-foreground hover:text-primary hover:bg-muted"
