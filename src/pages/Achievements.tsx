@@ -1,16 +1,12 @@
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
-import { Trophy, Star, Medal, Award } from "lucide-react";
+import { Trophy, Medal } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-const staticAchievements = [
-  { name: "Ananya R.", course: "BCA", achievement: "University Gold Medalist – 2025", type: "Academic" },
-  { name: "Rahul M.", course: "BBA", achievement: "State-level Business Plan Competition Winner", type: "Competition" },
-  { name: "Priya S.", course: "B.Com", achievement: "CA Foundation – All India Rank 45", type: "Academic" },
-  { name: "Vikram K.", course: "BCA", achievement: "National Level Hackathon – 1st Place", type: "Technical" },
-  { name: "Sneha D.", course: "BBA", achievement: "Best Speaker – Inter-College Debate", type: "Cultural" },
-  { name: "Arun P.", course: "B.Com", achievement: "District Cricket Championship MVP", type: "Sports" },
+const defaultAchievers = [
+  { name: "Anusha C.H", usn: "U03EF22C0068", percentage: "98.14%", course: "Bachelor of Commerce", batch: "2022–2025", rank: 1 },
+  { name: "SIMRAN B", usn: "UO3EF22C0007", percentage: "94.14%", course: "Bachelor of Commerce", batch: "2022–2025", rank: 2 },
 ];
 
 export default function Achievements() {
@@ -31,11 +27,37 @@ export default function Achievements() {
         </div>
       </section>
 
-      {/* Top Rank Holders from DB */}
+      {/* Achievers Gallery */}
+      <section className="py-20 bg-background">
+        <div className="container">
+          <SectionHeading title="🏆 Top Rank Holders 2022–2025" subtitle="Our brightest stars who achieved outstanding university results" />
+          <div className="grid sm:grid-cols-2 gap-8 max-w-3xl mx-auto">
+            {defaultAchievers.map((a, i) => (
+              <ScrollReveal key={a.name} delay={i * 150}>
+                <div className="bg-card border-2 border-secondary/30 rounded-2xl p-8 text-center hover-lift group transition-all duration-300 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 bg-secondary text-secondary-foreground px-4 py-1 rounded-bl-xl font-display text-sm font-bold">
+                    Rank #{a.rank}
+                  </div>
+                  <div className="w-24 h-24 rounded-full mx-auto mb-5 bg-gradient-to-br from-secondary/30 to-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <Medal className="w-12 h-12 text-secondary" />
+                  </div>
+                  <h3 className="font-display text-xl font-bold text-foreground">{a.name}</h3>
+                  <p className="font-body text-xs text-muted-foreground mt-1">USN: {a.usn}</p>
+                  <p className="font-display text-3xl font-bold text-secondary mt-3">{a.percentage}</p>
+                  <p className="font-body text-sm text-foreground mt-2 font-medium">{a.course}</p>
+                  <p className="font-body text-xs text-muted-foreground">Batch: {a.batch}</p>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* DB Top Students */}
       {topStudents.length > 0 && (
-        <section className="py-16 bg-cream">
+        <section className="py-16 bg-muted/30">
           <div className="container">
-            <SectionHeading title="Top Rank Holders 2022–2025" subtitle="Our brightest stars who achieved outstanding results" />
+            <SectionHeading title="More Top Achievers" subtitle="Students uploaded by the administration" />
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {topStudents.map((s: any, i: number) => (
                 <ScrollReveal key={s.id} delay={i * 100}>
@@ -60,28 +82,6 @@ export default function Achievements() {
           </div>
         </section>
       )}
-
-      {/* Static Achievements */}
-      <section className="py-20 bg-background">
-        <div className="container">
-          <SectionHeading title="Our Stars" subtitle="Celebrating the accomplishments of our talented students" />
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {staticAchievements.map((a, i) => (
-              <ScrollReveal key={i} delay={i * 100}>
-                <div className="bg-card border border-border rounded-xl p-6 text-center hover-lift">
-                  <div className="w-14 h-14 mx-auto rounded-full bg-secondary/15 flex items-center justify-center mb-4">
-                    <Trophy className="w-7 h-7 text-secondary" />
-                  </div>
-                  <h3 className="font-display text-lg font-bold text-foreground">{a.name}</h3>
-                  <p className="font-body text-xs text-secondary font-semibold mt-1">{a.course}</p>
-                  <p className="font-body text-sm text-muted-foreground mt-3">{a.achievement}</p>
-                  <span className="inline-block mt-3 text-[10px] font-body px-3 py-1 rounded-full bg-primary/10 text-primary font-medium">{a.type}</span>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

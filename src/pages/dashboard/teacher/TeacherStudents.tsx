@@ -15,7 +15,7 @@ export default function TeacherStudents() {
         .select("*, courses(name, code)")
         .eq("is_active", true)
         .order("roll_number");
-      if (!studentsData) return [];
+      if (!studentsData || studentsData.length === 0) return [];
       const userIds = studentsData.map((s) => s.user_id);
       const { data: profiles } = await supabase.from("profiles").select("*").in("user_id", userIds);
       return studentsData.map((s) => ({
@@ -32,42 +32,54 @@ export default function TeacherStudents() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-4">
-        <h2 className="font-display text-2xl font-bold text-foreground">Students</h2>
-        <div className="relative w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Search students..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+      <div className="bg-gradient-to-r from-primary/5 to-secondary/5 border border-border rounded-2xl p-6">
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div>
+            <h2 className="font-display text-xl font-bold text-foreground flex items-center gap-2">
+              <Users className="w-5 h-5 text-primary" /> Students
+            </h2>
+            <p className="font-body text-sm text-muted-foreground mt-1">{students.length} active students</p>
+          </div>
+          <div className="relative w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input placeholder="Search students..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 rounded-xl" />
+          </div>
         </div>
       </div>
-      <div className="bg-card border border-border rounded-xl overflow-x-auto">
+
+      <div className="bg-card border border-border rounded-2xl overflow-hidden">
         {isLoading ? (
-          <p className="font-body text-sm text-muted-foreground p-6">Loading...</p>
+          <div className="text-center py-12"><p className="font-body text-sm text-muted-foreground animate-pulse">Loading students...</p></div>
         ) : (
-          <table className="w-full min-w-[600px]">
-            <thead>
-              <tr className="border-b border-border bg-muted/50">
-                <th className="text-left font-body text-xs text-muted-foreground p-3">Roll No</th>
-                <th className="text-left font-body text-xs text-muted-foreground p-3">Name</th>
-                <th className="text-left font-body text-xs text-muted-foreground p-3">Course</th>
-                <th className="text-center font-body text-xs text-muted-foreground p-3">Semester</th>
-                <th className="text-left font-body text-xs text-muted-foreground p-3">Phone</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((s: any) => (
-                <tr key={s.id} className="border-b border-border/50 hover:bg-muted/30">
-                  <td className="font-body text-sm p-3 font-medium">{s.roll_number}</td>
-                  <td className="font-body text-sm p-3">{s.profile?.full_name || "-"}</td>
-                  <td className="font-body text-sm p-3">{s.courses?.name || "-"}</td>
-                  <td className="font-body text-sm p-3 text-center">{s.semester}</td>
-                  <td className="font-body text-sm p-3">{s.profile?.phone || s.parent_phone || "-"}</td>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[600px]">
+              <thead>
+                <tr className="border-b border-border bg-muted/30">
+                  <th className="text-left font-body text-xs font-semibold text-muted-foreground p-4">Roll No</th>
+                  <th className="text-left font-body text-xs font-semibold text-muted-foreground p-4">Name</th>
+                  <th className="text-left font-body text-xs font-semibold text-muted-foreground p-4">Course</th>
+                  <th className="text-center font-body text-xs font-semibold text-muted-foreground p-4">Semester</th>
+                  <th className="text-left font-body text-xs font-semibold text-muted-foreground p-4">Phone</th>
                 </tr>
-              ))}
-              {filtered.length === 0 && (
-                <tr><td colSpan={5} className="text-center font-body text-sm text-muted-foreground p-6">No students found.</td></tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filtered.map((s: any) => (
+                  <tr key={s.id} className="border-b border-border/50 hover:bg-muted/20 transition-colors">
+                    <td className="font-body text-sm p-4 font-semibold text-primary">{s.roll_number}</td>
+                    <td className="font-body text-sm p-4 font-medium text-foreground">{s.profile?.full_name || "—"}</td>
+                    <td className="font-body text-sm p-4 text-foreground">{s.courses?.name || "—"}</td>
+                    <td className="font-body text-sm p-4 text-center">
+                      <span className="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">{s.semester}</span>
+                    </td>
+                    <td className="font-body text-sm p-4 text-foreground">{s.profile?.phone || s.parent_phone || "—"}</td>
+                  </tr>
+                ))}
+                {filtered.length === 0 && (
+                  <tr><td colSpan={5} className="text-center font-body text-sm text-muted-foreground p-8">No students found.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>
