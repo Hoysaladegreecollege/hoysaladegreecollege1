@@ -24,10 +24,10 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border shadow-sm">
       {/* Top bar */}
-      <div className="bg-primary text-primary-foreground text-xs py-1.5">
-        <div className="container flex justify-between items-center">
-          <span className="font-body font-semibold">ಶ್ರೀಶಿರಡಿ ಸಾಯಿ ಎಜುಕೇಷನಲ್ ಟ್ರಸ್ಟ್ (ರಿ.)</span>
-          <div className="hidden sm:flex items-center gap-4">
+      <div className="bg-primary text-primary-foreground text-xs py-2">
+        <div className="container flex flex-col items-center gap-1">
+          <span className="font-display text-sm font-bold tracking-wide text-center w-full">ಶ್ರೀಶಿರಡಿ ಸಾಯಿ ಎಜುಕೇಷನಲ್ ಟ್ರಸ್ಟ್ (ರಿ.)</span>
+          <div className="flex items-center gap-4 flex-wrap justify-center">
             <span className="text-secondary font-semibold">✅ Recognized by Government of Karnataka</span>
             <a href="tel:7676272167" className="hover:text-secondary transition-colors">📞 7676272167</a>
             <a href="mailto:principal.hoysaladegreecollege@gmail.com" className="hover:text-secondary transition-colors">📧 Mail Us</a>

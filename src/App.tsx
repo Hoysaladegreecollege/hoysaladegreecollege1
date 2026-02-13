@@ -43,6 +43,7 @@ import TeacherMarks from "./pages/dashboard/teacher/TeacherMarks";
 import TeacherAbsent from "./pages/dashboard/teacher/TeacherAbsent";
 import TeacherMaterials from "./pages/dashboard/teacher/TeacherMaterials";
 import TeacherNotices from "./pages/dashboard/teacher/TeacherNotices";
+import TeacherTimetable from "./pages/dashboard/teacher/TeacherTimetable";
 
 // Principal Dashboard
 import PrincipalDashboard from "./pages/dashboard/PrincipalDashboard";
@@ -132,6 +133,7 @@ const App = () => (
             <Route path="/dashboard/teacher/absent" element={<TeacherRoute><TeacherAbsent /></TeacherRoute>} />
             <Route path="/dashboard/teacher/materials" element={<TeacherRoute><TeacherMaterials /></TeacherRoute>} />
             <Route path="/dashboard/teacher/notices" element={<TeacherRoute><TeacherNotices /></TeacherRoute>} />
+            <Route path="/dashboard/teacher/timetable" element={<TeacherRoute><TeacherTimetable /></TeacherRoute>} />
 
             {/* Principal */}
             <Route path="/dashboard/principal" element={<PrincipalRoute><PrincipalDashboard /></PrincipalRoute>} />
