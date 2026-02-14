@@ -2,7 +2,7 @@ import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { FileText, CheckCircle, Calendar, ArrowRight, X } from "lucide-react";
+import { FileText, CheckCircle, Calendar, ArrowRight, X, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -59,57 +59,73 @@ export default function Admissions() {
     else { toast.success("Application submitted successfully!"); setForm(initialForm); setShowForm(false); }
   };
 
+  const inputClass = "w-full border border-border rounded-xl px-3 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all";
+
   return (
     <div>
       <section className="bg-primary py-16 text-center text-primary-foreground">
-        <div className="container">
-          <h1 className="font-display text-4xl md:text-5xl font-bold">Admissions</h1>
+        <div className="container px-4">
+          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold">Admissions</h1>
           <p className="font-body text-sm mt-2 opacity-70">Home / Admissions</p>
         </div>
       </section>
 
-      <section className="bg-secondary/10 py-6">
-        <div className="container flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Calendar className="w-6 h-6 text-secondary" />
+      {/* CTA Banner with prominent Apply Now */}
+      <section className="bg-gradient-to-r from-secondary/20 via-secondary/10 to-primary/5 py-8 sm:py-10">
+        <div className="container px-4 flex flex-col sm:flex-row items-center justify-between gap-5">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-secondary/20 flex items-center justify-center shrink-0">
+              <Calendar className="w-7 h-7 text-secondary" />
+            </div>
             <div>
-              <p className="font-display text-lg font-bold text-foreground">Admissions Open for 2026–27</p>
+              <p className="font-display text-xl sm:text-2xl font-bold text-foreground">Admissions Open 2026–27</p>
               <p className="font-body text-sm text-muted-foreground">Apply now for BCA, B.Com, BBA, CA & CS programs</p>
             </div>
           </div>
-          <Button className="font-body bg-primary text-primary-foreground" onClick={() => setShowForm(true)}>Apply Online</Button>
+          <Button
+            onClick={() => setShowForm(true)}
+            size="lg"
+            className="font-body bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl text-base px-8 py-6 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 group w-full sm:w-auto"
+          >
+            <Sparkles className="w-5 h-5 mr-2 group-hover:animate-pulse" />
+            Apply Now
+            <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+          </Button>
         </div>
       </section>
 
       {/* Application Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-foreground/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-card rounded-xl border border-border w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 animate-fade-in-up">
+        <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-card rounded-2xl border border-border w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 animate-fade-in-up shadow-2xl">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="font-display text-xl font-bold text-foreground">Online Application Form</h2>
-              <button onClick={() => setShowForm(false)} className="text-muted-foreground hover:text-foreground"><X className="w-5 h-5" /></button>
+              <div>
+                <h2 className="font-display text-xl font-bold text-foreground">Online Application Form</h2>
+                <p className="font-body text-xs text-muted-foreground mt-1">Fill all required fields marked with *</p>
+              </div>
+              <button onClick={() => setShowForm(false)} className="text-muted-foreground hover:text-foreground p-1 rounded-lg hover:bg-muted transition-colors"><X className="w-5 h-5" /></button>
             </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="font-body text-sm font-medium text-foreground block mb-1">Full Name *</label>
-                  <input name="full_name" value={form.full_name} onChange={handleChange} required className="w-full border border-border rounded-lg px-3 py-2 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Full Name *</label>
+                  <input name="full_name" value={form.full_name} onChange={handleChange} required className={inputClass} />
                 </div>
                 <div>
-                  <label className="font-body text-sm font-medium text-foreground block mb-1">Email *</label>
-                  <input name="email" type="email" value={form.email} onChange={handleChange} required className="w-full border border-border rounded-lg px-3 py-2 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Email *</label>
+                  <input name="email" type="email" value={form.email} onChange={handleChange} required className={inputClass} />
                 </div>
                 <div>
-                  <label className="font-body text-sm font-medium text-foreground block mb-1">Phone *</label>
-                  <input name="phone" value={form.phone} onChange={handleChange} required className="w-full border border-border rounded-lg px-3 py-2 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Phone *</label>
+                  <input name="phone" value={form.phone} onChange={handleChange} required className={inputClass} />
                 </div>
                 <div>
-                  <label className="font-body text-sm font-medium text-foreground block mb-1">Date of Birth</label>
-                  <input name="date_of_birth" type="date" value={form.date_of_birth} onChange={handleChange} className="w-full border border-border rounded-lg px-3 py-2 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Date of Birth</label>
+                  <input name="date_of_birth" type="date" value={form.date_of_birth} onChange={handleChange} className={inputClass} />
                 </div>
                 <div>
-                  <label className="font-body text-sm font-medium text-foreground block mb-1">Gender</label>
-                  <select name="gender" value={form.gender} onChange={handleChange} className="w-full border border-border rounded-lg px-3 py-2 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30">
+                  <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Gender</label>
+                  <select name="gender" value={form.gender} onChange={handleChange} className={inputClass}>
                     <option value="">Select</option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
@@ -117,8 +133,8 @@ export default function Admissions() {
                   </select>
                 </div>
                 <div>
-                  <label className="font-body text-sm font-medium text-foreground block mb-1">Course *</label>
-                  <select name="course" value={form.course} onChange={handleChange} required className="w-full border border-border rounded-lg px-3 py-2 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30">
+                  <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Course *</label>
+                  <select name="course" value={form.course} onChange={handleChange} required className={inputClass}>
                     <option value="">Select Course</option>
                     <option value="BCA">BCA</option>
                     <option value="B.Com Regular">B.Com Regular</option>
@@ -127,41 +143,44 @@ export default function Admissions() {
                   </select>
                 </div>
                 <div>
-                  <label className="font-body text-sm font-medium text-foreground block mb-1">Father's Name</label>
-                  <input name="father_name" value={form.father_name} onChange={handleChange} className="w-full border border-border rounded-lg px-3 py-2 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Father's Name</label>
+                  <input name="father_name" value={form.father_name} onChange={handleChange} className={inputClass} />
                 </div>
                 <div>
-                  <label className="font-body text-sm font-medium text-foreground block mb-1">Mother's Name</label>
-                  <input name="mother_name" value={form.mother_name} onChange={handleChange} className="w-full border border-border rounded-lg px-3 py-2 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Mother's Name</label>
+                  <input name="mother_name" value={form.mother_name} onChange={handleChange} className={inputClass} />
                 </div>
                 <div>
-                  <label className="font-body text-sm font-medium text-foreground block mb-1">Previous PU College</label>
-                  <input name="previous_school" value={form.previous_school} onChange={handleChange} className="w-full border border-border rounded-lg px-3 py-2 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Previous PU College</label>
+                  <input name="previous_school" value={form.previous_school} onChange={handleChange} className={inputClass} />
                 </div>
                 <div>
-                  <label className="font-body text-sm font-medium text-foreground block mb-1">12th Percentage</label>
-                  <input name="percentage_12th" value={form.percentage_12th} onChange={handleChange} className="w-full border border-border rounded-lg px-3 py-2 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  <label className="font-body text-xs font-semibold text-foreground block mb-1.5">12th Percentage</label>
+                  <input name="percentage_12th" value={form.percentage_12th} onChange={handleChange} className={inputClass} />
                 </div>
               </div>
               <div>
-                <label className="font-body text-sm font-medium text-foreground block mb-1">Address</label>
-                <textarea name="address" value={form.address} onChange={handleChange as any} rows={2} className="w-full border border-border rounded-lg px-3 py-2 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Address</label>
+                <textarea name="address" value={form.address} onChange={handleChange as any} rows={2} className={`${inputClass} resize-none`} />
               </div>
-              <Button type="submit" disabled={submitting} className="w-full font-body bg-primary text-primary-foreground">
-                {submitting ? "Submitting..." : "Submit Application"}
-              </Button>
+              <div className="flex gap-3">
+                <Button type="button" variant="outline" onClick={() => setShowForm(false)} className="font-body rounded-xl flex-1">Cancel</Button>
+                <Button type="submit" disabled={submitting} className="font-body rounded-xl flex-1 bg-primary text-primary-foreground">
+                  {submitting ? "Submitting..." : "Submit Application"}
+                </Button>
+              </div>
             </form>
           </div>
         </div>
       )}
 
-      <section className="py-20 bg-background">
-        <div className="container max-w-4xl">
+      <section className="py-16 sm:py-20 bg-background">
+        <div className="container max-w-4xl px-4">
           <SectionHeading title="Admission Process" subtitle="Follow these simple steps to join Hoysala Degree College" />
-          <div className="space-y-6">
+          <div className="space-y-5">
             {steps.map((s, i) => (
               <ScrollReveal key={s.step} delay={i * 100}>
-                <div className="flex gap-4 items-start bg-card border border-border rounded-xl p-5 hover-lift">
+                <div className="flex gap-4 items-start bg-card border border-border rounded-2xl p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
                   <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-display font-bold text-lg shrink-0">{s.step}</div>
                   <div>
                     <h3 className="font-display text-lg font-semibold text-foreground">{s.title}</h3>
@@ -175,9 +194,9 @@ export default function Admissions() {
       </section>
 
       <section className="py-16 bg-cream">
-        <div className="container max-w-3xl">
+        <div className="container max-w-3xl px-4">
           <SectionHeading title="Required Documents" />
-          <div className="bg-card border border-border rounded-xl p-6 space-y-3">
+          <div className="bg-card border border-border rounded-2xl p-6 space-y-3">
             {documents.map((d) => (
               <div key={d} className="flex items-center gap-3 font-body text-sm text-foreground"><CheckCircle className="w-4 h-4 text-secondary shrink-0" />{d}</div>
             ))}
@@ -186,10 +205,13 @@ export default function Admissions() {
       </section>
 
       <section className="py-16 bg-background">
-        <div className="container text-center">
+        <div className="container text-center px-4">
           <h2 className="font-display text-2xl font-bold text-foreground mb-4">Have Questions?</h2>
           <p className="font-body text-muted-foreground mb-6">Our admissions team is here to help.</p>
-          <Link to="/contact"><Button variant="outline" className="font-body">Contact Admissions <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="tel:7676272167"><Button variant="outline" className="font-body rounded-xl">📞 Call: 7676272167</Button></a>
+            <Link to="/contact"><Button variant="outline" className="font-body rounded-xl">Contact Admissions <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
+          </div>
         </div>
       </section>
     </div>
