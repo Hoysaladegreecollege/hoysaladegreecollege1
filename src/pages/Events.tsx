@@ -4,26 +4,24 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { Calendar, Image as ImageIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const fallbackEvents = [
-  { id: "1", title: "Annual Sports Day 2026", event_date: "2026-03-15", category: "Sports", description: "Inter-college sports competition featuring athletics, cricket, basketball and more.", image_url: "" },
-  { id: "2", title: "Tech Fest – InnoVate 2026", event_date: "2026-02-28", category: "Technical", description: "Annual technical festival with coding competitions, hackathons, and tech talks.", image_url: "" },
-  { id: "3", title: "Cultural Night – Utsav", event_date: "2026-04-05", category: "Cultural", description: "A night of dance, music, drama, and art celebrating the diverse culture of our students.", image_url: "" },
+  { id: "1", title: "Annual Sports Day 2026", event_date: "2026-03-15", category: "Sports", description: "Inter-college sports competition.", image_url: "" },
+  { id: "2", title: "Tech Fest – InnoVate 2026", event_date: "2026-02-28", category: "Technical", description: "Annual technical festival.", image_url: "" },
+  { id: "3", title: "Cultural Night – Utsav", event_date: "2026-04-05", category: "Cultural", description: "A night of dance, music, and art.", image_url: "" },
 ];
 
 const categories = ["All", "General", "Sports", "Technical", "Cultural", "Workshop", "Academic", "NSS", "Placement", "Seminar"];
 
 export default function Events() {
   const [filter, setFilter] = useState("All");
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
 
   const { data: dbEvents = [] } = useQuery({
     queryKey: ["public-events"],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("events")
-        .select("*")
-        .eq("is_active", true)
-        .order("event_date", { ascending: false });
+      const { data } = await supabase.from("events").select("*").eq("is_active", true).order("event_date", { ascending: false });
       return data || [];
     },
   });
@@ -42,17 +40,14 @@ export default function Events() {
 
       <section className="py-16 sm:py-20 bg-background">
         <div className="container px-4">
-          <SectionHeading title="College Events" subtitle="Explore our vibrant campus life through events and activities" />
+          <SectionHeading title="College Events" subtitle="Explore our vibrant campus life" />
 
           <div className="flex flex-wrap gap-2 justify-center mb-10">
             {categories.map((c) => (
-              <button
-                key={c}
-                onClick={() => setFilter(c)}
+              <button key={c} onClick={() => setFilter(c)}
                 className={`font-body text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition-all duration-200 ${
                   filter === c ? "bg-primary text-primary-foreground shadow-md" : "bg-muted text-muted-foreground hover:bg-muted/80"
-                }`}
-              >
+                }`}>
                 {c}
               </button>
             ))}
@@ -61,7 +56,7 @@ export default function Events() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
             {filtered.map((e: any, i: number) => (
               <ScrollReveal key={e.id} delay={i * 80}>
-                <div className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div onClick={() => setSelectedEvent(e)} className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer">
                   {e.image_url ? (
                     <img src={e.image_url} alt={e.title} className="h-48 w-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   ) : (
@@ -88,6 +83,35 @@ export default function Events() {
           {filtered.length === 0 && <p className="text-center font-body text-muted-foreground py-12">No events found for this category.</p>}
         </div>
       </section>
+
+      {/* Event Detail Dialog */}
+      <Dialog open={!!selectedEvent} onOpenChange={() => setSelectedEvent(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          {selectedEvent && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="font-display text-2xl">{selectedEvent.title}</DialogTitle>
+              </DialogHeader>
+              {selectedEvent.image_url && (
+                <img src={selectedEvent.image_url} alt={selectedEvent.title} className="w-full rounded-xl object-cover max-h-80" />
+              )}
+              <div className="space-y-3 mt-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-body font-bold px-2.5 py-1 rounded-full bg-secondary/20 text-secondary-foreground">{selectedEvent.category}</span>
+                  {selectedEvent.event_date && (
+                    <span className="text-sm font-body text-muted-foreground flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5" /> {new Date(selectedEvent.event_date).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
+                    </span>
+                  )}
+                </div>
+                {selectedEvent.description && (
+                  <p className="font-body text-muted-foreground leading-relaxed whitespace-pre-line">{selectedEvent.description}</p>
+                )}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
