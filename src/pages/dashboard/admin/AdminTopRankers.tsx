@@ -4,14 +4,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Plus, Trophy, Trash2 } from "lucide-react";
+import { Plus, Trophy, Trash2, Upload } from "lucide-react";
 
 export default function AdminTopRankers() {
   const { user } = useAuth();
   const qc = useQueryClient();
-  const [form, setForm] = useState({ student_name: "", course: "", rank: "1", year: "2024-25", photo_url: "" });
+  const [form, setForm] = useState({ student_name: "", course: "", rank: "1", year: "2024-25" });
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
 
-  const { data: rankers = [] } = useQuery({
+  const { data: rankers = [], isLoading } = useQuery({
     queryKey: ["admin-top-rankers"],
     queryFn: async () => {
       const { data } = await supabase.from("top_students").select("*").order("rank");
@@ -21,22 +23,38 @@ export default function AdminTopRankers() {
 
   const addRanker = useMutation({
     mutationFn: async () => {
+      setUploading(true);
+      let photo_url: string | null = null;
+
+      if (photoFile) {
+        const ext = photoFile.name.split(".").pop();
+        const path = `rankers/${Date.now()}.${ext}`;
+        const { error: uploadErr } = await supabase.storage.from("uploads").upload(path, photoFile);
+        if (uploadErr) throw new Error("Photo upload failed: " + uploadErr.message);
+        const { data: urlData } = supabase.storage.from("uploads").getPublicUrl(path);
+        photo_url = urlData.publicUrl;
+      }
+
       const { error } = await supabase.from("top_students").insert({
         student_name: form.student_name,
         course: form.course,
         rank: parseInt(form.rank),
         year: form.year,
-        photo_url: form.photo_url || null,
+        photo_url,
         posted_by: user?.id,
       });
       if (error) throw error;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-top-rankers"] });
+      qc.invalidateQueries({ queryKey: ["achievements-top-students"] });
+      qc.invalidateQueries({ queryKey: ["homepage-top-students"] });
       toast.success("Top ranker added! Will appear on Achievements page.");
-      setForm({ student_name: "", course: "", rank: "1", year: "2024-25", photo_url: "" });
+      setForm({ student_name: "", course: "", rank: "1", year: "2024-25" });
+      setPhotoFile(null);
+      setUploading(false);
     },
-    onError: () => toast.error("Failed to add ranker"),
+    onError: (e: any) => { toast.error("Failed: " + e.message); setUploading(false); },
   });
 
   const toggleActive = useMutation({
@@ -68,7 +86,7 @@ export default function AdminTopRankers() {
 
       <div className="bg-card border border-border rounded-2xl p-6">
         <h3 className="font-body text-sm font-bold text-foreground mb-4">Add New Ranker</h3>
-        <form onSubmit={(e) => { e.preventDefault(); addRanker.mutate(); }} className="grid sm:grid-cols-2 gap-4">
+        <form onSubmit={(e) => { e.preventDefault(); if (!photoFile) { toast.error("Please upload a photo"); return; } addRanker.mutate(); }} className="grid sm:grid-cols-2 gap-4">
           <div>
             <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Student Name *</label>
             <input value={form.student_name} onChange={(e) => setForm({ ...form, student_name: e.target.value })} required className={inputClass} />
@@ -86,18 +104,26 @@ export default function AdminTopRankers() {
             <input value={form.year} onChange={(e) => setForm({ ...form, year: e.target.value })} required className={inputClass} />
           </div>
           <div className="sm:col-span-2">
-            <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Photo URL (optional)</label>
-            <input value={form.photo_url} onChange={(e) => setForm({ ...form, photo_url: e.target.value })} placeholder="https://..." className={inputClass} />
+            <label className="font-body text-xs font-semibold text-foreground block mb-1.5 flex items-center gap-1">
+              <Upload className="w-3 h-3" /> Upload Photo *
+            </label>
+            <input type="file" accept="image/*" onChange={(e) => setPhotoFile(e.target.files?.[0] || null)} required
+              className="w-full font-body text-sm file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-primary/10 file:text-primary file:font-semibold file:text-xs hover:file:bg-primary/20 cursor-pointer" />
+            {photoFile && <p className="font-body text-xs text-muted-foreground mt-1">Selected: {photoFile.name}</p>}
           </div>
           <div className="sm:col-span-2">
-            <Button type="submit" className="font-body rounded-xl"><Plus className="w-4 h-4 mr-2" /> Add Ranker</Button>
+            <Button type="submit" disabled={uploading} className="font-body rounded-xl">
+              {uploading ? "Uploading..." : <><Plus className="w-4 h-4 mr-2" /> Add Ranker</>}
+            </Button>
           </div>
         </form>
       </div>
 
       <div className="bg-card border border-border rounded-2xl p-6">
         <h3 className="font-body text-sm font-bold text-foreground mb-4">Current Top Rankers ({rankers.length})</h3>
-        {rankers.length === 0 ? (
+        {isLoading ? (
+          <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-16 bg-muted/50 rounded-xl animate-pulse" />)}</div>
+        ) : rankers.length === 0 ? (
           <p className="font-body text-sm text-muted-foreground text-center py-6">No rankers added yet.</p>
         ) : (
           <div className="space-y-3">
