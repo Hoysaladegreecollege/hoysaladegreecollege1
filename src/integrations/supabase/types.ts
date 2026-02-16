@@ -55,6 +55,7 @@ export type Database = {
       admission_applications: {
         Row: {
           address: string | null
+          application_number: string | null
           course: string
           created_at: string
           date_of_birth: string | null
@@ -66,6 +67,7 @@ export type Database = {
           mother_name: string | null
           percentage_12th: string | null
           phone: string
+          photo_url: string | null
           previous_school: string | null
           review_notes: string | null
           reviewed_by: string | null
@@ -73,6 +75,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          application_number?: string | null
           course: string
           created_at?: string
           date_of_birth?: string | null
@@ -84,6 +87,7 @@ export type Database = {
           mother_name?: string | null
           percentage_12th?: string | null
           phone: string
+          photo_url?: string | null
           previous_school?: string | null
           review_notes?: string | null
           reviewed_by?: string | null
@@ -91,6 +95,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          application_number?: string | null
           course?: string
           created_at?: string
           date_of_birth?: string | null
@@ -102,6 +107,7 @@ export type Database = {
           mother_name?: string | null
           percentage_12th?: string | null
           phone?: string
+          photo_url?: string | null
           previous_school?: string | null
           review_notes?: string | null
           reviewed_by?: string | null
