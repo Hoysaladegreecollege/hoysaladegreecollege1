@@ -4,13 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Plus, Calendar, Trash2, Image, Upload } from "lucide-react";
+import { Plus, Calendar, Trash2, Image, Upload, ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function AdminEvents() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [form, setForm] = useState({ title: "", description: "", event_date: "", category: "General" });
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
 
   const { data: events = [], isLoading } = useQuery({
@@ -24,21 +25,27 @@ export default function AdminEvents() {
   const addEvent = useMutation({
     mutationFn: async () => {
       setUploading(true);
-      let image_url: string | null = null;
+      const uploadedUrls: string[] = [];
 
-      // Upload image if provided
-      if (imageFile) {
-        const ext = imageFile.name.split(".").pop();
-        const path = `events/${Date.now()}.${ext}`;
-        const { error: uploadErr } = await supabase.storage.from("uploads").upload(path, imageFile);
-        if (uploadErr) throw new Error("Image upload failed: " + uploadErr.message);
+      for (const file of imageFiles) {
+        const ext = file.name.split(".").pop();
+        const path = `events/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error: uploadErr } = await supabase.storage.from("uploads").upload(path, file);
+        if (uploadErr) throw new Error("Upload failed: " + uploadErr.message);
         const { data: urlData } = supabase.storage.from("uploads").getPublicUrl(path);
-        image_url = urlData.publicUrl;
+        uploadedUrls.push(urlData.publicUrl);
+      }
+
+      const image_url = uploadedUrls[0] || null;
+      // Store additional images in description
+      let description = form.description || "";
+      if (uploadedUrls.length > 1) {
+        description += `\n\n---gallery---\n${uploadedUrls.join("\n")}`;
       }
 
       const { error } = await supabase.from("events").insert({
         title: form.title,
-        description: form.description,
+        description,
         event_date: form.event_date || null,
         category: form.category,
         image_url,
@@ -51,7 +58,7 @@ export default function AdminEvents() {
       qc.invalidateQueries({ queryKey: ["public-events"] });
       toast.success("Event posted! It will appear on the website.");
       setForm({ title: "", description: "", event_date: "", category: "General" });
-      setImageFile(null);
+      setImageFiles([]);
       setUploading(false);
     },
     onError: (e: any) => { toast.error("Failed: " + e.message); setUploading(false); },
@@ -78,15 +85,17 @@ export default function AdminEvents() {
   return (
     <div className="space-y-6">
       <div className="bg-gradient-to-r from-primary/5 to-secondary/5 border border-border rounded-2xl p-6">
-        <h2 className="font-display text-xl font-bold text-foreground flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-secondary" /> Events Management
-        </h2>
-        <p className="font-body text-sm text-muted-foreground mt-1">Post events with images that appear on the website</p>
+        <div className="flex items-center gap-3 mb-2">
+          <Link to="/dashboard/admin" className="p-2 rounded-xl hover:bg-muted transition-colors"><ArrowLeft className="w-4 h-4" /></Link>
+          <Calendar className="w-5 h-5 text-secondary" />
+          <h2 className="font-display text-xl font-bold text-foreground">Events Management</h2>
+        </div>
+        <p className="font-body text-sm text-muted-foreground ml-11">Post events with multiple images/videos that appear on the website</p>
       </div>
 
       <div className="bg-card border border-border rounded-2xl p-6">
         <h3 className="font-body text-sm font-bold text-foreground mb-4">Post New Event</h3>
-        <form onSubmit={(e) => { e.preventDefault(); if (!form.title) { toast.error("Title is required"); return; } if (!imageFile) { toast.error("Please upload an image or video"); return; } addEvent.mutate(); }} className="grid sm:grid-cols-2 gap-4">
+        <form onSubmit={(e) => { e.preventDefault(); if (!form.title) { toast.error("Title is required"); return; } if (imageFiles.length === 0) { toast.error("Please upload at least one image/video"); return; } addEvent.mutate(); }} className="grid sm:grid-cols-2 gap-4">
           <div className="sm:col-span-2">
             <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Title *</label>
             <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required className={inputClass} />
@@ -107,11 +116,13 @@ export default function AdminEvents() {
           </div>
           <div className="sm:col-span-2">
             <label className="font-body text-xs font-semibold text-foreground block mb-1.5 flex items-center gap-1">
-              <Upload className="w-3 h-3" /> Upload Image / Video *
+              <Upload className="w-3 h-3" /> Upload Images / Videos * (Multiple allowed)
             </label>
-            <input type="file" accept="image/*,video/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+            <input type="file" accept="image/*,video/*" multiple onChange={(e) => setImageFiles(Array.from(e.target.files || []))}
               className="w-full font-body text-sm file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-primary/10 file:text-primary file:font-semibold file:text-xs hover:file:bg-primary/20 cursor-pointer" />
-            {imageFile && <p className="font-body text-xs text-muted-foreground mt-1">Selected: {imageFile.name}</p>}
+            {imageFiles.length > 0 && (
+              <p className="font-body text-xs text-muted-foreground mt-1">{imageFiles.length} file(s) selected: {imageFiles.map(f => f.name).join(", ")}</p>
+            )}
           </div>
           <div className="sm:col-span-2">
             <Button type="submit" disabled={uploading} className="font-body rounded-xl">

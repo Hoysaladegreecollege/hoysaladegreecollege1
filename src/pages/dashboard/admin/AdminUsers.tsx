@@ -4,9 +4,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Search, Trash2, Edit3, X, Save, Users, Phone, UserPlus, Eye } from "lucide-react";
+import { Search, Trash2, Edit3, X, Save, Users, Phone, UserPlus, Eye, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Link } from "react-router-dom";
 
 export default function AdminUsers() {
   const { user } = useAuth();
@@ -17,6 +18,7 @@ export default function AdminUsers() {
   const [editForm, setEditForm] = useState({ full_name: "", phone: "", roll_number: "", semester: "", parent_phone: "", address: "" });
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [viewStudent, setViewStudent] = useState<any>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<any>(null);
   const [newStudent, setNewStudent] = useState({
     full_name: "", email: "", password: "", phone: "", date_of_birth: "",
     roll_number: "", course_id: "", semester: "1", admission_year: new Date().getFullYear().toString(),
@@ -59,7 +61,6 @@ export default function AdminUsers() {
     mutationFn: async ({ userId, full_name, phone, roll_number, semester, parent_phone, address }: any) => {
       const { error } = await supabase.from("profiles").update({ full_name, phone }).eq("user_id", userId);
       if (error) throw error;
-      // Update student details too
       const studentUpdate: any = {};
       if (roll_number) studentUpdate.roll_number = roll_number;
       if (semester) studentUpdate.semester = parseInt(semester);
@@ -76,21 +77,19 @@ export default function AdminUsers() {
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
       const { data, error } = await supabase.functions.invoke("delete-user", { body: { userId } });
-      if (error) throw error;
+      if (error) throw new Error(error.message || "Delete failed");
       if (data?.error) throw new Error(data.error);
     },
-    onSuccess: () => { toast.success("User deleted successfully!"); queryClient.invalidateQueries({ queryKey: ["admin-users"] }); },
+    onSuccess: () => {
+      toast.success("User deleted successfully!");
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      setDeleteConfirm(null);
+    },
     onError: (e: any) => toast.error(`Delete failed: ${e.message}`),
   });
 
   const addStudentMutation = useMutation({
     mutationFn: async () => {
-      // Use edge function to create user to avoid session switch
-      const { data, error } = await supabase.functions.invoke("delete-user", {
-        // We'll use a dedicated approach instead - signup creates the user
-      });
-      
-      // Sign up via auth (admin stays logged in because email confirmation is required)
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: newStudent.email,
         password: newStudent.password,
@@ -102,21 +101,23 @@ export default function AdminUsers() {
       if (authError) throw authError;
       if (!authData.user) throw new Error("Failed to create user");
 
-      // Wait for trigger
+      // Wait for trigger to create profile & student records
       await new Promise(r => setTimeout(r, 2000));
 
-      // Update profile
-      await supabase.from("profiles").update({ phone: newStudent.phone }).eq("user_id", authData.user.id);
+      // Update profile with phone
+      if (newStudent.phone) {
+        await supabase.from("profiles").update({ phone: newStudent.phone }).eq("user_id", authData.user.id);
+      }
 
       // Update student record
       const updateData: any = {
-        roll_number: newStudent.roll_number || `STU-${authData.user.id.substring(0, 8)}`,
         semester: parseInt(newStudent.semester) || 1,
         admission_year: parseInt(newStudent.admission_year),
         parent_phone: newStudent.parent_phone,
         address: newStudent.address,
         date_of_birth: newStudent.date_of_birth || null,
       };
+      if (newStudent.roll_number) updateData.roll_number = newStudent.roll_number;
       if (newStudent.course_id) updateData.course_id = newStudent.course_id;
       await supabase.from("students").update(updateData).eq("user_id", authData.user.id);
     },
@@ -153,11 +154,14 @@ export default function AdminUsers() {
     <div className="space-y-5 sm:space-y-6">
       <div className="bg-gradient-to-r from-primary/5 to-secondary/5 border border-border rounded-2xl p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-          <div>
-            <h2 className="font-display text-lg sm:text-xl font-bold text-foreground flex items-center gap-2">
-              <Users className="w-5 h-5 text-primary" /> User Management
-            </h2>
-            <p className="font-body text-xs sm:text-sm text-muted-foreground mt-1">{users.length} registered users</p>
+          <div className="flex items-center gap-3">
+            <Link to="/dashboard/admin" className="p-2 rounded-xl hover:bg-muted transition-colors"><ArrowLeft className="w-4 h-4" /></Link>
+            <div>
+              <h2 className="font-display text-lg sm:text-xl font-bold text-foreground flex items-center gap-2">
+                <Users className="w-5 h-5 text-primary" /> User Management
+              </h2>
+              <p className="font-body text-xs sm:text-sm text-muted-foreground mt-1">{users.length} registered users</p>
+            </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <div className="relative flex-1 sm:w-48">
@@ -217,25 +221,49 @@ export default function AdminUsers() {
         </DialogContent>
       </Dialog>
 
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!deleteConfirm} onOpenChange={() => setDeleteConfirm(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="font-display text-lg text-destructive">Confirm Deletion</DialogTitle>
+            <DialogDescription className="font-body text-sm">
+              Are you sure you want to permanently delete <strong>{deleteConfirm?.full_name || deleteConfirm?.email}</strong>? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-3 mt-4">
+            <Button variant="outline" onClick={() => setDeleteConfirm(null)} className="flex-1 rounded-xl font-body">Cancel</Button>
+            <Button variant="destructive" onClick={() => deleteUserMutation.mutate(deleteConfirm.user_id)} disabled={deleteUserMutation.isPending} className="flex-1 rounded-xl font-body">
+              {deleteUserMutation.isPending ? "Deleting..." : "Delete User"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* View Student Detail Dialog */}
       <Dialog open={!!viewStudent} onOpenChange={() => setViewStudent(null)}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle className="font-display">Student Details</DialogTitle>
+            <DialogTitle className="font-display text-xl">Student Details</DialogTitle>
           </DialogHeader>
           {viewStudent && (
             <div className="space-y-4 mt-2">
-              <div className="grid grid-cols-2 gap-3">
-                <div><p className="font-body text-[10px] text-muted-foreground uppercase">Name</p><p className="font-body text-sm font-semibold">{viewStudent.full_name || "—"}</p></div>
-                <div><p className="font-body text-[10px] text-muted-foreground uppercase">Email</p><p className="font-body text-sm">{viewStudent.email}</p></div>
-                <div><p className="font-body text-[10px] text-muted-foreground uppercase">Role</p><p className="font-body text-sm capitalize">{viewStudent.role}</p></div>
-                <div><p className="font-body text-[10px] text-muted-foreground uppercase">Course</p><p className="font-body text-sm">{viewStudent.student?.courses?.name || "—"}</p></div>
-                <div><p className="font-body text-[10px] text-muted-foreground uppercase">Roll Number</p><p className="font-body text-sm">{viewStudent.student?.roll_number || "—"}</p></div>
-                <div><p className="font-body text-[10px] text-muted-foreground uppercase">Semester</p><p className="font-body text-sm">{viewStudent.student?.semester || "—"}</p></div>
-                <div><p className="font-body text-[10px] text-muted-foreground uppercase">Admission Year</p><p className="font-body text-sm">{viewStudent.student?.admission_year || "—"}</p></div>
-                <div><p className="font-body text-[10px] text-muted-foreground uppercase">Address</p><p className="font-body text-sm">{viewStudent.student?.address || "—"}</p></div>
+              <div className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl p-4 text-center">
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
+                  <span className="text-2xl">{viewStudent.role === "teacher" ? "📚" : viewStudent.role === "admin" ? "⚙️" : "🎓"}</span>
+                </div>
+                <p className="font-display text-lg font-bold text-foreground">{viewStudent.full_name || "—"}</p>
+                <p className="font-body text-xs text-muted-foreground">{viewStudent.email}</p>
               </div>
-              <div className="flex gap-2 pt-2">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Role</p><p className="font-body text-sm font-semibold capitalize">{viewStudent.role}</p></div>
+                <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Course</p><p className="font-body text-sm font-semibold">{viewStudent.student?.courses?.name || "—"}</p></div>
+                <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Roll Number</p><p className="font-body text-sm font-semibold">{viewStudent.student?.roll_number || "—"}</p></div>
+                <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Semester</p><p className="font-body text-sm font-semibold">{viewStudent.student?.semester || "—"}</p></div>
+                <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Admission Year</p><p className="font-body text-sm font-semibold">{viewStudent.student?.admission_year || "—"}</p></div>
+                <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Phone</p><p className="font-body text-sm font-semibold">{viewStudent.phone || "—"}</p></div>
+                <div className="bg-muted/30 rounded-xl p-3 col-span-2"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Address</p><p className="font-body text-sm font-semibold">{viewStudent.student?.address || "—"}</p></div>
+              </div>
+              <div className="flex flex-wrap gap-2 pt-2">
                 {viewStudent.phone && (
                   <a href={`tel:${viewStudent.phone}`}>
                     <Button size="sm" variant="outline" className="rounded-xl font-body text-xs"><Phone className="w-3 h-3 mr-1" /> Call Student</Button>
@@ -246,6 +274,9 @@ export default function AdminUsers() {
                     <Button size="sm" variant="outline" className="rounded-xl font-body text-xs"><Phone className="w-3 h-3 mr-1" /> Call Parent</Button>
                   </a>
                 )}
+                <Button size="sm" variant="outline" onClick={() => { setViewStudent(null); startEdit(viewStudent); }} className="rounded-xl font-body text-xs">
+                  <Edit3 className="w-3 h-3 mr-1" /> Edit Details
+                </Button>
               </div>
             </div>
           )}
@@ -301,8 +332,8 @@ export default function AdminUsers() {
                   </select>
                   <button onClick={() => setViewStudent(u)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors" title="View"><Eye className="w-4 h-4" /></button>
                   <button onClick={() => startEdit(u)} className="p-1.5 rounded-lg hover:bg-primary/10 text-primary transition-colors" title="Edit"><Edit3 className="w-4 h-4" /></button>
-                  <button onClick={() => { if (confirm(`Delete ${u.full_name || u.email}? This cannot be undone.`)) deleteUserMutation.mutate(u.user_id); }}
-                    className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors opacity-0 group-hover:opacity-100" title="Delete"><Trash2 className="w-4 h-4" /></button>
+                  <button onClick={() => setDeleteConfirm(u)}
+                    className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors" title="Delete"><Trash2 className="w-4 h-4" /></button>
                 </div>
               </div>
             )}

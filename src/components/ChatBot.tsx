@@ -39,15 +39,19 @@ export default function ChatBot() {
   const handleSend = async (text: string) => {
     if (!text.trim() || isLoading) return;
     const userMsg = text.trim();
-    setMessages((prev) => [...prev, { role: "user", text: userMsg }]);
+    const newMessages = [...messages, { role: "user" as const, text: userMsg }];
+    setMessages(newMessages);
     setInput("");
     setIsLoading(true);
 
     setMessages((prev) => [...prev, { role: "bot", text: "", typing: true }]);
 
     try {
+      // Send conversation history for context
+      const history = newMessages.filter(m => !m.typing).slice(-8).map(m => ({ role: m.role, text: m.text }));
+      
       const { data, error } = await supabase.functions.invoke("chat", {
-        body: { message: userMsg },
+        body: { message: userMsg, history },
       });
 
       const reply = data?.reply || "I'm sorry, I couldn't process that. Please call 7676272167 for help.";

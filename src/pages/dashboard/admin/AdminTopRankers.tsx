@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Plus, Trophy, Trash2, Upload } from "lucide-react";
+import { Plus, Trophy, Trash2, Upload, ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function AdminTopRankers() {
   const { user } = useAuth();
@@ -23,17 +24,15 @@ export default function AdminTopRankers() {
 
   const addRanker = useMutation({
     mutationFn: async () => {
+      if (!photoFile) throw new Error("Photo is required");
       setUploading(true);
-      let photo_url: string | null = null;
 
-      if (photoFile) {
-        const ext = photoFile.name.split(".").pop();
-        const path = `rankers/${Date.now()}.${ext}`;
-        const { error: uploadErr } = await supabase.storage.from("uploads").upload(path, photoFile);
-        if (uploadErr) throw new Error("Photo upload failed: " + uploadErr.message);
-        const { data: urlData } = supabase.storage.from("uploads").getPublicUrl(path);
-        photo_url = urlData.publicUrl;
-      }
+      const ext = photoFile.name.split(".").pop();
+      const path = `rankers/${Date.now()}.${ext}`;
+      const { error: uploadErr } = await supabase.storage.from("uploads").upload(path, photoFile);
+      if (uploadErr) throw new Error("Photo upload failed: " + uploadErr.message);
+      const { data: urlData } = supabase.storage.from("uploads").getPublicUrl(path);
+      const photo_url = urlData.publicUrl;
 
       const { error } = await supabase.from("top_students").insert({
         student_name: form.student_name,
@@ -49,7 +48,7 @@ export default function AdminTopRankers() {
       qc.invalidateQueries({ queryKey: ["admin-top-rankers"] });
       qc.invalidateQueries({ queryKey: ["achievements-top-students"] });
       qc.invalidateQueries({ queryKey: ["homepage-top-students"] });
-      toast.success("Top ranker added! Will appear on Achievements page.");
+      toast.success("Top ranker added! Will appear on the website.");
       setForm({ student_name: "", course: "", rank: "1", year: "2024-25" });
       setPhotoFile(null);
       setUploading(false);
@@ -78,15 +77,17 @@ export default function AdminTopRankers() {
   return (
     <div className="space-y-6">
       <div className="bg-gradient-to-r from-primary/5 to-secondary/5 border border-border rounded-2xl p-6">
-        <h2 className="font-display text-xl font-bold text-foreground flex items-center gap-2">
-          <Trophy className="w-5 h-5 text-secondary" /> Upload Top Rankers
-        </h2>
-        <p className="font-body text-sm text-muted-foreground mt-1">Add top rank holders — they appear automatically on the Achievements page</p>
+        <div className="flex items-center gap-3 mb-2">
+          <Link to="/dashboard/admin" className="p-2 rounded-xl hover:bg-muted transition-colors"><ArrowLeft className="w-4 h-4" /></Link>
+          <Trophy className="w-5 h-5 text-secondary" />
+          <h2 className="font-display text-xl font-bold text-foreground">Upload Top Rankers</h2>
+        </div>
+        <p className="font-body text-sm text-muted-foreground ml-11">Add top rank holders — they appear automatically on the Achievements page & homepage</p>
       </div>
 
       <div className="bg-card border border-border rounded-2xl p-6">
         <h3 className="font-body text-sm font-bold text-foreground mb-4">Add New Ranker</h3>
-        <form onSubmit={(e) => { e.preventDefault(); if (!photoFile) { toast.error("Please upload a photo"); return; } addRanker.mutate(); }} className="grid sm:grid-cols-2 gap-4">
+        <form onSubmit={(e) => { e.preventDefault(); if (!photoFile) { toast.error("Please upload a photo — it's required"); return; } addRanker.mutate(); }} className="grid sm:grid-cols-2 gap-4">
           <div>
             <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Student Name *</label>
             <input value={form.student_name} onChange={(e) => setForm({ ...form, student_name: e.target.value })} required className={inputClass} />
@@ -105,7 +106,7 @@ export default function AdminTopRankers() {
           </div>
           <div className="sm:col-span-2">
             <label className="font-body text-xs font-semibold text-foreground block mb-1.5 flex items-center gap-1">
-              <Upload className="w-3 h-3" /> Upload Photo *
+              <Upload className="w-3 h-3" /> Upload Photo from Device * (Required)
             </label>
             <input type="file" accept="image/*" onChange={(e) => setPhotoFile(e.target.files?.[0] || null)} required
               className="w-full font-body text-sm file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-primary/10 file:text-primary file:font-semibold file:text-xs hover:file:bg-primary/20 cursor-pointer" />

@@ -1,9 +1,9 @@
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const SYSTEM_PROMPT = `You are the official AI assistant for Hoysala Degree College, Nelamangala, Bangalore.
+const SYSTEM_PROMPT = `You are the official AI assistant for Hoysala Degree College, Nelamangala, Bangalore. You are friendly, helpful, and knowledgeable.
 
 College Info:
 - Established: 2017 under Shri Shirdi Sai Educational Trust(R)
@@ -12,42 +12,73 @@ College Info:
 - Location: K.R.P. Arcade, UCO Bank Building, Paramanna Layout, Nelamangala Town, Bengaluru Rural Dist. - 562 123
 - Principal: Sri Gopal H.R (M.Sc, M.Ed, TET, KSET, Ph.D)
 
-Courses: BCA, B.Com Regular, B.Com Professional, BBA, CA/CS/CMA coaching
-Contact: 7676272167, 7975344252, 8618181383, 7892508243
+Courses Offered:
+1. BCA (Bachelor of Computer Applications) - 3 Years, Fee: ₹35,000/year, Eligibility: 10+2 with Maths/CS, min 45%
+2. B.Com Regular - 3 Years, Fee: ₹25,000/year, Eligibility: 10+2 any stream, min 40%
+3. B.Com Professional (CA/CS/CMA coaching included) - 3 Years, Fee: ₹30,000/year
+4. BBA (Bachelor of Business Administration) - 3 Years, Fee: ₹30,000/year
+5. CA/CS Coaching - Integrated with B.Com Professional
+
+Contact Numbers: 7676272167, 7975344252, 8618181383, 7892508243
 Email: principal.hoysaladegreecollege@gmail.com
 
-Facilities: Sophisticated Library, NSS, Student Counseling Cell, Placement Cell, Daily Attendance SMS, Monthly Internals, Weekly CA/CS Tests, AI & ML Workshops
+Key Features:
+- Experienced faculty with industry experience
+- Exclusive CA, CS & CMA coaching classes
+- Add-on courses: AI, ML, Python, Java, Web Design for BCA; Tally, Excel, Aptitude for BCom/BBA
+- Daily attendance SMS to parents
+- Monthly internal assessments
+- Weekly CA/CS mock tests
+- Sophisticated library with digital resources
+- NSS Unit for social service
+- Student counseling cell
+- Active placement cell with 90% placement rate
+- Smart classrooms with digital projectors
+- Computer lab with latest software
+- Safe campus with CCTV surveillance
 
 Committees: Language Club, Commerce Forum, Management Forum, Tech Club, NSS, Mentoring Cell, Placement Cell, Student Counseling Cell, Eco Club, Anti-Ragging Cell, Women Empowerment Cell, Grievance & Redressal Cell
 
-Add-on Courses:
-- BCom/BBA: CA/CS/CMA/IBPS, Tally ERP, MS Excel, Aptitude, Soft Skills
-- BCA: AI, ML, Web Designing, Data Science, Python, Java, Computer Networking
+Admissions: Open for 2026-27. Students can apply online at the Admissions page.
 
-Admissions: Open for 2026-27. Visit /admissions page to apply online.
+Documents Required: 10th & 12th Marksheets, TC, Migration Certificate, Aadhar, Photos, Caste Certificate (if applicable)
 
-Be helpful, friendly, concise. Answer only college-related queries. For unrelated questions, politely redirect to college topics.`;
+Instructions:
+- Be conversational and friendly. Use emojis occasionally.
+- Answer college-related questions comprehensively.
+- For admission queries, guide them to apply online or call 7676272167.
+- For unrelated questions, politely say you can only help with college-related topics.
+- Keep responses concise but informative (max 200 words).
+- If asked about fees, placements, courses, or facilities, provide specific details.
+- You can understand and respond in English, Hindi, and Kannada.`;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const { message } = await req.json();
+    const { message, history } = await req.json();
     if (!message) throw new Error("Message required");
 
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
     if (!apiKey) throw new Error("API key not configured");
+
+    // Build messages array with conversation history
+    const messages: any[] = [{ role: "system", content: SYSTEM_PROMPT }];
+    
+    if (history && Array.isArray(history)) {
+      for (const h of history.slice(-6)) {
+        messages.push({ role: h.role === "bot" ? "assistant" : "user", content: h.text });
+      }
+    }
+    messages.push({ role: "user", content: message });
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
       body: JSON.stringify({
         model: "google/gemini-2.5-flash-lite",
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: message },
-        ],
-        max_tokens: 500,
+        messages,
+        max_tokens: 600,
         temperature: 0.7,
       }),
     });
@@ -58,14 +89,15 @@ Deno.serve(async (req) => {
     }
 
     const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content || "I'm sorry, I couldn't process that. Please try again.";
+    const reply = data.choices?.[0]?.message?.content || "I'm sorry, I couldn't process that. Please try again or call 7676272167.";
 
     return new Response(JSON.stringify({ reply }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
+    console.error("Chat error:", error.message);
+    return new Response(JSON.stringify({ reply: "I'm having trouble connecting right now. Please try again or call us at 7676272167 for immediate assistance! 📞" }), {
+      status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }

@@ -43,8 +43,8 @@ export default function Navbar() {
           <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-primary flex items-center justify-center">
             <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-secondary" />
           </div>
-          <div className="hidden min-[400px]:block">
-            <span className="font-display text-base sm:text-lg font-bold text-primary leading-tight block">
+          <div>
+            <span className="font-display text-sm sm:text-lg font-bold text-primary leading-tight block">
               Hoysala Degree College
             </span>
             <span className="text-[8px] sm:text-[9px] text-muted-foreground font-body tracking-wide leading-tight block">

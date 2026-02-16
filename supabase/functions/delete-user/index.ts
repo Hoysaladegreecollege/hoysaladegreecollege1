@@ -31,21 +31,25 @@ Deno.serve(async (req) => {
     if (!userId) throw new Error("userId required");
     if (userId === caller.id) throw new Error("Cannot delete yourself");
 
-    // Delete related data first (order matters for FK constraints)
-    await adminClient.from("attendance").delete().eq("student_id", userId);
-    await adminClient.from("marks").delete().eq("student_id", userId);
-    await adminClient.from("absent_notes").delete().eq("student_id", userId);
-    
-    // Get student record ID to delete attendance/marks by student table ID
+    // Get student record ID first (FK references use students.id, not user_id)
     const { data: studentRecord } = await adminClient.from("students").select("id").eq("user_id", userId).maybeSingle();
+    
     if (studentRecord) {
+      // Delete records that reference students.id
       await adminClient.from("attendance").delete().eq("student_id", studentRecord.id);
       await adminClient.from("marks").delete().eq("student_id", studentRecord.id);
       await adminClient.from("absent_notes").delete().eq("student_id", studentRecord.id);
+      // Delete student record
+      await adminClient.from("students").delete().eq("id", studentRecord.id);
     }
-    
-    await adminClient.from("students").delete().eq("user_id", userId);
+
+    // Delete teacher record if exists
     await adminClient.from("teachers").delete().eq("user_id", userId);
+    
+    // Delete study materials uploaded by this user
+    await adminClient.from("study_materials").delete().eq("uploaded_by", userId);
+    
+    // Delete role and profile
     await adminClient.from("user_roles").delete().eq("user_id", userId);
     await adminClient.from("profiles").delete().eq("user_id", userId);
 
