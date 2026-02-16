@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { GraduationCap, MapPin, Phone, Mail, Facebook, Twitter, Instagram, Youtube } from "lucide-react";
 
+const MAPS_LINK = "https://maps.app.goo.gl/YGNgC5ev7v4pJWve9";
+
 export default function Footer() {
   return (
     <footer className="bg-primary text-primary-foreground">
@@ -44,15 +46,13 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Courses */}
+          {/* Courses - now with links */}
           <div>
             <h3 className="font-display text-sm sm:text-base font-semibold mb-4">Our Courses</h3>
             <div className="flex flex-col gap-2 font-body text-xs sm:text-sm opacity-80">
-              <span>BCA</span>
-              <span>B.Com Regular</span>
-              <span>B.Com Professional</span>
-              <span>BBA</span>
-              <span>CA / CS Coaching</span>
+              {["BCA", "B.Com Regular", "B.Com Professional", "BBA", "CA / CS Coaching"].map(c => (
+                <Link key={c} to="/courses" className="hover:text-secondary transition-colors hover:translate-x-1 inline-block">{c}</Link>
+              ))}
             </div>
           </div>
 
@@ -60,10 +60,10 @@ export default function Footer() {
           <div>
             <h3 className="font-display text-sm sm:text-base font-semibold mb-4">Contact Us</h3>
             <div className="flex flex-col gap-3 font-body text-xs sm:text-sm opacity-80">
-              <div className="flex gap-2 items-start">
+              <a href={MAPS_LINK} target="_blank" rel="noopener noreferrer" className="flex gap-2 items-start hover:text-secondary transition-colors">
                 <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
                 <span>K.R.P. Arcade, UCO Bank Building, Paramanna Layout, Nelamangala Town, Bengaluru Rural Dist. - 562 123</span>
-              </div>
+              </a>
               <div className="flex gap-2 items-center flex-wrap">
                 <Phone className="w-4 h-4 shrink-0" />
                 <div className="flex flex-wrap gap-x-2 gap-y-1">

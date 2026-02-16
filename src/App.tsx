@@ -25,6 +25,7 @@ import NotFound from "./pages/NotFound";
 import Management from "./pages/Management";
 import Committees from "./pages/Committees";
 import AddOnCourses from "./pages/AddOnCourses";
+import ApplicationStatus from "./pages/ApplicationStatus";
 
 // Student Dashboard
 import StudentDashboard from "./pages/dashboard/StudentDashboard";
@@ -106,6 +107,7 @@ const App = () => (
               <Route path="/committees" element={<Committees />} />
               <Route path="/addon-courses" element={<AddOnCourses />} />
               <Route path="/student-absent" element={<StudentAbsent />} />
+              <Route path="/application-status" element={<ApplicationStatus />} />
             </Route>
 
             <Route path="/login" element={<Login />} />
