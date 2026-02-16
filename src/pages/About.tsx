@@ -1,6 +1,6 @@
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
-import { Target, Eye, BookOpen, Users, Award, Heart, MapPin, Phone, Mail, Clock, GraduationCap, Shield, Globe } from "lucide-react";
+import { Target, Eye, BookOpen, Users, Award, Heart, MapPin, Phone, Mail, Clock, GraduationCap, Shield, Globe, Briefcase, Wifi, Coffee, TrendingUp, Star } from "lucide-react";
 import heroImage from "@/assets/hero-college.jpg";
 import principalImage from "@/assets/principal.jpg";
 
@@ -18,15 +18,25 @@ const facilities = [
   { icon: Shield, title: "Safe Campus", desc: "CCTV surveillance and dedicated security for a safe learning environment." },
   { icon: Clock, title: "Flexible Timings", desc: "Morning & afternoon sessions to accommodate all students." },
   { icon: Users, title: "Student Clubs", desc: "NSS, Eco Club, Tech Club, Language Club, and many more." },
+  { icon: Wifi, title: "Wi-Fi Campus", desc: "High-speed internet across the campus for research and learning." },
+  { icon: Coffee, title: "Canteen", desc: "Hygienic and affordable food options available on campus." },
+  { icon: Briefcase, title: "Placement Cell", desc: "Dedicated cell ensuring 90% placement rate with top companies." },
 ];
 
 const quickFacts = [
   { label: "Established", value: "2017" },
   { label: "Affiliated To", value: "Bangalore University" },
-  { label: "College Code", value: "BU 26 (P21GEF0099)" },
-  { label: "Approved By", value: "AICTE, New Delhi" },
-  { label: "Programs Offered", value: "BCA, B.Com, BBA" },
+  { label: "College Code", value: "BU 26" },
+  { label: "Approved By", value: "AICTE" },
+  { label: "Programs", value: "BCA, B.Com, BBA" },
   { label: "Placement Rate", value: "90%" },
+];
+
+const achievements = [
+  { icon: TrendingUp, title: "90% Placement Record", desc: "Our students are placed in top companies across India." },
+  { icon: Star, title: "University Rank Holders", desc: "Multiple students securing university ranks every year." },
+  { icon: Award, title: "Best College Award", desc: "Recognized for academic excellence in Bengaluru Rural." },
+  { icon: GraduationCap, title: "CA/CS Toppers", desc: "Students clearing CA/CS exams in their first attempt." },
 ];
 
 export default function About() {
@@ -48,7 +58,7 @@ export default function About() {
           <ScrollReveal delay={200}>
             <div className="font-body text-muted-foreground leading-relaxed space-y-4 text-sm sm:text-base">
               <p>Hoysala Degree College, established in 2017 under Shri Shirdi Sai Educational Trust(R), is located in Nelamangala Town, Bengaluru Rural District. Affiliated to Bangalore University and approved by AICTE New Delhi, the college offers BCA, B.Com (Regular & Professional), and BBA programs.</p>
-              <p>Our institution combines modern teaching methodologies with traditional values, creating an environment where students develop both professionally and personally.</p>
+              <p>Our institution combines modern teaching methodologies with traditional values, creating an environment where students develop both professionally and personally. With experienced faculty, state-of-the-art infrastructure, and a strong focus on placements, we ensure every student is career-ready.</p>
             </div>
           </ScrollReveal>
         </div>
@@ -98,30 +108,50 @@ export default function About() {
       <section className="py-16 bg-cream">
         <div className="container grid md:grid-cols-2 gap-6 sm:gap-8 max-w-4xl px-4">
           <ScrollReveal>
-            <div className="bg-card rounded-2xl p-6 sm:p-8 border border-border hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <div className="bg-card rounded-2xl p-6 sm:p-8 border border-border hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full">
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4"><Eye className="w-6 h-6 text-primary" /></div>
               <h3 className="font-display text-xl sm:text-2xl font-bold text-foreground mb-3">Our Vision</h3>
-              <p className="font-body text-sm text-muted-foreground leading-relaxed">To be a premier institution of higher learning, recognized for academic excellence, innovation, and producing socially responsible graduates.</p>
+              <p className="font-body text-sm text-muted-foreground leading-relaxed">To be a premier institution of higher learning, recognized for academic excellence, innovation, and producing socially responsible graduates who contribute to national development.</p>
             </div>
           </ScrollReveal>
           <ScrollReveal delay={200}>
-            <div className="bg-card rounded-2xl p-6 sm:p-8 border border-border hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <div className="bg-card rounded-2xl p-6 sm:p-8 border border-border hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full">
               <div className="w-12 h-12 rounded-xl bg-secondary/20 flex items-center justify-center mb-4"><Target className="w-6 h-6 text-secondary" /></div>
               <h3 className="font-display text-xl sm:text-2xl font-bold text-foreground mb-3">Our Mission</h3>
-              <p className="font-body text-sm text-muted-foreground leading-relaxed">To provide accessible, affordable, and quality education empowering students with knowledge, skills, and values for successful careers.</p>
+              <p className="font-body text-sm text-muted-foreground leading-relaxed">To provide accessible, affordable, and quality education empowering students with knowledge, skills, and values for successful careers and meaningful lives.</p>
             </div>
           </ScrollReveal>
         </div>
       </section>
 
-      {/* Values */}
+      {/* Key Achievements */}
       <section className="py-16 sm:py-20 bg-background">
+        <div className="container px-4">
+          <ScrollReveal><SectionHeading title="Our Achievements" subtitle="Milestones that define our excellence" /></ScrollReveal>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 max-w-5xl mx-auto">
+            {achievements.map((a, i) => (
+              <ScrollReveal key={a.title} delay={i * 100}>
+                <div className="text-center bg-card rounded-2xl border border-border p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group h-full">
+                  <div className="w-12 h-12 mx-auto rounded-full bg-gradient-to-br from-secondary/20 to-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <a.icon className="w-6 h-6 text-secondary" />
+                  </div>
+                  <h4 className="font-display text-base font-semibold text-foreground mb-2">{a.title}</h4>
+                  <p className="font-body text-xs text-muted-foreground">{a.desc}</p>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Values */}
+      <section className="py-16 sm:py-20 bg-cream">
         <div className="container px-4">
           <ScrollReveal><SectionHeading title="Our Core Values" subtitle="The principles that guide everything we do" /></ScrollReveal>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {values.map((v, i) => (
               <ScrollReveal key={v.title} delay={i * 100}>
-                <div className="text-center bg-card rounded-2xl border border-border p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                <div className="text-center bg-card rounded-2xl border border-border p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full">
                   <div className="w-12 h-12 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4"><v.icon className="w-6 h-6 text-primary" /></div>
                   <h4 className="font-display text-lg font-semibold text-foreground mb-2">{v.title}</h4>
                   <p className="font-body text-sm text-muted-foreground">{v.desc}</p>
@@ -133,7 +163,7 @@ export default function About() {
       </section>
 
       {/* Facilities */}
-      <section className="py-16 sm:py-20 bg-cream">
+      <section className="py-16 sm:py-20 bg-background">
         <div className="container px-4">
           <ScrollReveal><SectionHeading title="Campus Facilities" subtitle="Modern infrastructure for holistic learning" /></ScrollReveal>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 max-w-5xl mx-auto">
@@ -157,7 +187,7 @@ export default function About() {
       </section>
 
       {/* Contact Info */}
-      <section className="py-16 bg-background">
+      <section className="py-16 bg-cream">
         <div className="container max-w-3xl px-4">
           <ScrollReveal><SectionHeading title="Reach Us" /></ScrollReveal>
           <div className="bg-card border border-border rounded-2xl p-6 sm:p-8 space-y-4">

@@ -2,7 +2,7 @@ import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { FileText, CheckCircle, Calendar, ArrowRight, X, Sparkles } from "lucide-react";
+import { FileText, CheckCircle, Calendar, ArrowRight, X, Sparkles, Upload } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -34,6 +34,7 @@ const initialForm = {
 export default function Admissions() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(initialForm);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -47,16 +48,31 @@ export default function Admissions() {
       return;
     }
     setSubmitting(true);
-    const { error } = await supabase.from("admission_applications").insert({
+
+    let photoUrl: string | null = null;
+    if (photoFile) {
+      const ext = photoFile.name.split(".").pop();
+      const path = `applications/${Date.now()}.${ext}`;
+      const { error: uploadErr } = await supabase.storage.from("uploads").upload(path, photoFile);
+      if (!uploadErr) {
+        const { data: urlData } = supabase.storage.from("uploads").getPublicUrl(path);
+        photoUrl = urlData.publicUrl;
+      }
+    }
+
+    const insertData: any = {
       full_name: form.full_name, email: form.email, phone: form.phone,
       date_of_birth: form.date_of_birth || null, gender: form.gender || null,
       course: form.course, father_name: form.father_name || null,
       mother_name: form.mother_name || null, address: form.address || null,
       previous_school: form.previous_school || null, percentage_12th: form.percentage_12th || null,
-    });
+    };
+    if (photoUrl) insertData.review_notes = `Photo: ${photoUrl}`;
+
+    const { error } = await supabase.from("admission_applications").insert(insertData);
     setSubmitting(false);
     if (error) toast.error("Failed to submit application. Please try again.");
-    else { toast.success("Application submitted successfully!"); setForm(initialForm); setShowForm(false); }
+    else { toast.success("Application submitted successfully! 🎉"); setForm(initialForm); setPhotoFile(null); setShowForm(false); }
   };
 
   const inputClass = "w-full border border-border rounded-xl px-3 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all";
@@ -70,11 +86,11 @@ export default function Admissions() {
         </div>
       </section>
 
-      {/* CTA Banner with prominent Apply Now */}
+      {/* CTA Banner */}
       <section className="bg-gradient-to-r from-secondary/20 via-secondary/10 to-primary/5 py-8 sm:py-10">
         <div className="container px-4 flex flex-col sm:flex-row items-center justify-between gap-5">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-secondary/20 flex items-center justify-center shrink-0">
+            <div className="w-14 h-14 rounded-2xl bg-secondary/20 flex items-center justify-center shrink-0 animate-float">
               <Calendar className="w-7 h-7 text-secondary" />
             </div>
             <div>
@@ -85,18 +101,19 @@ export default function Admissions() {
           <Button
             onClick={() => setShowForm(true)}
             size="lg"
-            className="font-body bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl text-base px-8 py-6 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 group w-full sm:w-auto"
+            className="font-body bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl text-base sm:text-lg px-8 sm:px-10 py-6 sm:py-7 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 group relative overflow-hidden w-full sm:w-auto"
           >
-            <Sparkles className="w-5 h-5 mr-2 group-hover:animate-pulse" />
-            Apply Now
-            <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+            <span className="absolute inset-0 bg-gradient-to-r from-secondary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <Sparkles className="w-5 h-5 mr-2 group-hover:animate-pulse relative z-10" />
+            <span className="relative z-10 font-bold">Apply Now</span>
+            <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform relative z-10" />
           </Button>
         </div>
       </section>
 
       {/* Application Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={(e) => { if (e.target === e.currentTarget) setShowForm(false); }}>
           <div className="bg-card rounded-2xl border border-border w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 animate-fade-in-up shadow-2xl">
             <div className="flex items-center justify-between mb-6">
               <div>
@@ -106,6 +123,16 @@ export default function Admissions() {
               <button onClick={() => setShowForm(false)} className="text-muted-foreground hover:text-foreground p-1 rounded-lg hover:bg-muted transition-colors"><X className="w-5 h-5" /></button>
             </div>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Photo upload */}
+              <div className="bg-muted/30 rounded-xl p-4 border border-dashed border-border">
+                <label className="font-body text-xs font-semibold text-foreground block mb-2 flex items-center gap-1">
+                  <Upload className="w-3 h-3" /> Upload Your Photo
+                </label>
+                <input type="file" accept="image/*" onChange={(e) => setPhotoFile(e.target.files?.[0] || null)}
+                  className="w-full font-body text-sm file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-primary/10 file:text-primary file:font-semibold file:text-xs hover:file:bg-primary/20 cursor-pointer" />
+                {photoFile && <p className="font-body text-xs text-muted-foreground mt-1">Selected: {photoFile.name}</p>}
+              </div>
+
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Full Name *</label>
@@ -165,7 +192,7 @@ export default function Admissions() {
               </div>
               <div className="flex gap-3">
                 <Button type="button" variant="outline" onClick={() => setShowForm(false)} className="font-body rounded-xl flex-1">Cancel</Button>
-                <Button type="submit" disabled={submitting} className="font-body rounded-xl flex-1 bg-primary text-primary-foreground">
+                <Button type="submit" disabled={submitting} className="font-body rounded-xl flex-1 bg-primary text-primary-foreground hover:scale-[1.02] transition-transform">
                   {submitting ? "Submitting..." : "Submit Application"}
                 </Button>
               </div>

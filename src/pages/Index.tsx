@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { GraduationCap, BookOpen, Users, Award, Calendar, ArrowRight, Star, Sparkles, Brain, ClipboardCheck, Library, MessageSquare, FlaskConical, BarChart3, ChevronRight } from "lucide-react";
+import { GraduationCap, BookOpen, Users, Award, Calendar, ArrowRight, Star, Sparkles, Brain, ClipboardCheck, Library, MessageSquare, FlaskConical, BarChart3, ChevronRight, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -8,6 +8,7 @@ import heroImage from "@/assets/hero-college.jpg";
 import principalImage from "@/assets/principal.jpg";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect, useRef } from "react";
 
 const courses = [
   { name: "BCA", full: "Bachelor of Computer Applications", icon: "🖥️", desc: "Master programming, databases, networking and emerging technologies.", duration: "3 Years" },
@@ -34,11 +35,25 @@ const highlights = [
 
 const testimonials = [
   { name: "Anusha C.H", course: "B.Com 2022-25", text: "Hoysala Degree College gave me the best platform to prepare for CA. The faculty support is exceptional! Scored 98.14%.", rating: 5 },
-  { name: "Rahul M.", course: "BBA", text: "The practical exposure through internships and case studies prepared me for the real business world.", rating: 5 },
+  { name: "Rahul M.", course: "BBA 2023-26", text: "The practical exposure through internships and case studies prepared me for the real business world. Amazing college!", rating: 5 },
   { name: "Simran B.", course: "B.Com 2022-25", text: "The dedicated coaching for CS and CMA along with regular degree is a unique advantage. Scored 94.14%!", rating: 5 },
+  { name: "Priya K.", course: "BCA 2023-26", text: "The AI and ML workshops along with Python programming gave me an edge in the tech industry. Best decision to join Hoysala!", rating: 5 },
+  { name: "Kiran R.", course: "B.Com Professional", text: "CA coaching integrated with B.Com is a game changer. The faculty goes above and beyond to help students succeed.", rating: 5 },
+  { name: "Meera S.", course: "BBA 2024-27", text: "The placement cell helped me land an internship in my 2nd year itself. The exposure here is unmatched!", rating: 4 },
 ];
 
 export default function Index() {
+  const [testimonialIndex, setTestimonialIndex] = useState(0);
+  const testimonialRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Auto-slide testimonials
+  useEffect(() => {
+    testimonialRef.current = setInterval(() => {
+      setTestimonialIndex(prev => (prev + 1) % Math.ceil(testimonials.length / 3));
+    }, 5000);
+    return () => { if (testimonialRef.current) clearInterval(testimonialRef.current); };
+  }, []);
+
   const { data: liveStats } = useQuery({
     queryKey: ["homepage-stats"],
     queryFn: async () => {
@@ -81,6 +96,9 @@ export default function Index() {
         { date: "Feb 5, 2026", title: "Annual Sports Day – March 15, 2026", type: "Event" },
       ];
 
+  const totalSlides = Math.ceil(testimonials.length / 3);
+  const currentTestimonials = testimonials.slice(testimonialIndex * 3, testimonialIndex * 3 + 3);
+
   return (
     <div>
       {/* Hero */}
@@ -104,12 +122,12 @@ export default function Index() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center animate-fade-in-up animation-delay-400">
             <Link to="/admissions">
-              <Button size="lg" className="font-body bg-secondary text-secondary-foreground hover:bg-gold-light text-sm sm:text-base px-6 sm:px-8 w-full sm:w-auto shadow-lg hover:shadow-xl transition-all">
+              <Button size="lg" className="font-body bg-secondary text-secondary-foreground hover:bg-gold-light text-sm sm:text-base px-6 sm:px-8 w-full sm:w-auto shadow-lg hover:shadow-xl transition-all hover:scale-105">
                 Apply Now <ArrowRight className="w-4 h-4 ml-1" />
               </Button>
             </Link>
             <Link to="/courses">
-              <button className="glass-btn px-6 sm:px-8 py-3 rounded-xl font-body text-sm sm:text-base font-medium text-primary-foreground animate-pulse-glow w-full sm:w-auto">
+              <button className="glass-btn px-6 sm:px-8 py-3 rounded-xl font-body text-sm sm:text-base font-medium text-primary-foreground animate-pulse-glow w-full sm:w-auto hover:scale-105 transition-transform">
                 ✨ Explore Courses
               </button>
             </Link>
@@ -117,7 +135,6 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Info Slider */}
       <InfoSlider />
 
       {/* Stats */}
@@ -146,41 +163,43 @@ export default function Index() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5">
             {courses.map((c, i) => (
               <ScrollReveal key={c.name} delay={i * 80}>
-                <div className="group bg-card rounded-2xl border border-border p-5 sm:p-6 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer h-full">
-                  <div className="text-3xl sm:text-4xl mb-3 group-hover:scale-110 transition-transform duration-300 inline-block">{c.icon}</div>
-                  <h3 className="font-display text-lg font-bold text-foreground">{c.name}</h3>
-                  <p className="font-body text-[11px] text-muted-foreground mt-1">{c.full}</p>
-                  <p className="font-body text-xs text-muted-foreground mt-2 leading-relaxed">{c.desc}</p>
-                  <div className="mt-4 flex items-center justify-between">
-                    <span className="text-[10px] font-body text-secondary font-bold bg-secondary/10 px-2 py-1 rounded-full">{c.duration}</span>
-                    <Link to="/courses" className="text-primary text-xs font-body font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
-                      Details <ChevronRight className="w-3 h-3" />
-                    </Link>
+                <Link to="/courses">
+                  <div className="group bg-card rounded-2xl border border-border p-5 sm:p-6 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer h-full">
+                    <div className="text-3xl sm:text-4xl mb-3 group-hover:scale-110 transition-transform duration-300 inline-block">{c.icon}</div>
+                    <h3 className="font-display text-lg font-bold text-foreground">{c.name}</h3>
+                    <p className="font-body text-[11px] text-muted-foreground mt-1">{c.full}</p>
+                    <p className="font-body text-xs text-muted-foreground mt-2 leading-relaxed">{c.desc}</p>
+                    <div className="mt-4 flex items-center justify-between">
+                      <span className="text-[10px] font-body text-secondary font-bold bg-secondary/10 px-2 py-1 rounded-full">{c.duration}</span>
+                      <span className="text-primary text-xs font-body font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                        Details <ChevronRight className="w-3 h-3" />
+                      </span>
+                    </div>
                   </div>
-                </div>
+                </Link>
               </ScrollReveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Key Highlights - Fully Responsive with Hover Animations */}
+      {/* Key Highlights */}
       <section className="py-16 sm:py-20 bg-cream">
         <div className="container px-4">
           <ScrollReveal>
             <SectionHeading title="Why Hoysala?" subtitle="Key highlights that set us apart from the rest" />
           </ScrollReveal>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
             {highlights.map((h, i) => (
               <ScrollReveal key={h.label} delay={i * 60}>
-                <div className="group bg-card rounded-2xl border border-border p-5 hover:shadow-xl hover:border-primary/20 hover:-translate-y-1 transition-all duration-300 cursor-default">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center shrink-0 group-hover:from-primary/20 group-hover:to-secondary/20 group-hover:scale-110 transition-all duration-300">
-                      <h.icon className="w-5 h-5 text-primary group-hover:text-secondary transition-colors duration-300" />
+                <div className="group bg-card rounded-2xl border border-border p-4 sm:p-5 hover:shadow-xl hover:border-primary/20 hover:-translate-y-1 transition-all duration-300 cursor-default">
+                  <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center shrink-0 group-hover:from-primary/20 group-hover:to-secondary/20 group-hover:scale-110 transition-all duration-300">
+                      <h.icon className="w-4 h-4 sm:w-5 sm:h-5 text-primary group-hover:text-secondary transition-colors duration-300" />
                     </div>
                     <div className="min-w-0">
-                      <span className="font-body text-sm font-bold text-foreground block">{h.label}</span>
-                      <span className="font-body text-xs text-muted-foreground mt-0.5 block">{h.desc}</span>
+                      <span className="font-body text-xs sm:text-sm font-bold text-foreground block">{h.label}</span>
+                      <span className="font-body text-[10px] sm:text-xs text-muted-foreground mt-0.5 block">{h.desc}</span>
                     </div>
                   </div>
                 </div>
@@ -206,7 +225,6 @@ export default function Index() {
                 <blockquote className="font-body text-muted-foreground leading-relaxed text-sm italic border-l-4 border-secondary pl-5 space-y-3">
                   <p>It gives immense pleasure to welcome you to HOYSALA DEGREE COLLEGE, one of the best colleges in Nelamangala town, established in 2017 under the aegis of Shri Shirdi Sai Educational Trust(R).</p>
                   <p>Our college is affiliated to Bangalore University and offers B.Com, BBA, and BCA programs. We believe in holistic development of students through academics, co-curricular activities, and value-based education.</p>
-                  <p>Our experienced faculty, modern infrastructure, and student-centric approach ensure that every student receives personalized attention and guidance to excel in their chosen field.</p>
                 </blockquote>
                 <div className="mt-6 flex items-center gap-3">
                   <div className="w-1 h-10 bg-secondary rounded-full" />
@@ -250,29 +268,54 @@ export default function Index() {
         </section>
       )}
 
-      {/* Testimonials */}
-      <section className="py-16 sm:py-20 bg-background">
+      {/* Testimonials Slider */}
+      <section className="py-16 sm:py-20 bg-background overflow-hidden">
         <div className="container px-4">
           <ScrollReveal>
-            <SectionHeading title="Student Testimonials" subtitle="Hear from our students" />
+            <SectionHeading title="What Our Students Say" subtitle="Hear from the Hoysala family" />
           </ScrollReveal>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-5xl mx-auto">
-            {testimonials.map((t, i) => (
-              <ScrollReveal key={t.name} delay={i * 120}>
-                <div className="glass-card rounded-2xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full">
+          <div className="relative max-w-5xl mx-auto">
+            {/* Navigation arrows */}
+            <button
+              onClick={() => setTestimonialIndex(prev => prev === 0 ? totalSlides - 1 : prev - 1)}
+              className="absolute -left-2 sm:-left-5 top-1/2 -translate-y-1/2 z-10 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-card border border-border shadow-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground hover:scale-110 transition-all duration-300"
+            >
+              <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+            <button
+              onClick={() => setTestimonialIndex(prev => (prev + 1) % totalSlides)}
+              className="absolute -right-2 sm:-right-5 top-1/2 -translate-y-1/2 z-10 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-card border border-border shadow-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground hover:scale-110 transition-all duration-300"
+            >
+              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 px-4 sm:px-8">
+              {currentTestimonials.map((t, i) => (
+                <div key={`${testimonialIndex}-${i}`} className="bg-card border border-border rounded-2xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-500 animate-fade-in h-full flex flex-col">
                   <div className="flex gap-0.5 mb-4">
                     {[...Array(t.rating)].map((_, j) => (
                       <Star key={j} className="w-4 h-4 fill-secondary text-secondary" />
                     ))}
                   </div>
-                  <p className="font-body text-sm text-muted-foreground italic leading-relaxed">"{t.text}"</p>
+                  <p className="font-body text-sm text-muted-foreground italic leading-relaxed flex-1">"{t.text}"</p>
                   <div className="mt-5 pt-4 border-t border-border">
                     <p className="font-display text-sm font-bold text-foreground">{t.name}</p>
                     <p className="font-body text-xs text-secondary font-semibold">{t.course}</p>
                   </div>
                 </div>
-              </ScrollReveal>
-            ))}
+              ))}
+            </div>
+
+            {/* Dots */}
+            <div className="flex justify-center gap-2 mt-6">
+              {Array.from({ length: totalSlides }).map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setTestimonialIndex(i)}
+                  className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${i === testimonialIndex ? "bg-primary scale-125" : "bg-border hover:bg-muted-foreground"}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -313,7 +356,7 @@ export default function Index() {
               Join Hoysala Degree College and be part of an institution that shapes leaders of tomorrow.
             </p>
             <Link to="/admissions">
-              <Button size="lg" className="font-body bg-secondary text-secondary-foreground hover:bg-gold-light text-sm sm:text-base px-8 sm:px-10 shadow-xl hover:shadow-2xl transition-all">
+              <Button size="lg" className="font-body bg-secondary text-secondary-foreground hover:bg-gold-light text-sm sm:text-base px-8 sm:px-10 shadow-xl hover:shadow-2xl hover:scale-105 transition-all">
                 Apply for Admission <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>

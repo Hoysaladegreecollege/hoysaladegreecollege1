@@ -32,7 +32,11 @@ export default function Login() {
   // Redirect if already logged in and role is loaded
   useEffect(() => {
     if (user && currentUserRole && !isSignupMode) {
-      navigate("/dashboard", { replace: true });
+      const path = currentUserRole === "admin" ? "/dashboard/admin"
+        : currentUserRole === "principal" ? "/dashboard/principal"
+        : currentUserRole === "teacher" ? "/dashboard/teacher"
+        : "/dashboard/student";
+      navigate(path, { replace: true });
     }
   }, [user, currentUserRole, isSignupMode, navigate]);
 
@@ -47,7 +51,7 @@ export default function Login() {
         setLoading(false);
       } else {
         toast.success("Signed in successfully!");
-        // Don't navigate here - the useEffect will handle redirect once role loads
+        // useEffect handles redirect once role loads
       }
     } else {
       if (!canSignup) { toast.error("Only admins can create new accounts"); setLoading(false); return; }
