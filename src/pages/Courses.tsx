@@ -1,8 +1,9 @@
 import { useState } from "react";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
+import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
-import { Clock, CheckCircle, IndianRupee, ArrowRight, X } from "lucide-react";
+import { Clock, CheckCircle, IndianRupee, ArrowRight, GraduationCap } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
@@ -55,30 +56,25 @@ export default function Courses() {
   const [selectedCourse, setSelectedCourse] = useState<typeof courses[0] | null>(null);
 
   return (
-    <div>
-      <section className="bg-primary py-16 text-center text-primary-foreground">
-        <div className="container px-4">
-          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold">Our Courses</h1>
-          <p className="font-body text-sm mt-2 opacity-70">Home / Courses</p>
-        </div>
-      </section>
+    <div className="page-enter">
+      <PageHeader title="Our Courses" subtitle="Choose from our carefully designed programs" />
 
-      <section className="py-16 sm:py-20 bg-background">
+      <section className="py-16 sm:py-24 bg-background">
         <div className="container px-4">
           <SectionHeading title="Choose Your Path" subtitle="Click on any course to view full details" />
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 max-w-5xl mx-auto">
             {courses.map((c, i) => (
               <ScrollReveal key={c.name} delay={i * 80}>
                 <div
                   onClick={() => setSelectedCourse(c)}
-                  className="bg-card border border-border rounded-2xl p-6 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer group h-full"
+                  className="premium-card p-6 sm:p-7 cursor-pointer group h-full"
                 >
-                  <span className="text-4xl mb-4 inline-block group-hover:scale-110 transition-transform duration-300">{c.icon}</span>
-                  <h3 className="font-display text-xl font-bold text-foreground group-hover:text-primary transition-colors">{c.name}</h3>
+                  <span className="text-4xl sm:text-5xl mb-4 inline-block group-hover:scale-110 transition-transform duration-300">{c.icon}</span>
+                  <h3 className="font-display text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">{c.name}</h3>
                   <p className="font-body text-xs text-muted-foreground mt-1">{c.full}</p>
                   <p className="font-body text-sm text-muted-foreground mt-3 leading-relaxed line-clamp-2">{c.overview}</p>
-                  <div className="mt-4 flex items-center justify-between">
-                    <span className="text-[10px] font-body text-secondary font-bold bg-secondary/10 px-2.5 py-1 rounded-full">{c.duration.split(" (")[0]}</span>
+                  <div className="mt-5 flex items-center justify-between">
+                    <span className="text-[10px] font-body text-secondary font-bold bg-secondary/10 px-3 py-1 rounded-full">{c.duration.split(" (")[0]}</span>
                     <span className="text-xs font-body font-semibold text-primary flex items-center gap-1 group-hover:gap-2 transition-all">
                       View Details <ArrowRight className="w-3 h-3" />
                     </span>
@@ -90,14 +86,13 @@ export default function Courses() {
         </div>
       </section>
 
-      {/* Course Detail Dialog */}
       <Dialog open={!!selectedCourse} onOpenChange={() => setSelectedCourse(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl">
           {selectedCourse && (
             <>
               <DialogHeader>
-                <div className="flex items-center gap-3">
-                  <span className="text-4xl">{selectedCourse.icon}</span>
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center text-4xl shrink-0">{selectedCourse.icon}</div>
                   <div>
                     <DialogTitle className="font-display text-2xl">{selectedCourse.name}</DialogTitle>
                     <DialogDescription className="font-body">{selectedCourse.full}</DialogDescription>
@@ -107,40 +102,34 @@ export default function Courses() {
               <div className="space-y-5 mt-4">
                 <p className="font-body text-muted-foreground leading-relaxed">{selectedCourse.overview}</p>
                 <div className="grid sm:grid-cols-3 gap-3">
-                  <div className="flex items-start gap-3 bg-muted/50 rounded-xl p-3">
-                    <Clock className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-body text-xs text-muted-foreground">Duration</p>
-                      <p className="font-body text-sm font-medium text-foreground">{selectedCourse.duration}</p>
+                  {[
+                    { icon: Clock, label: "Duration", value: selectedCourse.duration },
+                    { icon: CheckCircle, label: "Eligibility", value: selectedCourse.eligibility },
+                    { icon: IndianRupee, label: "Fee", value: selectedCourse.fee },
+                  ].map(item => (
+                    <div key={item.label} className="flex items-start gap-3 bg-muted/30 rounded-xl p-3 border border-border/50">
+                      <item.icon className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">{item.label}</p>
+                        <p className="font-body text-sm font-medium text-foreground">{item.value}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-start gap-3 bg-muted/50 rounded-xl p-3">
-                    <CheckCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-body text-xs text-muted-foreground">Eligibility</p>
-                      <p className="font-body text-sm font-medium text-foreground">{selectedCourse.eligibility}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 bg-muted/50 rounded-xl p-3">
-                    <IndianRupee className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-body text-xs text-muted-foreground">Fee</p>
-                      <p className="font-body text-sm font-medium text-foreground">{selectedCourse.fee}</p>
-                    </div>
-                  </div>
+                  ))}
                 </div>
                 <div>
-                  <h4 className="font-display text-base font-semibold text-foreground mb-3">Course Highlights</h4>
+                  <h4 className="font-display text-base font-semibold text-foreground mb-3 flex items-center gap-2">
+                    <GraduationCap className="w-4 h-4 text-secondary" /> Course Highlights
+                  </h4>
                   <div className="grid sm:grid-cols-2 gap-2">
                     {selectedCourse.highlights.map((h) => (
-                      <div key={h} className="flex items-center gap-2 font-body text-sm text-muted-foreground">
+                      <div key={h} className="flex items-center gap-2 font-body text-sm text-muted-foreground p-2 rounded-lg hover:bg-muted/30 transition-colors">
                         <CheckCircle className="w-4 h-4 text-secondary shrink-0" /> {h}
                       </div>
                     ))}
                   </div>
                 </div>
                 <Link to="/admissions">
-                  <Button className="w-full font-body rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 text-base py-3 mt-2">
+                  <Button className="w-full font-body rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 text-base py-3 mt-2 hover:scale-[1.02] transition-transform">
                     Apply Now <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </Link>

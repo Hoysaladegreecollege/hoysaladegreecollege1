@@ -1,5 +1,7 @@
 import SectionHeading from "@/components/SectionHeading";
-import { Mail, GraduationCap } from "lucide-react";
+import ScrollReveal from "@/components/ScrollReveal";
+import PageHeader from "@/components/PageHeader";
+import { GraduationCap, Briefcase } from "lucide-react";
 
 const faculty = [
   { name: "Dr. Rajesh Kumar", role: "Principal", department: "Administration", qualification: "Ph.D. in Education Management", experience: "25+ years" },
@@ -14,31 +16,30 @@ const faculty = [
 
 export default function Faculty() {
   return (
-    <div>
-      <section className="bg-primary py-16 text-center text-primary-foreground">
-        <div className="container">
-          <h1 className="font-display text-4xl md:text-5xl font-bold">Our Faculty</h1>
-          <p className="font-body text-sm mt-2 opacity-70">Home / Faculty</p>
-        </div>
-      </section>
+    <div className="page-enter">
+      <PageHeader title="Our Faculty" subtitle="Dedicated professionals committed to your success" />
 
-      <section className="py-20 bg-background">
-        <div className="container">
-          <SectionHeading title="Meet Our Educators" subtitle="Dedicated professionals committed to shaping the future of our students" />
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {faculty.map((f) => (
-              <div key={f.name} className="bg-card border border-border rounded-xl p-5 text-center hover:shadow-md transition-shadow">
-                <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <GraduationCap className="w-8 h-8 text-primary" />
+      <section className="py-16 sm:py-24 bg-background">
+        <div className="container px-4">
+          <SectionHeading title="Meet Our Educators" subtitle="Experienced professors and industry experts shaping the future" />
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 max-w-5xl mx-auto">
+            {faculty.map((f, i) => (
+              <ScrollReveal key={f.name} delay={i * 80}>
+                <div className="premium-card p-6 text-center group h-full">
+                  <div className="w-18 h-18 w-[72px] h-[72px] mx-auto rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:from-primary/20 group-hover:to-secondary/20 transition-all duration-300">
+                    <GraduationCap className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="font-display text-base font-bold text-foreground">{f.name}</h3>
+                  <p className="font-body text-xs text-secondary font-semibold mt-1">{f.role}</p>
+                  <p className="font-body text-xs text-muted-foreground mt-0.5">{f.department}</p>
+                  <div className="mt-4 pt-3 border-t border-border space-y-1">
+                    <p className="font-body text-[11px] text-muted-foreground">{f.qualification}</p>
+                    <div className="flex items-center justify-center gap-1 font-body text-[11px] text-muted-foreground">
+                      <Briefcase className="w-3 h-3" /> {f.experience} experience
+                    </div>
+                  </div>
                 </div>
-                <h3 className="font-display text-base font-bold text-foreground">{f.name}</h3>
-                <p className="font-body text-xs text-secondary font-semibold mt-1">{f.role}</p>
-                <p className="font-body text-xs text-muted-foreground mt-0.5">{f.department}</p>
-                <div className="mt-3 pt-3 border-t border-border">
-                  <p className="font-body text-[11px] text-muted-foreground">{f.qualification}</p>
-                  <p className="font-body text-[11px] text-muted-foreground">{f.experience} experience</p>
-                </div>
-              </div>
+              </ScrollReveal>
             ))}
           </div>
         </div>

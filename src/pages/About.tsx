@@ -1,7 +1,7 @@
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
+import PageHeader from "@/components/PageHeader";
 import { Target, Eye, BookOpen, Users, Award, Heart, MapPin, Phone, Mail, Clock, GraduationCap, Shield, Globe, Briefcase, Wifi, Coffee, TrendingUp, Star } from "lucide-react";
-import heroImage from "@/assets/hero-college.jpg";
 import principalImage from "@/assets/principal.jpg";
 
 const values = [
@@ -41,18 +41,11 @@ const achievements = [
 
 export default function About() {
   return (
-    <div>
-      <section className="relative h-64 md:h-80 flex items-center justify-center overflow-hidden">
-        <img src={heroImage} alt="Campus" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-primary/80" />
-        <div className="relative z-10 text-center text-primary-foreground px-4">
-          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold">About Us</h1>
-          <p className="font-body text-sm mt-2 opacity-70">Home / About</p>
-        </div>
-      </section>
+    <div className="page-enter">
+      <PageHeader title="About Us" subtitle="Discover the story of Hoysala Degree College" />
 
       {/* About */}
-      <section className="py-16 sm:py-20 bg-background">
+      <section className="py-16 sm:py-24 bg-background">
         <div className="container max-w-4xl px-4">
           <ScrollReveal><SectionHeading title="About Hoysala Degree College" subtitle="Building a legacy of knowledge and character" /></ScrollReveal>
           <ScrollReveal delay={200}>
@@ -65,15 +58,15 @@ export default function About() {
       </section>
 
       {/* Quick Facts */}
-      <section className="py-12 sm:py-16 bg-cream">
+      <section className="py-14 sm:py-20 bg-cream">
         <div className="container px-4">
           <ScrollReveal><SectionHeading title="Quick Facts" /></ScrollReveal>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 max-w-5xl mx-auto">
             {quickFacts.map((f, i) => (
               <ScrollReveal key={f.label} delay={i * 80}>
-                <div className="bg-card border border-border rounded-xl p-4 text-center hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
-                  <p className="font-display text-lg sm:text-xl font-bold text-primary">{f.value}</p>
-                  <p className="font-body text-[10px] sm:text-xs text-muted-foreground mt-1">{f.label}</p>
+                <div className="premium-card p-4 sm:p-5 text-center group">
+                  <p className="font-display text-xl sm:text-2xl font-bold text-primary group-hover:text-secondary transition-colors duration-300">{f.value}</p>
+                  <p className="font-body text-[10px] sm:text-xs text-muted-foreground mt-1.5 uppercase tracking-wider">{f.label}</p>
                 </div>
               </ScrollReveal>
             ))}
@@ -82,12 +75,15 @@ export default function About() {
       </section>
 
       {/* Principal's Message */}
-      <section className="py-16 bg-background">
-        <div className="container max-w-4xl px-4">
+      <section className="py-16 sm:py-24 bg-background">
+        <div className="container max-w-5xl px-4">
           <div className="grid md:grid-cols-5 gap-8 items-start">
             <ScrollReveal className="md:col-span-2">
-              <img src={principalImage} alt="Principal" className="rounded-2xl shadow-xl w-full" />
-              <div className="mt-4 text-center">
+              <div className="relative">
+                <div className="absolute -inset-3 bg-gradient-to-br from-secondary/15 to-primary/5 rounded-3xl blur-xl" />
+                <img src={principalImage} alt="Principal" className="relative rounded-2xl shadow-xl w-full" />
+              </div>
+              <div className="mt-5 text-center">
                 <p className="font-display text-lg font-bold text-foreground">Sri Gopal H.R</p>
                 <p className="font-body text-sm text-muted-foreground">M.Sc, M.Ed, TET, KSET, Ph.D • Principal</p>
               </div>
@@ -105,18 +101,22 @@ export default function About() {
       </section>
 
       {/* Vision & Mission */}
-      <section className="py-16 bg-cream">
+      <section className="py-16 sm:py-24 bg-cream">
         <div className="container grid md:grid-cols-2 gap-6 sm:gap-8 max-w-4xl px-4">
           <ScrollReveal>
-            <div className="bg-card rounded-2xl p-6 sm:p-8 border border-border hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4"><Eye className="w-6 h-6 text-primary" /></div>
+            <div className="premium-card p-6 sm:p-8 h-full group">
+              <div className="icon-glow w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/15 transition-colors duration-300">
+                <Eye className="w-7 h-7 text-primary" />
+              </div>
               <h3 className="font-display text-xl sm:text-2xl font-bold text-foreground mb-3">Our Vision</h3>
               <p className="font-body text-sm text-muted-foreground leading-relaxed">To be a premier institution of higher learning, recognized for academic excellence, innovation, and producing socially responsible graduates who contribute to national development.</p>
             </div>
           </ScrollReveal>
           <ScrollReveal delay={200}>
-            <div className="bg-card rounded-2xl p-6 sm:p-8 border border-border hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full">
-              <div className="w-12 h-12 rounded-xl bg-secondary/20 flex items-center justify-center mb-4"><Target className="w-6 h-6 text-secondary" /></div>
+            <div className="premium-card p-6 sm:p-8 h-full group">
+              <div className="icon-glow w-14 h-14 rounded-2xl bg-secondary/15 flex items-center justify-center mb-5 group-hover:bg-secondary/25 transition-colors duration-300">
+                <Target className="w-7 h-7 text-secondary" />
+              </div>
               <h3 className="font-display text-xl sm:text-2xl font-bold text-foreground mb-3">Our Mission</h3>
               <p className="font-body text-sm text-muted-foreground leading-relaxed">To provide accessible, affordable, and quality education empowering students with knowledge, skills, and values for successful careers and meaningful lives.</p>
             </div>
@@ -125,14 +125,14 @@ export default function About() {
       </section>
 
       {/* Key Achievements */}
-      <section className="py-16 sm:py-20 bg-background">
+      <section className="py-16 sm:py-24 bg-background">
         <div className="container px-4">
           <ScrollReveal><SectionHeading title="Our Achievements" subtitle="Milestones that define our excellence" /></ScrollReveal>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 max-w-5xl mx-auto">
             {achievements.map((a, i) => (
               <ScrollReveal key={a.title} delay={i * 100}>
-                <div className="text-center bg-card rounded-2xl border border-border p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group h-full">
-                  <div className="w-12 h-12 mx-auto rounded-full bg-gradient-to-br from-secondary/20 to-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                <div className="premium-card p-6 text-center group h-full">
+                  <div className="icon-glow w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-secondary/20 to-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                     <a.icon className="w-6 h-6 text-secondary" />
                   </div>
                   <h4 className="font-display text-base font-semibold text-foreground mb-2">{a.title}</h4>
@@ -145,14 +145,16 @@ export default function About() {
       </section>
 
       {/* Values */}
-      <section className="py-16 sm:py-20 bg-cream">
+      <section className="py-16 sm:py-24 bg-cream">
         <div className="container px-4">
           <ScrollReveal><SectionHeading title="Our Core Values" subtitle="The principles that guide everything we do" /></ScrollReveal>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {values.map((v, i) => (
               <ScrollReveal key={v.title} delay={i * 100}>
-                <div className="text-center bg-card rounded-2xl border border-border p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full">
-                  <div className="w-12 h-12 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4"><v.icon className="w-6 h-6 text-primary" /></div>
+                <div className="premium-card p-6 text-center h-full group">
+                  <div className="icon-glow w-14 h-14 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/15 transition-colors duration-300">
+                    <v.icon className="w-6 h-6 text-primary" />
+                  </div>
                   <h4 className="font-display text-lg font-semibold text-foreground mb-2">{v.title}</h4>
                   <p className="font-body text-sm text-muted-foreground">{v.desc}</p>
                 </div>
@@ -163,15 +165,15 @@ export default function About() {
       </section>
 
       {/* Facilities */}
-      <section className="py-16 sm:py-20 bg-background">
+      <section className="py-16 sm:py-24 bg-background">
         <div className="container px-4">
           <ScrollReveal><SectionHeading title="Campus Facilities" subtitle="Modern infrastructure for holistic learning" /></ScrollReveal>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 max-w-5xl mx-auto">
             {facilities.map((f, i) => (
               <ScrollReveal key={f.title} delay={i * 80}>
-                <div className="bg-card rounded-2xl border border-border p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group">
+                <div className="premium-card p-5 group">
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
+                    <div className="icon-glow w-11 h-11 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
                       <f.icon className="w-5 h-5 text-primary" />
                     </div>
                     <div>
@@ -190,10 +192,13 @@ export default function About() {
       <section className="py-16 bg-cream">
         <div className="container max-w-3xl px-4">
           <ScrollReveal><SectionHeading title="Reach Us" /></ScrollReveal>
-          <div className="bg-card border border-border rounded-2xl p-6 sm:p-8 space-y-4">
-            <div className="flex items-start gap-3"><MapPin className="w-5 h-5 text-primary shrink-0 mt-0.5" /><p className="font-body text-sm text-muted-foreground">K.R.P. Arcade, UCO Bank Building, Paramanna Layout, Nelamangala Town, Bengaluru Rural Dist. - 562 123</p></div>
-            <div className="flex items-center gap-3"><Phone className="w-5 h-5 text-primary shrink-0" /><p className="font-body text-sm text-muted-foreground">7676272167 / 7975344252 / 8618181383</p></div>
-            <div className="flex items-center gap-3"><Mail className="w-5 h-5 text-primary shrink-0" /><p className="font-body text-sm text-muted-foreground">principal.hoysaladegreecollege@gmail.com</p></div>
+          <div className="premium-card p-6 sm:p-8 space-y-4">
+            <a href="https://maps.app.goo.gl/YGNgC5ev7v4pJWve9" target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 hover:text-primary transition-colors">
+              <MapPin className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+              <p className="font-body text-sm text-muted-foreground hover:text-primary transition-colors">K.R.P. Arcade, UCO Bank Building, Paramanna Layout, Nelamangala Town, Bengaluru Rural Dist. - 562 123</p>
+            </a>
+            <div className="flex items-center gap-3"><Phone className="w-5 h-5 text-primary shrink-0" /><p className="font-body text-sm text-muted-foreground"><a href="tel:7676272167" className="hover:text-primary transition-colors">7676272167</a> / <a href="tel:7975344252" className="hover:text-primary transition-colors">7975344252</a> / <a href="tel:8618181383" className="hover:text-primary transition-colors">8618181383</a></p></div>
+            <div className="flex items-center gap-3"><Mail className="w-5 h-5 text-primary shrink-0" /><a href="mailto:principal.hoysaladegreecollege@gmail.com" className="font-body text-sm text-muted-foreground hover:text-primary transition-colors">principal.hoysaladegreecollege@gmail.com</a></div>
             <div className="flex items-center gap-3"><Clock className="w-5 h-5 text-primary shrink-0" /><p className="font-body text-sm text-muted-foreground">Monday - Saturday: 9:00 AM - 5:00 PM</p></div>
           </div>
         </div>

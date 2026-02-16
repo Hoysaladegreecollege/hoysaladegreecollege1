@@ -1,6 +1,7 @@
 import { useState } from "react";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
+import PageHeader from "@/components/PageHeader";
 import { Calendar, Image as ImageIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -43,23 +44,18 @@ export default function Events() {
   const allImages = selectedEvent ? [selectedEvent.image_url, ...(selectedParsed?.gallery || [])].filter(Boolean) : [];
 
   return (
-    <div>
-      <section className="bg-primary py-16 text-center text-primary-foreground">
-        <div className="container px-4">
-          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold">Events & Gallery</h1>
-          <p className="font-body text-sm mt-2 opacity-70">Home / Events</p>
-        </div>
-      </section>
+    <div className="page-enter">
+      <PageHeader title="Events & Gallery" subtitle="Explore our vibrant campus life" />
 
-      <section className="py-16 sm:py-20 bg-background">
+      <section className="py-16 sm:py-24 bg-background">
         <div className="container px-4">
-          <SectionHeading title="College Events" subtitle="Explore our vibrant campus life" />
+          <SectionHeading title="College Events" subtitle="Discover what makes campus life exciting" />
 
           <div className="flex flex-wrap gap-2 justify-center mb-10">
             {categories.map((c) => (
               <button key={c} onClick={() => setFilter(c)}
-                className={`font-body text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition-all duration-200 ${
-                  filter === c ? "bg-primary text-primary-foreground shadow-md" : "bg-muted text-muted-foreground hover:bg-muted/80"
+                className={`font-body text-xs sm:text-sm px-4 py-2 rounded-full transition-all duration-300 ${
+                  filter === c ? "bg-primary text-primary-foreground shadow-lg scale-105" : "bg-card border border-border text-muted-foreground hover:bg-muted hover:scale-105"
                 }`}>
                 {c}
               </button>
@@ -69,16 +65,18 @@ export default function Events() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
             {filtered.map((e: any, i: number) => (
               <ScrollReveal key={e.id} delay={i * 80}>
-                <div onClick={() => { setSelectedEvent(e); setGalleryIndex(0); }} className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer">
+                <div onClick={() => { setSelectedEvent(e); setGalleryIndex(0); }} className="premium-card overflow-hidden cursor-pointer group">
                   {e.image_url ? (
-                    <img src={e.image_url} alt={e.title} className="h-48 w-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <div className="overflow-hidden">
+                      <img src={e.image_url} alt={e.title} className="h-52 w-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                    </div>
                   ) : (
-                    <div className="h-48 bg-gradient-to-br from-primary/5 to-secondary/10 flex items-center justify-center">
+                    <div className="h-52 bg-gradient-to-br from-primary/5 to-secondary/10 flex items-center justify-center">
                       <ImageIcon className="w-12 h-12 text-muted-foreground/20" />
                     </div>
                   )}
-                  <div className="p-5">
-                    <div className="flex items-center gap-2 mb-2">
+                  <div className="p-5 sm:p-6">
+                    <div className="flex items-center gap-2 mb-2.5">
                       <span className="text-[10px] font-body font-bold px-2.5 py-0.5 rounded-full bg-secondary/20 text-secondary-foreground">{e.category}</span>
                       {e.event_date && (
                         <span className="text-xs font-body text-muted-foreground flex items-center gap-1">
@@ -86,7 +84,7 @@ export default function Events() {
                         </span>
                       )}
                     </div>
-                    <h3 className="font-display text-lg font-bold text-foreground group-hover:text-primary transition-colors">{e.title}</h3>
+                    <h3 className="font-display text-lg font-bold text-foreground group-hover:text-primary transition-colors duration-300">{e.title}</h3>
                     {e.description && <p className="font-body text-sm text-muted-foreground mt-2 line-clamp-3">{parseGallery(e.description).text}</p>}
                   </div>
                 </div>
@@ -97,33 +95,31 @@ export default function Events() {
         </div>
       </section>
 
-      {/* Event Detail Dialog */}
       <Dialog open={!!selectedEvent} onOpenChange={() => setSelectedEvent(null)}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl">
           {selectedEvent && selectedParsed && (
             <>
               <DialogHeader>
                 <DialogTitle className="font-display text-2xl">{selectedEvent.title}</DialogTitle>
               </DialogHeader>
 
-              {/* Image Gallery */}
               {allImages.length > 0 && (
-                <div className="relative">
-                  <img src={allImages[galleryIndex]} alt={selectedEvent.title} className="w-full rounded-xl object-cover max-h-96" />
+                <div className="relative rounded-xl overflow-hidden">
+                  <img src={allImages[galleryIndex]} alt={selectedEvent.title} className="w-full object-cover max-h-96" />
                   {allImages.length > 1 && (
                     <>
                       <button onClick={() => setGalleryIndex(prev => prev === 0 ? allImages.length - 1 : prev - 1)}
-                        className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-card/80 shadow flex items-center justify-center hover:bg-card transition-colors">
+                        className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-card/90 shadow-lg flex items-center justify-center hover:bg-card transition-colors">
                         <ChevronLeft className="w-4 h-4" />
                       </button>
                       <button onClick={() => setGalleryIndex(prev => (prev + 1) % allImages.length)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-card/80 shadow flex items-center justify-center hover:bg-card transition-colors">
+                        className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-card/90 shadow-lg flex items-center justify-center hover:bg-card transition-colors">
                         <ChevronRight className="w-4 h-4" />
                       </button>
-                      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+                      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
                         {allImages.map((_, i) => (
                           <button key={i} onClick={() => setGalleryIndex(i)}
-                            className={`w-2 h-2 rounded-full transition-all ${i === galleryIndex ? "bg-primary scale-125" : "bg-card/60"}`} />
+                            className={`rounded-full transition-all ${i === galleryIndex ? "bg-primary w-6 h-2" : "bg-card/60 w-2 h-2"}`} />
                         ))}
                       </div>
                     </>
@@ -131,12 +127,11 @@ export default function Events() {
                 </div>
               )}
 
-              {/* Thumbnails */}
               {allImages.length > 1 && (
                 <div className="flex gap-2 overflow-x-auto py-2">
                   {allImages.map((url, i) => (
                     <img key={i} src={url} onClick={() => setGalleryIndex(i)} alt=""
-                      className={`w-16 h-16 rounded-lg object-cover cursor-pointer border-2 transition-all shrink-0 ${i === galleryIndex ? "border-primary" : "border-transparent opacity-60 hover:opacity-100"}`} />
+                      className={`w-16 h-16 rounded-lg object-cover cursor-pointer border-2 transition-all shrink-0 ${i === galleryIndex ? "border-primary scale-105" : "border-transparent opacity-60 hover:opacity-100"}`} />
                   ))}
                 </div>
               )}
