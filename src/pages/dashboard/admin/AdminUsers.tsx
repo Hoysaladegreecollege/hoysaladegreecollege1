@@ -15,7 +15,7 @@ export default function AdminUsers() {
   const [search, setSearch] = useState("");
   const [courseFilter, setCourseFilter] = useState("All");
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({ full_name: "", phone: "", roll_number: "", semester: "", parent_phone: "", address: "" });
+  const [editForm, setEditForm] = useState({ full_name: "", phone: "", roll_number: "", semester: "", parent_phone: "", address: "", date_of_birth: "", course_id: "", total_fee: "", fee_paid: "", fee_due_date: "", fee_remarks: "" });
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [viewStudent, setViewStudent] = useState<any>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<any>(null);
@@ -58,7 +58,7 @@ export default function AdminUsers() {
   });
 
   const updateProfileMutation = useMutation({
-    mutationFn: async ({ userId, full_name, phone, roll_number, semester, parent_phone, address }: any) => {
+    mutationFn: async ({ userId, full_name, phone, roll_number, semester, parent_phone, address, date_of_birth, course_id, total_fee, fee_paid, fee_due_date, fee_remarks }: any) => {
       const { error } = await supabase.from("profiles").update({ full_name, phone }).eq("user_id", userId);
       if (error) throw error;
       const studentUpdate: any = {};
@@ -66,6 +66,12 @@ export default function AdminUsers() {
       if (semester) studentUpdate.semester = parseInt(semester);
       if (parent_phone !== undefined) studentUpdate.parent_phone = parent_phone;
       if (address !== undefined) studentUpdate.address = address;
+      if (date_of_birth) studentUpdate.date_of_birth = date_of_birth;
+      if (course_id) studentUpdate.course_id = course_id;
+      if (total_fee !== undefined && total_fee !== "") studentUpdate.total_fee = parseFloat(total_fee) || 0;
+      if (fee_paid !== undefined && fee_paid !== "") studentUpdate.fee_paid = parseFloat(fee_paid) || 0;
+      if (fee_due_date) studentUpdate.fee_due_date = fee_due_date;
+      if (fee_remarks !== undefined) studentUpdate.fee_remarks = fee_remarks;
       if (Object.keys(studentUpdate).length > 0) {
         await supabase.from("students").update(studentUpdate).eq("user_id", userId);
       }
@@ -136,6 +142,9 @@ export default function AdminUsers() {
       full_name: u.full_name || "", phone: u.phone || "",
       roll_number: u.student?.roll_number || "", semester: String(u.student?.semester || ""),
       parent_phone: u.student?.parent_phone || "", address: u.student?.address || "",
+      date_of_birth: u.student?.date_of_birth || "", course_id: u.student?.course_id || "",
+      total_fee: String(u.student?.total_fee || ""), fee_paid: String(u.student?.fee_paid || ""),
+      fee_due_date: u.student?.fee_due_date || "", fee_remarks: u.student?.fee_remarks || "",
     });
   };
 
@@ -291,12 +300,24 @@ export default function AdminUsers() {
           <div key={u.id} className="bg-card border border-border rounded-xl p-4 hover:shadow-md transition-all group">
             {editingId === u.user_id ? (
               <div className="space-y-2">
-                <div className="grid sm:grid-cols-2 gap-2">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
                   <Input value={editForm.full_name} onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Name" />
                   <Input value={editForm.phone} onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Phone" />
                   <Input value={editForm.roll_number} onChange={(e) => setEditForm({ ...editForm, roll_number: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Roll Number" />
                   <Input value={editForm.parent_phone} onChange={(e) => setEditForm({ ...editForm, parent_phone: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Parent Phone" />
-                  <Input value={editForm.address} onChange={(e) => setEditForm({ ...editForm, address: e.target.value })} className="h-9 text-sm rounded-xl sm:col-span-2" placeholder="Address" />
+                  <Input type="date" value={editForm.date_of_birth} onChange={(e) => setEditForm({ ...editForm, date_of_birth: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="DOB" />
+                  <select value={editForm.course_id} onChange={(e) => setEditForm({ ...editForm, course_id: e.target.value })} className="h-9 text-sm rounded-xl border border-input bg-background px-3">
+                    <option value="">Select Course</option>
+                    {courses.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </select>
+                  <select value={editForm.semester} onChange={(e) => setEditForm({ ...editForm, semester: e.target.value })} className="h-9 text-sm rounded-xl border border-input bg-background px-3">
+                    {[1,2,3,4,5,6].map(s => <option key={s} value={s}>Sem {s}</option>)}
+                  </select>
+                  <Input type="number" value={editForm.total_fee} onChange={(e) => setEditForm({ ...editForm, total_fee: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Total Fee" />
+                  <Input type="number" value={editForm.fee_paid} onChange={(e) => setEditForm({ ...editForm, fee_paid: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Fee Paid" />
+                  <Input type="date" value={editForm.fee_due_date} onChange={(e) => setEditForm({ ...editForm, fee_due_date: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Fee Due Date" />
+                  <Input value={editForm.fee_remarks} onChange={(e) => setEditForm({ ...editForm, fee_remarks: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Fee Remarks" />
+                  <Input value={editForm.address} onChange={(e) => setEditForm({ ...editForm, address: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Address" />
                 </div>
                 <div className="flex gap-2">
                   <Button size="sm" onClick={() => updateProfileMutation.mutate({ userId: u.user_id, ...editForm })} className="flex-1 text-xs rounded-xl"><Save className="w-3 h-3 mr-1" /> Save</Button>
