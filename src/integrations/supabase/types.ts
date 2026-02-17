@@ -413,11 +413,15 @@ export type Database = {
           course_id: string | null
           created_at: string
           date_of_birth: string | null
+          fee_due_date: string | null
+          fee_paid: number | null
+          fee_remarks: string | null
           id: string
           is_active: boolean | null
           parent_phone: string | null
           roll_number: string
           semester: number | null
+          total_fee: number | null
           user_id: string
         }
         Insert: {
@@ -426,11 +430,15 @@ export type Database = {
           course_id?: string | null
           created_at?: string
           date_of_birth?: string | null
+          fee_due_date?: string | null
+          fee_paid?: number | null
+          fee_remarks?: string | null
           id?: string
           is_active?: boolean | null
           parent_phone?: string | null
           roll_number: string
           semester?: number | null
+          total_fee?: number | null
           user_id: string
         }
         Update: {
@@ -439,11 +447,15 @@ export type Database = {
           course_id?: string | null
           created_at?: string
           date_of_birth?: string | null
+          fee_due_date?: string | null
+          fee_paid?: number | null
+          fee_remarks?: string | null
           id?: string
           is_active?: boolean | null
           parent_phone?: string | null
           roll_number?: string
           semester?: number | null
+          total_fee?: number | null
           user_id?: string
         }
         Relationships: [
