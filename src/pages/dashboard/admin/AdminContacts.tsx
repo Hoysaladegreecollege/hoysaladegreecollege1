@@ -68,7 +68,7 @@ export default function AdminContacts() {
       </div>
 
       {isLoading ? (
-        <div className="text-center py-12"><p className="font-body text-sm text-muted-foreground animate-pulse">Loading messages...</p></div>
+        <div className="space-y-3">{[1,2,3,4].map(i => <div key={i} className="admin-card p-5 space-y-3"><div className="flex gap-4"><div className="w-10 h-10 rounded-xl bg-muted animate-pulse shrink-0" /><div className="flex-1 space-y-2"><div className="h-4 w-1/3 bg-muted animate-pulse rounded" /><div className="h-3 w-2/3 bg-muted animate-pulse rounded" /></div></div></div>)}</div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-12 bg-card border border-border rounded-2xl"><p className="font-body text-sm text-muted-foreground">No messages found.</p></div>
       ) : (
