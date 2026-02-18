@@ -1,5 +1,6 @@
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
+import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { FileText, CheckCircle, Calendar, ArrowRight, X, Sparkles, Upload } from "lucide-react";
@@ -84,13 +85,8 @@ export default function Admissions() {
   const inputClass = "w-full border border-border rounded-xl px-3 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all";
 
   return (
-    <div>
-      <section className="bg-primary py-16 text-center text-primary-foreground">
-        <div className="container px-4">
-          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold">Admissions</h1>
-          <p className="font-body text-sm mt-2 opacity-70">Home / Admissions</p>
-        </div>
-      </section>
+    <div className="page-enter">
+      <PageHeader title="Admissions" subtitle="Join Hoysala Degree College and shape your future" />
 
       {/* CTA Banner */}
       <section className="bg-gradient-to-r from-secondary/20 via-secondary/10 to-primary/5 py-8 sm:py-10">

@@ -1,3 +1,5 @@
+import { Sparkles } from "lucide-react";
+
 interface Props {
   title: string;
   subtitle?: string;
@@ -7,21 +9,21 @@ interface Props {
 
 export default function SectionHeading({ title, subtitle, centered = true, light = false }: Props) {
   return (
-    <div className={`mb-12 ${centered ? "text-center" : ""}`}>
-      <h2 className={`font-display text-3xl md:text-4xl font-bold ${light ? "text-primary-foreground" : "text-foreground"}`}>
+    <div className={`mb-14 ${centered ? "text-center" : ""}`}>
+      <h2 className={`font-display text-2xl sm:text-3xl md:text-4xl font-bold ${light ? "text-primary-foreground" : "text-foreground"}`}>
         {title}
       </h2>
       {subtitle && (
-        <p className={`mt-3 font-body text-sm sm:text-base max-w-2xl ${centered ? "mx-auto" : ""} ${light ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+        <p className={`mt-4 font-body text-sm sm:text-base max-w-2xl ${centered ? "mx-auto" : ""} ${light ? "text-primary-foreground/60" : "text-muted-foreground"}`}>
           {subtitle}
         </p>
       )}
-      <div className={`mt-5 flex items-center gap-2 ${centered ? "justify-center" : ""}`}>
-        <div className="h-0.5 w-8 rounded-full bg-secondary" />
-        <div className="h-1.5 w-1.5 rounded-full bg-secondary" />
-        <div className="h-0.5 w-16 rounded-full bg-secondary" />
-        <div className="h-1.5 w-1.5 rounded-full bg-secondary" />
-        <div className="h-0.5 w-8 rounded-full bg-secondary" />
+      <div className={`mt-6 flex items-center gap-2 ${centered ? "justify-center" : ""}`}>
+        <div className="h-px w-10 rounded-full bg-gradient-to-r from-transparent to-secondary" />
+        <Sparkles className={`w-3.5 h-3.5 ${light ? "text-secondary/60" : "text-secondary"}`} />
+        <div className="h-px w-20 rounded-full bg-secondary" />
+        <Sparkles className={`w-3.5 h-3.5 ${light ? "text-secondary/60" : "text-secondary"}`} />
+        <div className="h-px w-10 rounded-full bg-gradient-to-l from-transparent to-secondary" />
       </div>
     </div>
   );
