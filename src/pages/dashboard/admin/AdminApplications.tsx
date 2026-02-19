@@ -3,10 +3,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Eye, CheckCircle, XCircle, FileText, X, Phone, ArrowLeft, Filter } from "lucide-react";
+import { Search, Eye, CheckCircle, XCircle, FileText, X, Phone, ArrowLeft, Filter, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AdminApplications() {
   const queryClient = useQueryClient();
@@ -24,13 +25,36 @@ export default function AdminApplications() {
   });
 
   const updateStatus = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+    mutationFn: async ({ id, status, email, fullName, applicationNumber }: { id: string; status: string; email: string; fullName: string; applicationNumber: string }) => {
       const { error } = await supabase.from("admission_applications").update({ status }).eq("id", id);
       if (error) throw error;
+
+      // Send email notification
+      try {
+        await supabase.functions.invoke("send-application-email", {
+          body: { email, fullName, applicationNumber, status },
+        });
+      } catch (emailErr) {
+        console.warn("Email notification failed:", emailErr);
+      }
     },
-    onSuccess: () => { toast.success("Application updated!"); queryClient.invalidateQueries({ queryKey: ["admin-applications"] }); setSelected(null); },
+    onSuccess: (_, vars) => {
+      toast.success(`Application ${vars.status}! Email notification sent.`);
+      queryClient.invalidateQueries({ queryKey: ["admin-applications"] });
+      setSelected(null);
+    },
     onError: (e: any) => toast.error(e.message),
   });
+
+  const handleStatusChange = (app: any, status: string) => {
+    updateStatus.mutate({
+      id: app.id,
+      status,
+      email: app.email,
+      fullName: app.full_name,
+      applicationNumber: app.application_number || "",
+    });
+  };
 
   const filtered = apps.filter((a: any) => {
     const matchSearch = a.full_name.toLowerCase().includes(search.toLowerCase()) || 
@@ -44,7 +68,7 @@ export default function AdminApplications() {
   const uniqueCourses = [...new Set(apps.map((a: any) => a.course))];
 
   const statusColor = (s: string) =>
-    s === "approved" ? "text-primary bg-primary/10" : s === "rejected" ? "text-destructive bg-destructive/10" : "text-secondary bg-secondary/10";
+    s === "approved" ? "text-green-700 bg-green-100" : s === "rejected" ? "text-red-700 bg-red-100" : "text-secondary bg-secondary/10";
 
   const pendingCount = apps.filter((a: any) => a.status === "pending").length;
   const approvedCount = apps.filter((a: any) => a.status === "approved").length;
@@ -62,11 +86,10 @@ export default function AdminApplications() {
             <p className="font-body text-sm text-muted-foreground mt-1">{apps.length} total applications</p>
           </div>
         </div>
-        {/* Stats */}
         <div className="flex gap-3 ml-11 flex-wrap">
           <span className="text-xs font-body px-3 py-1 rounded-full bg-secondary/10 text-secondary-foreground font-semibold">⏳ {pendingCount} Pending</span>
-          <span className="text-xs font-body px-3 py-1 rounded-full bg-primary/10 text-primary font-semibold">✓ {approvedCount} Approved</span>
-          <span className="text-xs font-body px-3 py-1 rounded-full bg-destructive/10 text-destructive font-semibold">✗ {rejectedCount} Rejected</span>
+          <span className="text-xs font-body px-3 py-1 rounded-full bg-green-100 text-green-700 font-semibold">✓ {approvedCount} Approved</span>
+          <span className="text-xs font-body px-3 py-1 rounded-full bg-red-100 text-red-700 font-semibold">✗ {rejectedCount} Rejected</span>
         </div>
       </div>
 
@@ -107,7 +130,7 @@ export default function AdminApplications() {
             <tbody>
               {isLoading ? (
                 Array.from({ length: 4 }).map((_, i) => (
-                  <tr key={i}><td colSpan={7} className="p-4"><div className="h-10 bg-muted/50 rounded-xl animate-pulse" /></td></tr>
+                  <tr key={i}><td colSpan={7} className="p-4"><Skeleton className="h-10 rounded-xl" /></td></tr>
                 ))
               ) : filtered.map((a: any) => (
                 <tr key={a.id} className="border-b border-border/50 hover:bg-muted/20 transition-colors">
@@ -129,8 +152,8 @@ export default function AdminApplications() {
                       <button onClick={() => setSelected(a)} className="p-1.5 rounded-lg hover:bg-primary/10 text-primary transition-colors"><Eye className="w-4 h-4" /></button>
                       {a.status === "pending" && (
                         <>
-                          <button onClick={() => updateStatus.mutate({ id: a.id, status: "approved" })} className="p-1.5 rounded-lg hover:bg-primary/10 text-primary transition-colors"><CheckCircle className="w-4 h-4" /></button>
-                          <button onClick={() => updateStatus.mutate({ id: a.id, status: "rejected" })} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors"><XCircle className="w-4 h-4" /></button>
+                          <button onClick={() => handleStatusChange(a, "approved")} className="p-1.5 rounded-lg hover:bg-green-100 text-green-600 transition-colors"><CheckCircle className="w-4 h-4" /></button>
+                          <button onClick={() => handleStatusChange(a, "rejected")} className="p-1.5 rounded-lg hover:bg-red-100 text-red-600 transition-colors"><XCircle className="w-4 h-4" /></button>
                         </>
                       )}
                     </div>
@@ -182,16 +205,16 @@ export default function AdminApplications() {
             <div className="flex flex-wrap gap-2 mt-5">
               <a href={`tel:${selected.phone}`}>
                 <Button size="sm" variant="outline" className="rounded-xl font-body text-xs">
-                  <Phone className="w-3 h-3 mr-1" /> Call Applicant
+                  <Phone className="w-3 h-3 mr-1" /> Call
                 </Button>
               </a>
               {selected.status === "pending" && (
                 <>
-                  <Button size="sm" onClick={() => updateStatus.mutate({ id: selected.id, status: "approved" })} className="rounded-xl font-body text-xs">
-                    <CheckCircle className="w-3 h-3 mr-1" /> Approve
+                  <Button size="sm" onClick={() => handleStatusChange(selected, "approved")} className="rounded-xl font-body text-xs bg-green-600 hover:bg-green-700 text-white">
+                    <CheckCircle className="w-3 h-3 mr-1" /> Approve & Notify
                   </Button>
-                  <Button size="sm" variant="destructive" onClick={() => updateStatus.mutate({ id: selected.id, status: "rejected" })} className="rounded-xl font-body text-xs">
-                    <XCircle className="w-3 h-3 mr-1" /> Reject
+                  <Button size="sm" variant="destructive" onClick={() => handleStatusChange(selected, "rejected")} className="rounded-xl font-body text-xs">
+                    <XCircle className="w-3 h-3 mr-1" /> Reject & Notify
                   </Button>
                 </>
               )}

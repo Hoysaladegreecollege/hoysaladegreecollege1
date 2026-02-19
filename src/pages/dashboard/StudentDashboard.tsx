@@ -1,5 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { BookOpen, Clock, BarChart3, Bell, Calendar, TrendingUp } from "lucide-react";
+import { BookOpen, Clock, BarChart3, Bell, Calendar, TrendingUp, CheckCircle, XCircle } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
@@ -17,10 +17,12 @@ export default function StudentDashboard() {
       const { data: student } = await supabase.from("students").select("id").eq("user_id", user.id).single();
       if (!student) return null;
 
-      const [attendance, marks, notices] = await Promise.all([
+      const today = new Date().toISOString().split("T")[0];
+      const [attendance, marks, notices, todayAttendance] = await Promise.all([
         supabase.from("attendance").select("status").eq("student_id", student.id),
         supabase.from("marks").select("obtained_marks, max_marks").eq("student_id", student.id),
         supabase.from("notices").select("id", { count: "exact", head: true }).eq("is_active", true),
+        supabase.from("attendance").select("status").eq("student_id", student.id).eq("date", today),
       ]);
 
       const total = attendance.data?.length || 0;
@@ -32,7 +34,15 @@ export default function StudentDashboard() {
         ? Math.round(marksData.reduce((s, m) => s + (m.obtained_marks / m.max_marks) * 100, 0) / marksData.length)
         : 0;
 
-      return { attendance: `${pct}%`, avgMarks: `${avgMarks}%`, notices: notices.count || 0, present, absent: total - present };
+      // Today's attendance status
+      const todayRecords = todayAttendance.data || [];
+      let todayStatus: "present" | "absent" | "none" = "none";
+      if (todayRecords.length > 0) {
+        const hasAbsent = todayRecords.some(r => r.status === "absent");
+        todayStatus = hasAbsent ? "absent" : "present";
+      }
+
+      return { attendance: `${pct}%`, avgMarks: `${avgMarks}%`, notices: notices.count || 0, present, absent: total - present, todayStatus };
     },
     enabled: !!user,
   });
@@ -73,6 +83,44 @@ export default function StudentDashboard() {
         <p className="font-body text-xs sm:text-sm text-muted-foreground mt-2 relative">Here's your academic overview</p>
       </div>
 
+      {/* Today's Attendance Status Box */}
+      {data?.todayStatus && data.todayStatus !== "none" && (
+        <div className={`border-2 rounded-2xl p-5 flex items-center gap-4 transition-all duration-300 ${
+          data.todayStatus === "present"
+            ? "bg-green-50 border-green-300"
+            : "bg-red-50 border-red-300"
+        }`}>
+          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${
+            data.todayStatus === "present" ? "bg-green-100" : "bg-red-100"
+          }`}>
+            {data.todayStatus === "present"
+              ? <CheckCircle className="w-7 h-7 text-green-600" />
+              : <XCircle className="w-7 h-7 text-red-600" />
+            }
+          </div>
+          <div>
+            <p className={`font-display text-lg font-bold ${data.todayStatus === "present" ? "text-green-700" : "text-red-700"}`}>
+              {data.todayStatus === "present" ? "You're Present Today ✓" : "You're Marked Absent Today"}
+            </p>
+            <p className="font-body text-xs text-muted-foreground">
+              {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {data?.todayStatus === "none" && (
+        <div className="bg-muted/30 border border-border rounded-2xl p-5 flex items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center">
+            <Clock className="w-7 h-7 text-muted-foreground" />
+          </div>
+          <div>
+            <p className="font-display text-lg font-bold text-foreground">Attendance Not Marked Yet</p>
+            <p className="font-body text-xs text-muted-foreground">Today's attendance will appear here once marked.</p>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
         {quickStats.map((s) => (
           <div key={s.label} className={`bg-gradient-to-br ${s.gradient} border border-border rounded-2xl p-4 sm:p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group`}>
@@ -98,7 +146,6 @@ export default function StudentDashboard() {
               </Link>
             ))}
           </div>
-          {/* Attendance Chart */}
           {(data?.present || data?.absent) ? (
             <div className="mt-5 pt-4 border-t border-border">
               <p className="font-body text-xs font-semibold text-muted-foreground mb-2">Attendance Breakdown</p>

@@ -122,8 +122,8 @@ export default function Admissions() {
 
       {/* Application Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={(e) => { if (e.target === e.currentTarget) setShowForm(false); }}>
-          <div className="bg-card rounded-2xl border border-border w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 animate-fade-in shadow-2xl">
+        <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm z-50 flex items-center justify-center p-0 sm:p-4" onClick={(e) => { if (e.target === e.currentTarget) setShowForm(false); }}>
+          <div className="bg-card sm:rounded-2xl border-0 sm:border border-border w-full max-w-2xl h-full sm:h-auto sm:max-h-[90vh] overflow-y-auto p-4 sm:p-6 animate-fade-in shadow-2xl">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="font-display text-xl font-bold text-foreground">Online Application Form</h2>

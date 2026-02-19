@@ -53,7 +53,7 @@ export default function Navbar() {
             <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-secondary" />
           </div>
           <div>
-            <span className="font-display text-sm sm:text-lg font-bold text-primary leading-tight block group-hover:text-navy-dark transition-colors">
+            <span className="font-display text-sm sm:text-lg font-bold text-foreground leading-tight block group-hover:text-primary transition-colors">
               Hoysala Degree College
             </span>
             <span className="text-[8px] sm:text-[9px] text-muted-foreground font-body tracking-wide leading-tight block">
