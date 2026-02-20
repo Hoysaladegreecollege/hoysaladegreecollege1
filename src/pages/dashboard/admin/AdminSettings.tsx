@@ -1,9 +1,9 @@
-import { Settings, Globe, Calendar, Shield, Database, TrendingUp, Activity, Server, Users, Download } from "lucide-react";
+import { Settings, Globe, Calendar, Shield, TrendingUp, Activity, Download, Users } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
+import { ResponsiveContainer, LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip } from "recharts";
 import { toast } from "sonner";
 
 export default function AdminSettings() {
@@ -63,6 +63,27 @@ export default function AdminSettings() {
     toast.success("Health report exported!");
   };
 
+  const exportStudentsCSV = async () => {
+    const { data: students } = await supabase.from("students").select("*, courses(name, code)");
+    const { data: profiles } = await supabase.from("profiles").select("*");
+    if (!students) return;
+    const rows = students.map(s => {
+      const p = profiles?.find(pr => pr.user_id === s.user_id);
+      return [
+        p?.full_name || "", p?.email || "", p?.phone || "",
+        s.roll_number, s.semester, s.admission_year,
+        (s as any).courses?.name || "", (s as any).courses?.code || "",
+        s.parent_phone || "", s.address || "", s.date_of_birth || "",
+        s.total_fee || 0, s.fee_paid || 0, s.fee_remarks || "",
+      ].map(v => `"${v}"`).join(",");
+    });
+    const header = ["Name","Email","Phone","Roll Number","Semester","Admission Year","Course","Course Code","Parent Phone","Address","DOB","Total Fee","Fee Paid","Fee Remarks"].join(",");
+    const csv = [header, ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "students_export.csv"; a.click();
+    toast.success("Students exported to CSV!");
+  };
+
   return (
     <div className="space-y-6">
       <div className="bg-gradient-to-r from-primary/5 to-secondary/5 border border-border rounded-2xl p-6">
@@ -70,6 +91,21 @@ export default function AdminSettings() {
           <Settings className="w-5 h-5 text-primary" /> System Settings
         </h2>
         <p className="font-body text-sm text-muted-foreground mt-1">System configuration, analytics & health monitoring</p>
+      </div>
+
+      {/* Student CSV Export */}
+      <div className="bg-card border border-border rounded-2xl p-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-display text-base font-bold text-foreground flex items-center gap-2">
+              <Users className="w-4 h-4 text-primary" /> Export Students
+            </h3>
+            <p className="font-body text-xs text-muted-foreground mt-0.5">Download all student records including fees and contact info</p>
+          </div>
+          <Button variant="outline" onClick={exportStudentsCSV} className="rounded-xl font-body text-xs">
+            <Download className="w-3 h-3 mr-1" /> Export CSV
+          </Button>
+        </div>
       </div>
 
       {/* General Info */}

@@ -3,17 +3,26 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Upload, Trash2, ExternalLink, FileText } from "lucide-react";
+import { Upload, Trash2, ExternalLink, FileText, Download, File, Image, Video, FileArchive } from "lucide-react";
+
+function fileIcon(url: string) {
+  const ext = url?.split(".").pop()?.toLowerCase() || "";
+  if (["jpg","jpeg","png","gif","webp","svg"].includes(ext)) return <Image className="w-5 h-5 text-blue-500" />;
+  if (["mp4","webm","mov","avi"].includes(ext)) return <Video className="w-5 h-5 text-purple-500" />;
+  if (ext === "pdf") return <FileText className="w-5 h-5 text-red-500" />;
+  if (["doc","docx","ppt","pptx","xls","xlsx"].includes(ext)) return <FileArchive className="w-5 h-5 text-green-500" />;
+  return <File className="w-5 h-5 text-muted-foreground" />;
+}
 
 export default function TeacherMaterials() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
   const [subject, setSubject] = useState("");
-  const [materialFile, setMaterialFile] = useState<File | null>(null);
+  const [materialFiles, setMaterialFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const { data: courses = [] } = useQuery({
     queryKey: ["courses-list"],
@@ -37,32 +46,41 @@ export default function TeacherMaterials() {
 
   const addMutation = useMutation({
     mutationFn: async () => {
+      if (materialFiles.length === 0) throw new Error("Please select at least one file");
       setUploading(true);
-      let fileUrl = "";
+      const uploaded: string[] = [];
 
-      if (materialFile) {
-        const ext = materialFile.name.split(".").pop();
+      for (let i = 0; i < materialFiles.length; i++) {
+        const file = materialFiles[i];
+        setUploadProgress(Math.round(((i) / materialFiles.length) * 100));
+        const ext = file.name.split(".").pop();
         const path = `materials/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-        const { error: uploadErr } = await supabase.storage.from("uploads").upload(path, materialFile);
-        if (uploadErr) throw new Error("Upload failed: " + uploadErr.message);
+        const { error: uploadErr } = await supabase.storage.from("uploads").upload(path, file);
+        if (uploadErr) throw new Error(`Upload failed for ${file.name}: ` + uploadErr.message);
         const { data: urlData } = supabase.storage.from("uploads").getPublicUrl(path);
-        fileUrl = urlData.publicUrl;
+        uploaded.push(urlData.publicUrl);
       }
 
-      if (!fileUrl) throw new Error("Please select a file to upload");
+      // Insert one record per file
+      const inserts = uploaded.map((fileUrl, idx) => ({
+        title: materialFiles.length > 1 ? `${title} (${idx + 1})` : title,
+        subject,
+        file_url: fileUrl,
+        course_id: courseId || null,
+        uploaded_by: user!.id,
+      }));
 
-      const { error } = await supabase.from("study_materials").insert({
-        title, subject, file_url: fileUrl, course_id: courseId || null, uploaded_by: user!.id,
-      });
+      const { error } = await supabase.from("study_materials").insert(inserts);
       if (error) throw error;
+      setUploadProgress(100);
     },
     onSuccess: () => {
-      toast.success("Material uploaded!");
-      setTitle(""); setSubject(""); setMaterialFile(null); setCourseId("");
-      setUploading(false);
+      toast.success(`${materialFiles.length} file(s) uploaded!`);
+      setTitle(""); setSubject(""); setMaterialFiles([]); setCourseId("");
+      setUploading(false); setUploadProgress(0);
       queryClient.invalidateQueries({ queryKey: ["teacher-materials"] });
     },
-    onError: (e: any) => { toast.error(e.message); setUploading(false); },
+    onError: (e: any) => { toast.error(e.message); setUploading(false); setUploadProgress(0); },
   });
 
   const deleteMutation = useMutation({
@@ -76,7 +94,28 @@ export default function TeacherMaterials() {
     },
   });
 
+  const handleDownload = async (url: string, title: string) => {
+    try {
+      const resp = await fetch(url);
+      const blob = await resp.blob();
+      const ext = url.split(".").pop()?.split("?")[0] || "file";
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `${title}.${ext}`;
+      a.click();
+    } catch {
+      window.open(url, "_blank");
+    }
+  };
+
   const inputClass = "w-full border border-border rounded-xl px-3 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all";
+
+  const grouped = materials.reduce((acc: any, m: any) => {
+    const key = m.courses?.name || "General";
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(m);
+    return acc;
+  }, {});
 
   return (
     <div className="space-y-6">
@@ -84,11 +123,11 @@ export default function TeacherMaterials() {
         <h2 className="font-display text-xl font-bold text-foreground flex items-center gap-2">
           <FileText className="w-5 h-5 text-primary" /> Study Materials
         </h2>
-        <p className="font-body text-sm text-muted-foreground mt-1">Upload PDFs, images, videos and other files for students</p>
+        <p className="font-body text-sm text-muted-foreground mt-1">Upload multiple PDFs, images, videos and files for students</p>
       </div>
 
       <div className="bg-card border border-border rounded-2xl p-6">
-        <h3 className="font-body text-sm font-bold text-foreground mb-4">Upload New Material</h3>
+        <h3 className="font-body text-sm font-bold text-foreground mb-4">Upload New Material(s)</h3>
         <form onSubmit={(e) => { e.preventDefault(); addMutation.mutate(); }} className="space-y-4">
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
@@ -108,48 +147,105 @@ export default function TeacherMaterials() {
             </div>
             <div>
               <label className="font-body text-xs font-semibold text-foreground block mb-1.5 flex items-center gap-1">
-                <Upload className="w-3 h-3" /> Upload File * (PDF, Images, Videos)
+                <Upload className="w-3 h-3" /> Upload Files * (multiple allowed)
               </label>
-              <input type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,image/*,video/*" required
-                onChange={(e) => setMaterialFile(e.target.files?.[0] || null)}
-                className="w-full font-body text-sm file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-primary/10 file:text-primary file:font-semibold file:text-xs hover:file:bg-primary/20 cursor-pointer" />
-              {materialFile && <p className="font-body text-xs text-muted-foreground mt-1">{materialFile.name}</p>}
+              <input
+                type="file"
+                multiple
+                accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,image/*,video/*"
+                required
+                onChange={(e) => setMaterialFiles(Array.from(e.target.files || []))}
+                className="w-full font-body text-sm file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-primary/10 file:text-primary file:font-semibold file:text-xs hover:file:bg-primary/20 cursor-pointer"
+              />
+              {materialFiles.length > 0 && (
+                <div className="mt-2 space-y-1">
+                  {materialFiles.map((f, i) => (
+                    <p key={i} className="font-body text-xs text-muted-foreground flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" /> {f.name} ({(f.size / 1024).toFixed(1)} KB)
+                    </p>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
+
+          {uploading && (
+            <div className="w-full bg-muted rounded-full h-2">
+              <div className="bg-primary h-2 rounded-full transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
+            </div>
+          )}
+
           <Button type="submit" disabled={uploading || !title || !subject} className="rounded-xl font-body">
-            {uploading ? "Uploading..." : <><Upload className="w-4 h-4 mr-2" /> Upload Material</>}
+            {uploading ? `Uploading ${uploadProgress}%...` : <><Upload className="w-4 h-4 mr-2" /> Upload {materialFiles.length > 1 ? `${materialFiles.length} Files` : "Material"}</>}
           </Button>
         </form>
       </div>
 
-      <div className="bg-card border border-border rounded-2xl p-6">
-        <h3 className="font-body text-sm font-bold text-foreground mb-4">All Materials ({materials.length})</h3>
+      {/* Materials grouped by course */}
+      <div className="space-y-4">
         {isLoading ? (
           <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-14 bg-muted/50 rounded-xl animate-pulse" />)}</div>
         ) : materials.length === 0 ? (
-          <p className="font-body text-sm text-muted-foreground text-center py-6">No materials uploaded yet.</p>
-        ) : (
-          <div className="space-y-2">
-            {materials.map((m: any) => (
-              <div key={m.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors group">
-                <div className="min-w-0 flex-1">
-                  <p className="font-body text-sm font-semibold text-foreground">{m.title}</p>
-                  <p className="font-body text-xs text-muted-foreground">{m.subject} • {m.courses?.name || "General"}</p>
-                </div>
-                <div className="flex gap-1 shrink-0">
-                  {m.file_url && (
-                    <a href={m.file_url} target="_blank" rel="noopener noreferrer">
-                      <button className="p-1.5 rounded-lg hover:bg-primary/10 text-primary transition-colors"><ExternalLink className="w-4 h-4" /></button>
-                    </a>
-                  )}
-                  <button onClick={() => { if (confirm("Delete this material?")) deleteMutation.mutate(m.id); }}
-                    className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive opacity-0 group-hover:opacity-100 transition-all"><Trash2 className="w-4 h-4" /></button>
-                </div>
-              </div>
-            ))}
+          <div className="bg-card border border-border rounded-2xl p-10 text-center">
+            <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+            <p className="font-body text-sm text-muted-foreground">No materials uploaded yet.</p>
           </div>
+        ) : (
+          Object.entries(grouped).map(([courseName, items]: [string, any]) => (
+            <div key={courseName} className="bg-card border border-border rounded-2xl overflow-hidden">
+              <div className="px-5 py-3 bg-muted/30 border-b border-border flex items-center justify-between">
+                <h3 className="font-body text-sm font-bold text-foreground flex items-center gap-2">
+                  <BookIcon /> {courseName}
+                </h3>
+                <span className="font-body text-xs text-muted-foreground">{items.length} file(s)</span>
+              </div>
+              <div className="divide-y divide-border/50">
+                {items.map((m: any) => (
+                  <div key={m.id} className="flex items-center gap-3 px-5 py-3.5 hover:bg-muted/20 transition-colors group">
+                    <div className="shrink-0">{fileIcon(m.file_url || "")}</div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-body text-sm font-semibold text-foreground truncate">{m.title}</p>
+                      <p className="font-body text-xs text-muted-foreground">{m.subject} • {new Date(m.created_at).toLocaleDateString()}</p>
+                    </div>
+                    <div className="flex gap-1 shrink-0">
+                      {m.file_url && (
+                        <>
+                          <a href={m.file_url} target="_blank" rel="noopener noreferrer">
+                            <button className="p-1.5 rounded-lg hover:bg-primary/10 text-primary transition-colors" title="Open">
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            </button>
+                          </a>
+                          <button
+                            className="p-1.5 rounded-lg hover:bg-green-500/10 text-green-600 transition-colors"
+                            title="Download"
+                            onClick={() => handleDownload(m.file_url, m.title)}
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                          </button>
+                        </>
+                      )}
+                      <button
+                        onClick={() => { if (confirm("Delete this material?")) deleteMutation.mutate(m.id); }}
+                        className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive opacity-0 group-hover:opacity-100 transition-all"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))
         )}
       </div>
     </div>
+  );
+}
+
+function BookIcon() {
+  return (
+    <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+    </svg>
   );
 }
