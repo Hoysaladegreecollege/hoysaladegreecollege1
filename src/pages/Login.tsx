@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { GraduationCap, Eye, EyeOff } from "lucide-react";
+import { GraduationCap, Eye, EyeOff, Sparkles, Lock, Mail, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -7,11 +7,11 @@ import { toast } from "sonner";
 
 type Role = "student" | "teacher" | "principal" | "admin";
 
-const roles: { value: Role; label: string; icon: string }[] = [
-  { value: "student", label: "Student", icon: "🎓" },
-  { value: "teacher", label: "Teacher", icon: "📚" },
-  { value: "principal", label: "Principal", icon: "🏛️" },
-  { value: "admin", label: "Admin", icon: "⚙️" },
+const roles: { value: Role; label: string; icon: string; color: string }[] = [
+  { value: "student", label: "Student", icon: "🎓", color: "from-blue-500/20 to-blue-600/10" },
+  { value: "teacher", label: "Teacher", icon: "📚", color: "from-green-500/20 to-green-600/10" },
+  { value: "principal", label: "Principal", icon: "🏛️", color: "from-purple-500/20 to-purple-600/10" },
+  { value: "admin", label: "Admin", icon: "⚙️", color: "from-amber-500/20 to-amber-600/10" },
 ];
 
 export default function Login() {
@@ -24,12 +24,12 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [focused, setFocused] = useState<string | null>(null);
   const { signIn, signUp, role: currentUserRole, user } = useAuth();
   const navigate = useNavigate();
 
   const canSignup = isSignupMode && currentUserRole === "admin";
 
-  // Redirect if already logged in and role is loaded
   useEffect(() => {
     if (user && currentUserRole && !isSignupMode) {
       const path = currentUserRole === "admin" ? "/dashboard/admin"
@@ -46,100 +46,160 @@ export default function Login() {
     setLoading(true);
     if (mode === "login") {
       const { error } = await signIn(email, password);
-      if (error) {
-        toast.error(error.message);
-        setLoading(false);
-      } else {
-        toast.success("Signed in successfully!");
-        // useEffect handles redirect once role loads
-      }
+      if (error) { toast.error(error.message); setLoading(false); }
+      else toast.success("Signed in successfully!");
     } else {
       if (!canSignup) { toast.error("Only admins can create new accounts"); setLoading(false); return; }
       if (!fullName) { toast.error("Please enter the full name"); setLoading(false); return; }
       const { error } = await signUp(email, password, fullName, role);
       if (error) toast.error(error.message);
-      else toast.success("Account created! The user can now sign in after email verification.");
+      else toast.success("Account created! User can sign in after email verification.");
       setLoading(false);
     }
   };
 
+  const inputBase = "w-full border-2 rounded-2xl px-4 py-3.5 font-body text-sm bg-background/60 focus:outline-none transition-all duration-300 placeholder:text-muted-foreground/50";
+  const inputClass = (name: string) => `${inputBase} ${focused === name ? "border-secondary/60 ring-4 ring-secondary/10 bg-background" : "border-border/50 hover:border-border"}`;
+
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
-      <div className="absolute inset-0 animate-gradient" style={{
-        background: "linear-gradient(135deg, hsl(217 72% 18%), hsl(217 72% 25%), hsl(217 60% 22%), hsl(217 72% 18%))",
-        backgroundSize: "200% 200%",
+      {/* Animated Background */}
+      <div className="absolute inset-0" style={{
+        background: "linear-gradient(135deg, hsl(217 72% 14%), hsl(217 72% 20%), hsl(217 60% 18%), hsl(217 72% 12%))",
       }} />
-      <div className="absolute inset-0 opacity-20" style={{
-        backgroundImage: "radial-gradient(circle at 20% 50%, hsla(42, 87%, 55%, 0.3), transparent 50%), radial-gradient(circle at 80% 50%, hsla(42, 87%, 55%, 0.2), transparent 50%)",
-      }} />
+      {/* Gold orbs */}
+      <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full opacity-10 animate-float" style={{ background: "radial-gradient(circle, hsla(42,87%,55%,0.8), transparent 70%)", animationDelay: "0s" }} />
+      <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full opacity-8 animate-float" style={{ background: "radial-gradient(circle, hsla(42,87%,55%,0.6), transparent 70%)", animationDelay: "1.5s" }} />
+      <div className="absolute top-3/4 left-1/3 w-32 h-32 rounded-full opacity-5 animate-float" style={{ background: "radial-gradient(circle, hsla(42,87%,55%,0.5), transparent 70%)", animationDelay: "3s" }} />
+      {/* Grid pattern */}
+      <div className="absolute inset-0 opacity-3" style={{ backgroundImage: "linear-gradient(hsla(42,87%,55%,0.05) 1px, transparent 1px), linear-gradient(90deg, hsla(42,87%,55%,0.05) 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
 
       <div className="relative z-10 w-full max-w-md mx-4">
-        <div className="glass-card rounded-2xl p-8">
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
-                <GraduationCap className="w-7 h-7 text-secondary" />
-              </div>
-            </div>
-            <h1 className="font-display text-2xl font-bold text-foreground">
-              {canSignup ? "Create New Account" : "Welcome Back"}
-            </h1>
-            <p className="font-body text-sm text-muted-foreground mt-1">
-              {canSignup ? "Admin: Register a new user account" : "Sign in to your portal"}
-            </p>
-          </div>
+        {/* Card */}
+        <div className="relative bg-card/95 backdrop-blur-2xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
+          {/* Top accent */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-secondary to-transparent" />
 
-          {canSignup && (
-            <div className="mb-6">
-              <label className="font-body text-sm font-medium text-foreground block mb-2">Select Role</label>
-              <div className="grid grid-cols-4 gap-2">
-                {roles.map((r) => (
-                  <button key={r.value} type="button" onClick={() => setRole(r.value)}
-                    className={`p-3 rounded-lg border text-center transition-all font-body text-xs ${
-                      role === r.value ? "border-primary bg-primary/5 text-primary font-semibold" : "border-border text-muted-foreground hover:bg-muted"
-                    }`}>
-                    <div className="text-xl mb-1">{r.icon}</div>{r.label}
-                  </button>
-                ))}
+          <div className="p-8">
+            {/* Logo */}
+            <div className="text-center mb-8">
+              <div className="relative inline-flex items-center justify-center mb-5">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-navy-dark flex items-center justify-center shadow-2xl shadow-primary/30 border border-secondary/20">
+                  <GraduationCap className="w-10 h-10 text-secondary" />
+                </div>
+                <div className="absolute -top-1 -right-1 w-6 h-6 bg-secondary rounded-full flex items-center justify-center shadow-lg">
+                  <Sparkles className="w-3 h-3 text-primary" />
+                </div>
               </div>
+              <h1 className="font-display text-2xl font-bold text-foreground">
+                {canSignup ? "Create Account" : "Welcome Back"}
+              </h1>
+              <p className="font-body text-sm text-muted-foreground mt-1.5">
+                {canSignup ? "Register a new user account" : "Hoysala Degree College Portal"}
+              </p>
             </div>
-          )}
 
-          <form className="space-y-4" onSubmit={handleSubmit}>
+            {/* Role Selection (signup mode) */}
             {canSignup && (
-              <div>
-                <label className="font-body text-sm font-medium text-foreground block mb-1">Full Name</label>
-                <input value={fullName} onChange={(e) => setFullName(e.target.value)}
-                  className="w-full border border-border rounded-lg px-4 py-2.5 font-body text-sm bg-background/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-                  placeholder="Enter full name" />
+              <div className="mb-6">
+                <label className="font-body text-xs font-bold text-foreground block mb-3 uppercase tracking-wider">Select Role</label>
+                <div className="grid grid-cols-4 gap-2">
+                  {roles.map((r) => (
+                    <button key={r.value} type="button" onClick={() => setRole(r.value)}
+                      className={`p-3 rounded-2xl border-2 text-center transition-all duration-300 font-body text-xs hover:scale-105 ${
+                        role === r.value
+                          ? "border-primary bg-primary/10 text-primary font-bold shadow-lg shadow-primary/10"
+                          : "border-border/50 text-muted-foreground hover:border-border"
+                      }`}>
+                      <div className="text-xl mb-1">{r.icon}</div>{r.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
-            <div>
-              <label className="font-body text-sm font-medium text-foreground block mb-1">Email</label>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                className="w-full border border-border rounded-lg px-4 py-2.5 font-body text-sm bg-background/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-                placeholder="you@example.com" />
-            </div>
-            <div>
-              <label className="font-body text-sm font-medium text-foreground block mb-1">Password</label>
-              <div className="relative">
-                <input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)}
-                  className="w-full border border-border rounded-lg px-4 py-2.5 pr-10 font-body text-sm bg-background/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-                  placeholder="••••••••" />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-            <Button className="w-full font-body bg-primary text-primary-foreground hover:bg-navy-light transition-all" type="submit" disabled={loading}>
-              {loading ? "Please wait..." : canSignup ? "Create Account" : "Sign In"}
-            </Button>
-          </form>
 
-          <div className="text-center mt-4">
-            <Link to="/" className="font-body text-xs text-muted-foreground hover:text-primary transition-colors">← Back to Home</Link>
+            <form className="space-y-4" onSubmit={handleSubmit}>
+              {canSignup && (
+                <div>
+                  <label className="font-body text-xs font-bold text-foreground block mb-2 uppercase tracking-wider">Full Name</label>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
+                    <input
+                      value={fullName} onChange={(e) => setFullName(e.target.value)}
+                      className={`${inputClass("fullName")} pl-11`}
+                      placeholder="Enter full name"
+                      onFocus={() => setFocused("fullName")} onBlur={() => setFocused(null)}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <label className="font-body text-xs font-bold text-foreground block mb-2 uppercase tracking-wider">Email</label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
+                  <input
+                    type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                    className={`${inputClass("email")} pl-11`}
+                    placeholder="you@example.com"
+                    onFocus={() => setFocused("email")} onBlur={() => setFocused(null)}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-body text-xs font-bold text-foreground block mb-2 uppercase tracking-wider">Password</label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
+                  <input
+                    type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)}
+                    className={`${inputClass("password")} pl-11 pr-12`}
+                    placeholder="••••••••"
+                    onFocus={() => setFocused("password")} onBlur={() => setFocused(null)}
+                  />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1 rounded-lg">
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <Button
+                  className="w-full rounded-2xl font-body font-bold py-6 text-base relative overflow-hidden bg-primary hover:bg-primary/90 transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-0.5 group"
+                  type="submit"
+                  disabled={loading}
+                >
+                  <span className="absolute inset-0 bg-gradient-to-r from-secondary/20 via-transparent to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    {loading ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        Please wait...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4" />
+                        {canSignup ? "Create Account" : "Sign In to Portal"}
+                      </>
+                    )}
+                  </span>
+                </Button>
+              </div>
+            </form>
+
+            <div className="text-center mt-6">
+              <Link to="/" className="font-body text-xs text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1">
+                ← Back to Website
+              </Link>
+            </div>
           </div>
         </div>
+
+        {/* Footer note */}
+        <p className="text-center font-body text-xs text-white/30 mt-6">
+          Hoysala Degree College · Affiliated to Bangalore University
+        </p>
       </div>
     </div>
   );
