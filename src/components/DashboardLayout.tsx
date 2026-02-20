@@ -5,7 +5,7 @@ import {
   Bell, Clock, LogOut, GraduationCap, Users, Upload,
   BarChart3, Settings, Award, Image, Megaphone, Shield,
   UserCog, Menu, X, Mail, Trophy, ChevronRight, Sparkles, UserCheck,
-  DollarSign, Book
+  DollarSign, Book, ArrowUpCircle
 } from "lucide-react";
 import { useState } from "react";
 import PageLoader from "./PageLoader";
@@ -48,6 +48,8 @@ const principalNav: NavItem[] = [
 
 const adminNav: NavItem[] = [
   { label: "Dashboard", path: "/dashboard/admin", icon: LayoutDashboard },
+  { label: "Post Notice", path: "/dashboard/admin/post-notice", icon: Megaphone },
+  { label: "Semester Promotion", path: "/dashboard/admin/semester-promotion", icon: ArrowUpCircle },
   { label: "Applications", path: "/dashboard/admin/applications", icon: FileText },
   { label: "Messages", path: "/dashboard/admin/contacts", icon: Mail },
   { label: "Users", path: "/dashboard/admin/users", icon: Users },
