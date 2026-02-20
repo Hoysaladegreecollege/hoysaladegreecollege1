@@ -6,16 +6,41 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-// Sort periods by time - parse hour from period string like "9:00 - 9:50" or "Period 1 (9:00-9:50)"
-const sortByPeriod = (a: any, b: any) => {
-  const getTime = (p: string) => {
-    // Match first occurrence of H:MM or HH:MM in the string
-    const match = p.match(/\b(\d{1,2}):(\d{2})\b/);
-    if (!match) return 999;
-    return parseInt(match[1]) * 60 + parseInt(match[2]);
-  };
-  return getTime(a.period) - getTime(b.period);
+// Standard 7-period schedule starting from 9:00
+const STANDARD_PERIODS = [
+  "9:00 - 9:50",
+  "9:50 - 10:40",
+  "10:50 - 11:40",
+  "11:40 - 12:30",
+  "1:10 - 2:00",
+  "2:00 - 2:50",
+  "2:50 - 3:40",
+];
+
+// Parse start time in minutes from a period string like "9:00 - 9:50", "Period 1 (9:00-9:50)"
+const parseStartMinutes = (period: string): number => {
+  const match = period.match(/\b(\d{1,2}):(\d{2})\b/);
+  if (!match) {
+    // Try to match period number and map to standard schedule
+    const numMatch = period.match(/\b(\d)\b/);
+    if (numMatch) {
+      const idx = parseInt(numMatch[1]) - 1;
+      const std = STANDARD_PERIODS[idx];
+      if (std) {
+        const tm = std.match(/(\d{1,2}):(\d{2})/);
+        if (tm) return parseInt(tm[1]) * 60 + parseInt(tm[2]);
+      }
+    }
+    return 999;
+  }
+  const h = parseInt(match[1]);
+  const m = parseInt(match[2]);
+  // Lunch break: 12:30–1:10. Treat 1:xx as 13:xx if hour < 5
+  const normalizedH = h < 5 ? h + 12 : h;
+  return normalizedH * 60 + m;
 };
+
+const sortByPeriod = (a: any, b: any) => parseStartMinutes(a.period) - parseStartMinutes(b.period);
 
 export default function StudentTimetable() {
   const { user } = useAuth();
