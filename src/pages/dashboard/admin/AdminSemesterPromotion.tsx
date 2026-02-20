@@ -27,10 +27,16 @@ export default function AdminSemesterPromotion() {
   const { data: preview = [], isLoading: previewLoading } = useQuery({
     queryKey: ["promotion-preview", selectedCourse, fromSem],
     queryFn: async () => {
-      let q = supabase.from("students").select("id, roll_number, semester, courses(name, code), profiles!students_user_id_fkey(full_name)").eq("is_active", true).eq("semester", fromSem);
+      let q = supabase.from("students").select("id, roll_number, semester, user_id, courses(name, code)").eq("is_active", true).eq("semester", fromSem);
       if (selectedCourse !== "all") q = q.eq("course_id", selectedCourse);
-      const { data } = await q.limit(10);
-      return data || [];
+      const { data: studentsData } = await q.limit(10);
+      if (!studentsData || studentsData.length === 0) return [];
+      const userIds = studentsData.map((s) => s.user_id);
+      const { data: profiles } = await supabase.from("profiles").select("user_id, full_name").in("user_id", userIds);
+      return studentsData.map((s) => ({
+        ...s,
+        profile: profiles?.find((p) => p.user_id === s.user_id),
+      }));
     },
     enabled: fromSem >= 1,
   });
@@ -192,7 +198,7 @@ export default function AdminSemesterPromotion() {
                     <span className="font-body text-xs font-bold text-primary">{i + 1}</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-body text-sm font-semibold text-foreground truncate">{(s as any).profiles?.full_name || "—"}</p>
+                    <p className="font-body text-sm font-semibold text-foreground truncate">{(s as any).profile?.full_name || "—"}</p>
                     <p className="font-body text-xs text-muted-foreground">{s.roll_number}</p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
