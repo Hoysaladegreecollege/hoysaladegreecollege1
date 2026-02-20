@@ -205,9 +205,9 @@ export default function Index() {
 
           {/* Scroll indicator */}
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 opacity-40 animate-float">
-            <div className="w-5 h-8 rounded-full border border-primary-foreground/30 flex items-start justify-center p-1">
-              <div className="w-1 h-2 rounded-full bg-primary-foreground animate-bounce" />
-            </div>
+            
+
+
           </div>
         </div>
       </section>
