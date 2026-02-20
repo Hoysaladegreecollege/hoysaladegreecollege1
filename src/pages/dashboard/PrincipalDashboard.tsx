@@ -1,14 +1,60 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { Users, GraduationCap, Award, Megaphone, Image, BookOpen, Settings, TrendingUp, BarChart3 } from "lucide-react";
+import { Users, GraduationCap, Award, Megaphone, Image, BookOpen, Settings, TrendingUp, BarChart3, Bell, CheckSquare } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { useState, useEffect, useRef } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+
+function useAnimatedCounter(target: number, duration = 1400) {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const started = useRef(false);
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !started.current) {
+        started.current = true;
+        const start = Date.now();
+        const step = () => {
+          const elapsed = Date.now() - start;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          setCount(Math.floor(eased * target));
+          if (progress < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      }
+    }, { threshold: 0.3 });
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [target, duration]);
+  return { count, ref };
+}
+
+function AnimatedStatCard({ label, value, icon: Icon, gradient, accent, delay = 0 }: any) {
+  const { count, ref } = useAnimatedCounter(parseInt(value) || 0);
+  return (
+    <div
+      ref={ref}
+      className={`relative overflow-hidden bg-gradient-to-br ${gradient} border border-border rounded-2xl p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group card-stack`}
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none spotlight" />
+      <div className={`w-11 h-11 rounded-xl ${accent} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+        <Icon className="w-5 h-5 text-primary" />
+      </div>
+      <p className="font-display text-3xl font-bold text-foreground tabular-nums">{count}</p>
+      <p className="font-body text-xs text-muted-foreground mt-1">{label}</p>
+      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/0 via-primary/40 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+    </div>
+  );
+}
 
 export default function PrincipalDashboard() {
   const { profile } = useAuth();
 
-  const { data: counts } = useQuery({
+  const { data: counts, isLoading } = useQuery({
     queryKey: ["principal-stats"],
     queryFn: async () => {
       const [students, teachers, courses, notices] = await Promise.all([
@@ -29,79 +75,115 @@ export default function PrincipalDashboard() {
   ];
 
   const stats = [
-    { label: "Total Students", value: String(counts?.students ?? "—"), icon: Users, gradient: "from-primary/8 to-primary/3" },
-    { label: "Faculty", value: String(counts?.teachers ?? "—"), icon: GraduationCap, gradient: "from-secondary/8 to-secondary/3" },
-    { label: "Courses", value: String(counts?.courses ?? "—"), icon: BookOpen, gradient: "from-primary/8 to-primary/3" },
-    { label: "Notices", value: String(counts?.notices ?? "—"), icon: Megaphone, gradient: "from-secondary/8 to-secondary/3" },
+    { label: "Total Students", value: String(counts?.students ?? 0), icon: Users, gradient: "from-primary/8 to-primary/3", accent: "bg-primary/10", delay: 0 },
+    { label: "Faculty Members", value: String(counts?.teachers ?? 0), icon: GraduationCap, gradient: "from-secondary/8 to-secondary/3", accent: "bg-secondary/10", delay: 80 },
+    { label: "Active Courses", value: String(counts?.courses ?? 0), icon: BookOpen, gradient: "from-primary/8 to-primary/3", accent: "bg-primary/10", delay: 160 },
+    { label: "Active Notices", value: String(counts?.notices ?? 0), icon: Megaphone, gradient: "from-secondary/8 to-secondary/3", accent: "bg-secondary/10", delay: 240 },
   ];
 
   const actions = [
-    { icon: Award, label: "Top Students", desc: "Update top rank students", path: "/dashboard/principal/top-students" },
-    { icon: Image, label: "Events & Gallery", desc: "Post events & photos", path: "/dashboard/principal/events" },
-    { icon: Megaphone, label: "Notices", desc: "Publish announcements", path: "/dashboard/principal/notices" },
-    { icon: BookOpen, label: "Courses & Fees", desc: "Update course details", path: "/dashboard/principal/courses" },
-    { icon: GraduationCap, label: "Departments", desc: "Manage departments", path: "/dashboard/principal/departments" },
-    { icon: Settings, label: "Teachers", desc: "Add & manage faculty", path: "/dashboard/principal/teachers" },
+    { icon: Award, label: "Top Students", desc: "Update top rank students", path: "/dashboard/principal/top-students", color: "from-secondary/10 to-secondary/5 hover:border-secondary/30" },
+    { icon: Image, label: "Events & Gallery", desc: "Post events & photos", path: "/dashboard/principal/events", color: "from-blue-500/10 to-blue-500/5 hover:border-blue-500/30" },
+    { icon: Megaphone, label: "Notices", desc: "Publish announcements", path: "/dashboard/principal/notices", color: "from-primary/10 to-primary/5 hover:border-primary/30" },
+    { icon: BookOpen, label: "Courses & Fees", desc: "Update course details", path: "/dashboard/principal/courses", color: "from-purple-500/10 to-purple-500/5 hover:border-purple-500/30" },
+    { icon: GraduationCap, label: "Departments", desc: "Manage departments", path: "/dashboard/principal/departments", color: "from-emerald-500/10 to-emerald-500/5 hover:border-emerald-500/30" },
+    { icon: Settings, label: "Teachers", desc: "Add & manage faculty", path: "/dashboard/principal/teachers", color: "from-orange-500/10 to-orange-500/5 hover:border-orange-500/30" },
   ];
 
   return (
-    <div className="space-y-5 sm:space-y-6">
-      <div className="relative overflow-hidden bg-gradient-to-r from-primary/8 via-card to-secondary/8 border border-border rounded-2xl p-5 sm:p-6 md:p-8">
-        <div className="absolute top-0 right-0 w-28 h-28 bg-secondary/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-        <h2 className="font-display text-xl sm:text-2xl md:text-3xl font-bold text-foreground relative">
-          Welcome, {profile?.full_name || "Principal"} 🏛️
-        </h2>
-        <p className="font-body text-xs sm:text-sm text-muted-foreground mt-2 relative">Full administrative control of the college</p>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-        {stats.map((s) => (
-          <div key={s.label} className={`bg-gradient-to-br ${s.gradient} border border-border rounded-2xl p-4 sm:p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group`}>
-            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-primary/10 flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-300">
-              <s.icon className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-            </div>
-            <p className="font-display text-2xl sm:text-3xl font-bold text-foreground">{s.value}</p>
-            <p className="font-body text-[10px] sm:text-xs text-muted-foreground mt-1">{s.label}</p>
+    <div className="space-y-5 sm:space-y-6 animate-fade-in">
+      {/* Welcome Banner */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-primary/10 via-card to-secondary/10 border border-border rounded-2xl p-6 md:p-8">
+        <div className="absolute top-0 right-0 w-40 h-40 bg-secondary/8 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
+        <div className="absolute bottom-0 left-20 w-24 h-24 bg-primary/5 rounded-full translate-y-1/2 blur-2xl" />
+        <div className="relative">
+          <div className="inline-flex items-center gap-2 bg-secondary/15 border border-secondary/25 rounded-full px-3 py-1 mb-3">
+            <Award className="w-3 h-3 text-secondary" />
+            <span className="font-body text-[11px] text-secondary-foreground font-semibold uppercase tracking-wider">Principal Portal</span>
           </div>
-        ))}
+          <h2 className="font-display text-2xl sm:text-3xl font-bold text-foreground">
+            Welcome, {profile?.full_name?.split(" ")[0] || "Principal"} 🏛️
+          </h2>
+          <p className="font-body text-sm text-muted-foreground mt-2">Full administrative control — manage faculty, students, courses, and content.</p>
+        </div>
       </div>
 
+      {/* Stats Grid */}
+      {isLoading ? (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          {[1,2,3,4].map(i => <Skeleton key={i} className="h-32 rounded-2xl" />)}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          {stats.map((s) => <AnimatedStatCard key={s.label} {...s} />)}
+        </div>
+      )}
+
+      {/* Chart + Management */}
       <div className="grid md:grid-cols-2 gap-5 sm:gap-6">
-        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6">
+        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
           <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
             <BarChart3 className="w-4 h-4 text-primary" /> College Overview
           </h3>
-          <div className="h-44 sm:h-52">
+          <div className="h-52">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} barSize={32}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(214, 20%, 88%)" />
-                <XAxis dataKey="name" tick={{ fontSize: 11, fontFamily: "Inter" }} stroke="hsl(220, 10%, 45%)" />
-                <YAxis tick={{ fontSize: 11, fontFamily: "Inter" }} stroke="hsl(220, 10%, 45%)" />
-                <Tooltip contentStyle={{ borderRadius: 12, fontFamily: "Inter", fontSize: 12 }} />
-                <Bar dataKey="count" fill="hsl(217, 72%, 18%)" radius={[6, 6, 0, 0]} />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  contentStyle={{ borderRadius: 12, fontFamily: "Inter", fontSize: 12, border: "1px solid hsl(var(--border))", background: "hsl(var(--card))", color: "hsl(var(--foreground))" }}
+                  cursor={{ fill: "hsl(var(--muted))" }}
+                />
+                <Bar dataKey="count" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6">
+        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
           <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-primary" /> Management
           </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-            {actions.map((a) => (
-              <Link key={a.label} to={a.path} className="flex items-center gap-2.5 p-3 rounded-xl border border-border hover:bg-primary/5 hover:border-primary/20 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group">
-                <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5">
+            {actions.map((a, i) => (
+              <Link
+                key={a.label}
+                to={a.path}
+                className={`flex items-center gap-2.5 p-3 rounded-xl border border-border bg-gradient-to-br ${a.color} hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group`}
+                style={{ animationDelay: `${i * 50}ms` }}
+              >
+                <div className="w-9 h-9 rounded-xl bg-card/80 shadow-sm flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
                   <a.icon className="w-4 h-4 text-primary" />
                 </div>
                 <div className="min-w-0">
-                  <p className="font-body text-xs sm:text-sm font-semibold text-foreground truncate">{a.label}</p>
+                  <p className="font-body text-xs font-semibold text-foreground truncate">{a.label}</p>
                   <p className="font-body text-[10px] text-muted-foreground truncate">{a.desc}</p>
                 </div>
               </Link>
             ))}
           </div>
         </div>
+      </div>
+
+      {/* College Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {[
+          { label: "Student-Teacher Ratio", value: counts ? `${Math.round((counts.students || 1) / Math.max(counts.teachers || 1, 1))}:1` : "—", icon: "📊", desc: "Per faculty member" },
+          { label: "Active Courses", value: String(counts?.courses || 0), icon: "📚", desc: "Currently running" },
+          { label: "Notice Board", value: String(counts?.notices || 0), icon: "📢", desc: "Published notices" },
+        ].map((item) => (
+          <div key={item.label} className="bg-gradient-to-br from-muted/50 to-muted/20 border border-border rounded-2xl p-4 flex items-center gap-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group">
+            <div className="w-12 h-12 rounded-2xl bg-card shadow-sm flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-300">
+              {item.icon}
+            </div>
+            <div>
+              <p className="font-display text-xl font-bold text-foreground">{item.value}</p>
+              <p className="font-body text-xs font-semibold text-foreground">{item.label}</p>
+              <p className="font-body text-[10px] text-muted-foreground">{item.desc}</p>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
