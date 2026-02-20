@@ -30,23 +30,36 @@ export default function ApplicationStatus() {
     enabled: searched && !!appNumber && !!email,
   });
 
-  // Confetti on approved status
+  // Enhanced confetti on approved status
   useEffect(() => {
     if (application?.status === "approved" && !confettiFired.current) {
       confettiFired.current = true;
       import("canvas-confetti").then((mod) => {
         const fire = mod.default;
+
+        // Burst from center
+        fire({ particleCount: 120, spread: 100, origin: { y: 0.4 }, colors: ["#d4a843", "#0a1628", "#16a34a", "#fbbf24", "#ef4444", "#3b82f6", "#8b5cf6"] });
+
+        // Sides cannons with staggered timing
         const duration = 3000;
         const end = Date.now() + duration;
-        const colors = ["#d4a843", "#0a1628", "#16a34a", "#fbbf24"];
+        const colors = ["#d4a843", "#16a34a", "#fbbf24", "#3b82f6", "#ef4444", "#8b5cf6", "#ec4899"];
+
         (function frame() {
-          fire({ particleCount: 4, angle: 60, spread: 55, origin: { x: 0 }, colors });
-          fire({ particleCount: 4, angle: 120, spread: 55, origin: { x: 1 }, colors });
+          fire({ particleCount: 6, angle: 60, spread: 70, origin: { x: 0 }, colors, shapes: ["circle", "square"] });
+          fire({ particleCount: 6, angle: 120, spread: 70, origin: { x: 1 }, colors, shapes: ["circle", "square"] });
+          fire({ particleCount: 3, angle: 90, spread: 45, origin: { x: 0.5, y: 0 }, colors, ticks: 200 });
           if (Date.now() < end) requestAnimationFrame(frame);
         })();
+
+        // Final grand burst at end
+        setTimeout(() => {
+          fire({ particleCount: 200, spread: 160, origin: { y: 0.5 }, colors, scalar: 1.2 });
+        }, 2500);
       });
     }
   }, [application?.status]);
+
 
   const statusConfig: Record<string, { icon: any; color: string; bg: string; border: string; label: string }> = {
     pending: { icon: Clock, color: "text-secondary", bg: "bg-secondary/10", border: "border-secondary/30", label: "Under Review" },
@@ -56,106 +69,119 @@ export default function ApplicationStatus() {
 
   const handleDownloadPDF = () => {
     if (!application) return;
-    // Create a styled HTML document and print as PDF
-    const printWindow = window.open("", "_blank");
-    if (!printWindow) return;
-    printWindow.document.write(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Application Form - ${application.application_number}</title>
-      <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #fff; color: #333; padding: 0; }
-        .page { max-width: 800px; margin: 0 auto; padding: 40px; }
-        .header { background: linear-gradient(135deg, #0a1628, #1a2d50); color: white; padding: 32px; border-radius: 16px; text-align: center; margin-bottom: 32px; }
-        .header h1 { font-size: 22px; margin-bottom: 4px; }
-        .header p { font-size: 12px; opacity: 0.7; }
-        .app-number { background: rgba(255,255,255,0.15); display: inline-block; padding: 8px 24px; border-radius: 8px; margin-top: 12px; font-size: 20px; font-weight: bold; letter-spacing: 2px; }
-        .photo-section { text-align: center; margin-bottom: 24px; }
-        .photo-section img { width: 120px; height: 120px; border-radius: 12px; object-fit: cover; border: 3px solid #e5e7eb; }
-        .section { margin-bottom: 24px; }
-        .section-title { font-size: 14px; font-weight: 700; color: #0a1628; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #d4a843; padding-bottom: 8px; margin-bottom: 16px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .field { background: #f8f9fa; padding: 12px 16px; border-radius: 8px; border: 1px solid #e5e7eb; }
-        .field-label { font-size: 10px; text-transform: uppercase; color: #999; letter-spacing: 0.5px; margin-bottom: 4px; }
-        .field-value { font-size: 14px; font-weight: 600; color: #333; }
-        .status-badge { display: inline-block; padding: 8px 20px; border-radius: 20px; font-weight: 700; font-size: 14px; margin-top: 16px; }
-        .status-pending { background: #fef3c7; color: #92400e; }
-        .status-approved { background: #dcfce7; color: #166534; }
-        .status-rejected { background: #fee2e2; color: #991b1b; }
-        .footer { text-align: center; margin-top: 32px; padding-top: 16px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #999; }
-        .gold-divider { height: 3px; background: linear-gradient(90deg, transparent, #d4a843, transparent); margin: 24px 0; border-radius: 2px; }
-        @media print { body { padding: 0; } .page { padding: 20px; } }
-      </style>
-    </head>
-    <body>
-      <div class="page">
-        <div class="header">
-          <h1>🎓 Hoysala Degree College</h1>
-          <p>Affiliated to Bangalore University | BU 26</p>
-          <p style="margin-top:4px">ಶ್ರೀಶಿರಡಿ ಸಾಯಿ ಎಜುಕೇಷನಲ್ ಟ್ರಸ್ಟ್ (ರಿ.)</p>
-          <div class="app-number">${application.application_number}</div>
-        </div>
 
-        ${application.photo_url ? `<div class="photo-section"><img src="${application.photo_url}" alt="Applicant Photo" /></div>` : ""}
+    const htmlContent = `<!DOCTYPE html>
+<html>
+<head>
+  <title>Application Form - ${application.application_number}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; color: #333; }
+    .page { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+    .header { background: linear-gradient(135deg, #0a1628 0%, #1a3a6e 60%, #0a1628 100%); color: white; padding: 36px 32px; border-radius: 20px; text-align: center; margin-bottom: 28px; position: relative; overflow: hidden; }
+    .header::before { content: ''; position: absolute; top: -50%; right: -20%; width: 200px; height: 200px; background: rgba(212,168,67,0.1); border-radius: 50%; }
+    .header h1 { font-size: 24px; margin-bottom: 4px; font-weight: 800; letter-spacing: -0.5px; }
+    .header .sub { font-size: 12px; opacity: 0.6; margin-top: 4px; }
+    .header .app-number { background: rgba(212,168,67,0.2); border: 1px solid rgba(212,168,67,0.4); display: inline-block; padding: 10px 28px; border-radius: 12px; margin-top: 16px; font-size: 22px; font-weight: 900; letter-spacing: 3px; color: #d4a843; }
+    .card { background: white; border-radius: 16px; padding: 24px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    .section-title { font-size: 11px; font-weight: 800; color: #0a1628; text-transform: uppercase; letter-spacing: 1.5px; padding-bottom: 10px; border-bottom: 2px solid #d4a843; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .field { background: #f8fafc; padding: 12px 14px; border-radius: 10px; border: 1px solid #e2e8f0; }
+    .field-label { font-size: 9px; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.8px; font-weight: 700; margin-bottom: 4px; }
+    .field-value { font-size: 14px; font-weight: 600; color: #1a202c; }
+    .photo-section { text-align: center; margin-bottom: 20px; }
+    .photo-section img { width: 100px; height: 100px; border-radius: 16px; object-fit: cover; border: 3px solid #e2e8f0; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+    .status-section { text-align: center; padding: 20px; }
+    .status-badge { display: inline-block; padding: 10px 28px; border-radius: 50px; font-weight: 800; font-size: 15px; letter-spacing: 1px; }
+    .status-pending { background: #fef3c7; color: #92400e; border: 2px solid #fcd34d; }
+    .status-approved { background: linear-gradient(135deg, #dcfce7, #bbf7d0); color: #166534; border: 2px solid #86efac; }
+    .status-rejected { background: #fee2e2; color: #991b1b; border: 2px solid #fca5a5; }
+    .footer { text-align: center; margin-top: 24px; padding: 16px; background: white; border-radius: 12px; }
+    .footer p { font-size: 11px; color: #94a3b8; }
+    @media print { body { background: white; } .page { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <div style="font-size:40px; margin-bottom:8px;">🎓</div>
+      <h1>Hoysala Degree College</h1>
+      <div class="sub">Affiliated to Bangalore University | BU 26</div>
+      <div class="sub" style="margin-top:2px;">ಶ್ರೀಶಿರಡಿ ಸಾಯಿ ಎಜುಕೇಷನಲ್ ಟ್ರಸ್ಟ್ (ರಿ.)</div>
+      <div class="app-number">${application.application_number}</div>
+    </div>
 
-        <div class="section">
-          <div class="section-title">Personal Information</div>
-          <div class="grid">
-            <div class="field"><div class="field-label">Full Name</div><div class="field-value">${application.full_name}</div></div>
-            <div class="field"><div class="field-label">Email</div><div class="field-value">${application.email}</div></div>
-            <div class="field"><div class="field-label">Phone</div><div class="field-value">${application.phone}</div></div>
-            <div class="field"><div class="field-label">Date of Birth</div><div class="field-value">${application.date_of_birth || "N/A"}</div></div>
-            <div class="field"><div class="field-label">Gender</div><div class="field-value">${application.gender || "N/A"}</div></div>
-            <div class="field"><div class="field-label">Course Applied</div><div class="field-value">${application.course}</div></div>
-          </div>
-        </div>
+    ${application.photo_url ? `<div class="photo-section"><img src="${application.photo_url}" alt="Applicant Photo" /></div>` : ""}
 
-        <div class="gold-divider"></div>
-
-        <div class="section">
-          <div class="section-title">Academic Details</div>
-          <div class="grid">
-            <div class="field"><div class="field-label">Previous PU College</div><div class="field-value">${application.previous_school || "N/A"}</div></div>
-            <div class="field"><div class="field-label">12th Percentage</div><div class="field-value">${application.percentage_12th || "N/A"}</div></div>
-          </div>
-        </div>
-
-        <div class="gold-divider"></div>
-
-        <div class="section">
-          <div class="section-title">Parent / Guardian Details</div>
-          <div class="grid">
-            <div class="field"><div class="field-label">Father's Name</div><div class="field-value">${application.father_name || "N/A"}</div></div>
-            <div class="field"><div class="field-label">Mother's Name</div><div class="field-value">${application.mother_name || "N/A"}</div></div>
-          </div>
-        </div>
-
-        <div class="section">
-          <div class="section-title">Address</div>
-          <div class="field" style="grid-column: span 2"><div class="field-value">${application.address || "N/A"}</div></div>
-        </div>
-
-        <div class="gold-divider"></div>
-
-        <div style="text-align:center">
-          <div class="section-title" style="border:none; margin-bottom:8px">Application Status</div>
-          <span class="status-badge status-${application.status}">${application.status?.toUpperCase()}</span>
-          <p style="font-size:12px; color:#999; margin-top:8px">Applied on: ${new Date(application.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}</p>
-        </div>
-
-        <div class="footer">
-          <p>This is a computer-generated document from Hoysala Degree College admission portal.</p>
-          <p style="margin-top:4px">📞 7676272167 | 📧 principal.hoysaladegreecollege@gmail.com</p>
-        </div>
+    <div class="card">
+      <div class="section-title">👤 Personal Information</div>
+      <div class="grid">
+        <div class="field"><div class="field-label">Full Name</div><div class="field-value">${application.full_name}</div></div>
+        <div class="field"><div class="field-label">Course Applied</div><div class="field-value">${application.course}</div></div>
+        <div class="field"><div class="field-label">Email</div><div class="field-value">${application.email}</div></div>
+        <div class="field"><div class="field-label">Phone</div><div class="field-value">${application.phone}</div></div>
+        <div class="field"><div class="field-label">Date of Birth</div><div class="field-value">${application.date_of_birth || "N/A"}</div></div>
+        <div class="field"><div class="field-label">Gender</div><div class="field-value">${application.gender || "N/A"}</div></div>
       </div>
-      <script>window.onload = function() { window.print(); }</script>
-    </body>
-    </html>
-    `);
-    printWindow.document.close();
+    </div>
+
+    <div class="card">
+      <div class="section-title">🎓 Academic Details</div>
+      <div class="grid">
+        <div class="field"><div class="field-label">Previous PU College</div><div class="field-value">${application.previous_school || "N/A"}</div></div>
+        <div class="field"><div class="field-label">12th Percentage</div><div class="field-value">${application.percentage_12th || "N/A"}%</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">👨‍👩‍👧 Parent / Guardian Details</div>
+      <div class="grid">
+        <div class="field"><div class="field-label">Father's Name</div><div class="field-value">${application.father_name || "N/A"}</div></div>
+        <div class="field"><div class="field-label">Mother's Name</div><div class="field-value">${application.mother_name || "N/A"}</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">🏠 Address</div>
+      <div class="field" style="width:100%"><div class="field-value">${application.address || "N/A"}</div></div>
+    </div>
+
+    <div class="card">
+      <div class="status-section">
+        <div class="section-title" style="justify-content:center; border:none; margin-bottom:12px;">📋 Application Status</div>
+        <span class="status-badge status-${application.status}">${application.status?.toUpperCase()}</span>
+        <p style="font-size:12px; color:#94a3b8; margin-top:10px;">Applied on: ${new Date(application.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}</p>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>📞 7676272167 | 📧 principal.hoysaladegreecollege@gmail.com</p>
+      <p style="margin-top:4px;">This is a computer-generated document from Hoysala Degree College admission portal.</p>
+    </div>
+  </div>
+  <script>
+    window.onload = function() {
+      window.print();
+      // After print dialog closes, if user chose to save as PDF, the blob download handles it
+    };
+  </script>
+</body>
+</html>`;
+
+    // Use blob + object URL to force download dialog with filename
+    const blob = new Blob([htmlContent], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const printWindow = window.open(url, "_blank");
+    if (printWindow) {
+      printWindow.onload = () => {
+        printWindow.document.title = `Application-${application.application_number}.pdf`;
+        printWindow.print();
+      };
+    }
+    // Cleanup
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
   };
+
 
   const sc = statusConfig[application?.status || "pending"];
 
