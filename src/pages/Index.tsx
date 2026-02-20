@@ -142,52 +142,72 @@ export default function Index() {
   return (
     <div className="page-enter">
       {/* Hero */}
-      <section className="relative h-[90vh] min-h-[550px] flex items-center justify-center overflow-hidden">
-        <img src={heroImage} alt="Hoysala Degree College Campus" className="absolute inset-0 w-full h-full object-cover scale-105" />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, hsla(217,72%,10%,0.92), hsla(217,72%,18%,0.7), hsla(217,72%,25%,0.6))" }} />
-        {/* Decorative elements */}
-        <div className="absolute top-20 left-10 w-32 h-32 rounded-full bg-secondary/5 blur-3xl" />
-        <div className="absolute bottom-20 right-10 w-48 h-48 rounded-full bg-secondary/3 blur-3xl" />
+      <section className="relative h-[92vh] min-h-[580px] flex items-center justify-center overflow-hidden">
+        <img src={heroImage} alt="Hoysala Degree College Campus" className="absolute inset-0 w-full h-full object-cover scale-110 animate-hero-float" style={{ animationDuration: "20s" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, hsla(217,72%,8%,0.94), hsla(217,72%,15%,0.78), hsla(217,72%,22%,0.55))" }} />
+
+        {/* Floating ambient orbs */}
+        <div className="absolute top-16 left-[8%] w-40 h-40 rounded-full bg-secondary/6 blur-3xl animate-float pointer-events-none" />
+        <div className="absolute bottom-16 right-[8%] w-56 h-56 rounded-full bg-secondary/4 blur-3xl animate-float animation-delay-400 pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-secondary/3 blur-[150px] pointer-events-none" />
+
+        {/* Subtle grid pattern */}
+        <div className="absolute inset-0 opacity-[0.04] pointer-events-none"
+          style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
+
+        {/* Bottom gradient fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background/20 to-transparent pointer-events-none" />
+
         <div className="relative z-10 container text-center text-primary-foreground px-4">
-          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary-foreground/8 border border-primary-foreground/15 mb-6 animate-fade-in backdrop-blur-sm">
-            <Sparkles className="w-3.5 h-3.5 text-secondary" />
-            <span className="font-body text-xs tracking-[0.25em] uppercase text-secondary font-semibold">Excellence in Education</span>
-            <Sparkles className="w-3.5 h-3.5 text-secondary" />
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary-foreground/10 border border-primary-foreground/15 mb-6 animate-fade-in backdrop-blur-sm shadow-lg">
+            <Sparkles className="w-3.5 h-3.5 text-secondary animate-sparkle" />
+            <span className="font-body text-xs tracking-[0.2em] uppercase text-secondary font-bold">Excellence in Education</span>
+            <Sparkles className="w-3.5 h-3.5 text-secondary animate-sparkle animation-delay-300" />
           </div>
-          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.08] mb-5 animate-fade-in-up">
-            Hoysala Degree<br className="hidden sm:block" /> College
+
+          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.08] mb-5 animate-slide-up">
+            Hoysala Degree<br className="hidden sm:block" />
+            <span className="text-gradient bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(135deg, hsl(42,87%,70%), hsl(42,87%,55%), hsl(38,92%,48%))" }}> College</span>
           </h1>
-          <p className="font-body text-xs sm:text-sm max-w-2xl mx-auto opacity-70 mb-2 animate-fade-in-up animation-delay-200 leading-relaxed">
+
+          <p className="font-body text-xs sm:text-sm max-w-2xl mx-auto opacity-65 mb-1.5 animate-fade-in-up animation-delay-300 leading-relaxed">
             Affiliated To Bangalore University & Approved by AICTE New Delhi
-            <br />
-            <span className="opacity-60">College Code: BU 26 (P21GEF0099)</span>
           </p>
-          <p className="font-body text-[10px] sm:text-xs max-w-xl mx-auto opacity-40 mb-8 animate-fade-in-up animation-delay-200">
-            K.R.P. Arcade, UCO Bank Building, Paramanna Layout, Nelamangala Town, Bengaluru Rural Dist. - 562 123
+          <p className="font-body text-[11px] sm:text-xs max-w-xl mx-auto opacity-35 mb-8 animate-fade-in-up animation-delay-400">
+            College Code: BU 26 • K.R.P. Arcade, Nelamangala Town, Bengaluru Rural Dist. - 562 123
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animation-delay-400">
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up animation-delay-500">
             <Link to="/admissions">
-              <button className="relative group w-full sm:w-auto overflow-hidden px-8 sm:px-10 py-3.5 rounded-2xl font-body text-sm sm:text-base font-bold text-primary-foreground shadow-2xl transition-all duration-500 hover:scale-105 hover:-translate-y-0.5"
-                style={{ background: "linear-gradient(135deg, hsl(42,87%,55%), hsl(38,92%,48%), hsl(42,87%,65%))", boxShadow: "0 8px 32px hsla(42,87%,55%,0.45), inset 0 1px 0 rgba(255,255,255,0.25)" }}>
-                <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/0 via-white/15 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                <span className="relative flex items-center gap-2">
-                  <Sparkles className="w-4 h-4" />
+              <button className="relative group w-full sm:w-auto overflow-hidden px-8 sm:px-10 py-4 rounded-2xl font-body text-sm sm:text-base font-bold text-primary-foreground shadow-2xl transition-all duration-500 hover:scale-105 hover:-translate-y-1 active:scale-100"
+                style={{ background: "linear-gradient(135deg, hsl(42,87%,52%), hsl(38,92%,44%), hsl(42,87%,60%))", boxShadow: "0 8px 40px hsla(42,87%,52%,0.45), 0 2px 0 rgba(255,255,255,0.15) inset" }}>
+                <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                <span className="relative flex items-center justify-center gap-2">
+                  <Sparkles className="w-4 h-4 group-hover:animate-spin" />
                   Apply Now
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
                 </span>
               </button>
             </Link>
             <Link to="/courses">
-              <button className="relative group w-full sm:w-auto overflow-hidden px-8 sm:px-10 py-3.5 rounded-2xl font-body text-sm sm:text-base font-bold transition-all duration-500 hover:scale-105 hover:-translate-y-0.5"
-                style={{ background: "rgba(255,255,255,0.08)", border: "1.5px solid rgba(255,255,255,0.2)", backdropFilter: "blur(12px)", color: "white", boxShadow: "0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15)" }}>
-                <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                <span className="relative flex items-center gap-2">
-                  <GraduationCap className="w-4 h-4" />
+              <button className="relative group w-full sm:w-auto overflow-hidden px-8 sm:px-10 py-4 rounded-2xl font-body text-sm sm:text-base font-bold text-white transition-all duration-500 hover:scale-105 hover:-translate-y-1 active:scale-100"
+                style={{ background: "rgba(255,255,255,0.09)", border: "1.5px solid rgba(255,255,255,0.22)", backdropFilter: "blur(16px)", boxShadow: "0 8px 32px rgba(0,0,0,0.25), 0 1px 0 rgba(255,255,255,0.18) inset" }}>
+                <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/0 via-white/12 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                <span className="relative flex items-center justify-center gap-2">
+                  <GraduationCap className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
                   Explore Courses
                   <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
                 </span>
               </button>
             </Link>
+          </div>
+
+          {/* Scroll indicator */}
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 opacity-40 animate-float">
+            <div className="w-5 h-8 rounded-full border border-primary-foreground/30 flex items-start justify-center p-1">
+              <div className="w-1 h-2 rounded-full bg-primary-foreground animate-bounce" />
+            </div>
           </div>
         </div>
       </section>

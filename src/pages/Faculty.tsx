@@ -43,55 +43,72 @@ export default function Faculty() {
     <div className="page-enter">
       <PageHeader title="Our Faculty" subtitle="Dedicated professionals committed to your success" />
 
-      <section className="py-16 sm:py-24 bg-background">
-        <div className="container px-4">
+      <section className="py-16 sm:py-24 bg-background relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-secondary/4 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/3 rounded-full blur-3xl pointer-events-none" />
+        <div className="container px-4 relative">
           <ScrollReveal>
             <SectionHeading title="Meet Our Educators" subtitle="Experienced professors and industry experts shaping the future" />
           </ScrollReveal>
 
           {isLoading ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6 max-w-6xl mx-auto">
-              {Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-72 rounded-2xl" />)}
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="bg-card border border-border rounded-2xl p-6 flex flex-col items-center gap-4">
+                  <Skeleton className="w-20 h-20 rounded-2xl" />
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-1/2" />
+                  <Skeleton className="h-3 w-2/3" />
+                  <Skeleton className="h-3 w-1/3" />
+                </div>
+              ))}
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6 max-w-6xl mx-auto">
               {faculty.map((f: any, i: number) => {
                 const deptGrad = deptColors[f.department] || "from-primary/10 to-secondary/5";
                 return (
-                  <ScrollReveal key={f.id} delay={i * 80}>
+                  <ScrollReveal key={f.id} delay={i * 70}>
                     <div
                       onClick={() => setSelectedFaculty(f)}
-                      className="premium-card p-6 text-center group h-full flex flex-col cursor-pointer hover:shadow-xl hover:-translate-y-2 transition-all duration-400">
+                      className="premium-card p-6 text-center group h-full flex flex-col cursor-pointer relative overflow-hidden">
+                      {/* Hover bg */}
+                      <div className={`absolute inset-0 bg-gradient-to-br ${deptGrad} opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl`} />
+                      {/* Top line */}
+                      <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-secondary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-t-2xl" />
+
                       {/* Photo */}
-                      <div className={`relative w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br ${deptGrad} flex items-center justify-center mb-4 group-hover:scale-110 transition-all duration-400 overflow-hidden border-2 border-border group-hover:border-primary/30 shadow-md`}>
+                      <div className={`relative w-24 h-24 mx-auto rounded-2xl bg-gradient-to-br ${deptGrad} flex items-center justify-center mb-4 group-hover:scale-105 transition-all duration-400 overflow-hidden border-2 border-border group-hover:border-primary/30 shadow-md z-10`}>
                         {f.photo_url ? (
                           <img src={f.photo_url} alt={f.name} className="w-full h-full object-cover" />
                         ) : (
-                          <GraduationCap className="w-8 h-8 text-primary" />
+                          <GraduationCap className="w-10 h-10 text-primary group-hover:scale-110 transition-transform duration-300" />
                         )}
-                        {/* Shimmer overlay on hover */}
                         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                       </div>
-                      <h3 className="font-display text-base font-bold text-foreground group-hover:text-primary transition-colors duration-300">{f.name}</h3>
-                      <p className="font-body text-xs text-secondary font-semibold mt-1">{f.role}</p>
-                      <span className="inline-block mt-1.5 font-body text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-muted text-muted-foreground">
+
+                      <h3 className="font-display text-base font-bold text-foreground group-hover:text-primary transition-colors duration-300 relative z-10">{f.name}</h3>
+                      <p className="font-body text-xs text-secondary font-semibold mt-1 relative z-10">{f.role}</p>
+                      <span className="inline-block mt-2 font-body text-[10px] font-semibold px-3 py-1 rounded-full bg-muted/80 text-muted-foreground border border-border/50 relative z-10">
                         {f.department}
                       </span>
-                      <div className="mt-4 pt-3 border-t border-border space-y-1.5 flex-1">
+
+                      <div className="mt-4 pt-3 border-t border-border/60 space-y-1.5 flex-1 relative z-10">
                         <p className="font-body text-[11px] text-muted-foreground leading-relaxed">{f.qualification}</p>
                         <div className="flex items-center justify-center gap-1 font-body text-[11px] text-muted-foreground">
                           <Briefcase className="w-3 h-3 shrink-0" /> {f.experience} experience
                         </div>
                       </div>
+
                       {(f.email || f.phone) && (
-                        <div className="flex items-center justify-center gap-2 mt-3 pt-3 border-t border-border/50" onClick={e => e.stopPropagation()}>
+                        <div className="flex items-center justify-center gap-2 mt-3 pt-3 border-t border-border/40 relative z-10" onClick={e => e.stopPropagation()}>
                           {f.email && (
-                            <a href={`mailto:${f.email}`} className="p-1.5 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors">
+                            <a href={`mailto:${f.email}`} className="p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all duration-200 hover:scale-110">
                               <Mail className="w-3.5 h-3.5" />
                             </a>
                           )}
                           {f.phone && (
-                            <a href={`tel:${f.phone}`} className="p-1.5 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors">
+                            <a href={`tel:${f.phone}`} className="p-2 rounded-xl hover:bg-emerald-500/10 text-muted-foreground hover:text-emerald-600 transition-all duration-200 hover:scale-110">
                               <Phone className="w-3.5 h-3.5" />
                             </a>
                           )}
