@@ -284,10 +284,13 @@ export default function Index() {
           </ScrollReveal>
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
             {highlights.map((h, i) => (
-              <ScrollReveal key={h.label} delay={i * 50}>
-                <div className="premium-card p-4 sm:p-5 cursor-default group spotlight border-glow">
-                  <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
-                    <div className="icon-glow w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-400">
+              <ScrollReveal key={h.label} delay={i * 40}>
+                <div className="relative premium-card p-4 sm:p-5 cursor-default group spotlight border-glow overflow-hidden">
+                  {/* Hover bg */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-secondary/6 to-primary/4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/0 via-secondary/30 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="relative flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+                    <div className="icon-glow w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-400 shadow-sm border border-border/30">
                       <h.icon className="w-4 h-4 sm:w-5 sm:h-5 text-primary group-hover:text-secondary transition-colors duration-300" />
                     </div>
                     <div className="min-w-0">
@@ -395,29 +398,35 @@ export default function Index() {
       {/* Testimonials */}
       <section className="py-16 sm:py-24 bg-background relative overflow-hidden">
         <div className="absolute top-0 left-0 w-96 h-96 bg-secondary/4 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-64 h-64 bg-primary/3 rounded-full blur-3xl pointer-events-none" />
         <div className="container px-4 relative">
           <ScrollReveal>
             <SectionHeading title="What Our Students Say" subtitle="Real stories from the Hoysala family" />
           </ScrollReveal>
           <div className="grid sm:grid-cols-2 gap-5 sm:gap-6 max-w-4xl mx-auto">
             {currentTestimonials.map((t, i) => (
-              <div key={t.name} className="premium-card p-6 sm:p-7 group animate-fade-in-up card-stack" style={{ animationDelay: `${i * 150}ms` }}>
-                <div className="absolute top-5 right-5 text-secondary/15 group-hover:text-secondary/25 transition-colors duration-500">
-                  <Quote className="w-10 h-10" />
+              <div key={t.name} className="relative premium-card p-6 sm:p-7 group animate-fade-in-up card-stack border-glow overflow-hidden" style={{ animationDelay: `${i * 150}ms` }}>
+                {/* Ambient glow on hover */}
+                <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-primary/3 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
+                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-secondary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute top-5 right-5 text-secondary/10 group-hover:text-secondary/20 transition-colors duration-500">
+                  <Quote className="w-12 h-12" />
                 </div>
-                <div className="flex gap-0.5 mb-4">
-                  {Array.from({ length: t.rating }).map((_, j) => (
-                    <Star key={j} className="w-4 h-4 text-secondary fill-secondary" />
-                  ))}
-                </div>
-                <p className="font-body text-sm text-muted-foreground leading-relaxed italic mb-5">"{t.text}"</p>
-                <div className="flex items-center gap-3 pt-4 border-t border-border/60">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center border border-border">
-                    <span className="font-display text-sm font-bold text-primary">{t.name[0]}</span>
+                <div className="relative z-10">
+                  <div className="flex gap-0.5 mb-4">
+                    {Array.from({ length: t.rating }).map((_, j) => (
+                      <Star key={j} className="w-4 h-4 text-secondary fill-secondary group-hover:scale-110 transition-transform duration-300" style={{ transitionDelay: `${j * 50}ms` }} />
+                    ))}
                   </div>
-                  <div>
-                    <p className="font-body text-sm font-bold text-foreground">{t.name}</p>
-                    <p className="font-body text-xs text-muted-foreground">{t.course}</p>
+                  <p className="font-body text-sm text-muted-foreground leading-relaxed italic mb-5">"{t.text}"</p>
+                  <div className="flex items-center gap-3 pt-4 border-t border-border/60">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center border border-border group-hover:scale-110 transition-transform duration-300 shadow-sm">
+                      <span className="font-display text-sm font-bold text-primary">{t.name[0]}</span>
+                    </div>
+                    <div>
+                      <p className="font-body text-sm font-bold text-foreground group-hover:text-primary transition-colors duration-300">{t.name}</p>
+                      <p className="font-body text-xs text-muted-foreground">{t.course}</p>
+                    </div>
                   </div>
                 </div>
               </div>

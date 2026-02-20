@@ -154,17 +154,24 @@ export default function Admissions() {
       </section>
 
       {/* Course seats overview */}
-      <section className="py-12 sm:py-16 bg-background">
-        <div className="container px-4">
+      <section className="py-12 sm:py-16 bg-background relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-72 h-72 bg-secondary/4 rounded-full blur-3xl pointer-events-none" />
+        <div className="container px-4 relative">
           <ScrollReveal><SectionHeading title="Available Programs" subtitle="Choose the right course for your future" /></ScrollReveal>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
             {courses.map((c, i) => (
               <ScrollReveal key={c.name} delay={i * 80}>
-                <div className="premium-card p-5 text-center group cursor-pointer" onClick={() => setShowForm(true)}>
-                  <div className="text-4xl mb-3 group-hover:scale-110 transition-transform duration-300 inline-block">{c.icon}</div>
-                  <h3 className="font-display text-base font-bold text-foreground group-hover:text-primary transition-colors">{c.name}</h3>
-                  <p className="font-body text-xs text-muted-foreground mt-1">{c.seats}</p>
-                  <p className="font-body text-xs text-secondary font-bold mt-2 bg-secondary/10 px-2 py-0.5 rounded-full inline-block">{c.fee}</p>
+                <div className="relative premium-card p-5 text-center group cursor-pointer overflow-hidden border-glow card-stack" onClick={() => setShowForm(true)}>
+                  {/* Hover gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-secondary/8 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
+                  <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-secondary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="relative z-10">
+                    <div className="text-4xl mb-3 group-hover:scale-125 group-hover:-rotate-6 transition-all duration-400 inline-block">{c.icon}</div>
+                    <h3 className="font-display text-base font-bold text-foreground group-hover:text-primary transition-colors duration-300">{c.name}</h3>
+                    <p className="font-body text-xs text-muted-foreground mt-1">{c.seats}</p>
+                    <p className="font-body text-xs text-secondary font-bold mt-2 bg-secondary/10 px-3 py-1 rounded-full inline-block border border-secondary/20">{c.fee}</p>
+                    <div className="mt-3 font-body text-[10px] text-primary font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300">Click to Apply →</div>
+                  </div>
                 </div>
               </ScrollReveal>
             ))}
@@ -282,14 +289,19 @@ export default function Admissions() {
       {/* Admission Steps */}
       <section className="py-16 sm:py-20 bg-cream relative overflow-hidden">
         <div className="absolute right-0 top-0 w-64 h-64 bg-secondary/5 rounded-full blur-3xl" />
+        <div className="absolute inset-0 section-pattern opacity-30" />
         <div className="container max-w-4xl px-4 relative">
           <ScrollReveal><SectionHeading title="Admission Process" subtitle="Follow these simple steps to join Hoysala Degree College" /></ScrollReveal>
           <div className="space-y-4">
             {steps.map((s, i) => (
-              <ScrollReveal key={s.step} delay={i * 100}>
-                <div className={`flex gap-4 sm:gap-5 items-start bg-card border border-border rounded-2xl p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-400 relative overflow-hidden group`}>
+              <ScrollReveal key={s.step} delay={i * 80}>
+                <div className="flex gap-4 sm:gap-5 items-start bg-card border border-border rounded-2xl p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-400 relative overflow-hidden group border-glow">
                   <div className={`absolute inset-0 bg-gradient-to-r ${s.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl`} />
-                  <div className="relative z-10 w-14 h-14 rounded-2xl bg-primary flex items-center justify-center text-primary-foreground font-display font-bold text-lg shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  {/* Connector line */}
+                  {i < steps.length - 1 && (
+                    <div className="absolute left-[2.1rem] top-[4.5rem] bottom-[-1rem] w-0.5 bg-gradient-to-b from-primary/20 to-transparent z-20 pointer-events-none" />
+                  )}
+                  <div className="relative z-10 w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-navy-dark flex items-center justify-center text-primary-foreground font-display font-bold text-lg shrink-0 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
                     {s.step}
                   </div>
                   <div className="relative z-10 flex-1">
@@ -299,7 +311,7 @@ export default function Admissions() {
                     </div>
                     <p className="font-body text-sm text-muted-foreground">{s.desc}</p>
                   </div>
-                  <CheckCircle className="w-5 h-5 text-muted-foreground/20 group-hover:text-emerald-500 transition-colors duration-500 shrink-0 mt-1 relative z-10" />
+                  <CheckCircle className="w-5 h-5 text-muted-foreground/20 group-hover:text-emerald-500 transition-all duration-500 group-hover:scale-110 shrink-0 mt-1 relative z-10" />
                 </div>
               </ScrollReveal>
             ))}
