@@ -67,6 +67,10 @@ import AdminTopRankers from "./pages/dashboard/admin/AdminTopRankers";
 import AdminTimetable from "./pages/dashboard/admin/AdminTimetable";
 import AdminEvents from "./pages/dashboard/admin/AdminEvents";
 import AdminFaculty from "./pages/dashboard/admin/AdminFaculty";
+import AdminBannerAndPapers from "./pages/dashboard/admin/AdminBannerAndPapers";
+import AdminFeeManagement from "./pages/dashboard/admin/AdminFeeManagement";
+import PreviousYearPapers from "./pages/PreviousYearPapers";
+import TeacherAnnouncements from "./pages/dashboard/teacher/TeacherAnnouncements";
 
 const queryClient = new QueryClient();
 
@@ -109,6 +113,7 @@ const App = () => (
               <Route path="/addon-courses" element={<AddOnCourses />} />
               <Route path="/student-absent" element={<StudentAbsent />} />
               <Route path="/application-status" element={<ApplicationStatus />} />
+              <Route path="/previous-year-papers" element={<PreviousYearPapers />} />
             </Route>
 
             <Route path="/login" element={<Login />} />
@@ -137,6 +142,7 @@ const App = () => (
             <Route path="/dashboard/teacher/materials" element={<TeacherRoute><TeacherMaterials /></TeacherRoute>} />
             <Route path="/dashboard/teacher/notices" element={<TeacherRoute><TeacherNotices /></TeacherRoute>} />
             <Route path="/dashboard/teacher/timetable" element={<TeacherRoute><TeacherTimetable /></TeacherRoute>} />
+            <Route path="/dashboard/teacher/announcements" element={<TeacherRoute><TeacherAnnouncements /></TeacherRoute>} />
 
             {/* Principal */}
             <Route path="/dashboard/principal" element={<PrincipalRoute><PrincipalDashboard /></PrincipalRoute>} />
@@ -157,6 +163,8 @@ const App = () => (
             <Route path="/dashboard/admin/timetable" element={<AdminRoute><AdminTimetable /></AdminRoute>} />
             <Route path="/dashboard/admin/events" element={<AdminRoute><AdminEvents /></AdminRoute>} />
             <Route path="/dashboard/admin/faculty" element={<AdminRoute><AdminFaculty /></AdminRoute>} />
+            <Route path="/dashboard/admin/banners" element={<AdminRoute><AdminBannerAndPapers /></AdminRoute>} />
+            <Route path="/dashboard/admin/fees" element={<AdminRoute><AdminFeeManagement /></AdminRoute>} />
             <Route path="/dashboard/admin/roles" element={<AdminRoute><AdminRoles /></AdminRoute>} />
             <Route path="/dashboard/admin/settings" element={<AdminRoute><AdminSettings /></AdminRoute>} />
 

@@ -4,7 +4,8 @@ import {
   LayoutDashboard, User, BookOpen, Calendar, FileText,
   Bell, Clock, LogOut, GraduationCap, Users, Upload,
   BarChart3, Settings, Award, Image, Megaphone, Shield,
-  UserCog, Menu, X, Mail, Trophy, ChevronRight, Sparkles, UserCheck
+  UserCog, Menu, X, Mail, Trophy, ChevronRight, Sparkles, UserCheck,
+  DollarSign, Book
 } from "lucide-react";
 import { useState } from "react";
 import PageLoader from "./PageLoader";
@@ -29,7 +30,8 @@ const teacherNav: NavItem[] = [
   { label: "Timetable", path: "/dashboard/teacher/timetable", icon: Calendar },
   { label: "Absent Notes", path: "/dashboard/teacher/absent", icon: Bell },
   { label: "Materials", path: "/dashboard/teacher/materials", icon: Upload },
-  { label: "Notices", path: "/dashboard/teacher/notices", icon: Megaphone },
+  { label: "Announcements", path: "/dashboard/teacher/announcements", icon: Megaphone },
+  { label: "Notices", path: "/dashboard/teacher/notices", icon: Bell },
 ];
 
 const principalNav: NavItem[] = [
@@ -49,9 +51,11 @@ const adminNav: NavItem[] = [
   { label: "Messages", path: "/dashboard/admin/contacts", icon: Mail },
   { label: "Users", path: "/dashboard/admin/users", icon: Users },
   { label: "Faculty", path: "/dashboard/admin/faculty", icon: UserCheck },
+  { label: "Fee Management", path: "/dashboard/admin/fees", icon: DollarSign },
   { label: "Top Rankers", path: "/dashboard/admin/top-rankers", icon: Trophy },
   { label: "Timetable", path: "/dashboard/admin/timetable", icon: Calendar },
   { label: "Events", path: "/dashboard/admin/events", icon: Image },
+  { label: "Banners & Papers", path: "/dashboard/admin/banners", icon: Book },
   { label: "Roles", path: "/dashboard/admin/roles", icon: Shield },
   { label: "Settings", path: "/dashboard/admin/settings", icon: Settings },
 ];

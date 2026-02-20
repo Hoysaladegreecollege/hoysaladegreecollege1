@@ -115,6 +115,47 @@ export type Database = {
         }
         Relationships: []
       }
+      announcements: {
+        Row: {
+          content: string
+          course_id: string | null
+          created_at: string
+          id: string
+          is_active: boolean | null
+          posted_by: string | null
+          semester: number | null
+          title: string
+        }
+        Insert: {
+          content?: string
+          course_id?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          posted_by?: string | null
+          semester?: number | null
+          title: string
+        }
+        Update: {
+          content?: string
+          course_id?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          posted_by?: string | null
+          semester?: number | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "announcements_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       attendance: {
         Row: {
           created_at: string
@@ -347,6 +388,50 @@ export type Database = {
         }
         Relationships: []
       }
+      fee_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          payment_date: string
+          payment_method: string | null
+          receipt_number: string | null
+          recorded_by: string | null
+          remarks: string | null
+          student_id: string | null
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          id?: string
+          payment_date?: string
+          payment_method?: string | null
+          receipt_number?: string | null
+          recorded_by?: string | null
+          remarks?: string | null
+          student_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          payment_date?: string
+          payment_method?: string | null
+          receipt_number?: string | null
+          recorded_by?: string | null
+          remarks?: string | null
+          student_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fee_payments_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       marks: {
         Row: {
           created_at: string
@@ -421,6 +506,75 @@ export type Database = {
           posted_by?: string | null
           title?: string
           type?: string
+        }
+        Relationships: []
+      }
+      popup_banners: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          link_url: string | null
+          posted_by: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          link_url?: string | null
+          posted_by?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          link_url?: string | null
+          posted_by?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      previous_year_papers: {
+        Row: {
+          course: string
+          created_at: string
+          file_url: string | null
+          id: string
+          is_active: boolean | null
+          posted_by: string | null
+          semester: number | null
+          subject: string
+          title: string
+          year: string
+        }
+        Insert: {
+          course: string
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          posted_by?: string | null
+          semester?: number | null
+          subject: string
+          title: string
+          year: string
+        }
+        Update: {
+          course?: string
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          posted_by?: string | null
+          semester?: number | null
+          subject?: string
+          title?: string
+          year?: string
         }
         Relationships: []
       }
