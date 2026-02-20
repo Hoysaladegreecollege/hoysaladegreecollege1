@@ -90,8 +90,7 @@ export default function Events() {
                   <div className="p-5 space-y-3">
                     <div className="flex gap-2"><Skeleton className="h-5 w-20 rounded-full" /><Skeleton className="h-5 w-24" /></div>
                     <Skeleton className="h-5 w-3/4" />
-                    <Skeleton className="h-3 w-full" />
-                    <Skeleton className="h-3 w-2/3" />
+                    <Skeleton className="h-3 w-full" /><Skeleton className="h-3 w-2/3" />
                   </div>
                 </div>
               ))}
@@ -99,26 +98,36 @@ export default function Events() {
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
               {filtered.map((e: any, i: number) => (
-                <ScrollReveal key={e.id} delay={i * 70}>
+                <ScrollReveal key={e.id} delay={i * 60}>
                   <div onClick={() => { setSelectedEvent(e); setGalleryIndex(0); }}
-                    className="premium-card overflow-hidden cursor-pointer group h-full flex flex-col">
+                    className="premium-card overflow-hidden cursor-pointer group h-full flex flex-col card-stack border-glow">
                     {e.image_url ? (
-                      <div className="overflow-hidden relative">
-                        <img src={e.image_url} alt={e.title} className="h-52 w-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-foreground/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <div className="overflow-hidden relative h-52">
+                        <img src={e.image_url} alt={e.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                        <div className="absolute top-3 left-3">
+                          <span className={`text-[10px] font-body font-bold px-2.5 py-1 rounded-full bg-gradient-to-r ${catColor(e.category || "General")} border border-white/20 backdrop-blur-sm shadow-sm`}>
+                            {e.category || "General"}
+                          </span>
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-foreground/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-400">
+                          <div className="bg-card/90 backdrop-blur-sm rounded-xl px-4 py-2 font-body text-xs font-bold text-foreground shadow-lg">View Gallery</div>
+                        </div>
                       </div>
                     ) : (
                       <div className="h-52 bg-gradient-to-br from-primary/5 via-secondary/8 to-primary/3 flex items-center justify-center relative overflow-hidden">
                         <div className="absolute inset-0 opacity-[0.04]"
                           style={{ backgroundImage: "radial-gradient(hsl(var(--primary)) 1px, transparent 1px)", backgroundSize: "16px 16px" }} />
-                        <ImageIcon className="w-14 h-14 text-muted-foreground/20 group-hover:scale-110 transition-transform duration-500" />
+                        <div className="absolute top-3 left-3">
+                          <span className={`text-[10px] font-body font-bold px-2.5 py-1 rounded-full bg-gradient-to-r ${catColor(e.category || "General")} border border-current/10`}>
+                            {e.category || "General"}
+                          </span>
+                        </div>
+                        <ImageIcon className="w-14 h-14 text-muted-foreground/15 group-hover:scale-110 transition-transform duration-500" />
                       </div>
                     )}
                     <div className="p-5 sm:p-6 flex-1 flex flex-col">
                       <div className="flex items-center gap-2 mb-3">
-                        <span className={`text-[10px] font-body font-bold px-2.5 py-1 rounded-full bg-gradient-to-r ${catColor(e.category || "General")} border border-current/10`}>
-                          {e.category || "General"}
-                        </span>
                         {e.event_date && (
                           <span className="text-xs font-body text-muted-foreground flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
@@ -130,7 +139,7 @@ export default function Events() {
                       {e.description && (
                         <p className="font-body text-sm text-muted-foreground mt-2 line-clamp-2">{parseGallery(e.description).text}</p>
                       )}
-                      <div className="mt-4 flex items-center text-xs font-body font-semibold text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 gap-1">
+                      <div className="mt-4 flex items-center text-xs font-body font-semibold text-primary opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300 gap-1">
                         View Details <ChevronRight className="w-3 h-3" />
                       </div>
                     </div>
@@ -141,8 +150,11 @@ export default function Events() {
           )}
           {!isLoading && filtered.length === 0 && (
             <div className="text-center py-20">
-              <Filter className="w-12 h-12 text-muted-foreground/20 mx-auto mb-4" />
-              <p className="font-body text-muted-foreground">No events found for this category.</p>
+              <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-4">
+                <Filter className="w-8 h-8 text-muted-foreground/30" />
+              </div>
+              <p className="font-display text-lg font-semibold text-muted-foreground">No events found</p>
+              <p className="font-body text-sm text-muted-foreground/60 mt-1">Try selecting a different category</p>
             </div>
           )}
         </div>
