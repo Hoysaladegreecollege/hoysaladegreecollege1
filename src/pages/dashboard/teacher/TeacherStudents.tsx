@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { Users, Search, Eye, Phone, X, Filter } from "lucide-react";
+import { Users, Search, Eye, Phone, Filter } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -93,18 +93,27 @@ export default function TeacherStudents() {
           <div className="text-center py-12"><p className="font-body text-sm text-muted-foreground">No students found.</p></div>
         ) : (
           filtered.map((s: any) => (
-            <div key={s.id} className="bg-card border border-border rounded-xl p-4 hover:shadow-md transition-all">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-body text-sm font-bold text-primary">{s.roll_number}</span>
-                <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">Sem {s.semester}</span>
-                  <Button size="sm" variant="outline" onClick={() => setViewStudent(s)} className="rounded-lg h-7 px-2 font-body text-xs">
-                    <Eye className="w-3 h-3" />
-                  </Button>
+            <div key={s.id} className="bg-card border border-border rounded-xl p-4 hover:shadow-md transition-all flex items-center gap-3">
+              {s.avatar_url ? (
+                <img src={s.avatar_url} alt={s.profile?.full_name} className="w-10 h-10 rounded-xl object-cover border-2 border-secondary/30 shrink-0" />
+              ) : (
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-navy-dark/20 flex items-center justify-center shrink-0 border border-border">
+                  <span className="font-display text-xs font-bold text-primary">{(s.profile?.full_name || "S")[0].toUpperCase()}</span>
                 </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="font-body text-sm font-bold text-primary">{s.roll_number}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">Sem {s.semester}</span>
+                    <Button size="sm" variant="outline" onClick={() => setViewStudent(s)} className="rounded-lg h-7 px-2 font-body text-xs">
+                      <Eye className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
+                <p className="font-body text-sm font-medium text-foreground">{s.profile?.full_name || "—"}</p>
+                <p className="font-body text-xs text-muted-foreground">{s.courses?.name || "—"}</p>
               </div>
-              <p className="font-body text-sm font-medium text-foreground">{s.profile?.full_name || "—"}</p>
-              <p className="font-body text-xs text-muted-foreground mt-1">{s.courses?.name || "—"}</p>
             </div>
           ))
         )}
@@ -128,10 +137,21 @@ export default function TeacherStudents() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((s: any) => (
+                 {filtered.map((s: any) => (
                   <tr key={s.id} className="border-b border-border/50 hover:bg-muted/20 transition-colors">
                     <td className="font-body text-sm p-4 font-semibold text-primary">{s.roll_number}</td>
-                    <td className="font-body text-sm p-4 font-medium text-foreground">{s.profile?.full_name || "—"}</td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-2">
+                        {s.avatar_url ? (
+                          <img src={s.avatar_url} alt={s.profile?.full_name} className="w-8 h-8 rounded-lg object-cover border border-secondary/30" />
+                        ) : (
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary/20 to-navy-dark/20 flex items-center justify-center border border-border">
+                            <span className="font-display text-xs font-bold text-primary">{(s.profile?.full_name || "S")[0].toUpperCase()}</span>
+                          </div>
+                        )}
+                        <span className="font-body text-sm font-medium text-foreground">{s.profile?.full_name || "—"}</span>
+                      </div>
+                    </td>
                     <td className="font-body text-sm p-4 text-foreground">{s.courses?.name || "—"}</td>
                     <td className="font-body text-sm p-4 text-center">
                       <span className="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">{s.semester}</span>
@@ -167,10 +187,20 @@ export default function TeacherStudents() {
           </DialogHeader>
           {viewStudent && (
             <div className="space-y-3 mt-2">
-              <div className="flex flex-col items-center p-4 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-2xl border border-border">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-navy-dark flex items-center justify-center mb-3">
-                  <Users className="w-8 h-8 text-primary-foreground" />
-                </div>
+              <div className="flex flex-col items-center p-5 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-2xl border border-border">
+                {(viewStudent as any).avatar_url ? (
+                  <img
+                    src={(viewStudent as any).avatar_url}
+                    alt={viewStudent.profile?.full_name}
+                    className="w-20 h-20 rounded-2xl object-cover border-4 border-secondary/30 shadow-lg mb-3"
+                  />
+                ) : (
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-navy-dark flex items-center justify-center mb-3 border-4 border-secondary/20 shadow-lg">
+                    <span className="font-display text-2xl font-bold text-primary-foreground">
+                      {(viewStudent.profile?.full_name || "S").split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)}
+                    </span>
+                  </div>
+                )}
                 <h3 className="font-display text-lg font-bold text-foreground">{viewStudent.profile?.full_name || "—"}</h3>
                 <p className="font-body text-sm text-primary font-semibold">{viewStudent.roll_number}</p>
               </div>
@@ -178,7 +208,7 @@ export default function TeacherStudents() {
                 ["Course", viewStudent.courses?.name || "—"],
                 ["Semester", `Semester ${viewStudent.semester}`],
                 ["Email", viewStudent.profile?.email || "—"],
-                ["Student Phone", viewStudent.profile?.phone || "—"],
+                ["Student Phone", (viewStudent as any).phone || viewStudent.profile?.phone || "—"],
                 ["Parent Phone", viewStudent.parent_phone || "—"],
                 ["Date of Birth", viewStudent.date_of_birth || "—"],
                 ["Address", viewStudent.address || "—"],
@@ -190,8 +220,8 @@ export default function TeacherStudents() {
                 </div>
               ))}
               <div className="flex gap-2 pt-2">
-                {viewStudent.profile?.phone && (
-                  <a href={`tel:${viewStudent.profile.phone}`} className="flex-1">
+                {((viewStudent as any).phone || viewStudent.profile?.phone) && (
+                  <a href={`tel:${(viewStudent as any).phone || viewStudent.profile?.phone}`} className="flex-1">
                     <Button variant="outline" className="w-full rounded-xl font-body text-xs">
                       <Phone className="w-3 h-3 mr-1" /> Call Student
                     </Button>

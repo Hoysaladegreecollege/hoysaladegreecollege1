@@ -165,15 +165,27 @@ export default function Index() {
           <p className="font-body text-[10px] sm:text-xs max-w-xl mx-auto opacity-40 mb-8 animate-fade-in-up animation-delay-200">
             K.R.P. Arcade, UCO Bank Building, Paramanna Layout, Nelamangala Town, Bengaluru Rural Dist. - 562 123
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center animate-fade-in-up animation-delay-400">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animation-delay-400">
             <Link to="/admissions">
-              <Button size="lg" className="font-body bg-secondary text-secondary-foreground hover:bg-gold-light text-sm sm:text-base px-8 sm:px-10 w-full sm:w-auto shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 rounded-xl">
-                Apply Now <ArrowRight className="w-4 h-4 ml-1" />
-              </Button>
+              <button className="relative group w-full sm:w-auto overflow-hidden px-8 sm:px-10 py-3.5 rounded-2xl font-body text-sm sm:text-base font-bold text-primary-foreground shadow-2xl transition-all duration-500 hover:scale-105 hover:-translate-y-0.5"
+                style={{ background: "linear-gradient(135deg, hsl(42,87%,55%), hsl(38,92%,48%), hsl(42,87%,65%))", boxShadow: "0 8px 32px hsla(42,87%,55%,0.45), inset 0 1px 0 rgba(255,255,255,0.25)" }}>
+                <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/0 via-white/15 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                <span className="relative flex items-center gap-2">
+                  <Sparkles className="w-4 h-4" />
+                  Apply Now
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                </span>
+              </button>
             </Link>
             <Link to="/courses">
-              <button className="glass-btn px-8 sm:px-10 py-3 rounded-xl font-body text-sm sm:text-base font-medium text-primary-foreground animate-pulse-glow w-full sm:w-auto hover:scale-105 transition-transform">
-                ✨ Explore Courses
+              <button className="relative group w-full sm:w-auto overflow-hidden px-8 sm:px-10 py-3.5 rounded-2xl font-body text-sm sm:text-base font-bold transition-all duration-500 hover:scale-105 hover:-translate-y-0.5"
+                style={{ background: "rgba(255,255,255,0.08)", border: "1.5px solid rgba(255,255,255,0.2)", backdropFilter: "blur(12px)", color: "white", boxShadow: "0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15)" }}>
+                <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                <span className="relative flex items-center gap-2">
+                  <GraduationCap className="w-4 h-4" />
+                  Explore Courses
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                </span>
               </button>
             </Link>
           </div>

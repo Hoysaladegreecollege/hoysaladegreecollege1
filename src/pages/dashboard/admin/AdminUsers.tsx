@@ -35,7 +35,7 @@ export default function AdminUsers() {
       return profiles.map((p) => {
         const roleEntry = roles.find((r) => r.user_id === p.user_id);
         const studentEntry = students?.find((s) => s.user_id === p.user_id);
-        return { ...p, role: roleEntry?.role || "student", role_id: roleEntry?.id, student: studentEntry };
+        return { ...p, role: roleEntry?.role || "student", role_id: roleEntry?.id, student: studentEntry, avatarUrl: (studentEntry as any)?.avatar_url };
       });
     },
   });
@@ -257,9 +257,13 @@ export default function AdminUsers() {
           {viewStudent && (
             <div className="space-y-4 mt-2">
               <div className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl p-4 text-center">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
-                  <span className="text-2xl">{viewStudent.role === "teacher" ? "📚" : viewStudent.role === "admin" ? "⚙️" : "🎓"}</span>
-                </div>
+                {viewStudent.avatarUrl ? (
+                  <img src={viewStudent.avatarUrl} alt={viewStudent.full_name} className="w-20 h-20 rounded-2xl object-cover border-4 border-secondary/30 shadow-lg mx-auto mb-2" />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
+                    <span className="text-2xl">{viewStudent.role === "teacher" ? "📚" : viewStudent.role === "admin" ? "⚙️" : "🎓"}</span>
+                  </div>
+                )}
                 <p className="font-display text-lg font-bold text-foreground">{viewStudent.full_name || "—"}</p>
                 <p className="font-body text-xs text-muted-foreground">{viewStudent.email}</p>
               </div>

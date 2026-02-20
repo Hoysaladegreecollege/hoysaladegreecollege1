@@ -461,6 +461,7 @@ export type Database = {
         Row: {
           address: string | null
           admission_year: number | null
+          avatar_url: string | null
           course_id: string | null
           created_at: string
           date_of_birth: string | null
@@ -470,6 +471,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           parent_phone: string | null
+          phone: string | null
           roll_number: string
           semester: number | null
           total_fee: number | null
@@ -478,6 +480,7 @@ export type Database = {
         Insert: {
           address?: string | null
           admission_year?: number | null
+          avatar_url?: string | null
           course_id?: string | null
           created_at?: string
           date_of_birth?: string | null
@@ -487,6 +490,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           parent_phone?: string | null
+          phone?: string | null
           roll_number: string
           semester?: number | null
           total_fee?: number | null
@@ -495,6 +499,7 @@ export type Database = {
         Update: {
           address?: string | null
           admission_year?: number | null
+          avatar_url?: string | null
           course_id?: string | null
           created_at?: string
           date_of_birth?: string | null
@@ -504,6 +509,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           parent_phone?: string | null
+          phone?: string | null
           roll_number?: string
           semester?: number | null
           total_fee?: number | null
