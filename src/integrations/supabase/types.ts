@@ -296,6 +296,57 @@ export type Database = {
         }
         Relationships: []
       }
+      faculty_members: {
+        Row: {
+          created_at: string | null
+          department: string
+          email: string | null
+          experience: string
+          id: string
+          is_active: boolean | null
+          name: string
+          phone: string | null
+          photo_url: string | null
+          posted_by: string | null
+          qualification: string
+          role: string
+          sort_order: number | null
+          subjects: string[] | null
+        }
+        Insert: {
+          created_at?: string | null
+          department?: string
+          email?: string | null
+          experience?: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          phone?: string | null
+          photo_url?: string | null
+          posted_by?: string | null
+          qualification?: string
+          role?: string
+          sort_order?: number | null
+          subjects?: string[] | null
+        }
+        Update: {
+          created_at?: string | null
+          department?: string
+          email?: string | null
+          experience?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          phone?: string | null
+          photo_url?: string | null
+          posted_by?: string | null
+          qualification?: string
+          role?: string
+          sort_order?: number | null
+          subjects?: string[] | null
+        }
+        Relationships: []
+      }
       marks: {
         Row: {
           created_at: string

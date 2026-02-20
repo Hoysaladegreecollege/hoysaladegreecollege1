@@ -4,7 +4,7 @@ import {
   LayoutDashboard, User, BookOpen, Calendar, FileText,
   Bell, Clock, LogOut, GraduationCap, Users, Upload,
   BarChart3, Settings, Award, Image, Megaphone, Shield,
-  UserCog, Menu, X, Mail, Trophy, ChevronRight, Sparkles
+  UserCog, Menu, X, Mail, Trophy, ChevronRight, Sparkles, UserCheck
 } from "lucide-react";
 import { useState } from "react";
 import PageLoader from "./PageLoader";
@@ -48,6 +48,7 @@ const adminNav: NavItem[] = [
   { label: "Applications", path: "/dashboard/admin/applications", icon: FileText },
   { label: "Messages", path: "/dashboard/admin/contacts", icon: Mail },
   { label: "Users", path: "/dashboard/admin/users", icon: Users },
+  { label: "Faculty", path: "/dashboard/admin/faculty", icon: UserCheck },
   { label: "Top Rankers", path: "/dashboard/admin/top-rankers", icon: Trophy },
   { label: "Timetable", path: "/dashboard/admin/timetable", icon: Calendar },
   { label: "Events", path: "/dashboard/admin/events", icon: Image },

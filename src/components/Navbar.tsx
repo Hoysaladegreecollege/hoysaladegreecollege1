@@ -32,6 +32,7 @@ export default function Navbar() {
 
   return (
     <header className={`sticky top-0 z-50 transition-all duration-500 ${scrolled ? "bg-card/98 backdrop-blur-xl shadow-lg border-b border-border" : "bg-card/95 backdrop-blur-md border-b border-border/50"}`}>
+
       {/* Top bar */}
       <div className="bg-gradient-to-r from-primary via-primary to-navy-dark text-primary-foreground py-2">
         <div className="container px-4">
@@ -53,10 +54,10 @@ export default function Navbar() {
             <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-secondary" />
           </div>
           <div>
-            <span className="font-display text-sm sm:text-lg font-bold text-foreground leading-tight block group-hover:text-primary transition-colors">
+            <span className="font-display text-sm sm:text-lg font-bold leading-tight block group-hover:text-primary transition-colors text-foreground">
               Hoysala Degree College
             </span>
-            <span className="text-[8px] sm:text-[9px] text-muted-foreground font-body tracking-wide leading-tight block">
+            <span className="text-[8px] sm:text-[9px] font-body tracking-wide leading-tight block text-muted-foreground">
               Affiliated To Bangalore University | BU 26
             </span>
           </div>
@@ -93,12 +94,12 @@ export default function Navbar() {
           </Link>
           <button
             onClick={() => setOpen(!open)}
-            className="xl:hidden p-2 text-foreground rounded-xl hover:bg-primary/5 transition-all duration-300"
+            className="xl:hidden p-2 rounded-xl hover:bg-primary/5 transition-all duration-300 text-foreground"
             aria-label="Toggle menu"
           >
             <div className="relative w-5 h-5">
-              <Menu className={`w-5 h-5 absolute transition-all duration-300 ${open ? "opacity-0 rotate-90 scale-75" : "opacity-100 rotate-0 scale-100"}`} />
-              <X className={`w-5 h-5 absolute transition-all duration-300 ${open ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-75"}`} />
+              <Menu className={`w-5 h-5 absolute text-foreground transition-all duration-300 ${open ? "opacity-0 rotate-90 scale-75" : "opacity-100 rotate-0 scale-100"}`} />
+              <X className={`w-5 h-5 absolute text-foreground transition-all duration-300 ${open ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-75"}`} />
             </div>
           </button>
         </div>

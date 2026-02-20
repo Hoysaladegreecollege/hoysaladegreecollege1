@@ -66,6 +66,7 @@ import AdminContacts from "./pages/dashboard/admin/AdminContacts";
 import AdminTopRankers from "./pages/dashboard/admin/AdminTopRankers";
 import AdminTimetable from "./pages/dashboard/admin/AdminTimetable";
 import AdminEvents from "./pages/dashboard/admin/AdminEvents";
+import AdminFaculty from "./pages/dashboard/admin/AdminFaculty";
 
 const queryClient = new QueryClient();
 
@@ -155,6 +156,7 @@ const App = () => (
             <Route path="/dashboard/admin/top-rankers" element={<AdminRoute><AdminTopRankers /></AdminRoute>} />
             <Route path="/dashboard/admin/timetable" element={<AdminRoute><AdminTimetable /></AdminRoute>} />
             <Route path="/dashboard/admin/events" element={<AdminRoute><AdminEvents /></AdminRoute>} />
+            <Route path="/dashboard/admin/faculty" element={<AdminRoute><AdminFaculty /></AdminRoute>} />
             <Route path="/dashboard/admin/roles" element={<AdminRoute><AdminRoles /></AdminRoute>} />
             <Route path="/dashboard/admin/settings" element={<AdminRoute><AdminSettings /></AdminRoute>} />
 

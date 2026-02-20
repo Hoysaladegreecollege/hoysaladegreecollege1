@@ -15,6 +15,7 @@ export default function TeacherAttendance() {
   const [statuses, setStatuses] = useState<Record<string, string>>({});
   const [search, setSearch] = useState("");
   const [courseTab, setCourseTab] = useState("All");
+  const [semFilter, setSemFilter] = useState("all");
 
   const { data: courses = [] } = useQuery({
     queryKey: ["attendance-courses"],
@@ -68,12 +69,13 @@ export default function TeacherAttendance() {
     setStatuses(prev => ({ ...prev, ...all }));
   };
 
-  // Filter by course tab first, then by search
+  // Filter by course tab first, then by semester, then by search
   const courseFiltered = courseTab === "All" ? students : students.filter((s: any) => s.course_id === courseTab);
   const absentOnly = courseTab === "absent" ? students.filter((s: any) => statuses[s.id] === "absent") : [];
   const baseList = courseTab === "absent" ? absentOnly : courseFiltered;
+  const semFiltered = semFilter === "all" ? baseList : baseList.filter((s: any) => String(s.semester) === semFilter);
 
-  const filteredStudents = baseList.filter((s: any) => {
+  const filteredStudents = semFiltered.filter((s: any) => {
     const name = (s.profile?.full_name || s.roll_number || "").toLowerCase();
     return name.includes(search.toLowerCase()) || s.roll_number.toLowerCase().includes(search.toLowerCase());
   });
@@ -91,7 +93,7 @@ export default function TeacherAttendance() {
       </div>
 
       <div className="bg-card border border-border rounded-2xl p-4 sm:p-6">
-        <div className="grid sm:grid-cols-3 gap-3 mb-4">
+        <div className="grid sm:grid-cols-4 gap-3 mb-4">
           <div>
             <label className="font-body text-xs font-semibold text-foreground mb-1.5 block">Subject *</label>
             <Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="e.g. Data Structures" className="rounded-xl text-sm" />
@@ -99,6 +101,14 @@ export default function TeacherAttendance() {
           <div>
             <label className="font-body text-xs font-semibold text-foreground mb-1.5 block">Date *</label>
             <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="rounded-xl text-sm" />
+          </div>
+          <div>
+            <label className="font-body text-xs font-semibold text-foreground mb-1.5 block">Semester</label>
+            <select value={semFilter} onChange={e => setSemFilter(e.target.value)}
+              className="w-full border border-border rounded-xl px-3 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30">
+              <option value="all">All Semesters</option>
+              {[1,2,3,4,5,6].map(s => <option key={s} value={String(s)}>Semester {s}</option>)}
+            </select>
           </div>
           <div>
             <label className="font-body text-xs font-semibold text-foreground mb-1.5 block">Search</label>
