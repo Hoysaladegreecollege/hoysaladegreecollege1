@@ -97,19 +97,24 @@ export default function ChatBot() {
       {!isOpen && (
         <button
           onClick={handleOpen}
-          className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-primary text-primary-foreground shadow-2xl hover:shadow-primary/30 transition-all duration-300 hover:scale-105 flex items-center justify-center group overflow-hidden ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+      className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-14 h-14 sm:w-16 sm:h-16 rounded-2xl shadow-2xl hover:shadow-primary/30 transition-all duration-300 hover:scale-105 flex flex-col items-center justify-center group overflow-hidden ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+          style={{
+            background: "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--navy-light)) 100%)",
+            boxShadow: "0 8px 32px hsl(var(--primary) / 0.35), 0 2px 8px hsl(var(--primary) / 0.2)"
+          }}
           aria-label="Open chat assistant"
         >
           {/* Animated rings */}
-          <span className="absolute inset-0 rounded-2xl border-2 border-primary/40 animate-ping" style={{ animationDuration: "2s" }} />
-          <span className="absolute inset-0 rounded-2xl border border-primary/20 animate-ping" style={{ animationDuration: "2.5s", animationDelay: "0.5s" }} />
-          {/* Shimmer */}
-          <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
-          <div className="relative flex flex-col items-center justify-center">
-            <Bot className="w-6 h-6 sm:w-7 sm:h-7 group-hover:scale-110 transition-transform duration-300" />
+          <span className="absolute inset-0 rounded-2xl border-2 border-primary/30 animate-ping" style={{ animationDuration: "2.5s" }} />
+          {/* Shimmer sweep */}
+          <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
+          {/* Icon */}
+          <div className="relative flex flex-col items-center justify-center gap-0.5">
+            <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-secondary group-hover:rotate-12 transition-transform duration-300" />
+            <span className="font-body text-[8px] sm:text-[9px] font-bold text-primary-foreground/80 uppercase tracking-widest leading-none">AI</span>
           </div>
-          {/* Badge */}
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-secondary rounded-full flex items-center justify-center">
+          {/* Live badge */}
+          <span className="absolute -top-1 -right-1 w-4 h-4 bg-secondary rounded-full flex items-center justify-center border-2 border-card">
             <span className="w-1.5 h-1.5 bg-secondary-foreground rounded-full animate-pulse" />
           </span>
         </button>
