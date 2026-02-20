@@ -6,11 +6,12 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-// Sort periods by time (e.g. "9:00 - 9:50" comes before "10:50 - 11:40")
+// Sort periods by time - parse hour from period string like "9:00 - 9:50" or "Period 1 (9:00-9:50)"
 const sortByPeriod = (a: any, b: any) => {
   const getTime = (p: string) => {
-    const match = p.match(/(\d{1,2}):(\d{2})/);
-    if (!match) return 0;
+    // Match first occurrence of H:MM or HH:MM in the string
+    const match = p.match(/\b(\d{1,2}):(\d{2})\b/);
+    if (!match) return 999;
     return parseInt(match[1]) * 60 + parseInt(match[2]);
   };
   return getTime(a.period) - getTime(b.period);
