@@ -70,6 +70,8 @@ import AdminEvents from "./pages/dashboard/admin/AdminEvents";
 import AdminFaculty from "./pages/dashboard/admin/AdminFaculty";
 import AdminBannerAndPapers from "./pages/dashboard/admin/AdminBannerAndPapers";
 import AdminFeeManagement from "./pages/dashboard/admin/AdminFeeManagement";
+import AdminPostNotice from "./pages/dashboard/admin/AdminPostNotice";
+import AdminSemesterPromotion from "./pages/dashboard/admin/AdminSemesterPromotion";
 import PreviousYearPapers from "./pages/PreviousYearPapers";
 import TeacherAnnouncements from "./pages/dashboard/teacher/TeacherAnnouncements";
 
@@ -169,6 +171,8 @@ const App = () => (
             <Route path="/dashboard/admin/fees" element={<AdminRoute><AdminFeeManagement /></AdminRoute>} />
             <Route path="/dashboard/admin/roles" element={<AdminRoute><AdminRoles /></AdminRoute>} />
             <Route path="/dashboard/admin/settings" element={<AdminRoute><AdminSettings /></AdminRoute>} />
+            <Route path="/dashboard/admin/post-notice" element={<AdminRoute><AdminPostNotice /></AdminRoute>} />
+            <Route path="/dashboard/admin/semester-promotion" element={<AdminRoute><AdminSemesterPromotion /></AdminRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

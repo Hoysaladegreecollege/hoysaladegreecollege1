@@ -17,11 +17,12 @@ const STANDARD_PERIODS = [
   "2:50 - 3:40",
 ];
 
-// Parse start time in minutes from a period string like "9:00 - 9:50", "Period 1 (9:00-9:50)"
+// Parse start time in minutes from a period string like "9:00 - 9:50", "1:10 - 2:00"
+// Correctly handles AM/PM context: college runs 9:00–15:30, lunch 12:30–1:10
 const parseStartMinutes = (period: string): number => {
   const match = period.match(/\b(\d{1,2}):(\d{2})\b/);
   if (!match) {
-    // Try to match period number and map to standard schedule
+    // Try to match period number (e.g. "Period 3") and map to standard schedule
     const numMatch = period.match(/\b(\d)\b/);
     if (numMatch) {
       const idx = parseInt(numMatch[1]) - 1;
@@ -35,8 +36,9 @@ const parseStartMinutes = (period: string): number => {
   }
   const h = parseInt(match[1]);
   const m = parseInt(match[2]);
-  // Lunch break: 12:30–1:10. Treat 1:xx as 13:xx if hour < 5
-  const normalizedH = h < 5 ? h + 12 : h;
+  // College hours are 9:00–15:30. Periods after lunch start at 1:xx (i.e. 13:xx).
+  // Any hour <= 8 must be PM (afternoon), so add 12. Hour 9–12 stays as-is.
+  const normalizedH = h >= 1 && h <= 8 ? h + 12 : h;
   return normalizedH * 60 + m;
 };
 

@@ -78,15 +78,31 @@ export default function Admissions() {
       photo_url: photoUrl,
     }).select("application_number, id").single();
 
-    setSubmitting(false);
     if (error) {
+      setSubmitting(false);
       toast.error("Failed to submit application. Please try again.");
-    } else {
-      setForm(initialForm);
-      setPhotoFile(null);
-      setShowForm(false);
-      navigate(`/application-status?app=${data.application_number}&email=${encodeURIComponent(form.email)}`);
+      return;
     }
+
+    // Send confirmation email to the applicant
+    try {
+      await supabase.functions.invoke("send-application-email", {
+        body: {
+          email: form.email,
+          fullName: form.full_name,
+          applicationNumber: data.application_number,
+          status: "submitted",
+        },
+      });
+    } catch (emailErr) {
+      console.warn("Email notification failed (non-critical):", emailErr);
+    }
+
+    setSubmitting(false);
+    setForm(initialForm);
+    setPhotoFile(null);
+    setShowForm(false);
+    navigate(`/application-status?app=${data.application_number}&email=${encodeURIComponent(form.email)}`);
   };
 
   const inputClass = "w-full border border-border rounded-xl px-4 py-3 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all duration-300 placeholder:text-muted-foreground/40 hover:border-primary/30";
