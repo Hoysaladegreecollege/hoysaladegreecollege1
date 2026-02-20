@@ -1,12 +1,10 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { Users, GraduationCap, BookOpen, Calendar, FileText, Settings, UserPlus, Award, Mail, TrendingUp, Trophy, Shield, Image, BarChart3, PieChart, Megaphone, ArrowUpCircle, DollarSign, Download } from "lucide-react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Users, GraduationCap, BookOpen, Calendar, FileText, Settings, Mail, TrendingUp, Trophy, Shield, Image, BarChart3, PieChart } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RePieChart, Pie, Cell, LineChart, Line } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RePieChart, Pie, Cell } from "recharts";
 import { useState, useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const CHART_COLORS = ["hsl(217, 72%, 18%)", "hsl(42, 87%, 55%)", "hsl(217, 50%, 30%)", "hsl(142, 70%, 40%)"];
@@ -50,17 +48,7 @@ function AnimatedStatCard({ label, value, icon: Icon, gradient, iconBg }: any) {
 }
 
 export default function AdminDashboard() {
-  const { profile, user } = useAuth();
-  const queryClient = useQueryClient();
-
-  // Semester promotion state
-  const [promoCourse, setPromoCourse] = useState("all");
-  const [promoSem, setPromoSem] = useState(1);
-
-  // Notice upload state
-  const [noticeTitle, setNoticeTitle] = useState("");
-  const [noticeContent, setNoticeContent] = useState("");
-  const [noticeType, setNoticeType] = useState("General");
+  const { profile } = useAuth();
 
   const { data: counts, isLoading: countsLoading } = useQuery({
     queryKey: ["admin-stats"],
@@ -103,14 +91,6 @@ export default function AdminDashboard() {
     },
   });
 
-  const { data: courses = [] } = useQuery({
-    queryKey: ["admin-courses-for-promo"],
-    queryFn: async () => {
-      const { data } = await supabase.from("courses").select("id, name, code").eq("is_active", true);
-      return data || [];
-    },
-  });
-
   const { data: attendanceStats } = useQuery({
     queryKey: ["admin-attendance-stats"],
     queryFn: async () => {
@@ -122,65 +102,7 @@ export default function AdminDashboard() {
     },
   });
 
-  // Promote mutation
-  const promoteMutation = useMutation({
-    mutationFn: async () => {
-      let query = supabase.from("students").select("id, semester").eq("is_active", true);
-      if (promoCourse !== "all") query = query.eq("course_id", promoCourse);
-      query = query.eq("semester", promoSem);
-      const { data: studentsToPromote } = await query;
-      if (!studentsToPromote || studentsToPromote.length === 0) throw new Error("No students found for selected course/semester");
-      const ids = studentsToPromote.map(s => s.id);
-      const { error } = await supabase.from("students").update({ semester: promoSem + 1 }).in("id", ids);
-      if (error) throw error;
-      return studentsToPromote.length;
-    },
-    onSuccess: (count) => {
-      toast.success(`${count} students promoted to Semester ${promoSem + 1}!`);
-      queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
-    },
-    onError: (e: any) => toast.error(e.message),
-  });
 
-  // Post notice mutation
-  const noticeMutation = useMutation({
-    mutationFn: async () => {
-      if (!noticeTitle) throw new Error("Title is required");
-      const { error } = await supabase.from("notices").insert({ title: noticeTitle, content: noticeContent, type: noticeType, posted_by: user?.id, is_active: true });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Notice posted! It will appear on the website.");
-      setNoticeTitle(""); setNoticeContent(""); setNoticeType("General");
-    },
-    onError: (e: any) => toast.error(e.message),
-  });
-
-  // Export students to CSV
-  const exportStudents = async (format: "csv" | "json") => {
-    const { data } = await supabase.from("students").select("roll_number, semester, admission_year, total_fee, fee_paid, courses(name, code)").eq("is_active", true);
-    if (!data) return;
-    const { data: profiles } = await supabase.from("profiles").select("user_id, full_name, email, phone");
-    const { data: allStudents } = await supabase.from("students").select("id, user_id, roll_number, semester, admission_year, total_fee, fee_paid, fee_due_date, courses(name, code)").eq("is_active", true);
-
-    const rows = (allStudents || []).map((s: any) => {
-      const p = profiles?.find((pr: any) => pr.user_id === s.user_id);
-      return { "Roll Number": s.roll_number, "Name": p?.full_name || "", "Email": p?.email || "", "Phone": p?.phone || "", "Course": s.courses?.name || "", "Semester": s.semester, "Admission Year": s.admission_year, "Total Fee": s.total_fee, "Fee Paid": s.fee_paid, "Fee Remaining": (s.total_fee || 0) - (s.fee_paid || 0), "Fee Due Date": s.fee_due_date || "" };
-    });
-
-    if (format === "csv") {
-      const headers = Object.keys(rows[0] || {});
-      const csv = [headers.join(","), ...rows.map(r => headers.map(h => `"${(r as any)[h] ?? ""}"`).join(","))].join("\n");
-      const blob = new Blob([csv], { type: "text/csv" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a"); a.href = url; a.download = "students_export.csv"; a.click();
-    } else {
-      const blob = new Blob([JSON.stringify(rows, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a"); a.href = url; a.download = "students_export.json"; a.click();
-    }
-    toast.success(`Exported ${rows.length} students as ${format.toUpperCase()}`);
-  };
 
   const stats = [
     { label: "Total Students", value: String(counts?.students ?? 0), icon: Users, gradient: "from-primary/8 to-primary/3", iconBg: "bg-primary/10" },
@@ -190,9 +112,6 @@ export default function AdminDashboard() {
   ];
 
   const quickActions = [
-    { icon: Megaphone, label: "Post Notice / Announcement", desc: "Publish instantly to students", path: "#notice", isAnchor: true, highlight: true },
-    { icon: ArrowUpCircle, label: "Semester Promotion", desc: "Promote students in bulk", path: "#promotion", isAnchor: true, highlight: true },
-    { icon: Download, label: "Export Student Data", desc: "Download CSV report", path: "#export", isAnchor: true, highlight: true },
     { icon: FileText, label: "Admission Applications", desc: `${counts?.pendingApps || 0} pending`, path: "/dashboard/admin/applications", badge: counts?.pendingApps },
     { icon: Mail, label: "Contact Messages", desc: `${counts?.newContacts || 0} new`, path: "/dashboard/admin/contacts", badge: counts?.newContacts },
     { icon: Users, label: "Manage Users", desc: "View, edit & delete users", path: "/dashboard/admin/users" },
@@ -307,108 +226,28 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Semester Promotion */}
-      <div id="promotion" className="bg-card border border-border rounded-2xl p-5 sm:p-6">
-        <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-          <ArrowUpCircle className="w-4 h-4 text-primary" /> Semester Promotion
-        </h3>
-        <p className="font-body text-xs text-muted-foreground mb-4">Promote all students of a specific course and semester to the next semester in one click.</p>
-        <div className="flex flex-col sm:flex-row gap-3 items-end">
-          <div className="flex-1">
-            <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Course</label>
-            <select value={promoCourse} onChange={e => setPromoCourse(e.target.value)} className={inputClass}>
-              <option value="all">All Courses</option>
-              {courses.map((c: any) => <option key={c.id} value={c.id}>{c.name} ({c.code})</option>)}
-            </select>
-          </div>
-          <div className="flex-1">
-            <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Current Semester</label>
-            <select value={promoSem} onChange={e => setPromoSem(Number(e.target.value))} className={inputClass}>
-              {[1,2,3,4,5].map(s => <option key={s} value={s}>Semester {s}</option>)}
-            </select>
-          </div>
-          <Button onClick={() => { if (confirm(`Promote all Semester ${promoSem} students to Semester ${promoSem + 1}?`)) promoteMutation.mutate(); }} disabled={promoteMutation.isPending} className="rounded-xl font-body shrink-0">
-            <ArrowUpCircle className="w-4 h-4 mr-1" /> {promoteMutation.isPending ? "Promoting..." : `Promote to Sem ${promoSem + 1}`}
-          </Button>
-        </div>
-      </div>
-
-      {/* Post Notice / Announcement */}
-      <div id="notice" className="bg-card border border-border rounded-2xl p-5 sm:p-6">
-        <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-          <Megaphone className="w-4 h-4 text-secondary" /> Post Notice / Announcement
-        </h3>
-        <p className="font-body text-xs text-muted-foreground mb-4">Posted notices will appear on the main website immediately.</p>
-        <div className="grid sm:grid-cols-2 gap-3 mb-3">
-          <div>
-            <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Title *</label>
-            <input value={noticeTitle} onChange={e => setNoticeTitle(e.target.value)} className={inputClass} placeholder="e.g. Exam Schedule Released" />
-          </div>
-          <div>
-            <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Type</label>
-            <select value={noticeType} onChange={e => setNoticeType(e.target.value)} className={inputClass}>
-              {["General", "Academic", "Exam", "Event", "Admission", "Holiday", "Urgent"].map(t => <option key={t}>{t}</option>)}
-            </select>
-          </div>
-        </div>
-        <div className="mb-3">
-          <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Content</label>
-          <textarea value={noticeContent} onChange={e => setNoticeContent(e.target.value)} rows={3} className={`${inputClass} resize-none`} placeholder="Notice details..." />
-        </div>
-        <Button onClick={() => noticeMutation.mutate()} disabled={noticeMutation.isPending} className="rounded-xl font-body">
-          <Megaphone className="w-4 h-4 mr-1" /> {noticeMutation.isPending ? "Posting..." : "Post Notice"}
-        </Button>
-      </div>
-
-      {/* Export Section */}
-      <div id="export" className="bg-card border border-border rounded-2xl p-5 sm:p-6">
-        <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-          <Download className="w-4 h-4 text-primary" /> Export Data
-        </h3>
-        <div className="flex flex-wrap gap-3">
-          <Button variant="outline" onClick={() => exportStudents("csv")} className="rounded-xl font-body text-xs">
-            <Download className="w-3 h-3 mr-1" /> Export Students (CSV)
-          </Button>
-        </div>
-      </div>
-
       {/* Quick Actions */}
       <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-sm">
         <h3 className="font-display text-sm font-bold text-foreground mb-5 flex items-center gap-2">
           <TrendingUp className="w-4 h-4 text-primary" /> Quick Actions
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {quickActions.map((a: any, i: number) => (
-            a.isAnchor ? (
-              <a key={a.label} href={a.path}
-                className={`relative flex items-center gap-3 p-4 rounded-xl border-2 transition-all duration-300 group hover:-translate-y-1 hover:shadow-lg ${a.highlight ? "border-dashed border-secondary/40 hover:border-secondary/80 bg-gradient-to-br from-secondary/5 to-transparent" : "border-border hover:bg-primary/5 hover:border-primary/20"}`}
-                style={{ animationDelay: `${i * 40}ms` }}
-              >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-all duration-300 ${a.highlight ? "bg-secondary/15" : "bg-primary/10"}`}>
-                  <a.icon className={`w-5 h-5 ${a.highlight ? "text-secondary-foreground" : "text-primary"}`} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="font-body text-sm font-semibold text-foreground">{a.label}</p>
-                  <p className="font-body text-[11px] text-muted-foreground">{a.desc}</p>
-                </div>
-              </a>
-            ) : (
-              <Link key={a.label} to={a.path}
-                className="relative flex items-center gap-3 p-4 rounded-xl border border-border hover:bg-primary/5 hover:border-primary/20 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group border-glow"
-                style={{ animationDelay: `${i * 40}ms` }}
-              >
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
-                  <a.icon className="w-5 h-5 text-primary" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="font-body text-sm font-semibold text-foreground">{a.label}</p>
-                  <p className="font-body text-[11px] text-muted-foreground">{a.desc}</p>
-                </div>
-                {a.badge ? (
-                  <span className="absolute top-2 right-2 w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center animate-pulse">{a.badge}</span>
-                ) : null}
-              </Link>
-            )
+            <Link key={a.label} to={a.path}
+              className="relative flex items-center gap-3 p-4 rounded-xl border border-border hover:bg-primary/5 hover:border-primary/20 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group border-glow"
+              style={{ animationDelay: `${i * 40}ms` }}
+            >
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
+                <a.icon className="w-5 h-5 text-primary" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-body text-sm font-semibold text-foreground">{a.label}</p>
+                <p className="font-body text-[11px] text-muted-foreground">{a.desc}</p>
+              </div>
+              {a.badge ? (
+                <span className="absolute top-2 right-2 w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center animate-pulse">{a.badge}</span>
+              ) : null}
+            </Link>
           ))}
         </div>
       </div>
