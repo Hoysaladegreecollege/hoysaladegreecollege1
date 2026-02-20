@@ -206,12 +206,16 @@ export default function AdminDashboard() {
   const inputClass = "w-full border border-border rounded-xl px-3 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Welcome Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-primary/8 via-card to-secondary/8 border border-border rounded-2xl p-6 md:p-8">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+      <div className="relative overflow-hidden bg-gradient-to-r from-primary/10 via-card to-secondary/10 border border-border rounded-2xl p-6 md:p-8">
+        <div className="absolute top-0 right-0 w-40 h-40 bg-secondary/8 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/5 rounded-full translate-y-1/2 -translate-x-1/4 blur-2xl" />
         <div className="relative">
+          <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-3 py-1 mb-3">
+            <Shield className="w-3 h-3 text-primary" />
+            <span className="font-body text-[11px] text-primary font-semibold uppercase tracking-wider">Super Admin</span>
+          </div>
           <h2 className="font-display text-xl sm:text-2xl md:text-3xl font-bold text-foreground">Super Admin Panel ⚙️</h2>
           <p className="font-body text-sm text-muted-foreground mt-2">Welcome back, {profile?.full_name || "Admin"}. Full system control and content management.</p>
           {(counts?.pendingApps || counts?.newContacts) ? (
@@ -369,14 +373,17 @@ export default function AdminDashboard() {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-card border border-border rounded-2xl p-5 sm:p-6">
+      <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-sm">
         <h3 className="font-display text-sm font-bold text-foreground mb-5 flex items-center gap-2">
           <TrendingUp className="w-4 h-4 text-primary" /> Quick Actions
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {quickActions.map((a: any) => (
+          {quickActions.map((a: any, i: number) => (
             a.isAnchor ? (
-              <a key={a.label} href={a.path} className={`relative flex items-center gap-3 p-4 rounded-xl border-2 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md ${a.highlight ? "border-dashed border-secondary/40 hover:border-secondary/80 bg-gradient-to-br from-secondary/5 to-transparent" : "border-border hover:bg-primary/5 hover:border-primary/20"}`}>
+              <a key={a.label} href={a.path}
+                className={`relative flex items-center gap-3 p-4 rounded-xl border-2 transition-all duration-300 group hover:-translate-y-1 hover:shadow-lg ${a.highlight ? "border-dashed border-secondary/40 hover:border-secondary/80 bg-gradient-to-br from-secondary/5 to-transparent" : "border-border hover:bg-primary/5 hover:border-primary/20"}`}
+                style={{ animationDelay: `${i * 40}ms` }}
+              >
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-all duration-300 ${a.highlight ? "bg-secondary/15" : "bg-primary/10"}`}>
                   <a.icon className={`w-5 h-5 ${a.highlight ? "text-secondary-foreground" : "text-primary"}`} />
                 </div>
@@ -386,8 +393,11 @@ export default function AdminDashboard() {
                 </div>
               </a>
             ) : (
-              <Link key={a.label} to={a.path} className="relative flex items-center gap-3 p-4 rounded-xl border border-border hover:bg-primary/5 hover:border-primary/20 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 group-hover:scale-110 transition-all duration-300">
+              <Link key={a.label} to={a.path}
+                className="relative flex items-center gap-3 p-4 rounded-xl border border-border hover:bg-primary/5 hover:border-primary/20 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group border-glow"
+                style={{ animationDelay: `${i * 40}ms` }}
+              >
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
                   <a.icon className="w-5 h-5 text-primary" />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -395,7 +405,7 @@ export default function AdminDashboard() {
                   <p className="font-body text-[11px] text-muted-foreground">{a.desc}</p>
                 </div>
                 {a.badge ? (
-                  <span className="absolute top-2 right-2 w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">{a.badge}</span>
+                  <span className="absolute top-2 right-2 w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center animate-pulse">{a.badge}</span>
                 ) : null}
               </Link>
             )

@@ -85,11 +85,12 @@ export default function AdminTopRankers() {
   };
 
   return (
-    <div className="space-y-5 sm:space-y-6">
+    <div className="space-y-5 sm:space-y-6 animate-fade-in">
       {/* Header */}
       <div className="relative overflow-hidden bg-gradient-to-r from-secondary/10 via-card to-primary/8 border border-border rounded-2xl p-5 sm:p-6">
         <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
-        <div className="flex items-center gap-3">
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary/5 rounded-full translate-y-1/2 -translate-x-1/4 blur-xl" />
+        <div className="relative flex items-center gap-3">
           <Link to="/dashboard/admin" className="p-2 rounded-xl hover:bg-muted transition-colors shrink-0">
             <ArrowLeft className="w-4 h-4" />
           </Link>
@@ -103,7 +104,7 @@ export default function AdminTopRankers() {
       </div>
 
       {/* Add Form */}
-      <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-sm">
+      <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-shadow duration-300 card-interactive">
         <h3 className="font-display text-sm font-bold text-foreground mb-5 flex items-center gap-2">
           <Star className="w-4 h-4 text-secondary" /> Add New Top Ranker
         </h3>
@@ -152,7 +153,7 @@ export default function AdminTopRankers() {
       </div>
 
       {/* Rankers List */}
-      <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-sm">
+      <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
         <h3 className="font-display text-sm font-bold text-foreground mb-5">Current Top Rankers ({rankers.length})</h3>
         {isLoading ? (
           <div className="space-y-3">
@@ -176,7 +177,7 @@ export default function AdminTopRankers() {
             {rankers.map((r: any, i: number) => {
               const gradClass = rankColors[r.rank - 1] || "from-muted to-muted/30 border-border";
               return (
-                <div key={r.id} className={`flex items-center justify-between p-4 rounded-xl border bg-gradient-to-r ${gradClass} hover:shadow-md transition-all duration-300 group`}>
+                <div key={r.id} className={`flex items-center justify-between p-4 rounded-xl border bg-gradient-to-r ${gradClass} hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group`} style={{ animationDelay: `${i * 60}ms` }}>
                   <div className="flex items-center gap-3">
                     {r.photo_url ? (
                       <img src={r.photo_url} alt={r.student_name} className="w-14 h-14 rounded-xl object-cover border-2 border-white/50 shadow-md" />
