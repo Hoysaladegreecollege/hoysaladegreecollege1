@@ -33,6 +33,7 @@ export default function Navbar() {
   return (
     <header className={`sticky top-0 z-50 transition-all duration-500 ${scrolled ? "bg-card/98 backdrop-blur-xl shadow-lg border-b border-border" : "bg-card/95 backdrop-blur-md border-b border-border/50"}`}>
 
+
       {/* Top bar */}
       <div className="bg-gradient-to-r from-primary via-primary to-navy-dark text-primary-foreground py-2">
         <div className="container px-4">
@@ -54,7 +55,7 @@ export default function Navbar() {
             <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-secondary" />
           </div>
           <div>
-            <span className="font-display text-sm sm:text-lg font-bold leading-tight block group-hover:text-primary transition-colors text-foreground">
+            <span className="font-display text-sm sm:text-lg font-bold leading-tight block group-hover:text-primary transition-all duration-300 text-foreground contrast-more:text-foreground">
               Hoysala Degree College
             </span>
             <span className="text-[8px] sm:text-[9px] font-body tracking-wide leading-tight block text-muted-foreground">
