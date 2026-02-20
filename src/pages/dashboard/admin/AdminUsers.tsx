@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { Search, Trash2, Edit3, X, Save, Users, Phone, UserPlus, Eye, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -160,16 +161,25 @@ export default function AdminUsers() {
   const inputClass = "w-full border border-border rounded-xl px-3 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all";
 
   return (
-    <div className="space-y-5 sm:space-y-6">
-      <div className="bg-gradient-to-r from-primary/5 to-secondary/5 border border-border rounded-2xl p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+    <div className="space-y-5 sm:space-y-6 animate-fade-in">
+      {/* Header */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-primary/10 via-card to-secondary/10 border border-border rounded-2xl p-5 sm:p-6">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/8 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-20 h-20 bg-primary/5 rounded-full translate-y-1/2 -translate-x-1/4 blur-2xl" />
+        <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <Link to="/dashboard/admin" className="p-2 rounded-xl hover:bg-muted transition-colors"><ArrowLeft className="w-4 h-4" /></Link>
+            <Link to="/dashboard/admin" className="p-2 rounded-xl hover:bg-muted transition-colors shrink-0">
+              <ArrowLeft className="w-4 h-4" />
+            </Link>
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+              <Users className="w-5 h-5 text-primary" />
+            </div>
             <div>
-              <h2 className="font-display text-lg sm:text-xl font-bold text-foreground flex items-center gap-2">
-                <Users className="w-5 h-5 text-primary" /> User Management
-              </h2>
-              <p className="font-body text-xs sm:text-sm text-muted-foreground mt-1">{users.length} registered users</p>
+              <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-3 py-0.5 mb-1">
+                <span className="font-body text-[10px] text-primary font-semibold uppercase tracking-wider">Admin Panel</span>
+              </div>
+              <h2 className="font-display text-xl font-bold text-foreground">User Management</h2>
+              <p className="font-body text-xs text-muted-foreground">{users.length} registered users</p>
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
@@ -297,13 +307,32 @@ export default function AdminUsers() {
       </Dialog>
 
       {/* Users List */}
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         {isLoading ? (
-          <div className="space-y-3">{[1,2,3,4].map(i => <div key={i} className="h-20 bg-muted/50 rounded-xl animate-pulse" />)}</div>
-        ) : filtered.map((u: any) => (
-          <div key={u.id} className="bg-card border border-border rounded-xl p-4 hover:shadow-md transition-all group">
+          <div className="space-y-3">
+            {[1,2,3,4].map(i => (
+              <div key={i} className="bg-card border border-border rounded-2xl p-5 animate-pulse">
+                <div className="flex items-center gap-4">
+                  <Skeleton className="w-12 h-12 rounded-xl shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-1/3 rounded-lg" />
+                    <Skeleton className="h-3 w-1/2 rounded-lg" />
+                  </div>
+                  <Skeleton className="w-24 h-8 rounded-xl shrink-0" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filtered.map((u: any, idx: number) => (
+          <div
+            key={u.id}
+            className="relative overflow-hidden bg-card border border-border rounded-2xl p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group card-stack border-glow animate-fade-in"
+            style={{ animationDelay: `${idx * 30}ms` }}
+          >
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none spotlight" />
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/0 via-primary/30 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             {editingId === u.user_id ? (
-              <div className="space-y-2">
+              <div className="relative space-y-2">
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
                   <Input value={editForm.full_name} onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Name" />
                   <Input value={editForm.phone} onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Phone" />
@@ -329,22 +358,27 @@ export default function AdminUsers() {
                 </div>
               </div>
             ) : (
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-body text-sm font-bold text-foreground">{u.full_name || "—"}</span>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-body font-bold ${
-                      u.role === "admin" ? "bg-destructive/10 text-destructive" :
-                      u.role === "principal" ? "bg-secondary/20 text-secondary-foreground" :
-                      u.role === "teacher" ? "bg-primary/10 text-primary" :
-                      "bg-muted text-muted-foreground"
-                    }`}>{u.role}</span>
-                    {u.student?.courses?.code && <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-body">{u.student.courses.code}</span>}
+              <div className="relative flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center shrink-0 font-bold text-primary font-display text-base group-hover:scale-110 transition-transform duration-300 shadow-sm">
+                    {(u.full_name || u.email || "?")[0].toUpperCase()}
                   </div>
-                  <p className="font-body text-xs text-muted-foreground mt-0.5">{u.email}</p>
-                  <div className="flex items-center gap-3 mt-1">
-                    {u.phone && <a href={`tel:${u.phone}`} className="font-body text-xs text-primary hover:underline flex items-center gap-1"><Phone className="w-3 h-3" /> {u.phone}</a>}
-                    {u.student?.parent_phone && <a href={`tel:${u.student.parent_phone}`} className="font-body text-xs text-muted-foreground hover:text-primary flex items-center gap-1"><Phone className="w-3 h-3" /> Parent</a>}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-body text-sm font-bold text-foreground">{u.full_name || "—"}</span>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-body font-bold ${
+                        u.role === "admin" ? "bg-destructive/10 text-destructive" :
+                        u.role === "principal" ? "bg-secondary/20 text-secondary-foreground" :
+                        u.role === "teacher" ? "bg-primary/10 text-primary" :
+                        "bg-muted text-muted-foreground"
+                      }`}>{u.role}</span>
+                      {u.student?.courses?.code && <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-body">{u.student.courses.code}</span>}
+                    </div>
+                    <p className="font-body text-xs text-muted-foreground mt-0.5">{u.email}</p>
+                    <div className="flex items-center gap-3 mt-1">
+                      {u.phone && <a href={`tel:${u.phone}`} className="font-body text-xs text-primary hover:underline flex items-center gap-1"><Phone className="w-3 h-3" /> {u.phone}</a>}
+                      {u.student?.parent_phone && <a href={`tel:${u.student.parent_phone}`} className="font-body text-xs text-muted-foreground hover:text-primary flex items-center gap-1"><Phone className="w-3 h-3" /> Parent</a>}
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
@@ -355,10 +389,10 @@ export default function AdminUsers() {
                     <option value="principal">Principal</option>
                     <option value="admin">Admin</option>
                   </select>
-                  <button onClick={() => setViewStudent(u)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors" title="View"><Eye className="w-4 h-4" /></button>
-                  <button onClick={() => startEdit(u)} className="p-1.5 rounded-lg hover:bg-primary/10 text-primary transition-colors" title="Edit"><Edit3 className="w-4 h-4" /></button>
+                  <button onClick={() => setViewStudent(u)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:scale-110 transition-all duration-200" title="View"><Eye className="w-4 h-4" /></button>
+                  <button onClick={() => startEdit(u)} className="p-1.5 rounded-lg hover:bg-primary/10 text-primary hover:scale-110 transition-all duration-200" title="Edit"><Edit3 className="w-4 h-4" /></button>
                   <button onClick={() => setDeleteConfirm(u)}
-                    className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors" title="Delete"><Trash2 className="w-4 h-4" /></button>
+                    className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive hover:scale-110 transition-all duration-200" title="Delete"><Trash2 className="w-4 h-4" /></button>
                 </div>
               </div>
             )}
