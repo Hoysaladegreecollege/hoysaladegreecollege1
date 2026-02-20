@@ -1,5 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { Users, GraduationCap, BookOpen, Calendar, FileText, Settings, Mail, TrendingUp, Trophy, Shield, Image, BarChart3, PieChart } from "lucide-react";
+import { Users, GraduationCap, BookOpen, Calendar, FileText, Settings, Mail, TrendingUp, Trophy, Shield, Image, BarChart3, PieChart, Megaphone, ArrowUpCircle, Download } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
@@ -112,6 +112,9 @@ export default function AdminDashboard() {
   ];
 
   const quickActions = [
+    { icon: Megaphone, label: "Post Notice", desc: "Publish announcements instantly", path: "/dashboard/admin/post-notice", highlight: true },
+    { icon: ArrowUpCircle, label: "Semester Promotion", desc: "Promote students in bulk", path: "/dashboard/admin/semester-promotion", highlight: true },
+    { icon: Download, label: "Export Student Data", desc: "Download CSV report", path: "/dashboard/admin/settings", highlight: true },
     { icon: FileText, label: "Admission Applications", desc: `${counts?.pendingApps || 0} pending`, path: "/dashboard/admin/applications", badge: counts?.pendingApps },
     { icon: Mail, label: "Contact Messages", desc: `${counts?.newContacts || 0} new`, path: "/dashboard/admin/contacts", badge: counts?.newContacts },
     { icon: Users, label: "Manage Users", desc: "View, edit & delete users", path: "/dashboard/admin/users" },
@@ -234,11 +237,17 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {quickActions.map((a: any, i: number) => (
             <Link key={a.label} to={a.path}
-              className="relative flex items-center gap-3 p-4 rounded-xl border border-border hover:bg-primary/5 hover:border-primary/20 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group border-glow"
+              className={`relative flex items-center gap-3 p-4 rounded-xl border transition-all duration-300 group border-glow hover:shadow-lg hover:-translate-y-1 ${
+                a.highlight
+                  ? "border-secondary/40 bg-gradient-to-br from-secondary/8 to-primary/5 hover:border-secondary/60 hover:from-secondary/15"
+                  : "border-border hover:bg-primary/5 hover:border-primary/20"
+              }`}
               style={{ animationDelay: `${i * 40}ms` }}
             >
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
-                <a.icon className="w-5 h-5 text-primary" />
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-all duration-300 ${
+                a.highlight ? "bg-secondary/20 group-hover:bg-secondary/30" : "bg-primary/10 group-hover:bg-primary/20"
+              }`}>
+                <a.icon className={`w-5 h-5 ${a.highlight ? "text-secondary-foreground" : "text-primary"}`} />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="font-body text-sm font-semibold text-foreground">{a.label}</p>
