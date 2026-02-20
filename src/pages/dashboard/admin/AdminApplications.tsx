@@ -3,11 +3,16 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Eye, CheckCircle, XCircle, FileText, X, Phone, ArrowLeft, Filter, Mail } from "lucide-react";
+import { Search, Eye, CheckCircle, XCircle, FileText, X, Phone, ArrowLeft, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
+
+const statusColor = (s: string) =>
+  s === "approved" ? "text-emerald-700 bg-emerald-50 border border-emerald-200"
+  : s === "rejected" ? "text-destructive bg-destructive/8 border border-destructive/20"
+  : "text-amber-700 bg-amber-50 border border-amber-200";
 
 export default function AdminApplications() {
   const queryClient = useQueryClient();
@@ -28,8 +33,6 @@ export default function AdminApplications() {
     mutationFn: async ({ id, status, email, fullName, applicationNumber }: { id: string; status: string; email: string; fullName: string; applicationNumber: string }) => {
       const { error } = await supabase.from("admission_applications").update({ status }).eq("id", id);
       if (error) throw error;
-
-      // Send email notification
       try {
         await supabase.functions.invoke("send-application-email", {
           body: { email, fullName, applicationNumber, status },
@@ -47,17 +50,11 @@ export default function AdminApplications() {
   });
 
   const handleStatusChange = (app: any, status: string) => {
-    updateStatus.mutate({
-      id: app.id,
-      status,
-      email: app.email,
-      fullName: app.full_name,
-      applicationNumber: app.application_number || "",
-    });
+    updateStatus.mutate({ id: app.id, status, email: app.email, fullName: app.full_name, applicationNumber: app.application_number || "" });
   };
 
   const filtered = apps.filter((a: any) => {
-    const matchSearch = a.full_name.toLowerCase().includes(search.toLowerCase()) || 
+    const matchSearch = a.full_name.toLowerCase().includes(search.toLowerCase()) ||
       a.email.toLowerCase().includes(search.toLowerCase()) ||
       (a.application_number || "").toLowerCase().includes(search.toLowerCase());
     const matchStatus = statusFilter === "all" || a.status === statusFilter;
@@ -66,30 +63,30 @@ export default function AdminApplications() {
   });
 
   const uniqueCourses = [...new Set(apps.map((a: any) => a.course))];
-
-  const statusColor = (s: string) =>
-    s === "approved" ? "text-green-700 bg-green-100" : s === "rejected" ? "text-red-700 bg-red-100" : "text-secondary bg-secondary/10";
-
   const pendingCount = apps.filter((a: any) => a.status === "pending").length;
   const approvedCount = apps.filter((a: any) => a.status === "approved").length;
   const rejectedCount = apps.filter((a: any) => a.status === "rejected").length;
 
   return (
-    <div className="space-y-6">
-      <div className="bg-gradient-to-r from-primary/5 to-secondary/5 border border-border rounded-2xl p-6">
-        <div className="flex items-center gap-3 mb-3">
-          <Link to="/dashboard/admin" className="p-2 rounded-xl hover:bg-muted transition-colors"><ArrowLeft className="w-4 h-4" /></Link>
-          <div>
+    <div className="space-y-5 sm:space-y-6">
+      {/* Header */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-primary/8 via-card to-secondary/8 border border-border rounded-2xl p-5 sm:p-6">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
+        <div className="flex items-center gap-3 mb-4">
+          <Link to="/dashboard/admin" className="p-2 rounded-xl hover:bg-muted transition-colors shrink-0">
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+          <div className="flex-1">
             <h2 className="font-display text-xl font-bold text-foreground flex items-center gap-2">
               <FileText className="w-5 h-5 text-primary" /> Admission Applications
             </h2>
-            <p className="font-body text-sm text-muted-foreground mt-1">{apps.length} total applications</p>
+            <p className="font-body text-xs text-muted-foreground mt-0.5">{apps.length} total applications</p>
           </div>
         </div>
-        <div className="flex gap-3 ml-11 flex-wrap">
-          <span className="text-xs font-body px-3 py-1 rounded-full bg-secondary/10 text-secondary-foreground font-semibold">⏳ {pendingCount} Pending</span>
-          <span className="text-xs font-body px-3 py-1 rounded-full bg-green-100 text-green-700 font-semibold">✓ {approvedCount} Approved</span>
-          <span className="text-xs font-body px-3 py-1 rounded-full bg-red-100 text-red-700 font-semibold">✗ {rejectedCount} Rejected</span>
+        <div className="flex gap-2 flex-wrap ml-11">
+          <span className="text-[10px] font-body px-3 py-1.5 rounded-full bg-secondary/10 border border-secondary/20 text-secondary-foreground font-bold">⏳ {pendingCount} Pending</span>
+          <span className="text-[10px] font-body px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-bold">✓ {approvedCount} Approved</span>
+          <span className="text-[10px] font-body px-3 py-1.5 rounded-full bg-destructive/10 border border-destructive/20 text-destructive font-bold">✗ {rejectedCount} Rejected</span>
         </div>
       </div>
 
@@ -99,61 +96,76 @@ export default function AdminApplications() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input placeholder="Search by name, email or app number..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 rounded-xl" />
         </div>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
-          className="border border-border rounded-xl px-3 py-2 font-body text-xs bg-background">
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="border border-border rounded-xl px-3 py-2 font-body text-xs bg-background focus:ring-2 focus:ring-primary/20 focus:outline-none">
           <option value="all">All Status</option>
           <option value="pending">Pending</option>
           <option value="approved">Approved</option>
           <option value="rejected">Rejected</option>
         </select>
-        <select value={courseFilter} onChange={(e) => setCourseFilter(e.target.value)}
-          className="border border-border rounded-xl px-3 py-2 font-body text-xs bg-background">
+        <select value={courseFilter} onChange={(e) => setCourseFilter(e.target.value)} className="border border-border rounded-xl px-3 py-2 font-body text-xs bg-background focus:ring-2 focus:ring-primary/20 focus:outline-none">
           <option value="all">All Courses</option>
           {uniqueCourses.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
       </div>
 
-      <div className="bg-card border border-border rounded-2xl overflow-hidden">
+      {/* Table */}
+      <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[800px]">
+          <table className="w-full min-w-[820px]">
             <thead>
-              <tr className="border-b border-border bg-muted/30">
-                <th className="text-left font-body text-xs font-semibold text-muted-foreground p-4">App #</th>
-                <th className="text-left font-body text-xs font-semibold text-muted-foreground p-4">Name</th>
-                <th className="text-left font-body text-xs font-semibold text-muted-foreground p-4">Course</th>
-                <th className="text-left font-body text-xs font-semibold text-muted-foreground p-4">Phone</th>
-                <th className="text-left font-body text-xs font-semibold text-muted-foreground p-4">Date</th>
-                <th className="text-left font-body text-xs font-semibold text-muted-foreground p-4">Status</th>
-                <th className="text-center font-body text-xs font-semibold text-muted-foreground p-4">Actions</th>
+              <tr className="border-b border-border bg-muted/40">
+                {["App #", "Applicant", "Course", "Phone", "Date", "Status", "Actions"].map(h => (
+                  <th key={h} className="text-left font-body text-[10px] font-bold text-muted-foreground uppercase tracking-wider p-4">{h}</th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
-                Array.from({ length: 4 }).map((_, i) => (
-                  <tr key={i}><td colSpan={7} className="p-4"><Skeleton className="h-10 rounded-xl" /></td></tr>
+                Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i} className="border-b border-border/40">
+                    {Array.from({ length: 7 }).map((_, j) => (
+                      <td key={j} className="p-4"><Skeleton className="h-5 rounded-lg" /></td>
+                    ))}
+                  </tr>
                 ))
-              ) : filtered.map((a: any) => (
-                <tr key={a.id} className="border-b border-border/50 hover:bg-muted/20 transition-colors">
+              ) : filtered.map((a: any, idx: number) => (
+                <tr key={a.id} className="border-b border-border/40 hover:bg-muted/20 transition-colors duration-200 group" style={{ animationDelay: `${idx * 30}ms` }}>
                   <td className="font-body text-xs p-4 font-bold text-primary">{a.application_number || "—"}</td>
                   <td className="p-4">
-                    <div className="flex items-center gap-2">
-                      {a.photo_url && <img src={a.photo_url} alt="" className="w-8 h-8 rounded-full object-cover border border-border" />}
-                      <span className="font-body text-sm font-semibold text-foreground">{a.full_name}</span>
+                    <div className="flex items-center gap-2.5">
+                      {a.photo_url
+                        ? <img src={a.photo_url} alt="" className="w-9 h-9 rounded-xl object-cover border border-border shadow-sm" />
+                        : <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">{a.full_name[0]}</div>
+                      }
+                      <div>
+                        <span className="font-body text-sm font-semibold text-foreground block">{a.full_name}</span>
+                        <span className="font-body text-[10px] text-muted-foreground">{a.email}</span>
+                      </div>
                     </div>
                   </td>
                   <td className="font-body text-sm p-4 text-foreground">{a.course}</td>
-                  <td className="font-body text-sm p-4"><a href={`tel:${a.phone}`} className="text-primary hover:underline">{a.phone}</a></td>
-                  <td className="font-body text-sm p-4 text-muted-foreground">{format(new Date(a.created_at), "MMM d, yyyy")}</td>
+                  <td className="font-body text-sm p-4">
+                    <a href={`tel:${a.phone}`} className="text-primary hover:underline flex items-center gap-1">
+                      <Phone className="w-3 h-3" /> {a.phone}
+                    </a>
+                  </td>
+                  <td className="font-body text-xs p-4 text-muted-foreground">{format(new Date(a.created_at), "MMM d, yyyy")}</td>
                   <td className="p-4">
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-body font-semibold capitalize ${statusColor(a.status)}`}>{a.status}</span>
+                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-body font-bold capitalize ${statusColor(a.status)}`}>{a.status}</span>
                   </td>
                   <td className="p-4">
-                    <div className="flex items-center justify-center gap-1">
-                      <button onClick={() => setSelected(a)} className="p-1.5 rounded-lg hover:bg-primary/10 text-primary transition-colors"><Eye className="w-4 h-4" /></button>
+                    <div className="flex items-center gap-1">
+                      <button onClick={() => setSelected(a)} className="p-1.5 rounded-lg hover:bg-primary/10 text-primary transition-colors" title="View Details">
+                        <Eye className="w-4 h-4" />
+                      </button>
                       {a.status === "pending" && (
                         <>
-                          <button onClick={() => handleStatusChange(a, "approved")} className="p-1.5 rounded-lg hover:bg-green-100 text-green-600 transition-colors"><CheckCircle className="w-4 h-4" /></button>
-                          <button onClick={() => handleStatusChange(a, "rejected")} className="p-1.5 rounded-lg hover:bg-red-100 text-red-600 transition-colors"><XCircle className="w-4 h-4" /></button>
+                          <button onClick={() => handleStatusChange(a, "approved")} className="p-1.5 rounded-lg hover:bg-primary/10 text-primary transition-colors" title="Approve">
+                            <CheckCircle className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => handleStatusChange(a, "rejected")} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors" title="Reject">
+                            <XCircle className="w-4 h-4" />
+                          </button>
                         </>
                       )}
                     </div>
@@ -161,7 +173,7 @@ export default function AdminApplications() {
                 </tr>
               ))}
               {!isLoading && filtered.length === 0 && (
-                <tr><td colSpan={7} className="text-center font-body text-sm text-muted-foreground p-8">No applications found.</td></tr>
+                <tr><td colSpan={7} className="text-center font-body text-sm text-muted-foreground p-12">No applications found.</td></tr>
               )}
             </tbody>
           </table>
@@ -170,55 +182,63 @@ export default function AdminApplications() {
 
       {/* Detail Modal */}
       {selected && (
-        <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-card rounded-2xl border border-border w-full max-w-lg p-6 max-h-[85vh] overflow-y-auto shadow-2xl">
-            <div className="flex items-center justify-between mb-6">
+        <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" onClick={() => setSelected(null)}>
+          <div className="bg-card rounded-2xl border border-border w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-card border-b border-border px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
               <div>
-                <h3 className="font-display text-xl font-bold text-foreground">Application Details</h3>
-                <p className="font-body text-xs text-primary font-bold mt-0.5">{selected.application_number}</p>
+                <h3 className="font-display text-lg font-bold text-foreground">Application Details</h3>
+                <p className="font-body text-xs text-primary font-bold">{selected.application_number}</p>
               </div>
-              <button onClick={() => setSelected(null)} className="p-2 rounded-xl hover:bg-muted transition-colors"><X className="w-5 h-5" /></button>
+              <button onClick={() => setSelected(null)} className="p-2 rounded-xl hover:bg-muted transition-colors">
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
             {/* Photo */}
             {selected.photo_url && (
-              <div className="text-center mb-5">
+              <div className="text-center pt-6 px-6">
                 <img src={selected.photo_url} alt={selected.full_name} className="w-24 h-24 rounded-2xl object-cover mx-auto border-2 border-border shadow-lg" />
               </div>
             )}
 
-            <div className="space-y-2 font-body text-sm">
-              {Object.entries({
-                "Name": selected.full_name, "Email": selected.email, "Phone": selected.phone,
-                "DOB": selected.date_of_birth, "Gender": selected.gender, "Course": selected.course,
-                "Father": selected.father_name, "Mother": selected.mother_name, "Address": selected.address,
-                "Previous PU College": selected.previous_school, "12th %": selected.percentage_12th,
-                "Status": selected.status, "Applied": format(new Date(selected.created_at), "PPp"),
-              }).map(([k, v]) => (
-                <div key={k} className="flex gap-3 p-2 rounded-lg hover:bg-muted/30">
-                  <span className="text-muted-foreground w-32 shrink-0 font-semibold text-xs uppercase tracking-wider">{k}</span>
-                  <span className="text-foreground font-medium">{v || "—"}</span>
+            <div className="p-6 space-y-1.5">
+              {[
+                ["Name", selected.full_name], ["Email", selected.email], ["Phone", selected.phone],
+                ["DOB", selected.date_of_birth], ["Gender", selected.gender], ["Course", selected.course],
+                ["Father", selected.father_name], ["Mother", selected.mother_name], ["Address", selected.address],
+                ["Previous PU College", selected.previous_school], ["12th %", selected.percentage_12th],
+                ["Status", selected.status], ["Applied", format(new Date(selected.created_at), "PPp")],
+              ].map(([k, v]) => v ? (
+                <div key={k} className="flex gap-3 p-2.5 rounded-xl hover:bg-muted/30 transition-colors">
+                  <span className="text-muted-foreground w-32 shrink-0 font-body font-bold text-[10px] uppercase tracking-wider pt-0.5">{k}</span>
+                  <span className="text-foreground font-body text-sm font-medium">{v}</span>
                 </div>
-              ))}
+              ) : null)}
             </div>
 
-            <div className="flex flex-wrap gap-2 mt-5">
+            <div className="p-5 pt-0 flex flex-wrap gap-2 border-t border-border">
               <a href={`tel:${selected.phone}`}>
                 <Button size="sm" variant="outline" className="rounded-xl font-body text-xs">
                   <Phone className="w-3 h-3 mr-1" /> Call
                 </Button>
               </a>
+              <a href={`mailto:${selected.email}`}>
+                <Button size="sm" variant="outline" className="rounded-xl font-body text-xs">
+                  <Mail className="w-3 h-3 mr-1" /> Email
+                </Button>
+              </a>
               {selected.status === "pending" && (
                 <>
-                  <Button size="sm" onClick={() => handleStatusChange(selected, "approved")} className="rounded-xl font-body text-xs bg-green-600 hover:bg-green-700 text-white">
+                  <Button size="sm" onClick={() => handleStatusChange(selected, "approved")} disabled={updateStatus.isPending} className="rounded-xl font-body text-xs bg-primary hover:bg-primary/90 text-primary-foreground">
                     <CheckCircle className="w-3 h-3 mr-1" /> Approve & Notify
                   </Button>
-                  <Button size="sm" variant="destructive" onClick={() => handleStatusChange(selected, "rejected")} className="rounded-xl font-body text-xs">
+                  <Button size="sm" variant="destructive" onClick={() => handleStatusChange(selected, "rejected")} disabled={updateStatus.isPending} className="rounded-xl font-body text-xs">
                     <XCircle className="w-3 h-3 mr-1" /> Reject & Notify
                   </Button>
                 </>
               )}
-              <Button size="sm" variant="outline" onClick={() => setSelected(null)} className="rounded-xl font-body text-xs">Close</Button>
+              <Button size="sm" variant="outline" onClick={() => setSelected(null)} className="rounded-xl font-body text-xs ml-auto">Close</Button>
             </div>
           </div>
         </div>
