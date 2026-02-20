@@ -57,8 +57,8 @@ export default function Navbar() {
 
   return (
     <header className={`sticky top-0 z-50 transition-all duration-500 ${scrolled
-      ? "bg-card/98 backdrop-blur-2xl shadow-[0_4px_40px_-8px_hsl(var(--primary)/0.12)] border-b border-border"
-      : "bg-card/90 backdrop-blur-lg border-b border-border/40"
+      ? "bg-card shadow-sm border-b border-border"
+      : "bg-card border-b border-border/40"
     }`}>
 
       {/* Scroll progress bar */}
