@@ -52,6 +52,33 @@ export type Database = {
           },
         ]
       }
+      academic_years: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          id: string
+          is_current: boolean | null
+          label: string
+          start_date: string | null
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          is_current?: boolean | null
+          label: string
+          start_date?: string | null
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          is_current?: boolean | null
+          label?: string
+          start_date?: string | null
+        }
+        Relationships: []
+      }
       admission_applications: {
         Row: {
           address: string | null
@@ -158,6 +185,7 @@ export type Database = {
       }
       attendance: {
         Row: {
+          course_id: string | null
           created_at: string
           date: string
           id: string
@@ -165,8 +193,10 @@ export type Database = {
           status: string
           student_id: string
           subject: string
+          year_level: number | null
         }
         Insert: {
+          course_id?: string | null
           created_at?: string
           date?: string
           id?: string
@@ -174,8 +204,10 @@ export type Database = {
           status?: string
           student_id: string
           subject: string
+          year_level?: number | null
         }
         Update: {
+          course_id?: string | null
           created_at?: string
           date?: string
           id?: string
@@ -183,8 +215,16 @@ export type Database = {
           status?: string
           student_id?: string
           subject?: string
+          year_level?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "attendance_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "attendance_student_id_fkey"
             columns: ["student_id"]
@@ -434,6 +474,7 @@ export type Database = {
       }
       marks: {
         Row: {
+          course_id: string | null
           created_at: string
           exam_type: string
           id: string
@@ -443,8 +484,10 @@ export type Database = {
           student_id: string
           subject: string
           uploaded_by: string | null
+          year_level: number | null
         }
         Insert: {
+          course_id?: string | null
           created_at?: string
           exam_type?: string
           id?: string
@@ -454,8 +497,10 @@ export type Database = {
           student_id: string
           subject: string
           uploaded_by?: string | null
+          year_level?: number | null
         }
         Update: {
+          course_id?: string | null
           created_at?: string
           exam_type?: string
           id?: string
@@ -465,8 +510,16 @@ export type Database = {
           student_id?: string
           subject?: string
           uploaded_by?: string | null
+          year_level?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "marks_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "marks_student_id_fkey"
             columns: ["student_id"]
@@ -613,63 +666,82 @@ export type Database = {
       }
       students: {
         Row: {
+          academic_year_id: string | null
           address: string | null
           admission_year: number | null
           avatar_url: string | null
           course_id: string | null
           created_at: string
           date_of_birth: string | null
+          father_name: string | null
           fee_due_date: string | null
           fee_paid: number | null
           fee_remarks: string | null
           id: string
           is_active: boolean | null
+          mother_name: string | null
           parent_phone: string | null
           phone: string | null
           roll_number: string
           semester: number | null
           total_fee: number | null
           user_id: string
+          year_level: number | null
         }
         Insert: {
+          academic_year_id?: string | null
           address?: string | null
           admission_year?: number | null
           avatar_url?: string | null
           course_id?: string | null
           created_at?: string
           date_of_birth?: string | null
+          father_name?: string | null
           fee_due_date?: string | null
           fee_paid?: number | null
           fee_remarks?: string | null
           id?: string
           is_active?: boolean | null
+          mother_name?: string | null
           parent_phone?: string | null
           phone?: string | null
           roll_number: string
           semester?: number | null
           total_fee?: number | null
           user_id: string
+          year_level?: number | null
         }
         Update: {
+          academic_year_id?: string | null
           address?: string | null
           admission_year?: number | null
           avatar_url?: string | null
           course_id?: string | null
           created_at?: string
           date_of_birth?: string | null
+          father_name?: string | null
           fee_due_date?: string | null
           fee_paid?: number | null
           fee_remarks?: string | null
           id?: string
           is_active?: boolean | null
+          mother_name?: string | null
           parent_phone?: string | null
           phone?: string | null
           roll_number?: string
           semester?: number | null
           total_fee?: number | null
           user_id?: string
+          year_level?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "students_academic_year_id_fkey"
+            columns: ["academic_year_id"]
+            isOneToOne: false
+            referencedRelation: "academic_years"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "students_course_id_fkey"
             columns: ["course_id"]

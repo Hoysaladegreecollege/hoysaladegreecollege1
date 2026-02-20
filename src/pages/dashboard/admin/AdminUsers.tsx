@@ -22,7 +22,9 @@ export default function AdminUsers() {
   const [deleteConfirm, setDeleteConfirm] = useState<any>(null);
   const [newStudent, setNewStudent] = useState({
     full_name: "", email: "", password: "", phone: "", date_of_birth: "",
-    roll_number: "", course_id: "", semester: "1", admission_year: new Date().getFullYear().toString(),
+    roll_number: "", course_id: "", year_level: "1", semester: "1",
+    academic_year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`,
+    admission_year: new Date().getFullYear().toString(),
     father_name: "", mother_name: "", parent_phone: "", address: "",
   });
 
@@ -117,21 +119,30 @@ export default function AdminUsers() {
       }
 
       // Update student record
+      const yearLevel = parseInt(newStudent.year_level) || 1;
+      const semFromYear: Record<number, number> = { 1: 1, 2: 3, 3: 5 };
       const updateData: any = {
-        semester: parseInt(newStudent.semester) || 1,
+        semester: semFromYear[yearLevel] || 1,
+        year_level: yearLevel,
         admission_year: parseInt(newStudent.admission_year),
         parent_phone: newStudent.parent_phone,
+        father_name: newStudent.father_name,
+        mother_name: newStudent.mother_name,
         address: newStudent.address,
         date_of_birth: newStudent.date_of_birth || null,
       };
       if (newStudent.roll_number) updateData.roll_number = newStudent.roll_number;
       if (newStudent.course_id) updateData.course_id = newStudent.course_id;
+      // Also update profile phone
+      if (newStudent.phone) {
+        await supabase.from("profiles").update({ phone: newStudent.phone }).eq("user_id", authData.user.id);
+      }
       await supabase.from("students").update(updateData).eq("user_id", authData.user.id);
     },
     onSuccess: () => {
-      toast.success("Student created! Email confirmation has been sent.");
+      toast.success("Student created! Email confirmation sent.");
       setShowAddStudent(false);
-      setNewStudent({ full_name: "", email: "", password: "", phone: "", date_of_birth: "", roll_number: "", course_id: "", semester: "1", admission_year: new Date().getFullYear().toString(), father_name: "", mother_name: "", parent_phone: "", address: "" });
+      setNewStudent({ full_name: "", email: "", password: "", phone: "", date_of_birth: "", roll_number: "", course_id: "", year_level: "1", semester: "1", academic_year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`, admission_year: new Date().getFullYear().toString(), father_name: "", mother_name: "", parent_phone: "", address: "" });
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
     },
     onError: (e: any) => toast.error(e.message),
@@ -207,26 +218,58 @@ export default function AdminUsers() {
             <DialogDescription className="font-body text-sm">Create a student account — email confirmation will be sent automatically</DialogDescription>
           </DialogHeader>
           <form onSubmit={(e) => { e.preventDefault(); addStudentMutation.mutate(); }} className="grid sm:grid-cols-2 gap-4 mt-4">
-            <div className="sm:col-span-2"><h4 className="font-body text-xs font-bold text-primary uppercase tracking-wider">Personal Information</h4></div>
+            {/* Section: Personal */}
+            <div className="sm:col-span-2">
+              <div className="flex items-center gap-2 py-2 border-b border-border mb-1">
+                <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-[10px]">1</span>
+                <h4 className="font-body text-xs font-bold text-primary uppercase tracking-wider">Personal Information</h4>
+              </div>
+            </div>
             <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Full Name *</label><input value={newStudent.full_name} onChange={(e) => setNewStudent({ ...newStudent, full_name: e.target.value })} required className={inputClass} /></div>
             <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Email *</label><input type="email" value={newStudent.email} onChange={(e) => setNewStudent({ ...newStudent, email: e.target.value })} required className={inputClass} /></div>
             <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Password *</label><input type="password" value={newStudent.password} onChange={(e) => setNewStudent({ ...newStudent, password: e.target.value })} required minLength={6} className={inputClass} /></div>
-            <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Phone</label><input value={newStudent.phone} onChange={(e) => setNewStudent({ ...newStudent, phone: e.target.value })} className={inputClass} /></div>
+            <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Student Phone</label><input value={newStudent.phone} onChange={(e) => setNewStudent({ ...newStudent, phone: e.target.value })} className={inputClass} /></div>
             <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Date of Birth</label><input type="date" value={newStudent.date_of_birth} onChange={(e) => setNewStudent({ ...newStudent, date_of_birth: e.target.value })} className={inputClass} /></div>
             <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Roll Number</label><input value={newStudent.roll_number} onChange={(e) => setNewStudent({ ...newStudent, roll_number: e.target.value })} placeholder="Auto-generated if empty" className={inputClass} /></div>
-            <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Course *</label>
+
+            {/* Section: Academic */}
+            <div className="sm:col-span-2 mt-1">
+              <div className="flex items-center gap-2 py-2 border-b border-border mb-1">
+                <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-[10px]">2</span>
+                <h4 className="font-body text-xs font-bold text-primary uppercase tracking-wider">Academic Assignment</h4>
+              </div>
+            </div>
+            <div>
+              <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Course *</label>
               <select value={newStudent.course_id} onChange={(e) => setNewStudent({ ...newStudent, course_id: e.target.value })} required className={inputClass}>
                 <option value="">Select Course</option>
                 {courses.map((c: any) => <option key={c.id} value={c.id}>{c.name} ({c.code})</option>)}
               </select>
             </div>
-            <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Semester</label>
-              <select value={newStudent.semester} onChange={(e) => setNewStudent({ ...newStudent, semester: e.target.value })} className={inputClass}>
-                {[1,2,3,4,5,6].map(s => <option key={s} value={s}>Semester {s}</option>)}
+            <div>
+              <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Year *</label>
+              <select value={newStudent.year_level} onChange={(e) => setNewStudent({ ...newStudent, year_level: e.target.value })} required className={inputClass}>
+                <option value="1">1st Year</option>
+                <option value="2">2nd Year</option>
+                <option value="3">3rd Year</option>
               </select>
             </div>
-            <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Admission Year</label><input value={newStudent.admission_year} onChange={(e) => setNewStudent({ ...newStudent, admission_year: e.target.value })} className={inputClass} /></div>
-            <div className="sm:col-span-2 mt-2"><h4 className="font-body text-xs font-bold text-primary uppercase tracking-wider">Parent Information</h4></div>
+            <div>
+              <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Academic Year</label>
+              <input value={newStudent.academic_year} onChange={(e) => setNewStudent({ ...newStudent, academic_year: e.target.value })} placeholder="e.g. 2025-2026" className={inputClass} />
+            </div>
+            <div>
+              <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Admission Year</label>
+              <input value={newStudent.admission_year} onChange={(e) => setNewStudent({ ...newStudent, admission_year: e.target.value })} className={inputClass} />
+            </div>
+
+            {/* Section: Parent */}
+            <div className="sm:col-span-2 mt-1">
+              <div className="flex items-center gap-2 py-2 border-b border-border mb-1">
+                <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-[10px]">3</span>
+                <h4 className="font-body text-xs font-bold text-primary uppercase tracking-wider">Parent Information</h4>
+              </div>
+            </div>
             <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Father's Name</label><input value={newStudent.father_name} onChange={(e) => setNewStudent({ ...newStudent, father_name: e.target.value })} className={inputClass} /></div>
             <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Mother's Name</label><input value={newStudent.mother_name} onChange={(e) => setNewStudent({ ...newStudent, mother_name: e.target.value })} className={inputClass} /></div>
             <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Parent Phone</label><input value={newStudent.parent_phone} onChange={(e) => setNewStudent({ ...newStudent, parent_phone: e.target.value })} className={inputClass} /></div>
