@@ -190,6 +190,9 @@ export default function AdminDashboard() {
   ];
 
   const quickActions = [
+    { icon: Megaphone, label: "Post Notice / Announcement", desc: "Publish instantly to students", path: "#notice", isAnchor: true, highlight: true },
+    { icon: ArrowUpCircle, label: "Semester Promotion", desc: "Promote students in bulk", path: "#promotion", isAnchor: true, highlight: true },
+    { icon: Download, label: "Export Student Data", desc: "Download CSV report", path: "#export", isAnchor: true, highlight: true },
     { icon: FileText, label: "Admission Applications", desc: `${counts?.pendingApps || 0} pending`, path: "/dashboard/admin/applications", badge: counts?.pendingApps },
     { icon: Mail, label: "Contact Messages", desc: `${counts?.newContacts || 0} new`, path: "/dashboard/admin/contacts", badge: counts?.newContacts },
     { icon: Users, label: "Manage Users", desc: "View, edit & delete users", path: "/dashboard/admin/users" },
@@ -301,7 +304,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Semester Promotion */}
-      <div className="bg-card border border-border rounded-2xl p-5 sm:p-6">
+      <div id="promotion" className="bg-card border border-border rounded-2xl p-5 sm:p-6">
         <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
           <ArrowUpCircle className="w-4 h-4 text-primary" /> Semester Promotion
         </h3>
@@ -327,7 +330,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Post Notice / Announcement */}
-      <div className="bg-card border border-border rounded-2xl p-5 sm:p-6">
+      <div id="notice" className="bg-card border border-border rounded-2xl p-5 sm:p-6">
         <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
           <Megaphone className="w-4 h-4 text-secondary" /> Post Notice / Announcement
         </h3>
@@ -354,16 +357,13 @@ export default function AdminDashboard() {
       </div>
 
       {/* Export Section */}
-      <div className="bg-card border border-border rounded-2xl p-5 sm:p-6">
+      <div id="export" className="bg-card border border-border rounded-2xl p-5 sm:p-6">
         <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
           <Download className="w-4 h-4 text-primary" /> Export Data
         </h3>
         <div className="flex flex-wrap gap-3">
           <Button variant="outline" onClick={() => exportStudents("csv")} className="rounded-xl font-body text-xs">
             <Download className="w-3 h-3 mr-1" /> Export Students (CSV)
-          </Button>
-          <Button variant="outline" onClick={() => exportStudents("json")} className="rounded-xl font-body text-xs">
-            <Download className="w-3 h-3 mr-1" /> Export Students (JSON)
           </Button>
         </div>
       </div>
@@ -374,19 +374,31 @@ export default function AdminDashboard() {
           <TrendingUp className="w-4 h-4 text-primary" /> Quick Actions
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {quickActions.map((a) => (
-            <Link key={a.label} to={a.path} className="relative flex items-center gap-3 p-4 rounded-xl border border-border hover:bg-primary/5 hover:border-primary/20 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 group-hover:scale-110 transition-all duration-300">
-                <a.icon className="w-5 h-5 text-primary" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="font-body text-sm font-semibold text-foreground">{a.label}</p>
-                <p className="font-body text-[11px] text-muted-foreground">{a.desc}</p>
-              </div>
-              {a.badge ? (
-                <span className="absolute top-2 right-2 w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">{a.badge}</span>
-              ) : null}
-            </Link>
+          {quickActions.map((a: any) => (
+            a.isAnchor ? (
+              <a key={a.label} href={a.path} className={`relative flex items-center gap-3 p-4 rounded-xl border-2 transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-md ${a.highlight ? "border-dashed border-secondary/40 hover:border-secondary/80 bg-gradient-to-br from-secondary/5 to-transparent" : "border-border hover:bg-primary/5 hover:border-primary/20"}`}>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-all duration-300 ${a.highlight ? "bg-secondary/15" : "bg-primary/10"}`}>
+                  <a.icon className={`w-5 h-5 ${a.highlight ? "text-secondary-foreground" : "text-primary"}`} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-body text-sm font-semibold text-foreground">{a.label}</p>
+                  <p className="font-body text-[11px] text-muted-foreground">{a.desc}</p>
+                </div>
+              </a>
+            ) : (
+              <Link key={a.label} to={a.path} className="relative flex items-center gap-3 p-4 rounded-xl border border-border hover:bg-primary/5 hover:border-primary/20 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 group-hover:scale-110 transition-all duration-300">
+                  <a.icon className="w-5 h-5 text-primary" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-body text-sm font-semibold text-foreground">{a.label}</p>
+                  <p className="font-body text-[11px] text-muted-foreground">{a.desc}</p>
+                </div>
+                {a.badge ? (
+                  <span className="absolute top-2 right-2 w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">{a.badge}</span>
+                ) : null}
+              </Link>
+            )
           ))}
         </div>
       </div>

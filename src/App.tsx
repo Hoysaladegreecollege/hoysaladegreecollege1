@@ -35,6 +35,7 @@ import StudentMarks from "./pages/dashboard/student/StudentMarks";
 import StudentTimetable from "./pages/dashboard/student/StudentTimetable";
 import StudentNotices from "./pages/dashboard/student/StudentNotices";
 import StudentMaterials from "./pages/dashboard/student/StudentMaterials";
+import StudentAnnouncements from "./pages/dashboard/student/StudentAnnouncements";
 
 // Teacher Dashboard
 import TeacherDashboard from "./pages/dashboard/TeacherDashboard";
@@ -132,6 +133,7 @@ const App = () => (
             <Route path="/dashboard/student/timetable" element={<StudentRoute><StudentTimetable /></StudentRoute>} />
             <Route path="/dashboard/student/notices" element={<StudentRoute><StudentNotices /></StudentRoute>} />
             <Route path="/dashboard/student/materials" element={<StudentRoute><StudentMaterials /></StudentRoute>} />
+            <Route path="/dashboard/student/announcements" element={<StudentRoute><StudentAnnouncements /></StudentRoute>} />
 
             {/* Teacher */}
             <Route path="/dashboard/teacher" element={<TeacherRoute><TeacherDashboard /></TeacherRoute>} />
