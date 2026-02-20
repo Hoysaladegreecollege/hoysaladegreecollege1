@@ -1,12 +1,10 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { BookOpen, Clock, BarChart3, Bell, Calendar, TrendingUp, CheckCircle, XCircle, Megaphone, ArrowRight, Sparkles } from "lucide-react";
+import { BookOpen, Clock, BarChart3, Bell, Calendar, TrendingUp, CheckCircle, XCircle, Megaphone, ArrowRight, Sparkles, Upload } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
-
-const COLORS = ["hsl(142, 70%, 40%)", "hsl(0, 84%, 60%)"];
+import { useState, useEffect, useRef } from "react";
 
 const NOTICE_TYPE_COLORS: Record<string, string> = {
   Exam: "bg-destructive/10 text-destructive",
@@ -16,6 +14,78 @@ const NOTICE_TYPE_COLORS: Record<string, string> = {
   Fee: "bg-secondary/20 text-secondary-foreground",
 };
 
+function useAnimatedCounter(target: number, duration = 1400) {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const started = useRef(false);
+  useEffect(() => {
+    started.current = false;
+    setCount(0);
+  }, [target]);
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !started.current && target > 0) {
+        started.current = true;
+        const start = Date.now();
+        const step = () => {
+          const elapsed = Date.now() - start;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          setCount(Math.floor(eased * target));
+          if (progress < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      }
+    }, { threshold: 0.3 });
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [target, duration]);
+  return { count, ref };
+}
+
+function AnimatedStatCard({ label, value, suffix = "", icon: Icon, gradient, iconColor = "text-primary", delay = 0 }: any) {
+  const { count, ref } = useAnimatedCounter(parseInt(value) || 0);
+  return (
+    <div
+      ref={ref}
+      className={`relative overflow-hidden bg-gradient-to-br ${gradient} border border-border rounded-2xl p-4 sm:p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group card-stack`}
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none spotlight" />
+      <div className="w-10 h-10 rounded-xl bg-card/70 flex items-center justify-center mb-3 group-hover:scale-110 transition-all duration-300 shadow-sm">
+        <Icon className={`w-5 h-5 ${iconColor}`} />
+      </div>
+      <p className={`font-display text-3xl font-bold tabular-nums ${iconColor}`}>
+        {count}{suffix}
+      </p>
+      <p className="font-body text-[10px] text-muted-foreground mt-1 uppercase tracking-wider">{label}</p>
+      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/0 via-primary/40 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+    </div>
+  );
+}
+
+function CircularProgress({ pct, size = 88, stroke = 8, color = "hsl(var(--primary))" }: { pct: number; size?: number; stroke?: number; color?: string }) {
+  const r = (size - stroke) / 2;
+  const circ = 2 * Math.PI * r;
+  const [animated, setAnimated] = useState(0);
+  useEffect(() => {
+    const timer = setTimeout(() => setAnimated(pct), 120);
+    return () => clearTimeout(timer);
+  }, [pct]);
+  return (
+    <svg width={size} height={size} className="-rotate-90" viewBox={`0 0 ${size} ${size}`}>
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="hsl(var(--muted))" strokeWidth={stroke} />
+      <circle
+        cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={stroke}
+        strokeLinecap="round"
+        strokeDasharray={circ}
+        strokeDashoffset={circ * (1 - animated / 100)}
+        className="transition-all duration-1000 ease-out"
+      />
+    </svg>
+  );
+}
+
 export default function StudentDashboard() {
   const { profile, user } = useAuth();
 
@@ -23,14 +93,15 @@ export default function StudentDashboard() {
     queryKey: ["student-dashboard-stats", user?.id],
     queryFn: async () => {
       if (!user) return null;
-      const { data: student } = await supabase.from("students").select("id").eq("user_id", user.id).single();
+      const { data: student } = await supabase.from("students").select("id, semester").eq("user_id", user.id).single();
       if (!student) return null;
 
       const today = new Date().toISOString().split("T")[0];
-      const [attendance, marks, notices, todayAttendance] = await Promise.all([
+      const [attendance, marks, notices, materials, todayAttendance] = await Promise.all([
         supabase.from("attendance").select("status").eq("student_id", student.id),
         supabase.from("marks").select("obtained_marks, max_marks").eq("student_id", student.id),
         supabase.from("notices").select("id", { count: "exact", head: true }).eq("is_active", true),
+        supabase.from("study_materials").select("id", { count: "exact", head: true }),
         supabase.from("attendance").select("status").eq("student_id", student.id).eq("date", today),
       ]);
 
@@ -46,11 +117,15 @@ export default function StudentDashboard() {
       const todayRecords = todayAttendance.data || [];
       let todayStatus: "present" | "absent" | "none" = "none";
       if (todayRecords.length > 0) {
-        const hasAbsent = todayRecords.some(r => r.status === "absent");
-        todayStatus = hasAbsent ? "absent" : "present";
+        todayStatus = todayRecords.some(r => r.status === "absent") ? "absent" : "present";
       }
 
-      return { attendance: pct, avgMarks, notices: notices.count || 0, present, absent: total - present, total, todayStatus };
+      return {
+        attendance: pct, avgMarks, notices: notices.count || 0,
+        materials: materials.count || 0,
+        present, absent: total - present, total, todayStatus,
+        semester: student.semester,
+      };
     },
     enabled: !!user,
   });
@@ -67,7 +142,6 @@ export default function StudentDashboard() {
     queryKey: ["student-dashboard-announcements", user?.id],
     queryFn: async () => {
       if (!user) return [];
-      const { data: student } = await supabase.from("students").select("course_id, semester").eq("user_id", user.id).single();
       const { data } = await supabase
         .from("announcements")
         .select("id, title, content, created_at")
@@ -79,50 +153,54 @@ export default function StudentDashboard() {
     enabled: !!user,
   });
 
-  const attendancePie = [
-    { name: "Present", value: data?.present || 0 },
-    { name: "Absent", value: data?.absent || 0 },
-  ];
-
   const attendancePct = data?.attendance ?? 0;
   const attendanceColor = attendancePct >= 75 ? "text-emerald-600" : attendancePct >= 60 ? "text-secondary-foreground" : "text-destructive";
-  const attendanceBg = attendancePct >= 75 ? "from-emerald-500/10 to-emerald-500/3" : attendancePct >= 60 ? "from-secondary/15 to-secondary/3" : "from-destructive/10 to-destructive/3";
+  const attendanceRingColor = attendancePct >= 75 ? "hsl(142, 70%, 40%)" : attendancePct >= 60 ? "hsl(var(--secondary))" : "hsl(var(--destructive))";
+  const attendanceGradient = attendancePct >= 75 ? "from-emerald-500/10 to-emerald-500/3" : attendancePct >= 60 ? "from-secondary/15 to-secondary/3" : "from-destructive/10 to-destructive/3";
+
+  const stats = [
+    { label: "Attendance", value: String(attendancePct), suffix: "%", icon: Clock, gradient: attendanceGradient, iconColor: attendanceColor, delay: 0 },
+    { label: "Avg Marks", value: String(data?.avgMarks ?? 0), suffix: "%", icon: BarChart3, gradient: "from-primary/8 to-primary/3", iconColor: "text-primary", delay: 80 },
+    { label: "Active Notices", value: String(data?.notices ?? 0), icon: Bell, gradient: "from-secondary/12 to-secondary/3", iconColor: "text-secondary-foreground", delay: 160 },
+    { label: "Study Materials", value: String(data?.materials ?? 0), icon: Upload, gradient: "from-purple-500/10 to-purple-500/3", iconColor: "text-purple-500", delay: 240 },
+  ];
 
   const quickActions = [
-    { icon: Clock, label: "Attendance", path: "/dashboard/student/attendance", color: "from-blue-500/10 to-blue-500/3", iconColor: "text-blue-500" },
-    { icon: BarChart3, label: "My Marks", path: "/dashboard/student/marks", color: "from-emerald-500/10 to-emerald-500/3", iconColor: "text-emerald-500" },
-    { icon: Calendar, label: "Timetable", path: "/dashboard/student/timetable", color: "from-purple-500/10 to-purple-500/3", iconColor: "text-purple-500" },
-    { icon: BookOpen, label: "Materials", path: "/dashboard/student/materials", color: "from-secondary/15 to-secondary/3", iconColor: "text-secondary-foreground" },
-    { icon: Bell, label: "Notices", path: "/dashboard/student/notices", color: "from-primary/10 to-primary/3", iconColor: "text-primary" },
-    { icon: Megaphone, label: "Announcements", path: "/dashboard/student/announcements", color: "from-rose-500/10 to-rose-500/3", iconColor: "text-rose-500" },
+    { icon: Clock, label: "Attendance", desc: "View attendance records", path: "/dashboard/student/attendance", color: "from-blue-500/10 to-blue-500/5 hover:border-blue-500/30" },
+    { icon: BarChart3, label: "My Marks", desc: "Check exam results", path: "/dashboard/student/marks", color: "from-emerald-500/10 to-emerald-500/5 hover:border-emerald-500/30" },
+    { icon: Calendar, label: "Timetable", desc: "View class schedule", path: "/dashboard/student/timetable", color: "from-purple-500/10 to-purple-500/5 hover:border-purple-500/30" },
+    { icon: BookOpen, label: "Materials", desc: "Download resources", path: "/dashboard/student/materials", color: "from-secondary/10 to-secondary/5 hover:border-secondary/30" },
+    { icon: Bell, label: "Notices", desc: "College announcements", path: "/dashboard/student/notices", color: "from-primary/10 to-primary/5 hover:border-primary/30" },
+    { icon: Megaphone, label: "Announcements", desc: "Teacher messages", path: "/dashboard/student/announcements", color: "from-rose-500/10 to-rose-500/5 hover:border-rose-500/30" },
   ];
 
   return (
-    <div className="space-y-5 sm:space-y-6">
+    <div className="space-y-5 sm:space-y-6 animate-fade-in">
       {/* Welcome Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-primary/8 via-card to-secondary/8 border border-border rounded-2xl p-5 sm:p-7">
-        <div className="absolute top-0 right-0 w-40 h-40 bg-secondary/6 rounded-full -translate-y-1/2 translate-x-1/3 blur-2xl" />
-        <div className="absolute bottom-0 left-1/3 w-24 h-24 bg-primary/4 rounded-full translate-y-1/2 blur-xl" />
+      <div className="relative overflow-hidden bg-gradient-to-r from-primary/10 via-card to-secondary/10 border border-border rounded-2xl p-6 md:p-8">
+        <div className="absolute top-0 right-0 w-36 h-36 bg-secondary/8 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
+        <div className="absolute bottom-0 left-16 w-20 h-20 bg-primary/5 rounded-full translate-y-1/2 blur-xl" />
         <div className="relative">
-          <div className="flex items-center gap-2 mb-2">
-            <Sparkles className="w-4 h-4 text-secondary" />
-            <span className="font-body text-xs text-secondary font-semibold uppercase tracking-wider">Student Portal</span>
+          <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-3 py-1 mb-3">
+            <Sparkles className="w-3 h-3 text-primary" />
+            <span className="font-body text-[11px] text-primary font-semibold uppercase tracking-wider">Student Portal</span>
           </div>
-          <h2 className="font-display text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
+          <h2 className="font-display text-2xl sm:text-3xl font-bold text-foreground">
             Welcome back, {profile?.full_name?.split(" ")[0] || "Student"} 👋
           </h2>
-          <p className="font-body text-xs sm:text-sm text-muted-foreground mt-1.5">
+          <p className="font-body text-sm text-muted-foreground mt-2">
             {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+            {data?.semester ? ` · Semester ${data.semester}` : ""}
           </p>
         </div>
       </div>
 
       {/* Today's Attendance Status */}
       {data?.todayStatus && data.todayStatus !== "none" && (
-        <div className={`border-2 rounded-2xl p-4 sm:p-5 flex items-center gap-4 transition-all duration-300 ${
+        <div className={`border-2 rounded-2xl p-4 sm:p-5 flex items-center gap-4 animate-fade-in transition-all duration-300 ${
           data.todayStatus === "present" ? "bg-primary/5 border-primary/20" : "bg-destructive/5 border-destructive/20"
         }`}>
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
+          <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
             data.todayStatus === "present" ? "bg-primary/10" : "bg-destructive/10"
           }`}>
             {data.todayStatus === "present"
@@ -138,112 +216,104 @@ export default function StudentDashboard() {
         </div>
       )}
 
-      {/* 3 Summary Stat Cards */}
-      <div className="grid grid-cols-3 gap-3 sm:gap-4">
-        {/* Attendance % */}
-        {statsLoading ? (
-          [...Array(3)].map((_, i) => <Skeleton key={i} className="h-28 rounded-2xl" />)
-        ) : (
-          <>
-            <Link to="/dashboard/student/attendance">
-              <div className={`bg-gradient-to-br ${attendanceBg} border border-border rounded-2xl p-4 sm:p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group cursor-pointer h-full`}>
-                <div className="w-9 h-9 rounded-xl bg-background/60 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300 shadow-sm">
-                  <Clock className={`w-4 h-4 ${attendanceColor}`} />
-                </div>
-                <p className={`font-display text-3xl font-bold ${attendanceColor}`}>{attendancePct}%</p>
-                <p className="font-body text-[10px] text-muted-foreground mt-1 uppercase tracking-wider">Attendance</p>
-                {data && data.total > 0 && (
-                  <p className="font-body text-[9px] text-muted-foreground mt-1">{data.present}/{data.total} classes</p>
-                )}
-              </div>
-            </Link>
-            <Link to="/dashboard/student/marks">
-              <div className="bg-gradient-to-br from-primary/8 to-primary/3 border border-border rounded-2xl p-4 sm:p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group cursor-pointer h-full">
-                <div className="w-9 h-9 rounded-xl bg-background/60 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300 shadow-sm">
-                  <BarChart3 className="w-4 h-4 text-primary" />
-                </div>
-                <p className="font-display text-3xl font-bold text-primary">{data?.avgMarks ?? 0}%</p>
-                <p className="font-body text-[10px] text-muted-foreground mt-1 uppercase tracking-wider">Avg Marks</p>
-              </div>
-            </Link>
-            <Link to="/dashboard/student/notices">
-              <div className="bg-gradient-to-br from-secondary/15 to-secondary/3 border border-border rounded-2xl p-4 sm:p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group cursor-pointer h-full">
-                <div className="w-9 h-9 rounded-xl bg-background/60 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300 shadow-sm">
-                  <Bell className="w-4 h-4 text-secondary-foreground" />
-                </div>
-                <p className="font-display text-3xl font-bold text-foreground">{data?.notices ?? 0}</p>
-                <p className="font-body text-[10px] text-muted-foreground mt-1 uppercase tracking-wider">Notices</p>
-              </div>
-            </Link>
-          </>
-        )}
-      </div>
-
-      {/* Main Grid: Quick Actions + Attendance Chart */}
-      <div className="grid md:grid-cols-2 gap-5">
-        {/* Quick Actions */}
-        <div className="bg-card border border-border rounded-2xl p-5">
-          <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-primary" /> Quick Actions
-          </h3>
-          <div className="grid grid-cols-3 gap-2">
-            {quickActions.map((a) => (
-              <Link key={a.label} to={a.path}
-                className={`flex flex-col items-center gap-2 p-3 rounded-xl bg-gradient-to-br ${a.color} border border-border/50 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group`}>
-                <div className="w-9 h-9 rounded-lg bg-background/70 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-sm">
-                  <a.icon className={`w-4 h-4 ${a.iconColor}`} />
-                </div>
-                <span className="font-body text-[10px] font-semibold text-foreground text-center leading-tight">{a.label}</span>
-              </Link>
-            ))}
-          </div>
+      {/* Animated Stats Grid */}
+      {statsLoading ? (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+          {[1,2,3,4].map(i => <Skeleton key={i} className="h-32 rounded-2xl" />)}
         </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+          {stats.map((s) => <AnimatedStatCard key={s.label} {...s} />)}
+        </div>
+      )}
 
-        {/* Attendance Pie */}
-        <div className="bg-card border border-border rounded-2xl p-5">
-          <h3 className="font-display text-sm font-bold text-foreground mb-1 flex items-center gap-2">
-            <Clock className="w-4 h-4 text-primary" /> Attendance Breakdown
+      {/* Chart + Quick Actions */}
+      <div className="grid md:grid-cols-2 gap-5 sm:gap-6">
+        {/* Attendance Ring */}
+        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+            <Clock className="w-4 h-4 text-primary" /> Attendance Overview
           </h3>
           {statsLoading ? (
-            <div className="flex items-center justify-center h-44">
+            <div className="flex items-center justify-center h-40">
               <Skeleton className="w-36 h-36 rounded-full" />
             </div>
-          ) : (data?.present || data?.absent) ? (
-            <>
-              <div className="h-44">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={attendancePie} cx="50%" cy="50%" innerRadius={40} outerRadius={62} paddingAngle={4} dataKey="value">
-                      {attendancePie.map((_, i) => <Cell key={i} fill={COLORS[i]} />)}
-                    </Pie>
-                    <Tooltip contentStyle={{ borderRadius: 12, fontFamily: "Inter", fontSize: 11, border: "1px solid hsl(var(--border))" }} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="flex justify-center gap-5 mt-1">
-                {[{ label: "Present", color: "bg-emerald-500", val: data?.present }, { label: "Absent", color: "bg-destructive", val: data?.absent }].map(l => (
-                  <div key={l.label} className="flex items-center gap-1.5">
-                    <div className={`w-2.5 h-2.5 rounded-full ${l.color}`} />
-                    <span className="font-body text-xs text-muted-foreground">{l.label}: <b className="text-foreground">{l.val}</b></span>
-                  </div>
-                ))}
-              </div>
-            </>
           ) : (
-            <div className="flex items-center justify-center h-44 text-center">
-              <div>
-                <Clock className="w-10 h-10 text-muted-foreground/20 mx-auto mb-2" />
-                <p className="font-body text-sm text-muted-foreground">No attendance data yet</p>
+            <div className="flex items-center gap-5">
+              <div className="relative shrink-0">
+                <CircularProgress pct={attendancePct} size={100} stroke={9} color={attendanceRingColor} />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className={`font-display text-lg font-bold ${attendanceColor}`}>{attendancePct}%</span>
+                </div>
+              </div>
+              <div className="flex-1">
+                <p className="font-body text-sm font-semibold text-foreground">Overall Attendance</p>
+                <p className="font-body text-xs text-muted-foreground mt-1">
+                  {data?.present ?? 0} present · {data?.absent ?? 0} absent · {data?.total ?? 0} total
+                </p>
+                <div className="mt-3 h-2 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-1000 ease-out"
+                    style={{ width: `${attendancePct}%`, background: attendanceRingColor }}
+                  />
+                </div>
+                <p className={`font-body text-xs font-bold mt-2 ${attendancePct >= 75 ? "text-emerald-600" : "text-destructive"}`}>
+                  {attendancePct >= 75 ? "✓ Attendance criteria met" : `⚠ Need ${75 - attendancePct}% more to reach 75%`}
+                </p>
               </div>
             </div>
           )}
+
+          {/* Avg Marks bar */}
+          {!statsLoading && (
+            <div className="mt-5 pt-4 border-t border-border/60 flex items-center gap-4">
+              <div className="relative shrink-0">
+                <CircularProgress pct={data?.avgMarks ?? 0} size={72} stroke={7} color="hsl(var(--primary))" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="font-display text-sm font-bold text-primary">{data?.avgMarks ?? 0}%</span>
+                </div>
+              </div>
+              <div className="flex-1">
+                <p className="font-body text-sm font-semibold text-foreground">Average Marks</p>
+                <div className="mt-1.5 h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div className="h-full bg-primary rounded-full transition-all duration-1000" style={{ width: `${data?.avgMarks ?? 0}%` }} />
+                </div>
+                <p className="font-body text-[11px] text-muted-foreground mt-1">Based on all uploaded results</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Quick Actions */}
+        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-primary" /> Quick Actions
+          </h3>
+          <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
+            {quickActions.map((a, i) => (
+              <Link
+                key={a.label}
+                to={a.path}
+                className={`flex items-center gap-2.5 p-3 sm:p-3.5 rounded-xl border border-border bg-gradient-to-br ${a.color} hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group`}
+                style={{ animationDelay: `${i * 50}ms` }}
+              >
+                <div className="w-9 h-9 rounded-xl bg-card/80 shadow-sm flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
+                  <a.icon className="w-4 h-4 text-primary" />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-body text-xs font-semibold text-foreground truncate">{a.label}</p>
+                  <p className="font-body text-[10px] text-muted-foreground truncate">{a.desc}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Notices + Announcements Grid */}
       <div className="grid md:grid-cols-2 gap-5">
         {/* Recent Notices */}
-        <div className="bg-card border border-border rounded-2xl p-5">
+        <div className="bg-card border border-border rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow duration-300">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-display text-sm font-bold text-foreground flex items-center gap-2">
               <Bell className="w-4 h-4 text-secondary-foreground" /> Recent Notices
@@ -264,7 +334,11 @@ export default function StudentDashboard() {
           ) : (
             <div className="space-y-2">
               {recentNotices.map((n: any, i: number) => (
-                <div key={i} className="p-3 rounded-xl bg-muted/40 hover:bg-muted transition-colors duration-200 group border border-transparent hover:border-border">
+                <div
+                  key={i}
+                  className="p-3 rounded-xl bg-muted/40 hover:bg-muted transition-colors duration-200 group border border-transparent hover:border-border animate-fade-in"
+                  style={{ animationDelay: `${i * 40}ms` }}
+                >
                   <div className="flex items-start justify-between gap-2">
                     <p className="font-body text-xs font-semibold text-foreground group-hover:text-primary transition-colors duration-200 line-clamp-1">{n.title}</p>
                     <span className={`text-[9px] px-2 py-0.5 rounded-full font-body font-bold shrink-0 ${NOTICE_TYPE_COLORS[n.type] || NOTICE_TYPE_COLORS.General}`}>{n.type}</span>
@@ -278,7 +352,7 @@ export default function StudentDashboard() {
         </div>
 
         {/* Recent Announcements */}
-        <div className="bg-card border border-border rounded-2xl p-5">
+        <div className="bg-card border border-border rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow duration-300">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-display text-sm font-bold text-foreground flex items-center gap-2">
               <Megaphone className="w-4 h-4 text-destructive" /> Teacher Announcements
@@ -299,7 +373,11 @@ export default function StudentDashboard() {
           ) : (
             <div className="space-y-2">
               {announcements.map((a: any, i: number) => (
-                <div key={i} className="p-3 rounded-xl bg-destructive/5 hover:bg-destructive/8 transition-colors duration-200 group border border-transparent hover:border-destructive/10">
+                <div
+                  key={i}
+                  className="p-3 rounded-xl bg-destructive/5 hover:bg-destructive/8 transition-colors duration-200 group border border-transparent hover:border-destructive/10 animate-fade-in"
+                  style={{ animationDelay: `${i * 40}ms` }}
+                >
                   <p className="font-body text-xs font-semibold text-foreground group-hover:text-destructive transition-colors duration-200 line-clamp-1">{a.title}</p>
                   {a.content && <p className="font-body text-[10px] text-muted-foreground mt-1 line-clamp-2">{a.content}</p>}
                   <p className="font-body text-[9px] text-muted-foreground/60 mt-1">{new Date(a.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</p>
