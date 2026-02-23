@@ -110,8 +110,8 @@ export default function ChatBot() {
           <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
           {/* Icon */}
           <div className="relative flex flex-col items-center justify-center gap-0.5">
-            <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-secondary group-hover:rotate-12 transition-transform duration-300" />
-            <span className="font-body text-[8px] sm:text-[9px] font-bold text-primary-foreground/80 uppercase tracking-widest leading-none">AI</span>
+            <Bot className="w-6 h-6 sm:w-7 sm:h-7 text-primary-foreground group-hover:scale-110 transition-transform duration-300" />
+            <span className="font-body text-[7px] sm:text-[8px] font-bold text-primary-foreground/70 uppercase tracking-widest leading-none">AI</span>
           </div>
           {/* Live badge */}
           <span className="absolute -top-1 -right-1 w-4 h-4 bg-secondary rounded-full flex items-center justify-center border-2 border-card">
@@ -133,8 +133,8 @@ export default function ChatBot() {
               <div className="absolute bottom-0 left-0 w-20 h-20 rounded-full bg-white translate-y-1/2 -translate-x-1/4 blur-2xl" />
             </div>
             <div className="relative flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white/15 backdrop-blur flex items-center justify-center border border-white/20">
-                <Sparkles className="w-4 h-4 text-secondary" />
+              <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center border border-white/20">
+                <Bot className="w-5 h-5 text-secondary" />
               </div>
               <div>
                 <p className="font-body text-sm font-bold leading-tight">AI College Assistant</p>
@@ -221,7 +221,7 @@ export default function ChatBot() {
               )}
 
               {/* Input area */}
-              <div className="p-3 border-t border-border flex items-center gap-2 shrink-0 bg-card/80 backdrop-blur">
+              <div className="p-3 border-t border-border flex items-center gap-2 shrink-0 bg-card">
                 <input
                   ref={inputRef}
                   value={input}
