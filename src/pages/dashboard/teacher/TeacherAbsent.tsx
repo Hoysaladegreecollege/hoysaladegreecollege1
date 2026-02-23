@@ -5,8 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Phone, MessageSquare, UserX, Filter, ArrowLeft, PhoneCall, Users } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Phone, MessageSquare, UserX, Filter, PhoneCall, Users, Eye, Calendar } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -19,6 +18,8 @@ export default function TeacherAbsent() {
   const [courseFilter, setCourseFilter] = useState("all");
   const [semesterFilter, setSemesterFilter] = useState("all");
   const [callDialog, setCallDialog] = useState<any>(null);
+  const [detailsDialog, setDetailsDialog] = useState<any>(null);
+  const [dateFilter, setDateFilter] = useState(new Date().toISOString().split("T")[0]);
 
   const { data: courses = [] } = useQuery({
     queryKey: ["teacher-courses-absent"],
@@ -31,13 +32,14 @@ export default function TeacherAbsent() {
   const { data: students = [], isLoading: studentsLoading } = useQuery({
     queryKey: ["students-for-absent", courseFilter, semesterFilter],
     queryFn: async () => {
-      let query = supabase.from("students").select("id, roll_number, parent_phone, user_id, course_id, semester, courses(name, code)").eq("is_active", true).order("roll_number");
+      let query = supabase.from("students").select("id, roll_number, parent_phone, user_id, course_id, semester, phone, year_level, courses(name, code)").eq("is_active", true).order("roll_number");
       if (courseFilter !== "all") query = query.eq("course_id", courseFilter);
       if (semesterFilter !== "all") query = query.eq("semester", parseInt(semesterFilter));
       const { data: studentsData } = await query;
       if (!studentsData) return [];
       const userIds = studentsData.map((s) => s.user_id);
-      const { data: profiles } = await supabase.from("profiles").select("user_id, full_name, phone").in("user_id", userIds);
+      if (userIds.length === 0) return [];
+      const { data: profiles } = await supabase.from("profiles").select("user_id, full_name, phone, email").in("user_id", userIds);
       return studentsData.map((s) => ({
         ...s,
         profile: profiles?.find((p) => p.user_id === s.user_id),
@@ -45,17 +47,33 @@ export default function TeacherAbsent() {
     },
   });
 
-  // Get today's absent students
-  const today = new Date().toISOString().split("T")[0];
+  // Get absent students for selected date - query attendance directly
   const { data: todayAbsent = [], isLoading: absentLoading } = useQuery({
-    queryKey: ["today-absent-students", courseFilter, semesterFilter],
+    queryKey: ["absent-students-date", dateFilter, courseFilter, semesterFilter],
     queryFn: async () => {
-      const { data: absentRecords } = await supabase.from("attendance").select("student_id").eq("date", today).eq("status", "absent");
-      if (!absentRecords) return [];
+      // First get all absent attendance records for the date
+      let attendanceQuery = supabase.from("attendance").select("student_id").eq("date", dateFilter).eq("status", "absent");
+      const { data: absentRecords } = await attendanceQuery;
+      if (!absentRecords || absentRecords.length === 0) return [];
+      
       const absentIds = [...new Set(absentRecords.map(r => r.student_id))];
-      return students.filter(s => absentIds.includes(s.id));
+      
+      // Now fetch those students
+      let studentQuery = supabase.from("students").select("id, roll_number, parent_phone, user_id, course_id, semester, phone, year_level, courses(name, code)").in("id", absentIds).eq("is_active", true);
+      if (courseFilter !== "all") studentQuery = studentQuery.eq("course_id", courseFilter);
+      if (semesterFilter !== "all") studentQuery = studentQuery.eq("semester", parseInt(semesterFilter));
+      
+      const { data: absentStudents } = await studentQuery;
+      if (!absentStudents || absentStudents.length === 0) return [];
+      
+      const userIds = absentStudents.map(s => s.user_id);
+      const { data: profiles } = await supabase.from("profiles").select("user_id, full_name, phone, email").in("user_id", userIds);
+      
+      return absentStudents.map(s => ({
+        ...s,
+        profile: profiles?.find(p => p.user_id === s.user_id),
+      }));
     },
-    enabled: students.length > 0,
   });
 
   const { data: notes = [], isLoading: notesLoading } = useQuery({
@@ -68,6 +86,7 @@ export default function TeacherAbsent() {
         .limit(20);
       if (!notesData) return [];
       const userIds = notesData.map((n: any) => n.students?.user_id).filter(Boolean);
+      if (userIds.length === 0) return notesData.map((n: any) => ({ ...n, student_name: n.students?.roll_number || "Unknown" }));
       const { data: profiles } = await supabase.from("profiles").select("user_id, full_name").in("user_id", userIds);
       return notesData.map((n: any) => ({
         ...n,
@@ -96,15 +115,10 @@ export default function TeacherAbsent() {
   return (
     <div className="space-y-6">
       <div className="bg-gradient-to-r from-primary/5 to-secondary/5 border border-border rounded-2xl p-6">
-        <div className="flex items-center gap-3">
-          <Link to="/dashboard/teacher" className="p-2 rounded-xl hover:bg-muted transition-colors"><ArrowLeft className="w-4 h-4" /></Link>
-          <div>
-            <h2 className="font-display text-xl font-bold text-foreground flex items-center gap-2">
-              <UserX className="w-5 h-5 text-destructive" /> Absent Students
-            </h2>
-            <p className="font-body text-sm text-muted-foreground mt-1">View absent students, call them or their parents</p>
-          </div>
-        </div>
+        <h2 className="font-display text-xl font-bold text-foreground flex items-center gap-2">
+          <UserX className="w-5 h-5 text-destructive" /> Absent Students Report
+        </h2>
+        <p className="font-body text-sm text-muted-foreground mt-1">View absent students, call them or their parents, and add notes</p>
       </div>
 
       {/* Filters */}
@@ -113,7 +127,11 @@ export default function TeacherAbsent() {
           <Filter className="w-4 h-4 text-primary" />
           <h3 className="font-body text-sm font-bold text-foreground">Filters</h3>
         </div>
-        <div className="grid sm:grid-cols-2 gap-3">
+        <div className="grid sm:grid-cols-3 gap-3">
+          <div>
+            <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Date</label>
+            <Input type="date" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} className="rounded-xl" />
+          </div>
           <div>
             <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Course</label>
             <select value={courseFilter} onChange={(e) => setCourseFilter(e.target.value)} className={inputClass}>
@@ -131,66 +149,98 @@ export default function TeacherAbsent() {
         </div>
       </div>
 
-      {/* Today's Absent Students */}
-      <div className="bg-card border border-border rounded-2xl p-6">
+      {/* Absent Students */}
+      <div className="bg-card border border-border rounded-2xl p-4 sm:p-6">
         <h3 className="font-display text-lg font-bold text-foreground mb-4 flex items-center gap-2">
-          <UserX className="w-5 h-5 text-destructive" /> Today's Absent Students
-          <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700 font-body ml-2">{todayAbsent.length}</span>
+          <UserX className="w-5 h-5 text-destructive" /> Absent Students — {new Date(dateFilter).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" })}
+          <span className="text-xs px-2 py-0.5 rounded-full bg-destructive/10 text-destructive font-body ml-2">{todayAbsent.length}</span>
         </h3>
-        {absentLoading || studentsLoading ? (
+        {absentLoading ? (
           <div className="space-y-2">{[1,2,3].map(i => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>
         ) : todayAbsent.length === 0 ? (
           <div className="text-center py-8">
-            <Users className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
-            <p className="font-body text-sm text-muted-foreground">No absent students today! 🎉</p>
+            <Users className="w-10 h-10 text-muted-foreground/30 mx-auto mb-2" />
+            <p className="font-body text-sm text-muted-foreground">No absent students for this date! 🎉</p>
           </div>
         ) : (
-          <div className="space-y-2 max-h-[400px] overflow-y-auto">
+          <div className="space-y-2 max-h-[500px] overflow-y-auto">
             {todayAbsent.map((s: any) => (
-              <div key={s.id} className="flex items-center justify-between p-3 rounded-xl bg-red-50 border border-red-200 hover:shadow-md transition-all">
+              <div key={s.id} className="flex items-center justify-between p-3 sm:p-4 rounded-xl bg-destructive/5 border border-destructive/15 hover:shadow-md transition-all">
                 <div className="flex-1 min-w-0">
                   <p className="font-body text-sm font-semibold text-foreground">{s.profile?.full_name || s.roll_number}</p>
-                  <p className="font-body text-xs text-muted-foreground">{s.roll_number} • {(s as any).courses?.code || "—"} • Sem {s.semester}</p>
+                  <p className="font-body text-xs text-muted-foreground">{s.roll_number} • {(s as any).courses?.code || "—"} • Sem {s.semester} • Year {s.year_level}</p>
                 </div>
-                <Button size="sm" variant="outline" onClick={() => setCallDialog(s)} className="rounded-xl font-body text-xs shrink-0">
-                  <PhoneCall className="w-3 h-3 mr-1" /> Call
-                </Button>
+                <div className="flex items-center gap-2 shrink-0">
+                  <Button size="sm" variant="outline" onClick={() => setDetailsDialog(s)} className="rounded-xl font-body text-xs">
+                    <Eye className="w-3 h-3 mr-1" /> Details
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* Call Dialog */}
-      <Dialog open={!!callDialog} onOpenChange={() => setCallDialog(null)}>
-        <DialogContent className="max-w-sm">
+      {/* Student Details Dialog */}
+      <Dialog open={!!detailsDialog} onOpenChange={() => setDetailsDialog(null)}>
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="font-display text-lg">Call {callDialog?.profile?.full_name || "Student"}</DialogTitle>
+            <DialogTitle className="font-display text-lg">Student Details</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3 mt-4">
-            {callDialog?.profile?.phone && (
-              <a href={`tel:${callDialog.profile.phone}`} className="block">
-                <Button className="w-full rounded-xl font-body bg-primary hover:bg-primary/90">
-                  <Phone className="w-4 h-4 mr-2" /> Call Student: {callDialog.profile.phone}
-                </Button>
-              </a>
-            )}
-            {callDialog?.parent_phone && (
-              <a href={`tel:${callDialog.parent_phone}`} className="block">
-                <Button variant="outline" className="w-full rounded-xl font-body">
-                  <Phone className="w-4 h-4 mr-2" /> Call Parent: {callDialog.parent_phone}
-                </Button>
-              </a>
-            )}
-            {!callDialog?.profile?.phone && !callDialog?.parent_phone && (
-              <p className="font-body text-sm text-muted-foreground text-center py-4">No phone numbers available for this student.</p>
-            )}
-          </div>
+          {detailsDialog && (
+            <div className="space-y-4 mt-2">
+              <div className="bg-muted/50 rounded-xl p-4 space-y-2">
+                <div className="flex justify-between">
+                  <span className="font-body text-xs text-muted-foreground">Name</span>
+                  <span className="font-body text-sm font-semibold text-foreground">{detailsDialog.profile?.full_name || "—"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-body text-xs text-muted-foreground">Roll Number</span>
+                  <span className="font-body text-sm text-foreground">{detailsDialog.roll_number}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-body text-xs text-muted-foreground">Course</span>
+                  <span className="font-body text-sm text-foreground">{detailsDialog.courses?.name || "—"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-body text-xs text-muted-foreground">Semester / Year</span>
+                  <span className="font-body text-sm text-foreground">Sem {detailsDialog.semester} / Year {detailsDialog.year_level}</span>
+                </div>
+                {detailsDialog.profile?.email && (
+                  <div className="flex justify-between">
+                    <span className="font-body text-xs text-muted-foreground">Email</span>
+                    <span className="font-body text-sm text-foreground">{detailsDialog.profile.email}</span>
+                  </div>
+                )}
+              </div>
+              
+              <div className="space-y-2">
+                <p className="font-body text-xs font-bold text-foreground uppercase tracking-wider">Contact</p>
+                {(detailsDialog.profile?.phone || detailsDialog.phone) && (
+                  <a href={`tel:${detailsDialog.profile?.phone || detailsDialog.phone}`} className="block">
+                    <Button className="w-full rounded-xl font-body bg-primary hover:bg-primary/90">
+                      <Phone className="w-4 h-4 mr-2" /> Call Student: {detailsDialog.profile?.phone || detailsDialog.phone}
+                    </Button>
+                  </a>
+                )}
+                {detailsDialog.parent_phone && (
+                  <a href={`tel:${detailsDialog.parent_phone}`} className="block">
+                    <Button variant="outline" className="w-full rounded-xl font-body">
+                      <PhoneCall className="w-4 h-4 mr-2" /> Call Parent: {detailsDialog.parent_phone}
+                    </Button>
+                  </a>
+                )}
+                {!detailsDialog.profile?.phone && !detailsDialog.phone && !detailsDialog.parent_phone && (
+                  <p className="font-body text-sm text-muted-foreground text-center py-4">No phone numbers available.</p>
+                )}
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
       {/* Add Absence Note */}
-      <div className="bg-card border border-border rounded-2xl p-6">
+      <div className="bg-card border border-border rounded-2xl p-4 sm:p-6">
         <h3 className="font-display text-lg font-bold text-foreground mb-4">Add Absence Note</h3>
         <div className="grid sm:grid-cols-2 gap-4 mb-4">
           <div>
@@ -217,7 +267,7 @@ export default function TeacherAbsent() {
       </div>
 
       {/* Recent Notes */}
-      <div className="bg-card border border-border rounded-2xl p-6">
+      <div className="bg-card border border-border rounded-2xl p-4 sm:p-6">
         <h3 className="font-display text-lg font-bold text-foreground mb-4">Recent Notes</h3>
         {notesLoading ? (
           <div className="space-y-2">{[1,2,3].map(i => <Skeleton key={i} className="h-14 rounded-xl" />)}</div>

@@ -166,7 +166,7 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       <div className={`xl:hidden border-t border-border overflow-hidden transition-all duration-500 ease-in-out ${open ? "max-h-[700px] opacity-100" : "max-h-0 opacity-0"}`}>
-        <div className="container py-3 px-4 bg-card/98 backdrop-blur-xl">
+        <div className="container py-3 px-4 bg-card">
           {/* Nav links */}
           <div className="flex flex-col gap-0.5">
             {navLinks.map((link, i) => {

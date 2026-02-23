@@ -1,5 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { Users, GraduationCap, BookOpen, Calendar, FileText, Settings, Mail, TrendingUp, Trophy, Shield, Image, BarChart3, PieChart, Megaphone, ArrowUpCircle, Download } from "lucide-react";
+import { Users, GraduationCap, BookOpen, Calendar, FileText, Settings, Mail, TrendingUp, Trophy, Shield, Image, BarChart3, PieChart, Megaphone, ArrowUpCircle, Download, UserX, CalendarDays } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
@@ -114,7 +114,9 @@ export default function AdminDashboard() {
   const quickActions = [
     { icon: Megaphone, label: "Post Notice", desc: "Publish announcements instantly", path: "/dashboard/admin/post-notice", highlight: true },
     { icon: ArrowUpCircle, label: "Semester Promotion", desc: "Promote students in bulk", path: "/dashboard/admin/semester-promotion", highlight: true },
-    { icon: Download, label: "Export Student Data", desc: "Download CSV report", path: "/dashboard/admin/settings", highlight: true },
+    { icon: CalendarDays, label: "Academic Years", desc: "Manage academic sessions", path: "/dashboard/admin/academic-years", highlight: true },
+    { icon: UserX, label: "Absent Report", desc: "View absent students", path: "/dashboard/admin/absent-report", highlight: true },
+    { icon: Download, label: "Export Student Data", desc: "Download CSV report", path: "/dashboard/admin/settings", highlight: false },
     { icon: FileText, label: "Admission Applications", desc: `${counts?.pendingApps || 0} pending`, path: "/dashboard/admin/applications", badge: counts?.pendingApps },
     { icon: Mail, label: "Contact Messages", desc: `${counts?.newContacts || 0} new`, path: "/dashboard/admin/contacts", badge: counts?.newContacts },
     { icon: Users, label: "Manage Users", desc: "View, edit & delete users", path: "/dashboard/admin/users" },
