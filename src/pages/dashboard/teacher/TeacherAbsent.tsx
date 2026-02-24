@@ -168,7 +168,7 @@ export default function TeacherAbsent() {
               <div key={s.id} className="flex items-center justify-between p-3 sm:p-4 rounded-xl bg-destructive/5 border border-destructive/15 hover:shadow-md transition-all">
                 <div className="flex-1 min-w-0">
                   <p className="font-body text-sm font-semibold text-foreground">{s.profile?.full_name || s.roll_number}</p>
-                  <p className="font-body text-xs text-muted-foreground">{s.roll_number} • {(s as any).courses?.code || "—"} • Sem {s.semester} • Year {s.year_level}</p>
+                  <p className="font-body text-xs text-muted-foreground">{s.roll_number} • {(s as any).courses?.code || "—"} • Sem {s.semester}</p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <Button size="sm" variant="outline" onClick={() => setDetailsDialog(s)} className="rounded-xl font-body text-xs">
@@ -203,8 +203,8 @@ export default function TeacherAbsent() {
                   <span className="font-body text-sm text-foreground">{detailsDialog.courses?.name || "—"}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="font-body text-xs text-muted-foreground">Semester / Year</span>
-                  <span className="font-body text-sm text-foreground">Sem {detailsDialog.semester} / Year {detailsDialog.year_level}</span>
+                   <span className="font-body text-xs text-muted-foreground">Semester</span>
+                   <span className="font-body text-sm text-foreground">Sem {detailsDialog.semester}</span>
                 </div>
                 {detailsDialog.profile?.email && (
                   <div className="flex justify-between">
