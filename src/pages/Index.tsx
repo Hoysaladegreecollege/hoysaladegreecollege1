@@ -345,29 +345,35 @@ export default function Index() {
               </ScrollReveal>
             ))}
           </div>
+          <div className="text-center mt-8">
+            <Link to="/gallery" className="inline-flex items-center gap-2 font-body text-sm font-semibold text-primary hover:underline">
+              View Full Gallery <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Lightbox */}
+      {/* Full-screen Lightbox */}
       {lightboxIdx !== null && (
-        <div className="fixed inset-0 bg-foreground/90 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in" onClick={() => setLightboxIdx(null)}>
-          <button className="absolute top-4 right-4 sm:top-6 sm:right-6 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10" onClick={() => setLightboxIdx(null)}>
-            <X className="w-5 h-5" />
+        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center animate-fade-in" onClick={() => setLightboxIdx(null)}>
+          <button className="absolute top-4 right-4 sm:top-6 sm:right-6 w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
+            onClick={(e) => { e.stopPropagation(); setLightboxIdx(null); }}>
+            <X className="w-6 h-6" />
           </button>
-          <button className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
+          <button className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
             onClick={(e) => { e.stopPropagation(); setLightboxIdx((lightboxIdx - 1 + galleryImages.length) % galleryImages.length); }}>
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-6 h-6" />
           </button>
-          <button className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
+          <button className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
             onClick={(e) => { e.stopPropagation(); setLightboxIdx((lightboxIdx + 1) % galleryImages.length); }}>
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-6 h-6" />
           </button>
-          <div className="max-w-4xl w-full" onClick={(e) => e.stopPropagation()}>
-            <img src={galleryImages[lightboxIdx].src} alt={galleryImages[lightboxIdx].title} className="w-full max-h-[80vh] object-contain rounded-2xl shadow-2xl animate-scale-bounce" />
-            <div className="text-center mt-4">
-              <p className="font-display text-lg font-bold text-white">{galleryImages[lightboxIdx].title}</p>
-              <p className="font-body text-xs text-white/60 mt-1">{lightboxIdx + 1} / {galleryImages.length}</p>
-            </div>
+          <div className="w-full h-full flex items-center justify-center p-4 sm:p-8" onClick={(e) => e.stopPropagation()}>
+            <img src={galleryImages[lightboxIdx].src} alt={galleryImages[lightboxIdx].title} className="max-w-full max-h-full object-contain animate-scale-bounce" />
+          </div>
+          <div className="absolute bottom-4 sm:bottom-8 left-0 right-0 text-center pointer-events-none">
+            <p className="font-display text-lg font-bold text-white">{galleryImages[lightboxIdx].title}</p>
+            <p className="font-body text-xs text-white/60 mt-1">{lightboxIdx + 1} / {galleryImages.length}</p>
           </div>
         </div>
       )}

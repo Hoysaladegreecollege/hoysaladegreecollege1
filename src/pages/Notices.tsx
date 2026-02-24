@@ -191,8 +191,8 @@ export default function Notices() {
 
       {/* Notice Detail Dialog */}
       {selectedNotice && (
-        <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center sm:p-4 animate-fade-in" onClick={() => setSelectedNotice(null)}>
-          <div className="bg-card sm:rounded-3xl rounded-t-3xl border border-border w-full max-w-lg shadow-2xl animate-scale-bounce overflow-hidden max-h-[95vh] sm:max-h-[85vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm z-50 flex items-center justify-center animate-fade-in" onClick={() => setSelectedNotice(null)}>
+          <div className="bg-card w-full h-full sm:rounded-3xl sm:max-w-lg sm:h-auto sm:max-h-[85vh] border-0 sm:border sm:border-border shadow-2xl animate-scale-bounce overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
             {/* Dialog Header */}
             <div className="relative p-6 border-b border-border bg-gradient-to-br from-primary/4 to-secondary/3 overflow-hidden shrink-0">
               <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-secondary/50 to-transparent" />

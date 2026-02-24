@@ -35,6 +35,19 @@ export default function BirthdayPopup() {
     enabled: !!user && role === "student",
   });
 
+  const { data: birthdaySettings } = useQuery({
+    queryKey: ["birthday-settings"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("birthday_settings")
+        .select("*")
+        .limit(1)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!user && role === "student",
+  });
+
   useEffect(() => {
     if (!student?.date_of_birth) return;
     const today = new Date();
@@ -45,7 +58,6 @@ export default function BirthdayPopup() {
         const timer = setTimeout(() => {
           setIsOpen(true);
           sessionStorage.setItem("birthday-popup-shown", "true");
-          // Fire confetti
           confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 }, colors: ["#FFD700", "#FF6B6B", "#4ECDC4", "#A855F7", "#F97316"] });
           setTimeout(() => confetti({ particleCount: 80, spread: 100, origin: { y: 0.5 } }), 600);
         }, 2000);
@@ -57,6 +69,9 @@ export default function BirthdayPopup() {
   if (!isOpen) return null;
 
   const firstName = profile?.full_name?.split(" ")[0] || "Student";
+  const principalName = birthdaySettings?.principal_name || "Sri Gopal H.R";
+  const wishesMessage = birthdaySettings?.wishes_message || "On behalf of the entire Hoysala Degree College family and our Principal, we wish you a wonderful birthday filled with joy, success, and happiness. May this special day bring you closer to your dreams and aspirations.";
+  const quote = birthdaySettings?.quote || "Education is the passport to the future, for tomorrow belongs to those who prepare for it today.";
 
   return (
     <div className="fixed inset-0 bg-foreground/60 backdrop-blur-sm z-[250] flex items-end sm:items-center justify-center sm:p-4 animate-fade-in" onClick={() => setIsOpen(false)}>
@@ -66,21 +81,15 @@ export default function BirthdayPopup() {
       >
         {/* Decorative header */}
         <div className="relative bg-gradient-to-br from-primary via-primary to-secondary/80 p-8 pb-10 text-center overflow-hidden">
-          {/* Floating decorations */}
           <div className="absolute top-3 left-6 animate-sparkle"><Star className="w-4 h-4 text-secondary/60" /></div>
           <div className="absolute top-8 right-8 animate-sparkle animation-delay-300"><Sparkles className="w-5 h-5 text-secondary/50" /></div>
           <div className="absolute bottom-4 left-10 animate-sparkle animation-delay-600"><Star className="w-3 h-3 text-secondary/40" /></div>
           <div className="absolute top-4 right-4 animate-float"><PartyPopper className="w-6 h-6 text-secondary/50" /></div>
 
-          {/* Close button */}
-          <button
-            onClick={() => setIsOpen(false)}
-            className="absolute top-3 right-3 p-2 rounded-xl bg-primary-foreground/10 hover:bg-primary-foreground/20 transition-colors"
-          >
+          <button onClick={() => setIsOpen(false)} className="absolute top-3 right-3 p-2 rounded-xl bg-primary-foreground/10 hover:bg-primary-foreground/20 transition-colors">
             <X className="w-4 h-4 text-primary-foreground" />
           </button>
 
-          {/* Cake icon */}
           <div className="w-20 h-20 rounded-full bg-primary-foreground/15 flex items-center justify-center mx-auto mb-4 animate-float border-2 border-primary-foreground/20">
             <Cake className="w-10 h-10 text-primary-foreground" />
           </div>
@@ -92,7 +101,6 @@ export default function BirthdayPopup() {
             Dear {firstName}
           </p>
 
-          {/* Bottom wave */}
           <div className="absolute -bottom-1 left-0 right-0">
             <svg viewBox="0 0 400 30" className="w-full" preserveAspectRatio="none">
               <path d="M0,30 Q100,0 200,15 T400,30 L400,30 L0,30 Z" fill="hsl(var(--card))" />
@@ -103,15 +111,12 @@ export default function BirthdayPopup() {
         {/* Message body */}
         <div className="px-6 pt-2 pb-4 text-center">
           <p className="font-body text-sm text-muted-foreground leading-relaxed">
-            On behalf of the entire <span className="font-semibold text-foreground">Hoysala Degree College</span> family
-            and our <span className="font-semibold text-foreground">Principal</span>, we wish you a wonderful birthday
-            filled with joy, success, and happiness.
-          </p>
-          <p className="font-body text-sm text-muted-foreground leading-relaxed mt-3">
-            May this special day bring you closer to your dreams and aspirations. 🌟
+            {wishesMessage.includes("{principal}") 
+              ? wishesMessage.replace("{principal}", principalName)
+              : <>On behalf of the entire <span className="font-semibold text-foreground">Hoysala Degree College</span> family and our <span className="font-semibold text-foreground">Principal {principalName}</span>, {wishesMessage.replace(/On behalf of the entire Hoysala Degree College family and our Principal, /i, "").replace(/on behalf of.*?principal,?\s*/i, "")}</>
+            }
           </p>
 
-          {/* Decorative divider */}
           <div className="flex items-center justify-center gap-2 my-5">
             <div className="h-px flex-1 bg-gradient-to-r from-transparent to-border" />
             <Sparkles className="w-4 h-4 text-secondary" />
@@ -119,11 +124,10 @@ export default function BirthdayPopup() {
           </div>
 
           <p className="font-display text-xs text-muted-foreground italic">
-            "Education is the passport to the future, for tomorrow belongs to those who prepare for it today."
+            "{quote}"
           </p>
         </div>
 
-        {/* Footer */}
         <div className="px-6 pb-6">
           <button
             onClick={() => setIsOpen(false)}
