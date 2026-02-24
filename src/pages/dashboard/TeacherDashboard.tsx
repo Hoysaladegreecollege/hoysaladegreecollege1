@@ -3,7 +3,6 @@ import { Users, Clock, BarChart3, Upload, Bell, Megaphone, TrendingUp, Calendar,
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useState, useEffect, useRef } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -70,11 +69,6 @@ export default function TeacherDashboard() {
     },
   });
 
-  const chartData = [
-    { name: "Students", count: counts?.students || 0 },
-    { name: "Materials", count: counts?.materials || 0 },
-    { name: "Notices", count: counts?.notices || 0 },
-  ];
 
   const stats = [
     { label: "Total Students", value: String(counts?.students ?? 0), icon: Users, gradient: "from-primary/8 to-primary/3", delay: 0 },
@@ -121,29 +115,8 @@ export default function TeacherDashboard() {
         </div>
       )}
 
-      {/* Chart + Quick Actions */}
-      <div className="grid md:grid-cols-2 gap-5 sm:gap-6">
-        {/* Chart */}
-        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
-          <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-            <BarChart3 className="w-4 h-4 text-primary" /> Overview
-          </h3>
-          <div className="h-52">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} barSize={36}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="name" tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
-                <Tooltip
-                  contentStyle={{ borderRadius: 12, fontFamily: "Inter", fontSize: 12, border: "1px solid hsl(var(--border))", background: "hsl(var(--card))", color: "hsl(var(--foreground))" }}
-                  cursor={{ fill: "hsl(var(--muted))" }}
-                />
-                <Bar dataKey="count" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
+      {/* Quick Actions */}
+      <div className="grid md:grid-cols-1 gap-5 sm:gap-6">
         {/* Quick Actions */}
         <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
           <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
