@@ -191,10 +191,10 @@ export default function Notices() {
 
       {/* Notice Detail Dialog */}
       {selectedNotice && (
-        <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" onClick={() => setSelectedNotice(null)}>
-          <div className="bg-card rounded-3xl border border-border w-full max-w-lg shadow-2xl animate-scale-bounce overflow-hidden" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center sm:p-4 animate-fade-in" onClick={() => setSelectedNotice(null)}>
+          <div className="bg-card sm:rounded-3xl rounded-t-3xl border border-border w-full max-w-lg shadow-2xl animate-scale-bounce overflow-hidden max-h-[95vh] sm:max-h-[85vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
             {/* Dialog Header */}
-            <div className="relative p-6 border-b border-border bg-gradient-to-br from-primary/4 to-secondary/3 overflow-hidden">
+            <div className="relative p-6 border-b border-border bg-gradient-to-br from-primary/4 to-secondary/3 overflow-hidden shrink-0">
               <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-secondary/50 to-transparent" />
               <div className="absolute top-0 right-0 w-24 h-24 bg-secondary/8 rounded-full blur-2xl" />
               <div className="relative flex items-start justify-between gap-4">
@@ -218,7 +218,7 @@ export default function Notices() {
             </div>
 
             {/* Dialog Body */}
-            <div className="p-6">
+            <div className="p-6 overflow-y-auto flex-1">
               <div className="flex items-center gap-2 mb-5 p-3 rounded-xl bg-muted/50 border border-border/50">
                 <Bell className="w-4 h-4 text-primary shrink-0" />
                 <span className="font-body text-xs text-muted-foreground flex items-center gap-1">
