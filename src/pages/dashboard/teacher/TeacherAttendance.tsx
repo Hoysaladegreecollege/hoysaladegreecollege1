@@ -29,16 +29,14 @@ export default function TeacherAttendance() {
     queryFn: async () => {
       const { data } = await supabase.from("courses").select("id, name, code").eq("is_active", true).order("name");
       const result = (data || []) as { id: string; name: string; code: string }[];
-      // Auto-select first course
       if (result.length > 0 && !activeCourseId) setActiveCourseId(result[0].id);
       return result;
     },
   });
 
-  // Auto-set first course
   const resolvedCourseId = activeCourseId ?? (courses[0]?.id || null);
 
-  // Fetch students for selected course + year
+  // Fetch students for selected course + semester
   const { data: students = [], isLoading: studentsLoading } = useQuery({
     queryKey: ["attendance-students", resolvedCourseId, activeSemester],
     queryFn: async () => {
@@ -61,9 +59,9 @@ export default function TeacherAttendance() {
     enabled: !!resolvedCourseId,
   });
 
-  // Check if attendance already marked today for this course+year+subject
+  // Check if attendance already marked today for this course+semester+subject
   const { data: existingToday = [] } = useQuery({
-    queryKey: ["existing-attendance", resolvedCourseId, activeYear, date, subject],
+    queryKey: ["existing-attendance", resolvedCourseId, activeSemester, date, subject],
     queryFn: async () => {
       if (!resolvedCourseId || !subject) return [];
       const studentIds = students.map((s: any) => s.id);
@@ -142,6 +140,9 @@ export default function TeacherAttendance() {
       toast.success("Attendance saved successfully!");
       setStatuses({});
       queryClient.invalidateQueries({ queryKey: ["existing-attendance"] });
+      // Also invalidate absent report queries so they refresh
+      queryClient.invalidateQueries({ queryKey: ["absent-students-date"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-absent-students"] });
     },
     onError: (e: any) => toast.error(e.message),
   });
@@ -182,7 +183,7 @@ export default function TeacherAttendance() {
               Daily Absent Report — {date}
             </h3>
             <p className="font-body text-xs text-muted-foreground mt-0.5">
-              {activeCourse?.name || "All"} · {YEAR_LABELS[activeYear]} · {subject || "Select subject above"}
+              {activeCourse?.name || "All"} · {SEMESTER_LABELS[activeSemester]} · {subject || "Select subject above"}
             </p>
           </div>
           {absentStudents.length === 0 ? (
@@ -231,14 +232,14 @@ export default function TeacherAttendance() {
             </div>
           </div>
 
-          {/* YEAR SUB-TABS */}
+          {/* SEMESTER SUB-TABS */}
           <div>
-            <label className="font-body text-xs font-bold text-foreground uppercase tracking-wider mb-2 block">Step 2: Select Year</label>
-            <div className="flex gap-1.5">
-              {[1, 2, 3].map((yr) => (
-                <button key={yr} onClick={() => { setActiveYear(yr); setStatuses({}); }}
-                  className={`px-4 py-2 rounded-xl font-body text-xs font-semibold transition-all duration-200 border ${activeYear === yr ? "bg-secondary text-secondary-foreground border-secondary shadow-md scale-105" : "bg-muted text-muted-foreground border-border hover:bg-muted/80"}`}>
-                  {YEAR_LABELS[yr]}
+            <label className="font-body text-xs font-bold text-foreground uppercase tracking-wider mb-2 block">Step 2: Select Semester</label>
+            <div className="flex flex-wrap gap-1.5">
+              {[1, 2, 3, 4, 5, 6].map((sem) => (
+                <button key={sem} onClick={() => { setActiveSemester(sem); setStatuses({}); }}
+                  className={`px-4 py-2 rounded-xl font-body text-xs font-semibold transition-all duration-200 border ${activeSemester === sem ? "bg-secondary text-secondary-foreground border-secondary shadow-md scale-105" : "bg-muted text-muted-foreground border-border hover:bg-muted/80"}`}>
+                  {SEMESTER_LABELS[sem]}
                 </button>
               ))}
             </div>
@@ -288,7 +289,7 @@ export default function TeacherAttendance() {
               <Users className="w-3.5 h-3.5 text-primary shrink-0" />
               <p className="font-body text-xs text-muted-foreground">
                 Showing <span className="font-bold text-primary">{filteredStudents.length}</span> students from{" "}
-                <span className="font-bold text-primary">{activeCourse?.name}</span> — <span className="font-bold text-primary">{YEAR_LABELS[activeYear]}</span>
+                <span className="font-bold text-primary">{activeCourse?.name}</span> — <span className="font-bold text-primary">{SEMESTER_LABELS[activeSemester]}</span>
               </p>
             </div>
           )}
@@ -310,7 +311,7 @@ export default function TeacherAttendance() {
                 }`}>
                   <div className="min-w-0">
                     <p className="font-body text-sm font-semibold text-foreground truncate">{s.profile?.full_name || "Unnamed"}</p>
-                    <p className="font-body text-xs text-muted-foreground">{s.roll_number} · {activeCourse?.code} · {YEAR_LABELS[activeYear]}</p>
+                    <p className="font-body text-xs text-muted-foreground">{s.roll_number} · {activeCourse?.code} · {SEMESTER_LABELS[activeSemester]}</p>
                   </div>
                   <button onClick={() => toggleStatus(s.id)}
                     className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-body font-bold transition-all duration-200 shrink-0 ${
@@ -328,8 +329,8 @@ export default function TeacherAttendance() {
               {filteredStudents.length === 0 && (
                 <div className="text-center py-12">
                   <Users className="w-10 h-10 text-muted-foreground/20 mx-auto mb-3" />
-                  <p className="font-body text-sm text-muted-foreground">No students found for {activeCourse?.name} — {YEAR_LABELS[activeYear]}</p>
-                  <p className="font-body text-xs text-muted-foreground/60 mt-1">Students must be assigned to this course and year by the admin</p>
+                  <p className="font-body text-sm text-muted-foreground">No students found for {activeCourse?.name} — {SEMESTER_LABELS[activeSemester]}</p>
+                  <p className="font-body text-xs text-muted-foreground/60 mt-1">Students must be assigned to this course and semester by the admin</p>
                 </div>
               )}
             </div>
@@ -340,8 +341,8 @@ export default function TeacherAttendance() {
             disabled={!subject.trim() || Object.keys(statuses).length === 0 || submitMutation.isPending}
             onClick={() => submitMutation.mutate()}>
             {submitMutation.isPending
-              ? <span className="flex items-center gap-2"><span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> Saving...</span>
-              : `Submit Attendance (${Object.keys(statuses).length} students marked)`}
+              ? "Saving..."
+              : `Save Attendance (${Object.keys(statuses).length} students)`}
           </Button>
         </div>
       )}

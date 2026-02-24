@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const YEAR_LABELS: Record<number, string> = { 1: "1st Year", 2: "2nd Year", 3: "3rd Year" };
+
 
 export default function PrincipalStudents() {
   const [search, setSearch] = useState("");
@@ -193,7 +193,7 @@ export default function PrincipalStudents() {
               {[
                 ["Course", viewStudent.courses?.name || "—"],
                 ["Semester", `Semester ${viewStudent.semester}`],
-                ["Year", YEAR_LABELS[viewStudent.year_level] || "—"],
+                ["Year", `Year ${viewStudent.year_level}`],
                 ["Email", viewStudent.profile?.email || "—"],
                 ["Phone", viewStudent.phone || viewStudent.profile?.phone || "—"],
                 ["Parent Phone", viewStudent.parent_phone || "—"],

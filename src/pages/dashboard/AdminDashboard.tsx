@@ -1,11 +1,13 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { Users, GraduationCap, BookOpen, Calendar, FileText, Settings, Mail, TrendingUp, Trophy, Shield, Image, BarChart3, PieChart, Megaphone, ArrowUpCircle, Download, UserX, CalendarDays } from "lucide-react";
+import { Users, GraduationCap, BookOpen, Calendar, FileText, Settings, Mail, TrendingUp, Trophy, Shield, Image, BarChart3, PieChart, Megaphone, ArrowUpCircle, Download, UserX, CalendarDays, AlertTriangle, IndianRupee } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RePieChart, Pie, Cell } from "recharts";
 import { useState, useEffect, useRef } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const CHART_COLORS = ["hsl(217, 72%, 18%)", "hsl(42, 87%, 55%)", "hsl(217, 50%, 30%)", "hsl(142, 70%, 40%)"];
 
@@ -105,7 +107,59 @@ export default function AdminDashboard() {
     },
   });
 
+  // Fee defaulters query
+  const { data: feeDefaulters = [] } = useQuery({
+    queryKey: ["admin-fee-defaulters"],
+    queryFn: async () => {
+      const { data: students } = await supabase
+        .from("students")
+        .select("id, roll_number, total_fee, fee_paid, fee_due_date, user_id, courses(name, code)")
+        .eq("is_active", true)
+        .gt("total_fee", 0);
+      if (!students) return [];
+      const defaulters = students.filter((s: any) => {
+        const due = (s.total_fee || 0) - (s.fee_paid || 0);
+        return due > 0;
+      });
+      if (defaulters.length === 0) return [];
+      const userIds = defaulters.map((s: any) => s.user_id);
+      const { data: profiles } = await supabase.from("profiles").select("user_id, full_name").in("user_id", userIds);
+      return defaulters.map((s: any) => ({
+        ...s,
+        name: profiles?.find((p: any) => p.user_id === s.user_id)?.full_name || s.roll_number,
+        due: (s.total_fee || 0) - (s.fee_paid || 0),
+      })).sort((a: any, b: any) => b.due - a.due).slice(0, 10);
+    },
+  });
 
+  // Export students to CSV
+  const exportStudentsCSV = async () => {
+    toast.info("Generating CSV...");
+    const { data: students } = await supabase
+      .from("students")
+      .select("roll_number, semester, year_level, admission_year, parent_phone, phone, total_fee, fee_paid, fee_due_date, user_id, courses(name, code)")
+      .eq("is_active", true)
+      .order("roll_number");
+    if (!students || students.length === 0) { toast.error("No students to export"); return; }
+    const userIds = students.map(s => s.user_id);
+    const { data: profiles } = await supabase.from("profiles").select("user_id, full_name, email, phone").in("user_id", userIds);
+    const rows = students.map((s: any) => {
+      const p = profiles?.find((pr: any) => pr.user_id === s.user_id);
+      return [
+        s.roll_number, p?.full_name || "", p?.email || "", p?.phone || s.phone || "",
+        s.courses?.name || "", s.courses?.code || "", s.semester, s.year_level,
+        s.admission_year, s.parent_phone || "", s.total_fee || 0, s.fee_paid || 0,
+        (s.total_fee || 0) - (s.fee_paid || 0), s.fee_due_date || ""
+      ].join(",");
+    });
+    const csv = "Roll,Name,Email,Phone,Course,Code,Semester,Year,AdmissionYear,ParentPhone,TotalFee,FeePaid,FeeDue,DueDate\n" + rows.join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `students_export_${new Date().toISOString().split("T")[0]}.csv`;
+    a.click(); URL.revokeObjectURL(url);
+    toast.success("CSV downloaded!");
+  };
 
   const stats = [
     { label: "Total Students", value: String(counts?.students ?? 0), icon: Users, gradient: "from-primary/8 to-primary/3", iconBg: "bg-primary/10" },
@@ -248,6 +302,52 @@ export default function AdminDashboard() {
                 <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider mt-1">Sem {sem}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Fee Defaulters Alert + Export */}
+      <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
+        {/* Fee Defaulters */}
+        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6">
+          <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-destructive" /> Fee Defaulters
+            {feeDefaulters.length > 0 && <span className="text-xs px-2 py-0.5 rounded-full bg-destructive/10 text-destructive font-body">{feeDefaulters.length}</span>}
+          </h3>
+          {feeDefaulters.length === 0 ? (
+            <p className="font-body text-sm text-muted-foreground text-center py-6">No fee defaulters found 🎉</p>
+          ) : (
+            <div className="space-y-2 max-h-[280px] overflow-y-auto">
+              {feeDefaulters.map((s: any) => (
+                <div key={s.id} className="flex items-center justify-between p-3 rounded-xl bg-destructive/5 border border-destructive/10 hover:shadow-sm transition-all">
+                  <div className="min-w-0">
+                    <p className="font-body text-sm font-semibold text-foreground truncate">{s.name}</p>
+                    <p className="font-body text-xs text-muted-foreground">{s.roll_number} • {s.courses?.code || "—"}</p>
+                  </div>
+                  <div className="text-right shrink-0 ml-3">
+                    <p className="font-display text-sm font-bold text-destructive">₹{s.due.toLocaleString()}</p>
+                    <p className="font-body text-[10px] text-muted-foreground">due</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Data Export */}
+        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6">
+          <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+            <Download className="w-4 h-4 text-primary" /> Data Export
+          </h3>
+          <p className="font-body text-xs text-muted-foreground mb-4">Export student data with fee details, contact info, and course assignments as CSV.</p>
+          <Button onClick={exportStudentsCSV} className="w-full rounded-xl font-body">
+            <Download className="w-4 h-4 mr-2" /> Export All Students to CSV
+          </Button>
+          <div className="mt-4 p-3 rounded-xl bg-primary/5 border border-primary/10">
+            <p className="font-body text-xs text-muted-foreground">
+              <IndianRupee className="w-3 h-3 inline mr-1" />
+              CSV includes: Roll, Name, Email, Phone, Course, Semester, Fee details, Parent contact
+            </p>
           </div>
         </div>
       </div>

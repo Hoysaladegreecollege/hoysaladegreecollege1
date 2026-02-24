@@ -7,12 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const YEAR_LABELS: Record<number, string> = { 1: "1st Year", 2: "2nd Year", 3: "3rd Year" };
+const SEMESTER_LABELS: Record<number, string> = { 1: "Sem 1", 2: "Sem 2", 3: "Sem 3", 4: "Sem 4", 5: "Sem 5", 6: "Sem 6" };
 
 export default function TeacherStudents() {
   const [search, setSearch] = useState("");
   const [courseFilter, setCourseFilter] = useState("all");
-  const [yearFilter, setYearFilter] = useState("all");
   const [semesterFilter, setSemesterFilter] = useState("all");
   const [viewStudent, setViewStudent] = useState<any>(null);
 
@@ -25,7 +24,7 @@ export default function TeacherStudents() {
   });
 
   const { data: students = [], isLoading } = useQuery({
-    queryKey: ["teacher-students", courseFilter, yearFilter, semesterFilter],
+    queryKey: ["teacher-students", courseFilter, semesterFilter],
     queryFn: async () => {
       let q = supabase
         .from("students")
@@ -33,7 +32,6 @@ export default function TeacherStudents() {
         .eq("is_active", true)
         .order("roll_number");
       if (courseFilter !== "all") q = q.eq("course_id", courseFilter);
-      if (yearFilter !== "all") q = q.eq("year_level", parseInt(yearFilter));
       if (semesterFilter !== "all") q = q.eq("semester", parseInt(semesterFilter));
       const { data: studentsData } = await q;
       if (!studentsData || studentsData.length === 0) return [];
@@ -81,13 +79,6 @@ export default function TeacherStudents() {
             <option value="all">All Courses</option>
             {courses.map((c: any) => <option key={c.id} value={c.id}>{c.name} ({c.code})</option>)}
           </select>
-          <select value={yearFilter} onChange={e => setYearFilter(e.target.value)}
-            className="border border-border rounded-xl px-3 py-2 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30">
-            <option value="all">All Years</option>
-            <option value="1">1st Year</option>
-            <option value="2">2nd Year</option>
-            <option value="3">3rd Year</option>
-          </select>
           <select value={semesterFilter} onChange={e => setSemesterFilter(e.target.value)}
             className="border border-border rounded-xl px-3 py-2 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option value="all">All Semesters</option>
@@ -116,7 +107,7 @@ export default function TeacherStudents() {
                 <div className="flex items-center justify-between mb-0.5">
                   <span className="font-body text-sm font-bold text-primary">{s.roll_number}</span>
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">{YEAR_LABELS[s.year_level] || `Sem ${s.semester}`}</span>
+                    <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">Sem {s.semester}</span>
                     <Button size="sm" variant="outline" onClick={() => setViewStudent(s)} className="rounded-lg h-7 px-2 font-body text-xs">
                       <Eye className="w-3 h-3" />
                     </Button>
@@ -142,7 +133,7 @@ export default function TeacherStudents() {
                   <th className="text-left font-body text-xs font-semibold text-muted-foreground p-4">Roll No</th>
                   <th className="text-left font-body text-xs font-semibold text-muted-foreground p-4">Name</th>
                   <th className="text-left font-body text-xs font-semibold text-muted-foreground p-4">Course</th>
-                  <th className="text-center font-body text-xs font-semibold text-muted-foreground p-4">Year</th>
+                  <th className="text-center font-body text-xs font-semibold text-muted-foreground p-4">Semester</th>
                   <th className="text-left font-body text-xs font-semibold text-muted-foreground p-4">Phone</th>
                   <th className="text-center font-body text-xs font-semibold text-muted-foreground p-4">Actions</th>
                 </tr>
@@ -165,7 +156,7 @@ export default function TeacherStudents() {
                     </td>
                     <td className="font-body text-sm p-4 text-foreground">{s.courses?.name || "—"}</td>
                     <td className="font-body text-sm p-4 text-center">
-                      <span className="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">{YEAR_LABELS[s.year_level] || `Sem ${s.semester}`}</span>
+                      <span className="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">Sem {s.semester}</span>
                     </td>
                     <td className="font-body text-sm p-4 text-foreground">
                       {s.profile?.phone ? (

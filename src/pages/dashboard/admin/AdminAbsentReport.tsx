@@ -123,7 +123,7 @@ export default function AdminAbsentReport() {
                 <div className="flex justify-between"><span className="font-body text-xs text-muted-foreground">Name</span><span className="font-body text-sm font-semibold">{detailsDialog.profile?.full_name || "—"}</span></div>
                 <div className="flex justify-between"><span className="font-body text-xs text-muted-foreground">Roll</span><span className="font-body text-sm">{detailsDialog.roll_number}</span></div>
                 <div className="flex justify-between"><span className="font-body text-xs text-muted-foreground">Course</span><span className="font-body text-sm">{detailsDialog.courses?.name || "—"}</span></div>
-                <div className="flex justify-between"><span className="font-body text-xs text-muted-foreground">Sem / Year</span><span className="font-body text-sm">Sem {detailsDialog.semester} / Year {detailsDialog.year_level}</span></div>
+                <div className="flex justify-between"><span className="font-body text-xs text-muted-foreground">Semester</span><span className="font-body text-sm">Sem {detailsDialog.semester}</span></div>
               </div>
               <div className="space-y-2">
                 {(detailsDialog.profile?.phone || detailsDialog.phone) && (
