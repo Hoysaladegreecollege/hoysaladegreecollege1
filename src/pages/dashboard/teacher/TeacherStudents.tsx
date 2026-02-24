@@ -13,6 +13,7 @@ export default function TeacherStudents() {
   const [search, setSearch] = useState("");
   const [courseFilter, setCourseFilter] = useState("all");
   const [yearFilter, setYearFilter] = useState("all");
+  const [semesterFilter, setSemesterFilter] = useState("all");
   const [viewStudent, setViewStudent] = useState<any>(null);
 
   const { data: courses = [] } = useQuery({
@@ -24,16 +25,16 @@ export default function TeacherStudents() {
   });
 
   const { data: students = [], isLoading } = useQuery({
-    queryKey: ["teacher-students", courseFilter, yearFilter],
+    queryKey: ["teacher-students", courseFilter, yearFilter, semesterFilter],
     queryFn: async () => {
       let q = supabase
         .from("students")
         .select("*, courses(name, code)")
         .eq("is_active", true)
         .order("roll_number");
-      // Apply server-side filters for performance
       if (courseFilter !== "all") q = q.eq("course_id", courseFilter);
       if (yearFilter !== "all") q = q.eq("year_level", parseInt(yearFilter));
+      if (semesterFilter !== "all") q = q.eq("semester", parseInt(semesterFilter));
       const { data: studentsData } = await q;
       if (!studentsData || studentsData.length === 0) return [];
       const userIds = studentsData.map((s) => s.user_id);
@@ -70,7 +71,7 @@ export default function TeacherStudents() {
           <Filter className="w-4 h-4 text-primary" />
           <h3 className="font-body text-sm font-bold text-foreground">Filter Students</h3>
         </div>
-        <div className="grid sm:grid-cols-3 gap-3">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input placeholder="Search by name or roll..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 rounded-xl text-sm" />
@@ -86,6 +87,11 @@ export default function TeacherStudents() {
             <option value="1">1st Year</option>
             <option value="2">2nd Year</option>
             <option value="3">3rd Year</option>
+          </select>
+          <select value={semesterFilter} onChange={e => setSemesterFilter(e.target.value)}
+            className="border border-border rounded-xl px-3 py-2 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30">
+            <option value="all">All Semesters</option>
+            {[1,2,3,4,5,6].map(s => <option key={s} value={String(s)}>Semester {s}</option>)}
           </select>
         </div>
       </div>

@@ -54,14 +54,17 @@ export default function AdminDashboard() {
     queryKey: ["admin-stats"],
     queryFn: async () => {
       const [students, teachers, courses, events, pendingApps, contacts] = await Promise.all([
-        supabase.from("students").select("id", { count: "exact", head: true }).eq("is_active", true),
+        supabase.from("students").select("id, semester", { count: "exact" }).eq("is_active", true),
         supabase.from("teachers").select("id", { count: "exact", head: true }).eq("is_active", true),
         supabase.from("courses").select("id", { count: "exact", head: true }).eq("is_active", true),
         supabase.from("events").select("id", { count: "exact", head: true }).eq("is_active", true),
         supabase.from("admission_applications").select("id", { count: "exact", head: true }).eq("status", "pending"),
         supabase.from("contact_submissions").select("id", { count: "exact", head: true }).eq("status", "new"),
       ]);
-      return { students: students.count || 0, teachers: teachers.count || 0, courses: courses.count || 0, events: events.count || 0, pendingApps: pendingApps.count || 0, newContacts: contacts.count || 0 };
+      // semester breakdown
+      const semCounts: Record<number, number> = {};
+      (students.data || []).forEach((s: any) => { semCounts[s.semester] = (semCounts[s.semester] || 0) + 1; });
+      return { students: students.count || 0, teachers: teachers.count || 0, courses: courses.count || 0, events: events.count || 0, pendingApps: pendingApps.count || 0, newContacts: contacts.count || 0, semesterBreakdown: semCounts };
     },
   });
 
@@ -210,23 +213,41 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Attendance Overview */}
-      <div className="bg-card border border-border rounded-2xl p-5 sm:p-6">
-        <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-primary" /> Attendance Overview
-        </h3>
-        <div className="grid grid-cols-3 gap-4">
-          <div className="text-center p-4 rounded-xl bg-primary/5">
-            <p className="font-display text-2xl font-bold text-foreground">{attendanceStats?.total || 0}</p>
-            <p className="font-body text-xs text-muted-foreground">Total Records</p>
+      {/* Attendance + Semester Breakdown */}
+      <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
+        {/* Attendance Overview */}
+        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6">
+          <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-primary" /> Attendance Overview
+          </h3>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="text-center p-4 rounded-xl bg-primary/5">
+              <p className="font-display text-2xl font-bold text-foreground">{attendanceStats?.total || 0}</p>
+              <p className="font-body text-xs text-muted-foreground">Total Records</p>
+            </div>
+            <div className="text-center p-4 rounded-xl bg-primary/5">
+              <p className="font-display text-2xl font-bold text-primary">{attendanceStats?.present || 0}</p>
+              <p className="font-body text-xs text-muted-foreground">Present</p>
+            </div>
+            <div className="text-center p-4 rounded-xl bg-secondary/10">
+              <p className="font-display text-2xl font-bold text-secondary">{attendanceStats?.percentage || 0}%</p>
+              <p className="font-body text-xs text-muted-foreground">Attendance Rate</p>
+            </div>
           </div>
-          <div className="text-center p-4 rounded-xl bg-primary/5">
-            <p className="font-display text-2xl font-bold text-primary">{attendanceStats?.present || 0}</p>
-            <p className="font-body text-xs text-muted-foreground">Present</p>
-          </div>
-          <div className="text-center p-4 rounded-xl bg-secondary/10">
-            <p className="font-display text-2xl font-bold text-secondary">{attendanceStats?.percentage || 0}%</p>
-            <p className="font-body text-xs text-muted-foreground">Attendance Rate</p>
+        </div>
+
+        {/* Semester-wise Breakdown */}
+        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6">
+          <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+            <GraduationCap className="w-4 h-4 text-secondary" /> Students by Semester
+          </h3>
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+            {[1,2,3,4,5,6].map(sem => (
+              <div key={sem} className="text-center p-3 rounded-xl bg-gradient-to-br from-primary/8 to-primary/3 border border-border hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group">
+                <p className="font-display text-xl font-bold text-primary group-hover:scale-110 transition-transform">{counts?.semesterBreakdown?.[sem] || 0}</p>
+                <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider mt-1">Sem {sem}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
