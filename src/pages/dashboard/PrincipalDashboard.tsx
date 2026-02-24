@@ -58,12 +58,14 @@ export default function PrincipalDashboard() {
     queryKey: ["principal-stats"],
     queryFn: async () => {
       const [students, teachers, courses, notices] = await Promise.all([
-        supabase.from("students").select("id", { count: "exact", head: true }).eq("is_active", true),
+        supabase.from("students").select("id, semester", { count: "exact" }).eq("is_active", true),
         supabase.from("teachers").select("id", { count: "exact", head: true }).eq("is_active", true),
         supabase.from("courses").select("id", { count: "exact", head: true }).eq("is_active", true),
         supabase.from("notices").select("id", { count: "exact", head: true }).eq("is_active", true),
       ]);
-      return { students: students.count || 0, teachers: teachers.count || 0, courses: courses.count || 0, notices: notices.count || 0 };
+      const semCounts: Record<number, number> = {};
+      (students.data || []).forEach((s: any) => { semCounts[s.semester] = (semCounts[s.semester] || 0) + 1; });
+      return { students: students.count || 0, teachers: teachers.count || 0, courses: courses.count || 0, notices: notices.count || 0, semesterBreakdown: semCounts };
     },
   });
 
@@ -166,24 +168,42 @@ export default function PrincipalDashboard() {
         </div>
       </div>
 
-      {/* College Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {[
-          { label: "Student-Teacher Ratio", value: counts ? `${Math.round((counts.students || 1) / Math.max(counts.teachers || 1, 1))}:1` : "—", icon: "📊", desc: "Per faculty member" },
-          { label: "Active Courses", value: String(counts?.courses || 0), icon: "📚", desc: "Currently running" },
-          { label: "Notice Board", value: String(counts?.notices || 0), icon: "📢", desc: "Published notices" },
-        ].map((item) => (
-          <div key={item.label} className="bg-gradient-to-br from-muted/50 to-muted/20 border border-border rounded-2xl p-4 flex items-center gap-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group">
-            <div className="w-12 h-12 rounded-2xl bg-card shadow-sm flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-300">
-              {item.icon}
+      {/* Summary + Semester Breakdown */}
+      <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
+        {/* College Summary Cards */}
+        <div className="space-y-3">
+          {[
+            { label: "Student-Teacher Ratio", value: counts ? `${Math.round((counts.students || 1) / Math.max(counts.teachers || 1, 1))}:1` : "—", icon: "📊", desc: "Per faculty member" },
+            { label: "Active Courses", value: String(counts?.courses || 0), icon: "📚", desc: "Currently running" },
+            { label: "Notice Board", value: String(counts?.notices || 0), icon: "📢", desc: "Published notices" },
+          ].map((item) => (
+            <div key={item.label} className="bg-gradient-to-br from-muted/50 to-muted/20 border border-border rounded-2xl p-4 flex items-center gap-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group">
+              <div className="w-12 h-12 rounded-2xl bg-card shadow-sm flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-300">
+                {item.icon}
+              </div>
+              <div>
+                <p className="font-display text-xl font-bold text-foreground">{item.value}</p>
+                <p className="font-body text-xs font-semibold text-foreground">{item.label}</p>
+                <p className="font-body text-[10px] text-muted-foreground">{item.desc}</p>
+              </div>
             </div>
-            <div>
-              <p className="font-display text-xl font-bold text-foreground">{item.value}</p>
-              <p className="font-body text-xs font-semibold text-foreground">{item.label}</p>
-              <p className="font-body text-[10px] text-muted-foreground">{item.desc}</p>
-            </div>
+          ))}
+        </div>
+
+        {/* Semester-wise Breakdown */}
+        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6">
+          <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+            <GraduationCap className="w-4 h-4 text-secondary" /> Students by Semester
+          </h3>
+          <div className="grid grid-cols-3 gap-3">
+            {[1,2,3,4,5,6].map(sem => (
+              <div key={sem} className="text-center p-4 rounded-xl bg-gradient-to-br from-primary/8 to-secondary/5 border border-border hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group">
+                <p className="font-display text-2xl font-bold text-primary group-hover:scale-110 transition-transform">{counts?.semesterBreakdown?.[sem] || 0}</p>
+                <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider mt-1">Sem {sem}</p>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );

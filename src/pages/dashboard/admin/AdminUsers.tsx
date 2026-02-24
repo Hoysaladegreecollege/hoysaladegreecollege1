@@ -15,6 +15,7 @@ export default function AdminUsers() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [courseFilter, setCourseFilter] = useState("All");
+  const [semesterFilter, setSemesterFilter] = useState("All");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ full_name: "", phone: "", roll_number: "", semester: "", parent_phone: "", address: "", date_of_birth: "", course_id: "", total_fee: "", fee_paid: "", fee_due_date: "", fee_remarks: "" });
   const [showAddStudent, setShowAddStudent] = useState(false);
@@ -164,9 +165,12 @@ export default function AdminUsers() {
     const name = (u.full_name || "").toLowerCase();
     const email = (u.email || "").toLowerCase();
     const matchSearch = name.includes(search.toLowerCase()) || email.includes(search.toLowerCase());
-    if (courseFilter === "All") return matchSearch;
-    if (courseFilter === "no-course") return matchSearch && u.role === "student" && !u.student?.course_id;
-    return matchSearch && u.student?.course_id === courseFilter;
+    let matchCourse = true;
+    if (courseFilter === "no-course") matchCourse = u.role === "student" && !u.student?.course_id;
+    else if (courseFilter !== "All") matchCourse = u.student?.course_id === courseFilter;
+    let matchSemester = true;
+    if (semesterFilter !== "All") matchSemester = u.student?.semester === parseInt(semesterFilter);
+    return matchSearch && matchCourse && matchSemester;
   });
 
   const inputClass = "w-full border border-border rounded-xl px-3 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all";
@@ -198,10 +202,14 @@ export default function AdminUsers() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 rounded-xl text-sm" />
             </div>
-            <select value={courseFilter} onChange={(e) => setCourseFilter(e.target.value)} className="border border-border rounded-xl px-3 py-2 font-body text-xs bg-background">
-              <option value="All">All Users</option>
+            <select value={courseFilter} onChange={(e) => setCourseFilter(e.target.value)} className="border border-border rounded-xl px-3 py-2 font-body text-xs bg-background focus:outline-none focus:ring-2 focus:ring-primary/30">
+              <option value="All">All Courses</option>
               {courses.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
               <option value="no-course">No Course</option>
+            </select>
+            <select value={semesterFilter} onChange={(e) => setSemesterFilter(e.target.value)} className="border border-border rounded-xl px-3 py-2 font-body text-xs bg-background focus:outline-none focus:ring-2 focus:ring-primary/30">
+              <option value="All">All Semesters</option>
+              {[1,2,3,4,5,6].map(s => <option key={s} value={s}>Semester {s}</option>)}
             </select>
             <Button size="sm" onClick={() => setShowAddStudent(true)} className="rounded-xl font-body">
               <UserPlus className="w-4 h-4 mr-1" /> Add Student
