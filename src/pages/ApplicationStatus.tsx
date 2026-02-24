@@ -23,12 +23,11 @@ export default function ApplicationStatus() {
     queryKey: ["track-application", appNumber, email],
     queryFn: async () => {
       const { data } = await supabase
-        .from("admission_applications")
-        .select("*")
-        .eq("application_number", appNumber)
-        .eq("email", email)
-        .maybeSingle();
-      return data;
+        .rpc("get_application_status", {
+          _app_number: appNumber,
+          _email: email,
+        });
+      return data?.[0] || null;
     },
     enabled: searched && !!appNumber && !!email,
   });
