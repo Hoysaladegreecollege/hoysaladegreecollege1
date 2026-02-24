@@ -3,6 +3,22 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Simple in-memory rate limiter (per isolate)
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT = 15; // max requests per window
+const RATE_WINDOW_MS = 60_000; // 1 minute
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return false;
+  }
+  entry.count++;
+  return entry.count > RATE_LIMIT;
+}
+
 const SYSTEM_PROMPT = `You are the official AI assistant for Hoysala Degree College, Nelamangala, Bangalore. You are friendly, helpful, and knowledgeable.
 
 College Info:
@@ -56,8 +72,20 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
+    // Rate limiting by IP
+    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    if (isRateLimited(clientIp)) {
+      return new Response(JSON.stringify({ reply: "You're sending too many messages. Please wait a moment and try again. 🙏" }), {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { message, history } = await req.json();
-    if (!message) throw new Error("Message required");
+    if (!message || typeof message !== "string") throw new Error("Message required");
+
+    // Limit message length to prevent abuse
+    const sanitizedMessage = message.slice(0, 1000);
 
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
     if (!apiKey) throw new Error("API key not configured");
@@ -67,10 +95,12 @@ Deno.serve(async (req) => {
     
     if (history && Array.isArray(history)) {
       for (const h of history.slice(-6)) {
-        messages.push({ role: h.role === "bot" ? "assistant" : "user", content: h.text });
+        if (h.text && typeof h.text === "string") {
+          messages.push({ role: h.role === "bot" ? "assistant" : "user", content: h.text.slice(0, 1000) });
+        }
       }
     }
-    messages.push({ role: "user", content: message });
+    messages.push({ role: "user", content: sanitizedMessage });
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -84,8 +114,7 @@ Deno.serve(async (req) => {
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`AI API error: ${response.status} ${errorText}`);
+      throw new Error("AI service temporarily unavailable");
     }
 
     const data = await response.json();

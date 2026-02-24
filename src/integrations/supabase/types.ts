@@ -1005,6 +1005,35 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_application_status: {
+        Args: { _app_number: string; _email: string }
+        Returns: {
+          address: string | null
+          application_number: string | null
+          course: string
+          created_at: string
+          date_of_birth: string | null
+          email: string
+          father_name: string | null
+          full_name: string
+          gender: string | null
+          id: string
+          mother_name: string | null
+          percentage_12th: string | null
+          phone: string
+          photo_url: string | null
+          previous_school: string | null
+          review_notes: string | null
+          reviewed_by: string | null
+          status: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "admission_applications"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
