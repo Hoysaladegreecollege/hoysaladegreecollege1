@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { Search, Trash2, Edit3, X, Save, Users, Phone, UserPlus, Eye, ArrowLeft } from "lucide-react";
+import { Search, Trash2, Edit3, X, Save, Users, Phone, UserPlus, Eye, ArrowLeft, KeyRound } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
@@ -21,6 +21,8 @@ export default function AdminUsers() {
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [viewStudent, setViewStudent] = useState<any>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<any>(null);
+  const [resetPwUser, setResetPwUser] = useState<any>(null);
+  const [newPassword, setNewPassword] = useState("");
   const [newStudent, setNewStudent] = useState({
     full_name: "", email: "", password: "", phone: "", date_of_birth: "",
     roll_number: "", course_id: "", year_level: "1", semester: "1",
@@ -96,6 +98,16 @@ export default function AdminUsers() {
       setDeleteConfirm(null);
     },
     onError: (e: any) => toast.error(`Delete failed: ${e.message}`),
+  });
+
+  const resetPasswordMutation = useMutation({
+    mutationFn: async ({ userId, password }: { userId: string; password: string }) => {
+      const { data, error } = await supabase.functions.invoke("reset-password", { body: { userId, newPassword: password } });
+      if (error) throw new Error(error.message || "Reset failed");
+      if (data?.error) throw new Error(data.error);
+    },
+    onSuccess: () => { toast.success("Password reset successfully!"); setResetPwUser(null); setNewPassword(""); },
+    onError: (e: any) => toast.error(`Reset failed: ${e.message}`),
   });
 
   const addStudentMutation = useMutation({
@@ -442,6 +454,8 @@ export default function AdminUsers() {
                   </select>
                   <button onClick={() => setViewStudent(u)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:scale-110 transition-all duration-200" title="View"><Eye className="w-4 h-4" /></button>
                   <button onClick={() => startEdit(u)} className="p-1.5 rounded-lg hover:bg-primary/10 text-primary hover:scale-110 transition-all duration-200" title="Edit"><Edit3 className="w-4 h-4" /></button>
+                  <button onClick={() => { setResetPwUser(u); setNewPassword(""); }}
+                    className="p-1.5 rounded-lg hover:bg-secondary/10 text-secondary-foreground hover:scale-110 transition-all duration-200" title="Reset Password"><KeyRound className="w-4 h-4" /></button>
                   <button onClick={() => setDeleteConfirm(u)}
                     className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive hover:scale-110 transition-all duration-200" title="Delete"><Trash2 className="w-4 h-4" /></button>
                 </div>
@@ -451,6 +465,30 @@ export default function AdminUsers() {
         ))}
         {!isLoading && filtered.length === 0 && <p className="text-center py-8 font-body text-sm text-muted-foreground">No users found.</p>}
       </div>
+
+      {/* Reset Password Dialog */}
+      <Dialog open={!!resetPwUser} onOpenChange={() => setResetPwUser(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="font-display text-lg flex items-center gap-2"><KeyRound className="w-5 h-5 text-primary" /> Reset Password</DialogTitle>
+            <DialogDescription className="font-body text-sm">
+              Set a new password for <strong>{resetPwUser?.full_name || resetPwUser?.email}</strong>
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={(e) => { e.preventDefault(); resetPasswordMutation.mutate({ userId: resetPwUser.user_id, password: newPassword }); }} className="space-y-4 mt-2">
+            <div>
+              <label className="font-body text-xs font-semibold text-foreground block mb-1.5">New Password *</label>
+              <Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required minLength={6} placeholder="Minimum 6 characters" className="rounded-xl" />
+            </div>
+            <div className="flex gap-3">
+              <Button type="button" variant="outline" onClick={() => setResetPwUser(null)} className="flex-1 rounded-xl font-body">Cancel</Button>
+              <Button type="submit" disabled={resetPasswordMutation.isPending} className="flex-1 rounded-xl font-body">
+                {resetPasswordMutation.isPending ? "Resetting..." : "Reset Password"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

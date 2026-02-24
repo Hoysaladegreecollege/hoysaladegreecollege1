@@ -1,13 +1,28 @@
 import { Link } from "react-router-dom";
-import { GraduationCap, BookOpen, Users, Award, Calendar, ArrowRight, Star, Sparkles, Brain, ClipboardCheck, Library, MessageSquare, FlaskConical, BarChart3, ChevronRight, ChevronLeft, Quote, Zap, TrendingUp, Play } from "lucide-react";
+import { GraduationCap, BookOpen, Users, Award, Calendar, ArrowRight, Star, Sparkles, Brain, ClipboardCheck, Library, MessageSquare, FlaskConical, BarChart3, ChevronRight, ChevronLeft, Quote, Zap, TrendingUp, Play, X, Camera } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
 import InfoSlider from "@/components/InfoSlider";
 import heroImage from "@/assets/hero-college.jpg";
 import principalImage from "@/assets/principal.jpg";
+import galleryCampus from "@/assets/gallery-campus.jpg";
+import galleryLab from "@/assets/gallery-lab.jpg";
+import galleryLibrary from "@/assets/gallery-library.jpg";
+import galleryClassroom from "@/assets/gallery-classroom.jpg";
+import galleryEvents from "@/assets/gallery-events.jpg";
+import gallerySports from "@/assets/gallery-sports.jpg";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect, useRef } from "react";
+
+const galleryImages = [
+  { src: galleryCampus, title: "Campus Building", category: "Campus" },
+  { src: galleryLab, title: "Computer Lab", category: "Facilities" },
+  { src: galleryLibrary, title: "Library", category: "Facilities" },
+  { src: galleryClassroom, title: "Classroom", category: "Academics" },
+  { src: galleryEvents, title: "Annual Day", category: "Events" },
+  { src: gallerySports, title: "Sports Ground", category: "Sports" },
+];
 
 const courses = [
   { name: "BCA", full: "Bachelor of Computer Applications", icon: "🖥️", desc: "Master programming, databases, networking and emerging technologies.", duration: "3 Years", color: "from-blue-500/15 to-cyan-500/5" },
@@ -87,7 +102,7 @@ export default function Index() {
   const [testimonialIndex, setTestimonialIndex] = useState(0);
   const testimonialRef = useRef<NodeJS.Timeout | null>(null);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
-
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
   useEffect(() => {
     testimonialRef.current = setInterval(() => {
       setTestimonialIndex((prev) => (prev + 1) % Math.ceil(testimonials.length / 2));
@@ -302,6 +317,60 @@ export default function Index() {
           </div>
         </div>
       </section>
+
+      {/* Campus Gallery with Lightbox */}
+      <section className="py-20 sm:py-28 bg-background relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-72 h-72 bg-primary/4 rounded-full blur-3xl pointer-events-none" />
+        <div className="container px-4 relative">
+          <ScrollReveal>
+            <SectionHeading title="Campus Gallery" subtitle="Take a virtual tour of our world-class facilities" />
+          </ScrollReveal>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5">
+            {galleryImages.map((img, i) => (
+              <ScrollReveal key={img.title} delay={i * 60}>
+                <div
+                  className="relative group cursor-pointer overflow-hidden rounded-2xl border border-border aspect-[4/3] hover:shadow-2xl transition-all duration-500"
+                  onClick={() => setLightboxIdx(i)}
+                >
+                  <img src={img.src} alt={img.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+                    <span className="inline-block text-[10px] px-2 py-0.5 rounded-full bg-secondary/90 text-primary-foreground font-body font-bold mb-1">{img.category}</span>
+                    <p className="font-display text-sm sm:text-base font-bold text-white">{img.title}</p>
+                  </div>
+                  <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    <Camera className="w-4 h-4 text-white" />
+                  </div>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Lightbox */}
+      {lightboxIdx !== null && (
+        <div className="fixed inset-0 bg-foreground/90 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in" onClick={() => setLightboxIdx(null)}>
+          <button className="absolute top-4 right-4 sm:top-6 sm:right-6 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10" onClick={() => setLightboxIdx(null)}>
+            <X className="w-5 h-5" />
+          </button>
+          <button className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
+            onClick={(e) => { e.stopPropagation(); setLightboxIdx((lightboxIdx - 1 + galleryImages.length) % galleryImages.length); }}>
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
+            onClick={(e) => { e.stopPropagation(); setLightboxIdx((lightboxIdx + 1) % galleryImages.length); }}>
+            <ChevronRight className="w-5 h-5" />
+          </button>
+          <div className="max-w-4xl w-full" onClick={(e) => e.stopPropagation()}>
+            <img src={galleryImages[lightboxIdx].src} alt={galleryImages[lightboxIdx].title} className="w-full max-h-[80vh] object-contain rounded-2xl shadow-2xl animate-scale-bounce" />
+            <div className="text-center mt-4">
+              <p className="font-display text-lg font-bold text-white">{galleryImages[lightboxIdx].title}</p>
+              <p className="font-body text-xs text-white/60 mt-1">{lightboxIdx + 1} / {galleryImages.length}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Principal's Message */}
       <section className="py-16 sm:py-24 bg-background">
