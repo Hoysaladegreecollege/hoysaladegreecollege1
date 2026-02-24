@@ -1,5 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { BookOpen, Clock, BarChart3, Bell, Calendar, TrendingUp, CheckCircle, XCircle, Megaphone, ArrowRight, Sparkles, Upload } from "lucide-react";
+import BirthdayPopup from "@/components/BirthdayPopup";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
@@ -176,6 +177,7 @@ export default function StudentDashboard() {
 
   return (
     <div className="space-y-5 sm:space-y-6 animate-fade-in">
+      <BirthdayPopup />
       {/* Welcome Banner */}
       <div className="relative overflow-hidden bg-gradient-to-r from-primary/10 via-card to-secondary/10 border border-border rounded-2xl p-6 md:p-8">
         <div className="absolute top-0 right-0 w-36 h-36 bg-secondary/8 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
