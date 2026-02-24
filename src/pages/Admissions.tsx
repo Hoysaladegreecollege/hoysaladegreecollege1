@@ -133,18 +133,18 @@ export default function Admissions() {
             <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
               <button
                 onClick={() => setShowForm(true)}
-                className="relative group overflow-hidden px-8 py-4 rounded-2xl font-body text-base font-bold text-primary-foreground shadow-2xl transition-all duration-500 hover:scale-105 hover:-translate-y-0.5 w-full sm:w-auto"
+                className="relative group overflow-hidden px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-body text-sm sm:text-base font-bold text-primary-foreground shadow-2xl transition-all duration-500 hover:scale-105 hover:-translate-y-0.5 w-full sm:w-auto text-center"
                 style={{ background: "linear-gradient(135deg, hsl(42,87%,52%), hsl(38,92%,44%), hsl(42,87%,60%))", boxShadow: "0 8px 32px hsla(42,87%,52%,0.4), inset 0 1px 0 rgba(255,255,255,0.2)" }}
               >
                 <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                 <span className="relative flex items-center justify-center gap-2">
-                  <Sparkles className="w-5 h-5" />
+                  <Sparkles className="w-4 sm:w-5 h-4 sm:h-5" />
                   Apply Now
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+                  <ArrowRight className="w-4 sm:w-5 h-4 sm:h-5 group-hover:translate-x-1 transition-transform duration-300" />
                 </span>
               </button>
               <Link to="/application-status" className="w-full sm:w-auto">
-                <Button variant="outline" size="lg" className="font-body rounded-2xl w-full py-4 hover:bg-primary/5 hover:border-primary/30 transition-all duration-300">
+                <Button variant="outline" size="lg" className="font-body rounded-2xl w-full py-3 sm:py-4 hover:bg-primary/5 hover:border-primary/30 transition-all duration-300 text-sm sm:text-base">
                   <FileText className="w-4 h-4 mr-2" /> Track Application
                 </Button>
               </Link>
@@ -158,18 +158,23 @@ export default function Admissions() {
         <div className="absolute top-0 right-0 w-72 h-72 bg-secondary/4 rounded-full blur-3xl pointer-events-none" />
         <div className="container px-4 relative">
           <ScrollReveal><SectionHeading title="Available Programs" subtitle="Choose the right course for your future" /></ScrollReveal>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto">
             {courses.map((c, i) => (
               <ScrollReveal key={c.name} delay={i * 80}>
-                <div className="relative premium-card p-6 sm:p-7 text-center group cursor-pointer overflow-hidden border-glow card-stack" onClick={() => setShowForm(true)}>
+                <div className="relative premium-card p-5 sm:p-7 text-center group cursor-pointer overflow-hidden border-glow card-stack" onClick={() => setShowForm(true)}>
                   <div className="absolute inset-0 bg-gradient-to-br from-secondary/8 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
                   <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-secondary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="relative z-10">
-                    <div className="text-5xl mb-4 group-hover:scale-125 group-hover:-rotate-6 transition-all duration-400 inline-block filter group-hover:drop-shadow-lg">{c.icon}</div>
-                    <h3 className="font-display text-lg font-bold text-foreground group-hover:text-primary transition-colors duration-300">{c.name}</h3>
-                    <p className="font-body text-sm text-muted-foreground mt-1.5">{c.seats}</p>
-                    <p className="font-body text-sm text-secondary font-bold mt-3 bg-secondary/10 px-4 py-1.5 rounded-full inline-block border border-secondary/20">{c.fee}</p>
-                    <div className="mt-4 font-body text-xs text-primary font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-1">Click to Apply <ArrowRight className="w-3 h-3" /></div>
+                    <div className="text-4xl sm:text-5xl mb-3 sm:mb-4 group-hover:scale-125 group-hover:-rotate-6 transition-all duration-400 inline-block filter group-hover:drop-shadow-lg">{c.icon}</div>
+                    <h3 className="font-display text-base sm:text-lg font-bold text-foreground group-hover:text-primary transition-colors duration-300">{c.name}</h3>
+                    <p className="font-body text-xs sm:text-sm text-muted-foreground mt-1.5">{c.seats}</p>
+                    <p className="font-body text-xs sm:text-sm text-secondary font-bold mt-2 sm:mt-3 bg-secondary/10 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full inline-block border border-secondary/20">{c.fee}</p>
+                    <button className="mt-3 sm:mt-4 w-full py-2 rounded-xl font-body text-xs font-bold text-primary-foreground transition-all duration-300 hover:scale-105"
+                      style={{ background: "linear-gradient(135deg, hsl(42,87%,52%), hsl(38,92%,44%))" }}>
+                      <span className="flex items-center justify-center gap-1.5">
+                        <Sparkles className="w-3 h-3" /> Apply Now <ArrowRight className="w-3 h-3" />
+                      </span>
+                    </button>
                   </div>
                 </div>
               </ScrollReveal>
@@ -345,13 +350,13 @@ export default function Admissions() {
               <h2 className="font-display text-2xl sm:text-3xl font-bold text-foreground mb-3">Have Questions?</h2>
               <p className="font-body text-muted-foreground mb-8 text-sm">Our admissions team is here to help you through every step.</p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <a href="tel:7676272167">
-                  <Button variant="outline" className="font-body rounded-xl hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300 group">
+                <a href="tel:7676272167" className="w-full sm:w-auto">
+                  <Button variant="outline" className="font-body rounded-xl hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300 group w-full">
                     <Phone className="w-4 h-4 mr-2 group-hover:animate-pulse" /> Call: 7676272167
                   </Button>
                 </a>
-                <Link to="/contact">
-                  <Button variant="outline" className="font-body rounded-xl hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300 group">
+                <Link to="/contact" className="w-full sm:w-auto">
+                  <Button variant="outline" className="font-body rounded-xl hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300 group w-full">
                     Contact Admissions <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
