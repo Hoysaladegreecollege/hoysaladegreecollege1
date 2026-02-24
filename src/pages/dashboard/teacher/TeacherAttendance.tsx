@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { CheckCircle, XCircle, Users, Search, AlertTriangle, Phone, Calendar } from "lucide-react";
 
-const YEAR_LABELS: Record<number, string> = { 1: "1st Year", 2: "2nd Year", 3: "3rd Year" };
+const SEMESTER_LABELS: Record<number, string> = { 1: "Sem 1", 2: "Sem 2", 3: "Sem 3", 4: "Sem 4", 5: "Sem 5", 6: "Sem 6" };
 
 export default function TeacherAttendance() {
   const { user } = useAuth();
@@ -16,7 +16,7 @@ export default function TeacherAttendance() {
 
   // Primary filters
   const [activeCourseId, setActiveCourseId] = useState<string | null>(null);
-  const [activeYear, setActiveYear] = useState<number>(1);
+  const [activeSemester, setActiveSemester] = useState<number>(1);
   const [subject, setSubject] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [statuses, setStatuses] = useState<Record<string, "present" | "absent">>({});
@@ -40,15 +40,15 @@ export default function TeacherAttendance() {
 
   // Fetch students for selected course + year
   const { data: students = [], isLoading: studentsLoading } = useQuery({
-    queryKey: ["attendance-students", resolvedCourseId, activeYear],
+    queryKey: ["attendance-students", resolvedCourseId, activeSemester],
     queryFn: async () => {
       if (!resolvedCourseId) return [];
       const { data: studentsData } = await supabase
         .from("students")
-        .select("id, roll_number, user_id, course_id, year_level, phone, parent_phone, courses(name, code)")
+        .select("id, roll_number, user_id, course_id, semester, phone, parent_phone, courses(name, code)")
         .eq("is_active", true)
         .eq("course_id", resolvedCourseId)
-        .eq("year_level", activeYear)
+        .eq("semester", activeSemester)
         .order("roll_number");
       if (!studentsData || studentsData.length === 0) return [];
       const userIds = studentsData.map((s) => s.user_id);
@@ -122,7 +122,7 @@ export default function TeacherAttendance() {
         date,
         status,
         marked_by: user!.id,
-        year_level: activeYear,
+        year_level: Math.ceil(activeSemester / 2),
         course_id: resolvedCourseId,
       }));
 
@@ -156,7 +156,7 @@ export default function TeacherAttendance() {
           <Users className="w-5 h-5 text-primary" /> Mark Attendance
         </h2>
         <p className="font-body text-xs sm:text-sm text-muted-foreground mt-1">
-          Select course and year, then mark attendance per subject
+          Select course and semester, then mark attendance per subject
         </p>
       </div>
 
