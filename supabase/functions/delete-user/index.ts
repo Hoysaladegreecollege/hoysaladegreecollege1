@@ -61,8 +61,18 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error: any) {
-    console.error("Delete user error:", error.message);
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error("Delete user error:", error);
+    const msg = error.message || "";
+    const safeMessage = msg.includes("Cannot delete yourself")
+      ? "Cannot delete yourself"
+      : msg.includes("userId required")
+      ? "User ID is required"
+      : msg.includes("Unauthorized") || msg.includes("No auth header")
+      ? "Unauthorized"
+      : msg.includes("Only admin")
+      ? "Insufficient permissions"
+      : "An error occurred while deleting the user";
+    return new Response(JSON.stringify({ error: safeMessage }), {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

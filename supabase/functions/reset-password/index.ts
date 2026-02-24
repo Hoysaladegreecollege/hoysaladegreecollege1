@@ -38,8 +38,18 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error: any) {
-    console.error("Reset password error:", error.message);
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error("Reset password error:", error);
+    const msg = error.message || "";
+    const safeMessage = msg.includes("Unauthorized") || msg.includes("No auth header")
+      ? "Unauthorized"
+      : msg.includes("Only admin")
+      ? "Insufficient permissions"
+      : msg.includes("Password must be")
+      ? "Password must be at least 6 characters"
+      : msg.includes("userId required")
+      ? "User ID is required"
+      : "An error occurred while resetting the password";
+    return new Response(JSON.stringify({ error: safeMessage }), {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
