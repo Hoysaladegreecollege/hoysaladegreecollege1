@@ -198,22 +198,26 @@ export default function StudentDashboard() {
       </div>
 
       {/* Today's Attendance Status */}
-      {data?.todayStatus && data.todayStatus !== "none" && (
+      {!statsLoading && data && (
         <div className={`border-2 rounded-2xl p-4 sm:p-5 flex items-center gap-4 animate-fade-in transition-all duration-300 ${
-          data.todayStatus === "present" ? "bg-primary/5 border-primary/20" : "bg-destructive/5 border-destructive/20"
+          data.todayStatus === "present" ? "bg-primary/5 border-primary/20" : data.todayStatus === "absent" ? "bg-destructive/5 border-destructive/20" : "bg-muted/30 border-border"
         }`}>
           <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
-            data.todayStatus === "present" ? "bg-primary/10" : "bg-destructive/10"
+            data.todayStatus === "present" ? "bg-primary/10" : data.todayStatus === "absent" ? "bg-destructive/10" : "bg-muted"
           }`}>
             {data.todayStatus === "present"
               ? <CheckCircle className="w-6 h-6 text-primary" />
-              : <XCircle className="w-6 h-6 text-destructive" />}
+              : data.todayStatus === "absent"
+              ? <XCircle className="w-6 h-6 text-destructive" />
+              : <Clock className="w-6 h-6 text-muted-foreground" />}
           </div>
           <div>
-            <p className={`font-display text-base font-bold ${data.todayStatus === "present" ? "text-primary" : "text-destructive"}`}>
-              {data.todayStatus === "present" ? "You're Present Today ✓" : "You're Marked Absent Today"}
+            <p className={`font-display text-base font-bold ${data.todayStatus === "present" ? "text-primary" : data.todayStatus === "absent" ? "text-destructive" : "text-muted-foreground"}`}>
+              {data.todayStatus === "present" ? "You're Present Today ✓" : data.todayStatus === "absent" ? "You're Marked Absent Today" : "No Attendance Marked Today"}
             </p>
-            <p className="font-body text-xs text-muted-foreground mt-0.5">Today's attendance status from your teacher</p>
+            <p className="font-body text-xs text-muted-foreground mt-0.5">
+              {data.todayStatus === "none" ? "Your teacher hasn't marked attendance yet today" : "Today's attendance status from your teacher"}
+            </p>
           </div>
         </div>
       )}
