@@ -45,19 +45,19 @@ export default function About() {
       <PageHeader title="About Us" subtitle="Discover the story of Hoysala Degree College" />
 
       {/* About intro */}
-      <section className="py-16 sm:py-24 bg-background relative overflow-hidden">
+      <section className="py-20 sm:py-28 bg-background relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/4 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-72 h-72 bg-primary/3 rounded-full blur-3xl pointer-events-none" />
         <div className="container max-w-4xl px-4 relative">
           <ScrollReveal>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/8 border border-primary/15 mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/8 border border-primary/15 mb-8">
               <Sparkles className="w-3.5 h-3.5 text-secondary" />
-              <span className="font-body text-xs font-semibold text-primary">Est. 2017 · Nelamangala, Bengaluru</span>
+              <span className="font-body text-xs font-semibold text-primary tracking-wide">Est. 2017 · Nelamangala, Bengaluru</span>
             </div>
-            <SectionHeading title="About Hoysala Degree College" subtitle="Building a legacy of knowledge and character" />
+             <SectionHeading title="About Hoysala Degree College" subtitle="Building a legacy of knowledge and character" />
           </ScrollReveal>
           <ScrollReveal delay={200}>
-            <div className="relative mt-8 bg-gradient-to-br from-primary/3 to-secondary/3 rounded-3xl p-6 sm:p-8 border border-border/50">
+            <div className="relative mt-10 bg-gradient-to-br from-primary/3 to-secondary/3 rounded-3xl p-8 sm:p-10 border border-border/50">
               <div className="absolute top-0 left-6 right-6 h-0.5 bg-gradient-to-r from-transparent via-secondary/40 to-transparent" />
               <div className="font-body text-muted-foreground leading-relaxed space-y-4 text-sm sm:text-base">
                 <p>Hoysala Degree College, established in 2017 under Shri Shirdi Sai Educational Trust(R), is located in Nelamangala Town, Bengaluru Rural District. Affiliated to Bangalore University and approved by AICTE New Delhi, the college offers BCA, B.Com (Regular & Professional), and BBA programs.</p>
@@ -70,18 +70,18 @@ export default function About() {
       </section>
 
       {/* Quick Facts */}
-      <section className="py-14 sm:py-20 bg-cream relative overflow-hidden">
+      <section className="py-16 sm:py-24 bg-cream relative overflow-hidden">
         <div className="absolute inset-0 section-pattern opacity-50" />
         <div className="container px-4 relative">
           <ScrollReveal><SectionHeading title="Quick Facts" subtitle="Numbers that define our institution" /></ScrollReveal>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5 max-w-5xl mx-auto">
             {quickFacts.map((f, i) => (
               <ScrollReveal key={f.label} delay={i * 80}>
-                <div className="premium-card p-4 sm:p-5 text-center group relative overflow-hidden border-glow card-stack">
+                <div className="premium-card p-5 sm:p-6 text-center group relative overflow-hidden border-glow card-stack">
                   <div className="absolute inset-0 bg-gradient-to-br from-secondary/8 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
                   <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-secondary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <p className="font-display text-xl sm:text-2xl font-bold text-primary group-hover:text-secondary transition-colors duration-400 relative">{f.value}</p>
-                  <p className="font-body text-[10px] sm:text-xs text-muted-foreground mt-1.5 uppercase tracking-wider relative">{f.label}</p>
+                  <p className="font-display text-2xl sm:text-3xl font-bold text-primary group-hover:text-secondary transition-colors duration-400 relative">{f.value}</p>
+                  <p className="font-body text-[10px] sm:text-xs text-muted-foreground mt-2 uppercase tracking-widest relative">{f.label}</p>
                 </div>
               </ScrollReveal>
             ))}
@@ -199,10 +199,10 @@ export default function About() {
       </section>
 
       {/* Facilities */}
-      <section className="py-16 sm:py-24 bg-background">
+      <section className="py-20 sm:py-28 bg-background">
         <div className="container px-4">
           <ScrollReveal><SectionHeading title="Campus Facilities" subtitle="Modern infrastructure for holistic learning" /></ScrollReveal>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 max-w-5xl mx-auto">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 max-w-5xl mx-auto">
             {facilities.map((f, i) => (
               <ScrollReveal key={f.title} delay={i * 70}>
                 <div className="premium-card p-5 group relative overflow-hidden spotlight border-glow">

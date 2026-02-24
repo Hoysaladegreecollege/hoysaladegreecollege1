@@ -92,17 +92,17 @@ export default function Courses() {
         </div>
       </section>
 
-      <section className="py-16 sm:py-24 bg-background relative overflow-hidden">
+      <section className="py-20 sm:py-28 bg-background relative overflow-hidden">
         <div className="absolute top-0 right-0 w-80 h-80 bg-secondary/4 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/3 rounded-full blur-3xl pointer-events-none" />
         <div className="container px-4 relative">
           <ScrollReveal><SectionHeading title="Choose Your Path" subtitle="Click on any course to view full details, fees, and highlights" /></ScrollReveal>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 max-w-5xl mx-auto">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 max-w-5xl mx-auto">
             {courses.map((c, i) => (
               <ScrollReveal key={c.name} delay={i * 80}>
                 <div
                   onClick={() => setSelectedCourse(c)}
-                  className="premium-card p-6 sm:p-7 cursor-pointer group h-full relative overflow-hidden"
+                  className="premium-card p-7 sm:p-8 cursor-pointer group h-full relative overflow-hidden border-glow"
                 >
                   {/* Hover gradient bg */}
                   <div className={`absolute inset-0 bg-gradient-to-br ${c.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl`} />
@@ -110,12 +110,12 @@ export default function Courses() {
                   <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-secondary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-t-2xl" />
 
                   <div className="relative z-10">
-                    <span className="text-4xl sm:text-5xl mb-4 group-hover:scale-110 transition-transform duration-300 inline-block filter group-hover:drop-shadow-lg">{c.icon}</span>
-                    <h3 className="font-display text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">{c.name}</h3>
-                    <p className="font-body text-xs text-muted-foreground mt-1">{c.full}</p>
-                    <p className="font-body text-sm text-muted-foreground mt-3 leading-relaxed line-clamp-2">{c.overview}</p>
-                    <div className="mt-5 flex items-center justify-between">
-                      <span className="text-[10px] font-body text-secondary font-bold bg-secondary/10 px-3 py-1 rounded-full border border-secondary/20">{c.duration.split(" (")[0]}</span>
+                    <span className="text-5xl sm:text-6xl mb-5 group-hover:scale-110 transition-transform duration-300 inline-block filter group-hover:drop-shadow-lg">{c.icon}</span>
+                    <h3 className="font-display text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">{c.name}</h3>
+                    <p className="font-body text-xs text-muted-foreground mt-1.5 font-medium">{c.full}</p>
+                    <p className="font-body text-sm text-muted-foreground mt-4 leading-relaxed line-clamp-2">{c.overview}</p>
+                    <div className="mt-6 flex items-center justify-between">
+                      <span className="text-[10px] font-body text-secondary font-bold bg-secondary/10 px-3 py-1.5 rounded-full border border-secondary/20">{c.duration.split(" (")[0]}</span>
                       <span className="text-xs font-body font-semibold text-primary flex items-center gap-1 group-hover:gap-2 transition-all duration-300">
                         View Details <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform duration-300" />
                       </span>

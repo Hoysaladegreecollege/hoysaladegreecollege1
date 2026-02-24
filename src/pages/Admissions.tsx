@@ -154,23 +154,22 @@ export default function Admissions() {
       </section>
 
       {/* Course seats overview */}
-      <section className="py-12 sm:py-16 bg-background relative overflow-hidden">
+      <section className="py-16 sm:py-24 bg-background relative overflow-hidden">
         <div className="absolute top-0 right-0 w-72 h-72 bg-secondary/4 rounded-full blur-3xl pointer-events-none" />
         <div className="container px-4 relative">
           <ScrollReveal><SectionHeading title="Available Programs" subtitle="Choose the right course for your future" /></ScrollReveal>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 max-w-4xl mx-auto">
             {courses.map((c, i) => (
               <ScrollReveal key={c.name} delay={i * 80}>
-                <div className="relative premium-card p-5 text-center group cursor-pointer overflow-hidden border-glow card-stack" onClick={() => setShowForm(true)}>
-                  {/* Hover gradient */}
+                <div className="relative premium-card p-6 sm:p-7 text-center group cursor-pointer overflow-hidden border-glow card-stack" onClick={() => setShowForm(true)}>
                   <div className="absolute inset-0 bg-gradient-to-br from-secondary/8 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
                   <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-secondary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="relative z-10">
-                    <div className="text-4xl mb-3 group-hover:scale-125 group-hover:-rotate-6 transition-all duration-400 inline-block">{c.icon}</div>
-                    <h3 className="font-display text-base font-bold text-foreground group-hover:text-primary transition-colors duration-300">{c.name}</h3>
-                    <p className="font-body text-xs text-muted-foreground mt-1">{c.seats}</p>
-                    <p className="font-body text-xs text-secondary font-bold mt-2 bg-secondary/10 px-3 py-1 rounded-full inline-block border border-secondary/20">{c.fee}</p>
-                    <div className="mt-3 font-body text-[10px] text-primary font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300">Click to Apply →</div>
+                    <div className="text-5xl mb-4 group-hover:scale-125 group-hover:-rotate-6 transition-all duration-400 inline-block filter group-hover:drop-shadow-lg">{c.icon}</div>
+                    <h3 className="font-display text-lg font-bold text-foreground group-hover:text-primary transition-colors duration-300">{c.name}</h3>
+                    <p className="font-body text-sm text-muted-foreground mt-1.5">{c.seats}</p>
+                    <p className="font-body text-sm text-secondary font-bold mt-3 bg-secondary/10 px-4 py-1.5 rounded-full inline-block border border-secondary/20">{c.fee}</p>
+                    <div className="mt-4 font-body text-xs text-primary font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-1">Click to Apply <ArrowRight className="w-3 h-3" /></div>
                   </div>
                 </div>
               </ScrollReveal>
@@ -287,7 +286,7 @@ export default function Admissions() {
       )}
 
       {/* Admission Steps */}
-      <section className="py-16 sm:py-20 bg-cream relative overflow-hidden">
+      <section className="py-20 sm:py-28 bg-cream relative overflow-hidden">
         <div className="absolute right-0 top-0 w-64 h-64 bg-secondary/5 rounded-full blur-3xl" />
         <div className="absolute inset-0 section-pattern opacity-30" />
         <div className="container max-w-4xl px-4 relative">
@@ -320,12 +319,12 @@ export default function Admissions() {
       </section>
 
       {/* Documents */}
-      <section className="py-16 bg-background">
+      <section className="py-20 sm:py-24 bg-background">
         <div className="container max-w-3xl px-4">
           <ScrollReveal><SectionHeading title="Required Documents" subtitle="Prepare these documents before applying" /></ScrollReveal>
           <ScrollReveal delay={150}>
-            <div className="premium-card p-6 sm:p-8">
-              <div className="grid sm:grid-cols-2 gap-3">
+            <div className="premium-card p-7 sm:p-10">
+              <div className="grid sm:grid-cols-2 gap-4">
                 {documents.map((d, i) => (
                   <div key={d} className="flex items-start gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors duration-200 group">
                     <CheckCircle className="w-4 h-4 text-secondary shrink-0 mt-0.5 group-hover:scale-110 transition-transform duration-200" />
