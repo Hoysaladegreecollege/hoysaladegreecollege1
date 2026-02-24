@@ -234,6 +234,33 @@ export type Database = {
           },
         ]
       }
+      birthday_settings: {
+        Row: {
+          id: string
+          principal_name: string
+          quote: string
+          updated_at: string
+          updated_by: string | null
+          wishes_message: string
+        }
+        Insert: {
+          id?: string
+          principal_name?: string
+          quote?: string
+          updated_at?: string
+          updated_by?: string | null
+          wishes_message?: string
+        }
+        Update: {
+          id?: string
+          principal_name?: string
+          quote?: string
+          updated_at?: string
+          updated_by?: string | null
+          wishes_message?: string
+        }
+        Relationships: []
+      }
       contact_submissions: {
         Row: {
           created_at: string
@@ -471,6 +498,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      gallery_images: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string
+          is_active: boolean | null
+          posted_by: string | null
+          sort_order: number | null
+          title: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url: string
+          is_active?: boolean | null
+          posted_by?: string | null
+          sort_order?: number | null
+          title: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string
+          is_active?: boolean | null
+          posted_by?: string | null
+          sort_order?: number | null
+          title?: string
+        }
+        Relationships: []
       }
       marks: {
         Row: {

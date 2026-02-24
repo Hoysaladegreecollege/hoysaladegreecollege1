@@ -26,6 +26,7 @@ import Management from "./pages/Management";
 import Committees from "./pages/Committees";
 import AddOnCourses from "./pages/AddOnCourses";
 import ApplicationStatus from "./pages/ApplicationStatus";
+import Gallery from "./pages/Gallery";
 
 // Student Dashboard
 import StudentDashboard from "./pages/dashboard/StudentDashboard";
@@ -76,6 +77,8 @@ import AdminAcademicYear from "./pages/dashboard/admin/AdminAcademicYear";
 import AdminAbsentReport from "./pages/dashboard/admin/AdminAbsentReport";
 import PreviousYearPapers from "./pages/PreviousYearPapers";
 import TeacherAnnouncements from "./pages/dashboard/teacher/TeacherAnnouncements";
+import AdminGallery from "./pages/dashboard/admin/AdminGallery";
+import AdminBirthdaySettings from "./pages/dashboard/admin/AdminBirthdaySettings";
 
 const queryClient = new QueryClient();
 
@@ -119,6 +122,7 @@ const App = () => (
               <Route path="/student-absent" element={<StudentAbsent />} />
               <Route path="/application-status" element={<ApplicationStatus />} />
               <Route path="/previous-year-papers" element={<PreviousYearPapers />} />
+              <Route path="/gallery" element={<Gallery />} />
             </Route>
 
             <Route path="/login" element={<Login />} />
@@ -177,6 +181,8 @@ const App = () => (
             <Route path="/dashboard/admin/semester-promotion" element={<AdminRoute><AdminSemesterPromotion /></AdminRoute>} />
             <Route path="/dashboard/admin/academic-years" element={<AdminRoute><AdminAcademicYear /></AdminRoute>} />
             <Route path="/dashboard/admin/absent-report" element={<AdminRoute><AdminAbsentReport /></AdminRoute>} />
+            <Route path="/dashboard/admin/gallery" element={<AdminRoute><AdminGallery /></AdminRoute>} />
+            <Route path="/dashboard/admin/birthday-settings" element={<AdminRoute><AdminBirthdaySettings /></AdminRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
