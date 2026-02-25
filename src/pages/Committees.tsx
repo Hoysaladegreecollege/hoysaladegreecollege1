@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
 import PageHeader from "@/components/PageHeader";
@@ -22,6 +23,7 @@ const committees = [
 export default function Committees() {
   return (
     <div className="page-enter">
+      <SEOHead title="Committees & Clubs" description="Explore 13+ committees and clubs at Hoysala Degree College – NSS, Tech Club, Placement Cell, Eco Club, and more for holistic student development." canonical="/committees" />
       <PageHeader title="Committees & Clubs" subtitle="Driving holistic student development" />
 
       {/* Stats strip */}

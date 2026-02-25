@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
 import { BookOpen, Monitor, Briefcase } from "lucide-react";
@@ -26,6 +27,7 @@ const bca = [
 export default function AddOnCourses() {
   return (
     <div>
+      <SEOHead title="Add-on Courses" description="Value-added courses at Hoysala Degree College: AI, ML, Python, CA/CS/CMA coaching, Tally ERP, soft skills, aptitude training for BCA, BCom and BBA students." canonical="/addon-courses" />
       <section className="bg-primary py-16 text-center text-primary-foreground">
         <div className="container">
           <h1 className="font-display text-4xl md:text-5xl font-bold">Add-on Courses</h1>

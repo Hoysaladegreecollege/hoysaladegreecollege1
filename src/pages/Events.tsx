@@ -1,4 +1,5 @@
 import { useState } from "react";
+import SEOHead from "@/components/SEOHead";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
 import PageHeader from "@/components/PageHeader";
@@ -60,6 +61,7 @@ export default function Events() {
 
   return (
     <div className="page-enter">
+      <SEOHead title="Events & Gallery" description="Explore college events at Hoysala Degree College – sports, cultural, technical festivals, workshops, and campus activities." canonical="/events" />
       <PageHeader title="Events & Gallery" subtitle="Explore our vibrant campus life" />
 
       <section className="py-16 sm:py-24 bg-background relative overflow-hidden">

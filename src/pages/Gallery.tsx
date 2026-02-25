@@ -1,4 +1,5 @@
 import { useState } from "react";
+import SEOHead from "@/components/SEOHead";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import PageHeader from "@/components/PageHeader";
@@ -61,6 +62,7 @@ export default function Gallery() {
 
   return (
     <div className="page-enter">
+      <SEOHead title="Campus Gallery" description="Explore Hoysala Degree College campus through photos – classrooms, labs, library, sports, events, and campus life." canonical="/gallery" />
       <PageHeader title="Campus Gallery" subtitle="Explore our world-class facilities and campus life through photos" />
 
       <section className="py-16 sm:py-24 bg-background relative overflow-hidden">
@@ -119,8 +121,15 @@ export default function Gallery() {
       {lightboxIdx !== null && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm animate-fade-in" onClick={() => setLightboxIdx(null)}>
           <div
-            className="absolute rounded-2xl border border-white/15 bg-black/95 shadow-2xl overflow-hidden"
-            style={{ width: `${popupWidth}px`, height: `${popupHeight}px`, left: `${popupLeft}px`, top: `${popupTop}px` }}
+            className="absolute rounded-2xl border border-white/15 bg-black/95 shadow-2xl overflow-hidden transition-none"
+            style={{
+              width: `${popupWidth}px`,
+              height: `${popupHeight}px`,
+              left: `${popupLeft}px`,
+              top: `${popupTop}px`,
+              transformOrigin: `${clickPoint.x - popupLeft}px ${clickPoint.y - popupTop}px`,
+              animation: "popup-expand 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             <button

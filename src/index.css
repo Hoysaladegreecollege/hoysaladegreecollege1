@@ -591,3 +591,14 @@
   animation: chatbot-ripple 2.1s ease-out infinite;
   pointer-events: none;
 }
+
+@keyframes popup-expand {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

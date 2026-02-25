@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import SectionHeading from "@/components/SectionHeading";
 import { HelpCircle, MessageSquare, Phone, Mail, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -15,6 +16,7 @@ const faqs = [
 export default function Support() {
   return (
     <div>
+      <SEOHead title="Support & Help" description="Get help with admissions, fees, attendance, placements, and more at Hoysala Degree College. FAQs and contact support team." canonical="/support" />
       <section className="bg-primary py-16 text-center text-primary-foreground">
         <div className="container">
           <h1 className="font-display text-4xl md:text-5xl font-bold">Support & Help</h1>

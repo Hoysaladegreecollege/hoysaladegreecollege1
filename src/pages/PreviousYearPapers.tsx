@@ -1,4 +1,5 @@
 import { useState } from "react";
+import SEOHead from "@/components/SEOHead";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import PageHeader from "@/components/PageHeader";
@@ -38,6 +39,7 @@ export default function PreviousYearPapers() {
 
   return (
     <div className="page-enter">
+      <SEOHead title="Previous Year Papers" description="Download previous year question papers for BCA, BCom, and BBA at Hoysala Degree College. Filter by course, semester, and year." canonical="/previous-year-papers" />
       <PageHeader title="Previous Year Papers" subtitle="Download question papers from previous semesters and exams" />
 
       <section className="py-16 sm:py-24 bg-background">

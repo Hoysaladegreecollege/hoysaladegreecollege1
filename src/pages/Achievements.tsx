@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
 import PageHeader from "@/components/PageHeader";
@@ -136,6 +137,7 @@ export default function Achievements() {
 
   return (
     <div className="page-enter">
+      <SEOHead title="Student Achievements" description="Celebrating top rank holders and academic excellence at Hoysala Degree College. University toppers, 90% placement rate, and student success stories." canonical="/achievements" />
       <PageHeader title="Student Achievements" subtitle="Celebrating excellence and hard work" />
 
       {/* Top Rank Holders (static default) */}

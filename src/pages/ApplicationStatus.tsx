@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import SEOHead from "@/components/SEOHead";
 import { useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -167,6 +168,7 @@ export default function ApplicationStatus() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/3 via-background to-secondary/3">
+      <SEOHead title="Track Application Status" description="Track your admission application status at Hoysala Degree College. Enter your application number and email to check." canonical="/application-status" />
       {/* Hero Header */}
       <section className="relative overflow-hidden py-16 sm:py-24 text-center">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-navy-dark" />
