@@ -31,11 +31,10 @@ export default function Notices() {
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
   const [selectedNotice, setSelectedNotice] = useState<any>(null);
-  const [popupTop, setPopupTop] = useState(0);
+  const [popupPoint, setPopupPoint] = useState({ x: 0, y: 0 });
 
   const openNotice = (n: any, e: React.MouseEvent) => {
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    setPopupTop(rect.top + window.scrollY);
+    setPopupPoint({ x: e.clientX, y: e.clientY });
     setSelectedNotice(n);
   };
 
@@ -57,6 +56,18 @@ export default function Notices() {
     const matchesSearch = !search || n.title.toLowerCase().includes(search.toLowerCase()) || n.content?.toLowerCase().includes(search.toLowerCase());
     return matchesType && matchesSearch;
   });
+
+  const isMobilePopup = typeof window !== "undefined" && window.innerWidth < 640;
+  const viewportWidth = typeof window !== "undefined" ? window.innerWidth : 1024;
+  const viewportHeight = typeof window !== "undefined" ? window.innerHeight : 768;
+  const noticeWidth = isMobilePopup ? Math.min(viewportWidth - 20, 430) : Math.min(viewportWidth - 40, 680);
+  const noticeMaxHeight = isMobilePopup ? Math.min(viewportHeight - 24, 640) : Math.min(viewportHeight - 40, 760);
+  const noticeLeft = isMobilePopup
+    ? (viewportWidth - noticeWidth) / 2
+    : Math.max(20, Math.min(popupPoint.x - noticeWidth / 2, viewportWidth - noticeWidth - 20));
+  const noticeTop = isMobilePopup
+    ? (viewportHeight - noticeMaxHeight) / 2
+    : Math.max(20, Math.min(popupPoint.y - noticeMaxHeight / 2, viewportHeight - noticeMaxHeight - 20));
 
   const pinnedCount = notices.filter((n: any) => n.pinned).length;
 
@@ -198,10 +209,10 @@ export default function Notices() {
 
       {/* Notice Detail Dialog */}
       {selectedNotice && (
-        <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm z-50 flex items-start justify-center animate-fade-in overflow-y-auto" onClick={() => setSelectedNotice(null)}>
+        <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm z-50 animate-fade-in" onClick={() => setSelectedNotice(null)}>
           <div
-            className="bg-card w-full sm:rounded-3xl sm:max-w-lg border-0 sm:border sm:border-border shadow-2xl animate-scale-bounce overflow-hidden flex flex-col my-4 sm:my-0"
-            style={{ marginTop: window.innerWidth >= 640 ? `${Math.max(20, Math.min(popupTop - window.scrollY - 40, window.innerHeight - 400))}px` : undefined }}
+            className="absolute bg-card rounded-3xl border border-border shadow-2xl overflow-hidden flex flex-col"
+            style={{ width: `${noticeWidth}px`, maxHeight: `${noticeMaxHeight}px`, left: `${noticeLeft}px`, top: `${noticeTop}px` }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Dialog Header */}
@@ -239,7 +250,7 @@ export default function Notices() {
               <p className="font-body text-sm text-foreground leading-relaxed whitespace-pre-line">{selectedNotice.content}</p>
             </div>
 
-            <div className="p-5 pt-0">
+            <div className="p-5 pt-0 shrink-0">
               <button onClick={() => setSelectedNotice(null)}
                 className="w-full py-3 rounded-2xl border-2 border-border font-body text-sm font-semibold text-muted-foreground hover:bg-muted hover:text-foreground hover:border-primary/30 transition-all duration-200">
                 Close

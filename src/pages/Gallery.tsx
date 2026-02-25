@@ -27,10 +27,11 @@ const fallbackImages = [
 export default function Gallery() {
   const [filter, setFilter] = useState("All");
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
-  const [clickY, setClickY] = useState(0);
+  const [clickPoint, setClickPoint] = useState({ x: 0, y: 0 });
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
   const openLightbox = (index: number, e: React.MouseEvent) => {
-    setClickY(e.clientY);
+    setClickPoint({ x: e.clientX, y: e.clientY });
     setLightboxIdx(index);
   };
 
@@ -45,6 +46,18 @@ export default function Gallery() {
   const images = dbImages.length > 0 ? dbImages : fallbackImages;
   const categories = ["All", ...Array.from(new Set(images.map((img: any) => img.category)))];
   const filtered = filter === "All" ? images : images.filter((img: any) => img.category === filter);
+
+  const isMobilePopup = typeof window !== "undefined" && window.innerWidth < 640;
+  const viewportWidth = typeof window !== "undefined" ? window.innerWidth : 1024;
+  const viewportHeight = typeof window !== "undefined" ? window.innerHeight : 768;
+  const popupWidth = isMobilePopup ? Math.min(viewportWidth - 20, 420) : Math.min(viewportWidth - 40, 980);
+  const popupHeight = isMobilePopup ? Math.min(viewportHeight - 24, 620) : Math.min(viewportHeight - 60, 720);
+  const popupLeft = isMobilePopup
+    ? (viewportWidth - popupWidth) / 2
+    : Math.max(20, Math.min(clickPoint.x - popupWidth / 2, viewportWidth - popupWidth - 20));
+  const popupTop = isMobilePopup
+    ? (viewportHeight - popupHeight) / 2
+    : Math.max(20, Math.min(clickPoint.y - popupHeight / 2, viewportHeight - popupHeight - 20));
 
   return (
     <div className="page-enter">
@@ -104,45 +117,58 @@ export default function Gallery() {
 
       {/* Full-screen Lightbox */}
       {lightboxIdx !== null && (
-        <div className="fixed inset-0 bg-black/95 backdrop-blur-sm z-50 flex flex-col animate-fade-in" onClick={() => setLightboxIdx(null)}>
-          {/* Close */}
-          <button className="absolute top-4 right-4 sm:top-6 sm:right-6 w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
-            onClick={(e) => { e.stopPropagation(); setLightboxIdx(null); }}>
-            <X className="w-6 h-6" />
-          </button>
-          {/* Nav arrows */}
-          <button className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
-            onClick={(e) => { e.stopPropagation(); setLightboxIdx((lightboxIdx - 1 + filtered.length) % filtered.length); }}>
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          <button className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
-            onClick={(e) => { e.stopPropagation(); setLightboxIdx((lightboxIdx + 1) % filtered.length); }}>
-            <ChevronRight className="w-6 h-6" />
-          </button>
-          {/* Image container - swipe support */}
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm animate-fade-in" onClick={() => setLightboxIdx(null)}>
           <div
-            className="w-full flex-1 flex items-center justify-center p-4 sm:p-8"
+            className="absolute rounded-2xl border border-white/15 bg-black/95 shadow-2xl overflow-hidden"
+            style={{ width: `${popupWidth}px`, height: `${popupHeight}px`, left: `${popupLeft}px`, top: `${popupTop}px` }}
             onClick={(e) => e.stopPropagation()}
-            onTouchStart={(e) => { (e.currentTarget as any)._touchX = e.touches[0].clientX; }}
-            onTouchEnd={(e) => {
-              const startX = (e.currentTarget as any)._touchX;
-              if (startX === undefined) return;
-              const diff = e.changedTouches[0].clientX - startX;
-              if (Math.abs(diff) > 50) {
-                setLightboxIdx(diff > 0 ? (lightboxIdx - 1 + filtered.length) % filtered.length : (lightboxIdx + 1) % filtered.length);
-              }
-            }}
           >
-            <img
-              src={(filtered[lightboxIdx] as any).image_url}
-              alt={(filtered[lightboxIdx] as any).title}
-              className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
-              key={lightboxIdx}
-            />
-          </div>
-          <div className="pb-4 sm:pb-8 text-center pointer-events-none">
-            <p className="font-display text-lg font-bold text-white">{(filtered[lightboxIdx] as any).title}</p>
-            <p className="font-body text-xs text-white/60 mt-1">{lightboxIdx + 1} / {filtered.length}</p>
+            <button
+              className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-colors z-20"
+              onClick={() => setLightboxIdx(null)}
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <button
+              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-colors z-20"
+              onClick={() => setLightboxIdx((lightboxIdx - 1 + filtered.length) % filtered.length)}
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+
+            <button
+              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-colors z-20"
+              onClick={() => setLightboxIdx((lightboxIdx + 1) % filtered.length)}
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+
+            <div
+              className="h-full w-full flex flex-col"
+              onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
+              onTouchEnd={(e) => {
+                if (touchStartX === null) return;
+                const diff = e.changedTouches[0].clientX - touchStartX;
+                if (Math.abs(diff) > 50) {
+                  setLightboxIdx(diff > 0 ? (lightboxIdx - 1 + filtered.length) % filtered.length : (lightboxIdx + 1) % filtered.length);
+                }
+                setTouchStartX(null);
+              }}
+            >
+              <div className="flex-1 p-4 sm:p-6 flex items-center justify-center">
+                <img
+                  src={(filtered[lightboxIdx] as any).image_url}
+                  alt={(filtered[lightboxIdx] as any).title}
+                  className="max-w-full max-h-full object-contain rounded-xl"
+                  key={lightboxIdx}
+                />
+              </div>
+              <div className="pb-4 px-4 text-center pointer-events-none">
+                <p className="font-display text-base sm:text-lg font-bold text-white">{(filtered[lightboxIdx] as any).title}</p>
+                <p className="font-body text-xs text-white/60 mt-1">{lightboxIdx + 1} / {filtered.length}</p>
+              </div>
+            </div>
           </div>
         </div>
       )}
