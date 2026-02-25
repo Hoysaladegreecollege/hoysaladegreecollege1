@@ -27,6 +27,12 @@ const fallbackImages = [
 export default function Gallery() {
   const [filter, setFilter] = useState("All");
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+  const [clickY, setClickY] = useState(0);
+
+  const openLightbox = (index: number, e: React.MouseEvent) => {
+    setClickY(e.clientY);
+    setLightboxIdx(index);
+  };
 
   const { data: dbImages = [], isLoading } = useQuery({
     queryKey: ["public-gallery"],
@@ -77,7 +83,7 @@ export default function Gallery() {
                 <ScrollReveal key={img.id} delay={i * 60}>
                   <div
                     className="relative group cursor-pointer overflow-hidden rounded-2xl border border-border aspect-[4/3] hover:shadow-2xl transition-all duration-500"
-                    onClick={() => setLightboxIdx(i)}
+                    onClick={(e) => openLightbox(i, e)}
                   >
                     <img src={img.image_url} alt={img.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" />
                     <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -98,11 +104,13 @@ export default function Gallery() {
 
       {/* Full-screen Lightbox */}
       {lightboxIdx !== null && (
-        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center animate-fade-in" onClick={() => setLightboxIdx(null)}>
+        <div className="fixed inset-0 bg-black/95 backdrop-blur-sm z-50 flex flex-col animate-fade-in" onClick={() => setLightboxIdx(null)}>
+          {/* Close */}
           <button className="absolute top-4 right-4 sm:top-6 sm:right-6 w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
             onClick={(e) => { e.stopPropagation(); setLightboxIdx(null); }}>
             <X className="w-6 h-6" />
           </button>
+          {/* Nav arrows */}
           <button className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
             onClick={(e) => { e.stopPropagation(); setLightboxIdx((lightboxIdx - 1 + filtered.length) % filtered.length); }}>
             <ChevronLeft className="w-6 h-6" />
@@ -111,14 +119,28 @@ export default function Gallery() {
             onClick={(e) => { e.stopPropagation(); setLightboxIdx((lightboxIdx + 1) % filtered.length); }}>
             <ChevronRight className="w-6 h-6" />
           </button>
-          <div className="w-full h-full flex items-center justify-center p-4 sm:p-8" onClick={(e) => e.stopPropagation()}>
+          {/* Image container - swipe support */}
+          <div
+            className="w-full flex-1 flex items-center justify-center p-4 sm:p-8"
+            onClick={(e) => e.stopPropagation()}
+            onTouchStart={(e) => { (e.currentTarget as any)._touchX = e.touches[0].clientX; }}
+            onTouchEnd={(e) => {
+              const startX = (e.currentTarget as any)._touchX;
+              if (startX === undefined) return;
+              const diff = e.changedTouches[0].clientX - startX;
+              if (Math.abs(diff) > 50) {
+                setLightboxIdx(diff > 0 ? (lightboxIdx - 1 + filtered.length) % filtered.length : (lightboxIdx + 1) % filtered.length);
+              }
+            }}
+          >
             <img
               src={(filtered[lightboxIdx] as any).image_url}
               alt={(filtered[lightboxIdx] as any).title}
-              className="max-w-full max-h-full object-contain animate-scale-bounce"
+              className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+              key={lightboxIdx}
             />
           </div>
-          <div className="absolute bottom-4 sm:bottom-8 left-0 right-0 text-center pointer-events-none">
+          <div className="pb-4 sm:pb-8 text-center pointer-events-none">
             <p className="font-display text-lg font-bold text-white">{(filtered[lightboxIdx] as any).title}</p>
             <p className="font-body text-xs text-white/60 mt-1">{lightboxIdx + 1} / {filtered.length}</p>
           </div>

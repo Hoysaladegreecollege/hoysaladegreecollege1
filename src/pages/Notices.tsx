@@ -31,6 +31,13 @@ export default function Notices() {
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
   const [selectedNotice, setSelectedNotice] = useState<any>(null);
+  const [popupTop, setPopupTop] = useState(0);
+
+  const openNotice = (n: any, e: React.MouseEvent) => {
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    setPopupTop(rect.top + window.scrollY);
+    setSelectedNotice(n);
+  };
 
   const { data: dbNotices = [], isLoading } = useQuery({
     queryKey: ["public-notices"],
@@ -138,7 +145,7 @@ export default function Notices() {
                 return (
                   <ScrollReveal key={n.id || i} delay={i * 40}>
                     <div
-                      onClick={() => setSelectedNotice(n)}
+                      onClick={(e) => openNotice(n, e)}
                       className={`relative overflow-hidden premium-card p-5 sm:p-6 group cursor-pointer border-glow card-stack ${n.pinned ? "ring-1 ring-secondary/20" : ""}`}
                     >
                       {/* Left accent bar */}
@@ -191,8 +198,12 @@ export default function Notices() {
 
       {/* Notice Detail Dialog */}
       {selectedNotice && (
-        <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm z-50 flex items-center justify-center animate-fade-in" onClick={() => setSelectedNotice(null)}>
-          <div className="bg-card w-full h-full sm:rounded-3xl sm:max-w-lg sm:h-auto sm:max-h-[85vh] border-0 sm:border sm:border-border shadow-2xl animate-scale-bounce overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm z-50 flex items-start justify-center animate-fade-in overflow-y-auto" onClick={() => setSelectedNotice(null)}>
+          <div
+            className="bg-card w-full sm:rounded-3xl sm:max-w-lg border-0 sm:border sm:border-border shadow-2xl animate-scale-bounce overflow-hidden flex flex-col my-4 sm:my-0"
+            style={{ marginTop: window.innerWidth >= 640 ? `${Math.max(20, Math.min(popupTop - window.scrollY - 40, window.innerHeight - 400))}px` : undefined }}
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Dialog Header */}
             <div className="relative p-6 border-b border-border bg-gradient-to-br from-primary/4 to-secondary/3 overflow-hidden shrink-0">
               <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-secondary/50 to-transparent" />
