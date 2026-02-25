@@ -1,4 +1,5 @@
 import { useState } from "react";
+import SEOHead from "@/components/SEOHead";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
 import PageHeader from "@/components/PageHeader";
@@ -73,6 +74,7 @@ export default function Notices() {
 
   return (
     <div className="page-enter">
+      <SEOHead title="Notices & Announcements" description="Latest notices, announcements, exam schedules, admission updates, and important circulars from Hoysala Degree College." canonical="/notices" />
       <PageHeader title="Notices & Announcements" subtitle="Important updates for students, faculty, and parents" />
 
       <section className="py-16 sm:py-24 bg-background relative overflow-hidden">
@@ -211,8 +213,15 @@ export default function Notices() {
       {selectedNotice && (
         <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm z-50 animate-fade-in" onClick={() => setSelectedNotice(null)}>
           <div
-            className="absolute bg-card rounded-3xl border border-border shadow-2xl overflow-hidden flex flex-col"
-            style={{ width: `${noticeWidth}px`, maxHeight: `${noticeMaxHeight}px`, left: `${noticeLeft}px`, top: `${noticeTop}px` }}
+            className="absolute bg-card rounded-3xl border border-border shadow-2xl overflow-hidden flex flex-col transition-none"
+            style={{
+              width: `${noticeWidth}px`,
+              maxHeight: `${noticeMaxHeight}px`,
+              left: `${noticeLeft}px`,
+              top: `${noticeTop}px`,
+              transformOrigin: `${popupPoint.x - noticeLeft}px ${popupPoint.y - noticeTop}px`,
+              animation: "popup-expand 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Dialog Header */}

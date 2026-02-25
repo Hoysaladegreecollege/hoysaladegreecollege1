@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
 import PageHeader from "@/components/PageHeader";
@@ -36,6 +37,7 @@ export default function Faculty() {
 
   return (
     <div className="page-enter">
+      <SEOHead title="Faculty Members" description="Meet the experienced faculty of Hoysala Degree College – qualified professors across Computer Applications, Commerce, and Business Administration departments." canonical="/faculty" />
       <PageHeader title="Our Faculty" subtitle="Dedicated professionals committed to your success" />
 
       {/* Stats strip */}

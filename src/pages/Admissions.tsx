@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
 import PageHeader from "@/components/PageHeader";
@@ -109,6 +110,7 @@ export default function Admissions() {
 
   return (
     <div className="page-enter">
+      <SEOHead title="Admissions 2026-27" description="Apply for admission to Hoysala Degree College Nelamangala. BCA, B.Com, BBA programs. Online application, eligibility, fees, required documents." canonical="/admissions" />
       <PageHeader title="Admissions" subtitle="Join Hoysala Degree College and shape your future" />
 
       {/* Hero CTA Banner */}

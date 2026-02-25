@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import SEOHead from "@/components/SEOHead";
 import { GraduationCap, Eye, EyeOff, Sparkles, Lock, Mail, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
@@ -63,6 +64,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
+      <SEOHead title="Login" description="Sign in to Hoysala Degree College portal. Access student, teacher, principal, and admin dashboards." canonical="/login" noIndex />
       {/* Animated Background */}
       <div className="absolute inset-0" style={{
         background: "linear-gradient(135deg, hsl(217 72% 14%), hsl(217 72% 20%), hsl(217 60% 18%), hsl(217 72% 12%))",

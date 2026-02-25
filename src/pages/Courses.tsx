@@ -1,4 +1,5 @@
 import { useState } from "react";
+import SEOHead from "@/components/SEOHead";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
 import PageHeader from "@/components/PageHeader";
@@ -69,6 +70,7 @@ export default function Courses() {
 
   return (
     <div className="page-enter">
+      <SEOHead title="Courses - BCA, BCom, BBA, CA/CS" description="Explore undergraduate programs at Hoysala Degree College: BCA, B.Com Regular, B.Com Professional, BBA, CA & CS coaching. View fees, duration, eligibility." canonical="/courses" />
       <PageHeader title="Our Courses" subtitle="Choose from our carefully designed programs" />
 
       {/* Stats strip */}

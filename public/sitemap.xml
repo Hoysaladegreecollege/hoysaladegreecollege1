@@ -12,6 +12,10 @@
   <url><loc>https://hoysaladegreecollege1.lovable.app/contact</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://hoysaladegreecollege1.lovable.app/management</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://hoysaladegreecollege1.lovable.app/committees</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://hoysaladegreecollege1.lovable.app/add-on-courses</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://hoysaladegreecollege1.lovable.app/addon-courses</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://hoysaladegreecollege1.lovable.app/support</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://hoysaladegreecollege1.lovable.app/gallery</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://hoysaladegreecollege1.lovable.app/previous-year-papers</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://hoysaladegreecollege1.lovable.app/student-absent</loc><changefreq>daily</changefreq><priority>0.4</priority></url>
+  <url><loc>https://hoysaladegreecollege1.lovable.app/application-status</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
 </urlset>

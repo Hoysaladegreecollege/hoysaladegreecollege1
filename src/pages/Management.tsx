@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
 
@@ -13,6 +14,7 @@ const committee = [
 export default function Management() {
   return (
     <div>
+      <SEOHead title="Top Management Committee" description="Meet the leadership committee of Hoysala Degree College under Shri Shirdi Sai Educational Trust. President, Secretary, Trustees, and Principal." canonical="/management" />
       <section className="bg-primary py-16 text-center text-primary-foreground">
         <div className="container">
           <h1 className="font-display text-4xl md:text-5xl font-bold">Top Management Committee</h1>

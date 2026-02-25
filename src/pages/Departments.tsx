@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
 import PageHeader from "@/components/PageHeader";
@@ -54,6 +55,7 @@ const departments = [
 export default function Departments() {
   return (
     <div className="page-enter">
+      <SEOHead title="Departments" description="Explore departments at Hoysala Degree College – Computer Applications, Commerce, and Business Administration. Specialized faculty and modern facilities." canonical="/departments" />
       <PageHeader title="Departments" subtitle="Specialized education and skill development" />
 
       {/* Stats strip */}

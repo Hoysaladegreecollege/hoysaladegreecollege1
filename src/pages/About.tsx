@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import SEOHead from "@/components/SEOHead";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
 import PageHeader from "@/components/PageHeader";
@@ -96,6 +97,7 @@ export default function About() {
 
   return (
     <div className="page-enter">
+      <SEOHead title="About Us" description="Learn about Hoysala Degree College, Nelamangala – our history, vision, mission, principal's message, and world-class facilities. Affiliated to Bangalore University." canonical="/about" />
       <PageHeader title="About Us" subtitle="Discover the story of Hoysala Degree College" />
 
       <div className="relative">

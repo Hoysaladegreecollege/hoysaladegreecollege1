@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
 import PageHeader from "@/components/PageHeader";
@@ -66,6 +67,7 @@ export default function Contact() {
 
   return (
     <div className="page-enter">
+      <SEOHead title="Contact Us" description="Contact Hoysala Degree College Nelamangala. Phone: 7676272167, Email: principal.hoysaladegreecollege@gmail.com. Visit us at K.R.P. Arcade, Nelamangala." canonical="/contact" />
       <PageHeader title="Contact Us" subtitle="We'd love to hear from you" />
 
       <section className="py-16 sm:py-24 bg-background relative overflow-hidden">

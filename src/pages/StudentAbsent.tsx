@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import SectionHeading from "@/components/SectionHeading";
 import { Phone, StickyNote, AlertTriangle, User } from "lucide-react";
 import { useState } from "react";
@@ -51,6 +52,7 @@ export default function StudentAbsent() {
 
   return (
     <div>
+      <SEOHead title="Student Absent List" description="Today's absent students list at Hoysala Degree College. Teacher access for notes, remarks, and parent communication." canonical="/student-absent" noIndex />
       <section className="bg-primary py-16 text-center text-primary-foreground">
         <div className="container">
           <h1 className="font-display text-4xl md:text-5xl font-bold">Student Absent List</h1>

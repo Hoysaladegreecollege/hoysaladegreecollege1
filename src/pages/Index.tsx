@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import SEOHead from "@/components/SEOHead";
 import { GraduationCap, BookOpen, Users, Award, Calendar, ArrowRight, Star, Sparkles, Brain, ClipboardCheck, Library, MessageSquare, FlaskConical, BarChart3, ChevronRight, ChevronLeft, Quote, Zap, TrendingUp, Play, X, Camera } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -157,6 +158,31 @@ export default function Index() {
 
   return (
     <div className="page-enter">
+      <SEOHead
+        title="Hoysala Degree College Nelamangala | BCA, BCom, BBA"
+        description="Hoysala Degree College, Nelamangala – Affiliated to Bangalore University (BU 26), Approved by AICTE. Offering BCA, B.Com, BBA with CA/CS coaching. 90% placement rate. Admissions open 2026-27."
+        canonical="/"
+        schemaJson={{
+          "@context": "https://schema.org",
+          "@type": "CollegeOrUniversity",
+          "name": "Hoysala Degree College",
+          "alternateName": ["Hoysala College Nelamangala", "HDC Nelamangala"],
+          "url": "https://hoysaladegreecollege1.lovable.app",
+          "description": "Hoysala Degree College, Nelamangala - Affiliated to Bangalore University (BU 26), Approved by AICTE. Offering BCA, B.Com, BBA with integrated CA/CS/CMA coaching.",
+          "foundingDate": "2017",
+          "address": { "@type": "PostalAddress", "streetAddress": "K.R.P. Arcade, UCO Bank Building, Paramanna Layout", "addressLocality": "Nelamangala Town", "addressRegion": "Karnataka", "postalCode": "562123", "addressCountry": "IN" },
+          "geo": { "@type": "GeoCoordinates", "latitude": "13.0977", "longitude": "77.3927" },
+          "telephone": ["+917676272167", "+917975344252", "+918618181383"],
+          "email": "principal.hoysaladegreecollege@gmail.com",
+          "parentOrganization": { "@type": "Organization", "name": "Shri Shirdi Sai Educational Trust (R)" },
+          "hasOfferCatalog": { "@type": "OfferCatalog", "name": "Degree Programs", "itemListElement": [
+            { "@type": "Course", "name": "BCA - Bachelor of Computer Applications" },
+            { "@type": "Course", "name": "B.Com - Bachelor of Commerce" },
+            { "@type": "Course", "name": "B.Com Professional (CA/CS/CMA)" },
+            { "@type": "Course", "name": "BBA - Bachelor of Business Administration" }
+          ]}
+        }}
+      />
       {/* Hero */}
       <section className="relative h-[92vh] min-h-[580px] flex items-center justify-center overflow-hidden">
         <img src={heroImage} alt="Hoysala Degree College Campus" className="absolute inset-0 w-full h-full object-cover scale-110 animate-hero-float" style={{ animationDuration: "20s" }} />
