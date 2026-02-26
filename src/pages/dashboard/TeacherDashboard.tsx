@@ -115,6 +115,27 @@ export default function TeacherDashboard() {
         </div>
       )}
 
+      {/* Classroom Command Panel */}
+      {!isLoading && (
+        <div className="grid md:grid-cols-3 gap-3 sm:gap-4">
+          <Link to="/dashboard/teacher/attendance" className="premium-card p-4 sm:p-5 group">
+            <p className="font-body text-[11px] uppercase tracking-wider text-muted-foreground">Today's Priority</p>
+            <p className="font-display text-xl font-bold text-foreground mt-2">Mark Attendance</p>
+            <p className="font-body text-xs text-muted-foreground mt-1">Keep classes up to date</p>
+          </Link>
+          <Link to="/dashboard/teacher/marks" className="premium-card p-4 sm:p-5 group">
+            <p className="font-body text-[11px] uppercase tracking-wider text-muted-foreground">Academic Updates</p>
+            <p className="font-display text-xl font-bold text-foreground mt-2">Upload Marks</p>
+            <p className="font-body text-xs text-muted-foreground mt-1">Publish latest evaluations</p>
+          </Link>
+          <div className="premium-card p-4 sm:p-5">
+            <p className="font-body text-[11px] uppercase tracking-wider text-muted-foreground">Today</p>
+            <p className="font-display text-lg font-bold text-foreground mt-2">{new Date().toLocaleDateString("en-IN", { weekday: "long" })}</p>
+            <p className="font-body text-xs text-muted-foreground mt-1">{new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}</p>
+          </div>
+        </div>
+      )}
+
       {/* Quick Actions */}
       <div className="grid md:grid-cols-1 gap-5 sm:gap-6">
         {/* Quick Actions */}

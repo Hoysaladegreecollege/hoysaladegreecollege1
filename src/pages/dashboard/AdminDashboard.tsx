@@ -1,5 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { Users, GraduationCap, BookOpen, Calendar, FileText, Settings, Mail, TrendingUp, Trophy, Shield, Image, BarChart3, PieChart, Megaphone, ArrowUpCircle, Download, UserX, CalendarDays, AlertTriangle, IndianRupee } from "lucide-react";
+import { Users, GraduationCap, BookOpen, Calendar, FileText, Settings, Mail, TrendingUp, Trophy, Shield, Image, BarChart3, PieChart, Megaphone, ArrowUpCircle, Download, UserX, CalendarDays, AlertTriangle, IndianRupee, UserPlus, Activity } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
@@ -177,7 +177,7 @@ export default function AdminDashboard() {
     { icon: FileText, label: "Admission Applications", desc: `${counts?.pendingApps || 0} pending`, path: "/dashboard/admin/applications", badge: counts?.pendingApps },
     { icon: Mail, label: "Contact Messages", desc: `${counts?.newContacts || 0} new`, path: "/dashboard/admin/contacts", badge: counts?.newContacts },
     { icon: Users, label: "Manage Users", desc: "View, edit & delete users", path: "/dashboard/admin/users" },
-    { icon: Trophy, label: "Upload Top Rankers", desc: "Add achievers to website", path: "/dashboard/admin/top-rankers" },
+    { icon: UserPlus, label: "Add Staff", desc: "Create teacher/admin/principal", path: "/dashboard/admin/add-staff", highlight: true },
     { icon: Calendar, label: "Upload Timetable", desc: "Manage class schedules", path: "/dashboard/admin/timetable" },
     { icon: Image, label: "Upload Events", desc: "Post events & gallery", path: "/dashboard/admin/events" },
     { icon: Shield, label: "Roles & Permissions", desc: "View role distribution", path: "/dashboard/admin/roles" },
@@ -213,6 +213,31 @@ export default function AdminDashboard() {
               ) : null}
             </div>
           ) : null}
+        </div>
+      </div>
+
+      {/* Command Center */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+        <Link to="/dashboard/admin/applications" className="premium-card p-4 sm:p-5 group">
+          <p className="font-body text-[11px] uppercase tracking-wider text-muted-foreground">Pending Applications</p>
+          <div className="mt-2 flex items-center justify-between">
+            <p className="font-display text-3xl font-bold text-foreground">{counts?.pendingApps || 0}</p>
+            <FileText className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+          </div>
+        </Link>
+        <Link to="/dashboard/admin/contacts" className="premium-card p-4 sm:p-5 group">
+          <p className="font-body text-[11px] uppercase tracking-wider text-muted-foreground">New Messages</p>
+          <div className="mt-2 flex items-center justify-between">
+            <p className="font-display text-3xl font-bold text-foreground">{counts?.newContacts || 0}</p>
+            <Mail className="w-5 h-5 text-secondary group-hover:scale-110 transition-transform" />
+          </div>
+        </Link>
+        <div className="premium-card p-4 sm:p-5">
+          <p className="font-body text-[11px] uppercase tracking-wider text-muted-foreground">Attendance Health</p>
+          <div className="mt-2 flex items-center justify-between">
+            <p className="font-display text-3xl font-bold text-foreground">{attendanceStats?.percentage || 0}%</p>
+            <Activity className="w-5 h-5 text-primary" />
+          </div>
         </div>
       </div>
 

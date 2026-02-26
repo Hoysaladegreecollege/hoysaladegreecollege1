@@ -116,23 +116,19 @@ export default function ChatBot() {
         <ArrowUp className="w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-y-0.5 transition-transform" />
       </button>
 
-      {/* Chatbot launcher — gradient orb with ripple rings */}
+      {/* Chatbot launcher — premium compact button with micro motion */}
       {!isOpen && (
         <button
           onClick={handleOpen}
-          className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-[60px] h-[60px] rounded-full flex items-center justify-center transition-all duration-500 hover:scale-105 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+          className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-[60px] h-[60px] flex items-center justify-center transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"} chatbot-launcher-shell`}
           aria-label="Open chat assistant"
-          style={{ background: "linear-gradient(135deg, hsl(270 60% 75%), hsl(330 50% 70%), hsl(30 70% 70%))" }}
         >
-          {/* Ripple rings */}
-          <span className="absolute inset-0 rounded-full chatbot-ripple-ring" style={{ animationDelay: "0s" }} />
-          <span className="absolute inset-0 rounded-full chatbot-ripple-ring" style={{ animationDelay: "0.7s" }} />
-          <span className="absolute inset-0 rounded-full chatbot-ripple-ring" style={{ animationDelay: "1.4s" }} />
-          {/* Eyes icon */}
-          <svg width="28" height="28" viewBox="0 0 80 80" fill="none" className="relative z-10">
-            <path d="M24 40 Q28 26 32 40" stroke="white" strokeWidth="4" fill="none" strokeLinecap="round" />
-            <path d="M48 40 Q52 26 56 40" stroke="white" strokeWidth="4" fill="none" strokeLinecap="round" />
-          </svg>
+          <span className="chatbot-launcher-glow" />
+          <span className="chatbot-launcher-ring" />
+          <span className="chatbot-launcher-ring animation-delay-300" />
+          <span className="chatbot-launcher-orb relative z-10">
+            <Sparkles className="w-5 h-5 text-primary-foreground chatbot-launcher-spark" />
+          </span>
         </button>
       )}
 

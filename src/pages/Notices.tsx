@@ -32,10 +32,8 @@ export default function Notices() {
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
   const [selectedNotice, setSelectedNotice] = useState<any>(null);
-  const [popupPoint, setPopupPoint] = useState({ x: 0, y: 0 });
 
-  const openNotice = (n: any, e: React.MouseEvent) => {
-    setPopupPoint({ x: e.clientX, y: e.clientY });
+  const openNotice = (n: any) => {
     setSelectedNotice(n);
   };
 
@@ -61,14 +59,8 @@ export default function Notices() {
   const isMobilePopup = typeof window !== "undefined" && window.innerWidth < 640;
   const viewportWidth = typeof window !== "undefined" ? window.innerWidth : 1024;
   const viewportHeight = typeof window !== "undefined" ? window.innerHeight : 768;
-  const noticeWidth = isMobilePopup ? Math.min(viewportWidth - 20, 430) : Math.min(viewportWidth - 40, 680);
-  const noticeMaxHeight = isMobilePopup ? Math.min(viewportHeight - 24, 640) : Math.min(viewportHeight - 40, 760);
-  const noticeLeft = isMobilePopup
-    ? (viewportWidth - noticeWidth) / 2
-    : Math.max(20, Math.min(popupPoint.x - noticeWidth / 2, viewportWidth - noticeWidth - 20));
-  const noticeTop = isMobilePopup
-    ? (viewportHeight - noticeMaxHeight) / 2
-    : Math.max(20, Math.min(popupPoint.y - noticeMaxHeight / 2, viewportHeight - noticeMaxHeight - 20));
+  const noticeWidth = isMobilePopup ? Math.min(viewportWidth - 16, 430) : Math.min(viewportWidth - 48, 720);
+  const noticeMaxHeight = isMobilePopup ? Math.min(viewportHeight - 24, 640) : Math.min(viewportHeight - 56, 760);
 
   const pinnedCount = notices.filter((n: any) => n.pinned).length;
 
@@ -158,7 +150,7 @@ export default function Notices() {
                 return (
                   <ScrollReveal key={n.id || i} delay={i * 40}>
                     <div
-                      onClick={(e) => openNotice(n, e)}
+                      onClick={() => openNotice(n)}
                       className={`relative overflow-hidden premium-card p-5 sm:p-6 group cursor-pointer border-glow card-stack ${n.pinned ? "ring-1 ring-secondary/20" : ""}`}
                     >
                       {/* Left accent bar */}
@@ -211,15 +203,12 @@ export default function Notices() {
 
       {/* Notice Detail Dialog */}
       {selectedNotice && (
-        <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm z-50 animate-fade-in" onClick={() => setSelectedNotice(null)}>
+        <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm z-50 animate-fade-in p-3 sm:p-6 flex items-center justify-center" onClick={() => setSelectedNotice(null)}>
           <div
-            className="absolute bg-card rounded-3xl border border-border shadow-2xl overflow-hidden flex flex-col transition-none"
+            className="relative bg-card rounded-3xl border border-border shadow-2xl overflow-hidden flex flex-col w-full"
             style={{
-              width: `${noticeWidth}px`,
+              maxWidth: `${noticeWidth}px`,
               maxHeight: `${noticeMaxHeight}px`,
-              left: `${noticeLeft}px`,
-              top: `${noticeTop}px`,
-              transformOrigin: `${popupPoint.x - noticeLeft}px ${popupPoint.y - noticeTop}px`,
               animation: "popup-expand 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
             }}
             onClick={(e) => e.stopPropagation()}
