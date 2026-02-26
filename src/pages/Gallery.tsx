@@ -28,11 +28,9 @@ const fallbackImages = [
 export default function Gallery() {
   const [filter, setFilter] = useState("All");
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
-  const [clickPoint, setClickPoint] = useState({ x: 0, y: 0 });
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
-  const openLightbox = (index: number, e: React.MouseEvent) => {
-    setClickPoint({ x: e.clientX, y: e.clientY });
+  const openLightbox = (index: number) => {
     setLightboxIdx(index);
   };
 
@@ -51,14 +49,9 @@ export default function Gallery() {
   const isMobilePopup = typeof window !== "undefined" && window.innerWidth < 640;
   const viewportWidth = typeof window !== "undefined" ? window.innerWidth : 1024;
   const viewportHeight = typeof window !== "undefined" ? window.innerHeight : 768;
-  const popupWidth = isMobilePopup ? Math.min(viewportWidth - 20, 420) : Math.min(viewportWidth - 40, 980);
-  const popupHeight = isMobilePopup ? Math.min(viewportHeight - 24, 620) : Math.min(viewportHeight - 60, 720);
-  const popupLeft = isMobilePopup
-    ? (viewportWidth - popupWidth) / 2
-    : Math.max(20, Math.min(clickPoint.x - popupWidth / 2, viewportWidth - popupWidth - 20));
-  const popupTop = isMobilePopup
-    ? (viewportHeight - popupHeight) / 2
-    : Math.max(20, Math.min(clickPoint.y - popupHeight / 2, viewportHeight - popupHeight - 20));
+  const popupWidth = isMobilePopup ? Math.min(viewportWidth - 16, 420) : Math.min(viewportWidth - 48, 980);
+  const popupHeight = isMobilePopup ? Math.min(viewportHeight - 24, 620) : Math.min(viewportHeight - 56, 740);
+
 
   return (
     <div className="page-enter">
@@ -98,7 +91,7 @@ export default function Gallery() {
                 <ScrollReveal key={img.id} delay={i * 60}>
                   <div
                     className="relative group cursor-pointer overflow-hidden rounded-2xl border border-border aspect-[4/3] hover:shadow-2xl transition-all duration-500"
-                    onClick={(e) => openLightbox(i, e)}
+                    onClick={() => openLightbox(i)}
                   >
                     <img src={img.image_url} alt={img.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" />
                     <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -119,21 +112,19 @@ export default function Gallery() {
 
       {/* Full-screen Lightbox */}
       {lightboxIdx !== null && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm animate-fade-in" onClick={() => setLightboxIdx(null)}>
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm animate-fade-in p-3 sm:p-6 flex items-center justify-center" onClick={() => setLightboxIdx(null)}>
           <div
-            className="absolute rounded-2xl border border-white/15 bg-black/95 shadow-2xl overflow-hidden transition-none"
+            className="relative rounded-2xl border border-white/15 bg-black/95 shadow-2xl overflow-hidden transition-none"
             style={{
               width: `${popupWidth}px`,
               height: `${popupHeight}px`,
-              left: `${popupLeft}px`,
-              top: `${popupTop}px`,
-              transformOrigin: `${clickPoint.x - popupLeft}px ${clickPoint.y - popupTop}px`,
+              maxHeight: isMobilePopup ? "calc(100vh - 24px)" : "calc(100vh - 56px)",
               animation: "popup-expand 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
             }}
             onClick={(e) => e.stopPropagation()}
           >
             <button
-              className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-colors z-20"
+              className="absolute top-2 right-2 sm:top-3 sm:right-3 w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-colors z-20"
               onClick={() => setLightboxIdx(null)}
             >
               <X className="w-5 h-5" />
@@ -165,7 +156,7 @@ export default function Gallery() {
                 setTouchStartX(null);
               }}
             >
-              <div className="flex-1 p-4 sm:p-6 flex items-center justify-center">
+              <div className="flex-1 p-3 sm:p-6 flex items-center justify-center">
                 <img
                   src={(filtered[lightboxIdx] as any).image_url}
                   alt={(filtered[lightboxIdx] as any).title}

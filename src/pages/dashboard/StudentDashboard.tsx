@@ -222,6 +222,30 @@ export default function StudentDashboard() {
         </div>
       )}
 
+      {/* Student Focus */}
+      {!statsLoading && data && (
+        <div className="grid md:grid-cols-3 gap-3 sm:gap-4">
+          <div className="premium-card p-4 sm:p-5 md:col-span-2">
+            <p className="font-body text-[11px] uppercase tracking-wider text-muted-foreground">Today Focus</p>
+            <div className="mt-3 grid sm:grid-cols-2 gap-3">
+              <Link to="/dashboard/student/materials" className="rounded-xl border border-border bg-muted/20 p-3 hover:bg-muted/35 transition-all">
+                <p className="font-body text-xs font-semibold text-foreground">Review study materials</p>
+                <p className="font-body text-[11px] text-muted-foreground mt-1">{data.materials} materials available</p>
+              </Link>
+              <Link to="/dashboard/student/notices" className="rounded-xl border border-border bg-muted/20 p-3 hover:bg-muted/35 transition-all">
+                <p className="font-body text-xs font-semibold text-foreground">Check latest notices</p>
+                <p className="font-body text-[11px] text-muted-foreground mt-1">{data.notices} active updates</p>
+              </Link>
+            </div>
+          </div>
+          <div className="premium-card p-4 sm:p-5">
+            <p className="font-body text-[11px] uppercase tracking-wider text-muted-foreground">Semester</p>
+            <p className="font-display text-3xl font-bold text-foreground mt-2">{data.semester || "-"}</p>
+            <p className="font-body text-xs text-muted-foreground mt-1">Keep your attendance above 75%</p>
+          </div>
+        </div>
+      )}
+
       {/* Animated Stats Grid */}
       {statsLoading ? (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">

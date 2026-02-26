@@ -84,15 +84,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const handleLogout = async () => { await signOut(); navigate("/"); };
 
   return (
-    <div className="min-h-screen flex bg-muted/20">
+    <div className="min-h-screen flex bg-background">
       <PageLoader />
       {sidebarOpen && (
         <div className="fixed inset-0 bg-foreground/40 backdrop-blur-sm z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
-      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-[250px] sm:w-[260px] bg-gradient-to-b from-primary to-navy-dark text-primary-foreground transform transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col`}>
+      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-[252px] sm:w-[266px] bg-primary text-primary-foreground transform transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col border-r border-primary-foreground/10 shadow-2xl`}>
         {/* Decorative sidebar glow */}
-        <div className="absolute top-20 -right-10 w-20 h-40 bg-secondary/5 blur-3xl rounded-full" />
+        <div className="absolute top-20 -right-10 w-20 h-40 bg-secondary/12 blur-3xl rounded-full" />
         
         <div className="p-4 sm:p-5 border-b border-primary-foreground/8 shrink-0 relative">
           <div className="flex items-center justify-between">
@@ -114,15 +114,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             const active = location.pathname === item.path;
             return (
               <Link key={item.path} to={item.path} onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-body text-[12px] sm:text-[13px] transition-all duration-300 group relative ${
+                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-body text-[12px] sm:text-[13px] transition-all duration-300 group relative border ${
                   active
-                    ? "bg-secondary text-secondary-foreground font-semibold shadow-lg shadow-secondary/20"
-                    : "text-primary-foreground/50 hover:bg-primary-foreground/8 hover:text-primary-foreground"
+                    ? "bg-secondary text-secondary-foreground font-semibold shadow-lg shadow-secondary/20 border-secondary/30"
+                    : "text-primary-foreground/75 border-transparent hover:bg-primary-foreground/8 hover:text-primary-foreground hover:border-primary-foreground/15"
                 }`}>
                 {active && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-secondary rounded-r-full" />}
-                <item.icon className={`w-4 h-4 sm:w-[18px] sm:h-[18px] shrink-0 transition-all duration-300 ${active ? "" : "group-hover:scale-110 group-hover:text-secondary"}`} />
+                <span className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${active ? "bg-secondary-foreground/10" : "bg-primary-foreground/5 group-hover:bg-primary-foreground/12"}`}>
+                  <item.icon className={`w-4 h-4 sm:w-[18px] sm:h-[18px] shrink-0 transition-all duration-300 ${active ? "" : "group-hover:scale-110 group-hover:text-secondary"}`} />
+                </span>
                 <span className="flex-1 truncate">{item.label}</span>
-                {active && <ChevronRight className="w-3 h-3 opacity-60 shrink-0" />}
+                {active && <ChevronRight className="w-3 h-3 opacity-70 shrink-0" />}
               </Link>
             );
           })}
@@ -145,15 +147,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="bg-card/90 backdrop-blur-xl border-b border-border px-4 sm:px-6 py-3 sm:py-3.5 flex items-center justify-between sticky top-0 z-30 shadow-sm">
+        <header className="bg-card border-b border-border px-4 sm:px-6 py-3.5 flex items-center justify-between sticky top-0 z-30 shadow-sm">
           <div className="flex items-center gap-2 sm:gap-3">
             <button className="lg:hidden p-2 rounded-xl hover:bg-muted transition-colors" onClick={() => setSidebarOpen(true)}><Menu className="w-5 h-5 text-foreground" /></button>
             <div>
-              <h1 className="font-display text-base sm:text-lg font-bold text-foreground flex items-center gap-2">{roleLabel} Dashboard <Sparkles className="w-4 h-4 text-secondary" /></h1>
+              <div className="flex items-center gap-2">
+                <h1 className="font-display text-base sm:text-lg font-bold text-foreground flex items-center gap-2">{roleLabel} Dashboard <Sparkles className="w-4 h-4 text-secondary" /></h1>
+                <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-body font-semibold bg-primary/8 text-primary border border-primary/15">Live</span>
+              </div>
               <p className="font-body text-[9px] sm:text-[10px] text-muted-foreground hidden sm:block">Hoysala Degree College • Management Portal</p>
             </div>
           </div>
-          <Link to="/" className="font-body text-[11px] sm:text-xs text-muted-foreground hover:text-primary transition-all duration-300 px-3 py-1.5 rounded-xl hover:bg-primary/5 flex items-center gap-1">
+          <Link to="/" className="font-body text-[11px] sm:text-xs text-muted-foreground hover:text-primary transition-all duration-300 px-3 py-1.5 rounded-xl hover:bg-primary/5 flex items-center gap-1 border border-transparent hover:border-primary/15">
             ← Website
           </Link>
         </header>

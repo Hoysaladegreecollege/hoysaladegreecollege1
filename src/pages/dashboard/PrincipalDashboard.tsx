@@ -121,6 +121,30 @@ export default function PrincipalDashboard() {
         </div>
       )}
 
+      {/* Leadership Snapshot */}
+      {!isLoading && (
+        <div className="grid md:grid-cols-3 gap-3 sm:gap-4">
+          <div className="premium-card p-4 sm:p-5">
+            <p className="font-body text-[11px] uppercase tracking-wider text-muted-foreground">Campus Strength</p>
+            <p className="font-display text-3xl font-bold text-foreground mt-2">{counts?.students || 0}</p>
+            <p className="font-body text-xs text-muted-foreground mt-1">Active enrolled students</p>
+          </div>
+          <div className="premium-card p-4 sm:p-5">
+            <p className="font-body text-[11px] uppercase tracking-wider text-muted-foreground">Faculty Capacity</p>
+            <p className="font-display text-3xl font-bold text-foreground mt-2">{counts?.teachers || 0}</p>
+            <p className="font-body text-xs text-muted-foreground mt-1">Teaching members available</p>
+          </div>
+          <Link to="/dashboard/principal/notices" className="premium-card p-4 sm:p-5 group">
+            <p className="font-body text-[11px] uppercase tracking-wider text-muted-foreground">Priority Action</p>
+            <div className="mt-2 flex items-center justify-between">
+              <p className="font-display text-xl font-bold text-foreground">Review Notices</p>
+              <CheckSquare className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+            </div>
+            <p className="font-body text-xs text-muted-foreground mt-1">{counts?.notices || 0} active on board</p>
+          </Link>
+        </div>
+      )}
+
       {/* Chart + Management */}
       <div className="grid md:grid-cols-2 gap-5 sm:gap-6">
         <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
