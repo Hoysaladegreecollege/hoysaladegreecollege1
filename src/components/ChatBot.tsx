@@ -9,10 +9,7 @@ interface Message {
 }
 
 const initialMessages: Message[] = [
-  {
-    role: "bot",
-    text: "Welcome to Hoysala Degree College! 👋\n\nI'm your AI-powered college assistant. Ask me anything about courses, admissions, fees, or campus life!",
-  },
+  { role: "bot", text: "Welcome to Hoysala Degree College! 👋\n\nI'm your AI-powered college assistant. Ask me anything about courses, admissions, fees, or campus life!" },
 ];
 
 const quickReplies = [
@@ -59,10 +56,7 @@ export default function ChatBot() {
     setMessages((prev) => [...prev, { role: "bot", text: "", typing: true }]);
 
     try {
-      const history = newMessages
-        .filter((m) => !m.typing)
-        .slice(-8)
-        .map((m) => ({ role: m.role, text: m.text }));
+      const history = newMessages.filter(m => !m.typing).slice(-8).map(m => ({ role: m.role, text: m.text }));
       const { data } = await supabase.functions.invoke("chat", {
         body: { message: userMsg, history },
       });
@@ -87,7 +81,11 @@ export default function ChatBot() {
     <>
       {/* Chatbot launcher */}
       {!isOpen && (
-        <button onClick={handleOpen} aria-label="Open chat assistant">
+        <button
+          onClick={handleOpen}
+          className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-14 h-14 sm:w-[60px] sm:h-[60px] flex items-center justify-center transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"} chatbot-launcher-shell`}
+          aria-label="Open chat assistant"
+        >
           <span className="chatbot-launcher-glow" />
           <span className="chatbot-launcher-ring" />
           <span className="chatbot-launcher-ring animation-delay-300" />
@@ -117,20 +115,10 @@ export default function ChatBot() {
               </div>
             </div>
             <div className="flex items-center gap-1">
-              <button
-                onClick={() => setIsMinimized(!isMinimized)}
-                className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-primary-foreground/10 transition-colors"
-                aria-label="Minimize"
-              >
-                <ChevronDown
-                  className={`w-4 h-4 text-primary-foreground/70 transition-transform duration-300 ${isMinimized ? "rotate-180" : ""}`}
-                />
+              <button onClick={() => setIsMinimized(!isMinimized)} className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-primary-foreground/10 transition-colors" aria-label="Minimize">
+                <ChevronDown className={`w-4 h-4 text-primary-foreground/70 transition-transform duration-300 ${isMinimized ? "rotate-180" : ""}`} />
               </button>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-primary-foreground/10 transition-colors"
-                aria-label="Close"
-              >
+              <button onClick={() => setIsOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-primary-foreground/10 transition-colors" aria-label="Close">
                 <X className="w-4 h-4 text-primary-foreground/70" />
               </button>
             </div>
@@ -141,11 +129,7 @@ export default function ChatBot() {
               {/* Messages area */}
               <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 bg-muted/20">
                 {messages.map((msg, i) => (
-                  <div
-                    key={i}
-                    className={`flex gap-2.5 ${msg.role === "user" ? "justify-end" : "justify-start"} animate-fade-in`}
-                    style={{ animationDelay: `${Math.min(i * 30, 300)}ms` }}
-                  >
+                  <div key={i} className={`flex gap-2.5 ${msg.role === "user" ? "justify-end" : "justify-start"} animate-fade-in`} style={{ animationDelay: `${Math.min(i * 30, 300)}ms` }}>
                     {msg.role === "bot" && (
                       <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
                         <Sparkles className="w-3.5 h-3.5 text-primary" />
@@ -158,13 +142,11 @@ export default function ChatBot() {
                         <span className="typing-dot" />
                       </div>
                     ) : (
-                      <div
-                        className={`max-w-[80%] px-3.5 py-2.5 rounded-2xl text-sm font-body whitespace-pre-line leading-relaxed shadow-sm ${
-                          msg.role === "user"
-                            ? "rounded-br-md bg-primary text-primary-foreground"
-                            : "bg-card border border-border/50 text-foreground rounded-bl-md"
-                        }`}
-                      >
+                      <div className={`max-w-[80%] px-3.5 py-2.5 rounded-2xl text-sm font-body whitespace-pre-line leading-relaxed shadow-sm ${
+                        msg.role === "user"
+                          ? "rounded-br-md bg-primary text-primary-foreground"
+                          : "bg-card border border-border/50 text-foreground rounded-bl-md"
+                      }`}>
                         {msg.text}
                       </div>
                     )}
@@ -183,11 +165,8 @@ export default function ChatBot() {
                 <div className="px-3 sm:px-4 pb-2.5 flex flex-wrap gap-1.5 shrink-0 border-t border-border/30 pt-2.5 bg-card">
                   <p className="w-full font-body text-[10px] text-muted-foreground mb-1">Quick questions:</p>
                   {quickReplies.map((q) => (
-                    <button
-                      key={q.label}
-                      onClick={() => handleSend(q.value)}
-                      className="text-[11px] font-body px-2.5 py-1.5 rounded-full border border-border/60 bg-card text-foreground hover:border-primary/40 hover:bg-primary/5 transition-all duration-200 hover:scale-105"
-                    >
+                    <button key={q.label} onClick={() => handleSend(q.value)}
+                      className="text-[11px] font-body px-2.5 py-1.5 rounded-full border border-border/60 bg-card text-foreground hover:border-primary/40 hover:bg-primary/5 transition-all duration-200 hover:scale-105">
                       {q.label}
                     </button>
                   ))}
@@ -197,21 +176,14 @@ export default function ChatBot() {
               {/* Input area */}
               <div className="p-3 border-t border-border/30 flex items-center gap-2 shrink-0 bg-card">
                 <div className="flex-1 flex items-center bg-muted/40 border border-border/50 rounded-full px-4 py-2.5 focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary/30 transition-all">
-                  <input
-                    ref={inputRef}
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
+                  <input ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend(input)}
                     placeholder="Message..."
                     disabled={isLoading}
-                    className="flex-1 bg-transparent text-sm font-body outline-none disabled:opacity-50 text-foreground placeholder:text-muted-foreground"
-                  />
+                    className="flex-1 bg-transparent text-sm font-body outline-none disabled:opacity-50 text-foreground placeholder:text-muted-foreground" />
                 </div>
-                <button
-                  onClick={() => handleSend(input)}
-                  disabled={isLoading || !input.trim()}
-                  className="w-10 h-10 rounded-full bg-primary flex items-center justify-center transition-all duration-200 shrink-0 disabled:opacity-30 disabled:cursor-not-allowed hover:scale-105 active:scale-95 text-primary-foreground"
-                >
+                <button onClick={() => handleSend(input)} disabled={isLoading || !input.trim()}
+                  className="w-10 h-10 rounded-full bg-primary flex items-center justify-center transition-all duration-200 shrink-0 disabled:opacity-30 disabled:cursor-not-allowed hover:scale-105 active:scale-95 text-primary-foreground">
                   {isLoading ? (
                     <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                   ) : (
