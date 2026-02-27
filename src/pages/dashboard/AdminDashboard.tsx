@@ -8,6 +8,7 @@ import { useState, useEffect, useRef } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import ActionCenter from "@/components/ActionCenter";
 
 const CHART_COLORS = ["hsl(217, 72%, 18%)", "hsl(42, 87%, 55%)", "hsl(217, 50%, 30%)", "hsl(142, 70%, 40%)"];
 
@@ -54,6 +55,7 @@ export default function AdminDashboard() {
 
   const { data: counts, isLoading: countsLoading } = useQuery({
     queryKey: ["admin-stats"],
+    refetchInterval: 30000,
     queryFn: async () => {
       const [students, teachers, courses, events, pendingApps, contacts] = await Promise.all([
         supabase.from("students").select("id, semester", { count: "exact" }).eq("is_active", true),
@@ -215,6 +217,9 @@ export default function AdminDashboard() {
           ) : null}
         </div>
       </div>
+
+      {/* Action Center */}
+      <ActionCenter role="admin" />
 
       {/* Command Center */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">

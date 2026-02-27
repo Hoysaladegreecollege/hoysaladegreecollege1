@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect, useRef } from "react";
+import ActionCenter from "@/components/ActionCenter";
 
 const NOTICE_TYPE_COLORS: Record<string, string> = {
   Exam: "bg-destructive/10 text-destructive",
@@ -92,6 +93,7 @@ export default function StudentDashboard() {
 
   const { data, isLoading: statsLoading } = useQuery({
     queryKey: ["student-dashboard-stats", user?.id],
+    refetchInterval: 30000,
     queryFn: async () => {
       if (!user) return null;
       const { data: student } = await supabase.from("students").select("id, semester").eq("user_id", user.id).single();
@@ -245,6 +247,9 @@ export default function StudentDashboard() {
           </div>
         </div>
       )}
+
+      {/* Action Center */}
+      <ActionCenter role="student" />
 
       {/* Animated Stats Grid */}
       {statsLoading ? (

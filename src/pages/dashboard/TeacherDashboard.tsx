@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import ActionCenter from "@/components/ActionCenter";
 
 function useAnimatedCounter(target: number, duration = 1400) {
   const [count, setCount] = useState(0);
@@ -55,6 +56,7 @@ export default function TeacherDashboard() {
 
   const { data: counts, isLoading } = useQuery({
     queryKey: ["teacher-stats"],
+    refetchInterval: 30000,
     queryFn: async () => {
       const [students, materials, notices, attendance] = await Promise.all([
         supabase.from("students").select("id", { count: "exact", head: true }).eq("is_active", true),
@@ -103,6 +105,9 @@ export default function TeacherDashboard() {
           <p className="font-body text-sm text-muted-foreground mt-2">Manage your students, attendance, and course materials with ease.</p>
         </div>
       </div>
+
+      {/* Action Center */}
+      <ActionCenter role="teacher" />
 
       {/* Stats Grid */}
       {isLoading ? (

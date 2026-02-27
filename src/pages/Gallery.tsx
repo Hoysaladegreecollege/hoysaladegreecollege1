@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import SEOHead from "@/components/SEOHead";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,7 +8,6 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { Camera, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Fallback images from assets
 import galleryCampus from "@/assets/gallery-campus.jpg";
 import galleryLab from "@/assets/gallery-lab.jpg";
 import galleryLibrary from "@/assets/gallery-library.jpg";
@@ -30,10 +29,6 @@ export default function Gallery() {
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
-  const openLightbox = (index: number) => {
-    setLightboxIdx(index);
-  };
-
   const { data: dbImages = [], isLoading } = useQuery({
     queryKey: ["public-gallery"],
     queryFn: async () => {
@@ -46,12 +41,37 @@ export default function Gallery() {
   const categories = ["All", ...Array.from(new Set(images.map((img: any) => img.category)))];
   const filtered = filter === "All" ? images : images.filter((img: any) => img.category === filter);
 
-  const isMobilePopup = typeof window !== "undefined" && window.innerWidth < 640;
-  const viewportWidth = typeof window !== "undefined" ? window.innerWidth : 1024;
-  const viewportHeight = typeof window !== "undefined" ? window.innerHeight : 768;
-  const popupWidth = isMobilePopup ? Math.min(viewportWidth - 16, 420) : Math.min(viewportWidth - 48, 980);
-  const popupHeight = isMobilePopup ? Math.min(viewportHeight - 24, 620) : Math.min(viewportHeight - 56, 740);
+  const openLightbox = useCallback((index: number) => {
+    setLightboxIdx(index);
+    document.body.style.overflow = "hidden";
+  }, []);
 
+  const closeLightbox = useCallback(() => {
+    setLightboxIdx(null);
+    document.body.style.overflow = "";
+  }, []);
+
+  const goNext = useCallback(() => {
+    if (lightboxIdx === null) return;
+    setLightboxIdx((lightboxIdx + 1) % filtered.length);
+  }, [lightboxIdx, filtered.length]);
+
+  const goPrev = useCallback(() => {
+    if (lightboxIdx === null) return;
+    setLightboxIdx((lightboxIdx - 1 + filtered.length) % filtered.length);
+  }, [lightboxIdx, filtered.length]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (lightboxIdx === null) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowRight") goNext();
+      if (e.key === "ArrowLeft") goPrev();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [lightboxIdx, closeLightbox, goNext, goPrev]);
 
   return (
     <div className="page-enter">
@@ -65,7 +85,6 @@ export default function Gallery() {
             <SectionHeading title="Photo Gallery" subtitle="A glimpse into life at Hoysala Degree College" />
           </ScrollReveal>
 
-          {/* Filter */}
           <ScrollReveal delay={100}>
             <div className="flex flex-wrap gap-2 mb-8 justify-center">
               {categories.map((c: any) => (
@@ -110,40 +129,45 @@ export default function Gallery() {
         </div>
       </section>
 
-      {/* Full-screen Lightbox */}
+      {/* Full-screen Lightbox - viewport centered */}
       {lightboxIdx !== null && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm animate-fade-in p-3 sm:p-6 flex items-center justify-center" onClick={() => setLightboxIdx(null)}>
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center animate-fade-in"
+          onClick={closeLightbox}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Image lightbox"
+        >
           <div
-            className="relative rounded-2xl border border-white/15 bg-black/95 shadow-2xl overflow-hidden transition-none"
-            style={{
-              width: `${popupWidth}px`,
-              height: `${popupHeight}px`,
-              maxHeight: isMobilePopup ? "calc(100vh - 24px)" : "calc(100vh - 56px)",
-              animation: "popup-expand 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
-            }}
+            className="relative w-[calc(100vw-2rem)] sm:w-[calc(100vw-4rem)] max-w-[980px] h-[calc(100vh-4rem)] sm:h-[calc(100vh-6rem)] max-h-[740px] rounded-2xl border border-white/10 bg-black/95 shadow-2xl overflow-hidden animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Close button */}
             <button
-              className="absolute top-2 right-2 sm:top-3 sm:right-3 w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-colors z-20"
-              onClick={() => setLightboxIdx(null)}
+              className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-colors z-20"
+              onClick={closeLightbox}
+              aria-label="Close lightbox"
             >
               <X className="w-5 h-5" />
             </button>
 
+            {/* Nav buttons */}
             <button
               className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-colors z-20"
-              onClick={() => setLightboxIdx((lightboxIdx - 1 + filtered.length) % filtered.length)}
+              onClick={goPrev}
+              aria-label="Previous image"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
-
             <button
               className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-colors z-20"
-              onClick={() => setLightboxIdx((lightboxIdx + 1) % filtered.length)}
+              onClick={goNext}
+              aria-label="Next image"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
 
+            {/* Image content */}
             <div
               className="h-full w-full flex flex-col"
               onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
@@ -151,12 +175,12 @@ export default function Gallery() {
                 if (touchStartX === null) return;
                 const diff = e.changedTouches[0].clientX - touchStartX;
                 if (Math.abs(diff) > 50) {
-                  setLightboxIdx(diff > 0 ? (lightboxIdx - 1 + filtered.length) % filtered.length : (lightboxIdx + 1) % filtered.length);
+                  diff > 0 ? goPrev() : goNext();
                 }
                 setTouchStartX(null);
               }}
             >
-              <div className="flex-1 p-3 sm:p-6 flex items-center justify-center">
+              <div className="flex-1 p-4 sm:p-8 flex items-center justify-center">
                 <img
                   src={(filtered[lightboxIdx] as any).image_url}
                   alt={(filtered[lightboxIdx] as any).title}
