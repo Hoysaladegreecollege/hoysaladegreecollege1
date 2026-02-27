@@ -89,14 +89,14 @@ export default function ChatBot() {
       {!isOpen && (
         <button
           onClick={handleOpen}
-          className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-14 h-14 sm:w-[60px] sm:h-[60px] flex items-center justify-center transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"} chatbot-launcher-shell`}
+          className={`fixed bottom-4 right-4 sm:bottom-2 sm:right-6 z-50 w-14 h-14 sm:w-[60px] sm:h-[60px] flex items-center justify-center transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"} chatbot-launcher-shell`}
           aria-label="Open chat assistant"
         >
           <span className="chatbot-launcher-glow" />
           <span className="chatbot-launcher-ring" />
           <span className="chatbot-launcher-ring animation-delay-300" />
           <span className="chatbot-launcher-orb relative z-10">
-            <MessageCircle className="w-0 h-0 text-primary-foreground" />
+            <MessageCircle className="w-5 h-5 text-primary-foreground" />
           </span>
         </button>
       )}
