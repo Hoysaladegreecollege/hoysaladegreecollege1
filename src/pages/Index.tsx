@@ -17,45 +17,45 @@ import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect, useRef } from "react";
 
 const galleryImages = [
-  { src: galleryCampus, title: "Campus Building", category: "Campus" },
-  { src: galleryLab, title: "Computer Lab", category: "Facilities" },
-  { src: galleryLibrary, title: "Library", category: "Facilities" },
-  { src: galleryClassroom, title: "Classroom", category: "Academics" },
-  { src: galleryEvents, title: "Annual Day", category: "Events" },
-  { src: gallerySports, title: "Sports Ground", category: "Sports" },
-];
+{ src: galleryCampus, title: "Campus Building", category: "Campus" },
+{ src: galleryLab, title: "Computer Lab", category: "Facilities" },
+{ src: galleryLibrary, title: "Library", category: "Facilities" },
+{ src: galleryClassroom, title: "Classroom", category: "Academics" },
+{ src: galleryEvents, title: "Annual Day", category: "Events" },
+{ src: gallerySports, title: "Sports Ground", category: "Sports" }];
+
 
 const courses = [
-  { name: "BCA", full: "Bachelor of Computer Applications", icon: "🖥️", desc: "Master programming, databases, networking and emerging technologies.", duration: "3 Years", color: "from-blue-500/15 to-cyan-500/5" },
-  { name: "B.Com Regular", full: "Bachelor of Commerce", icon: "📊", desc: "Build expertise in accounting, finance, taxation and business law.", duration: "3 Years", color: "from-emerald-500/15 to-green-500/5" },
-  { name: "B.Com Professional", full: "Commerce with CA/CS/CMA", icon: "📈", desc: "Professional coaching integrated with commerce degree.", duration: "3 Years", color: "from-secondary/20 to-amber-500/5" },
-  { name: "BBA", full: "Bachelor of Business Administration", icon: "💼", desc: "Develop leadership, management, and entrepreneurial skills.", duration: "3 Years", color: "from-purple-500/15 to-violet-500/5" },
-  { name: "CA / CS", full: "Chartered Accountancy & Company Secretary", icon: "⚖️", desc: "Exclusive coaching for CA & CS Foundation aspirants.", duration: "Integrated", color: "from-rose-500/15 to-red-500/5" },
-];
+{ name: "BCA", full: "Bachelor of Computer Applications", icon: "🖥️", desc: "Master programming, databases, networking and emerging technologies.", duration: "3 Years", color: "from-blue-500/15 to-cyan-500/5" },
+{ name: "B.Com Regular", full: "Bachelor of Commerce", icon: "📊", desc: "Build expertise in accounting, finance, taxation and business law.", duration: "3 Years", color: "from-emerald-500/15 to-green-500/5" },
+{ name: "B.Com Professional", full: "Commerce with CA/CS/CMA", icon: "📈", desc: "Professional coaching integrated with commerce degree.", duration: "3 Years", color: "from-secondary/20 to-amber-500/5" },
+{ name: "BBA", full: "Bachelor of Business Administration", icon: "💼", desc: "Develop leadership, management, and entrepreneurial skills.", duration: "3 Years", color: "from-purple-500/15 to-violet-500/5" },
+{ name: "CA / CS", full: "Chartered Accountancy & Company Secretary", icon: "⚖️", desc: "Exclusive coaching for CA & CS Foundation aspirants.", duration: "Integrated", color: "from-rose-500/15 to-red-500/5" }];
+
 
 const highlights = [
-  { icon: Users, label: "Experienced Faculties", desc: "Industry-trained professors" },
-  { icon: Star, label: "CA, CS & CMA Classes", desc: "Exclusive coaching sessions" },
-  { icon: BookOpen, label: "Add-on Courses for BCA", desc: "AI, ML, Python & more" },
-  { icon: Brain, label: "AI & ML Workshops", desc: "Hands-on practical training" },
-  { icon: Sparkles, label: "Special Guest Lectures", desc: "Industry expert sessions" },
-  { icon: ClipboardCheck, label: "Daily Attendance SMS", desc: "Real-time parent updates" },
-  { icon: BarChart3, label: "Monthly Internals", desc: "Regular assessments" },
-  { icon: FlaskConical, label: "Weekly CA/CS Tests", desc: "Consistent preparation" },
-  { icon: Library, label: "Sophisticated Library", desc: "Vast resource collection" },
-  { icon: Award, label: "NSS Unit", desc: "Social service opportunities" },
-  { icon: MessageSquare, label: "Student Counseling", desc: "Personal guidance cell" },
-  { icon: Calendar, label: "Placement Cell", desc: "Career & job support" },
-];
+{ icon: Users, label: "Experienced Faculties", desc: "Industry-trained professors" },
+{ icon: Star, label: "CA, CS & CMA Classes", desc: "Exclusive coaching sessions" },
+{ icon: BookOpen, label: "Add-on Courses for BCA", desc: "AI, ML, Python & more" },
+{ icon: Brain, label: "AI & ML Workshops", desc: "Hands-on practical training" },
+{ icon: Sparkles, label: "Special Guest Lectures", desc: "Industry expert sessions" },
+{ icon: ClipboardCheck, label: "Daily Attendance SMS", desc: "Real-time parent updates" },
+{ icon: BarChart3, label: "Monthly Internals", desc: "Regular assessments" },
+{ icon: FlaskConical, label: "Weekly CA/CS Tests", desc: "Consistent preparation" },
+{ icon: Library, label: "Sophisticated Library", desc: "Vast resource collection" },
+{ icon: Award, label: "NSS Unit", desc: "Social service opportunities" },
+{ icon: MessageSquare, label: "Student Counseling", desc: "Personal guidance cell" },
+{ icon: Calendar, label: "Placement Cell", desc: "Career & job support" }];
+
 
 const testimonials = [
-  { name: "Anusha C.H", course: "B.Com 2022-25", text: "Hoysala Degree College gave me the best platform to prepare for CA. The faculty support is exceptional! Scored 98.14%.", rating: 5 },
-  { name: "Rahul M.", course: "BBA 2023-26", text: "The practical exposure through internships and case studies prepared me for the real business world. Amazing college!", rating: 5 },
-  { name: "Simran B.", course: "B.Com 2022-25", text: "The dedicated coaching for CS and CMA along with regular degree is a unique advantage. Scored 94.14%!", rating: 5 },
-  { name: "Priya K.", course: "BCA 2023-26", text: "The AI and ML workshops along with Python programming gave me an edge in the tech industry. Best decision to join Hoysala!", rating: 5 },
-  { name: "Kiran R.", course: "B.Com Professional", text: "CA coaching integrated with B.Com is a game changer. The faculty goes above and beyond to help students succeed.", rating: 5 },
-  { name: "Meera S.", course: "BBA 2024-27", text: "The placement cell helped me land an internship in my 2nd year itself. The exposure here is unmatched!", rating: 4 },
-];
+{ name: "Anusha C.H", course: "B.Com 2022-25", text: "Hoysala Degree College gave me the best platform to prepare for CA. The faculty support is exceptional! Scored 98.14%.", rating: 5 },
+{ name: "Rahul M.", course: "BBA 2023-26", text: "The practical exposure through internships and case studies prepared me for the real business world. Amazing college!", rating: 5 },
+{ name: "Simran B.", course: "B.Com 2022-25", text: "The dedicated coaching for CS and CMA along with regular degree is a unique advantage. Scored 94.14%!", rating: 5 },
+{ name: "Priya K.", course: "BCA 2023-26", text: "The AI and ML workshops along with Python programming gave me an edge in the tech industry. Best decision to join Hoysala!", rating: 5 },
+{ name: "Kiran R.", course: "B.Com Professional", text: "CA coaching integrated with B.Com is a game changer. The faculty goes above and beyond to help students succeed.", rating: 5 },
+{ name: "Meera S.", course: "BBA 2024-27", text: "The placement cell helped me land an internship in my 2nd year itself. The exposure here is unmatched!", rating: 4 }];
+
 
 function useAnimatedCounter(target: number, duration = 2000) {
   const [count, setCount] = useState(0);
@@ -84,7 +84,7 @@ function useAnimatedCounter(target: number, duration = 2000) {
   return { count, ref };
 }
 
-function AnimatedStat({ value, label, icon: Icon, suffix = "" }: { value: number; label: string; icon: any; suffix?: string }) {
+function AnimatedStat({ value, label, icon: Icon, suffix = "" }: {value: number;label: string;icon: any;suffix?: string;}) {
   const { count, ref } = useAnimatedCounter(value);
   return (
     <div ref={ref} className="text-center text-primary-foreground group cursor-default">
@@ -95,8 +95,8 @@ function AnimatedStat({ value, label, icon: Icon, suffix = "" }: { value: number
         {count}{suffix}
       </div>
       <div className="font-body text-[10px] sm:text-xs opacity-50 mt-2 tracking-widest uppercase group-hover:opacity-80 transition-opacity duration-300">{label}</div>
-    </div>
-  );
+    </div>);
+
 }
 
 export default function Index() {
@@ -108,19 +108,19 @@ export default function Index() {
     testimonialRef.current = setInterval(() => {
       setTestimonialIndex((prev) => (prev + 1) % Math.ceil(testimonials.length / 2));
     }, 5000);
-    return () => { if (testimonialRef.current) clearInterval(testimonialRef.current); };
+    return () => {if (testimonialRef.current) clearInterval(testimonialRef.current);};
   }, []);
 
   const { data: liveStats } = useQuery({
     queryKey: ["homepage-stats"],
     queryFn: async () => {
       const [students, teachers, events] = await Promise.all([
-        supabase.from("students").select("id", { count: "exact", head: true }).eq("is_active", true),
-        supabase.from("teachers").select("id", { count: "exact", head: true }).eq("is_active", true),
-        supabase.from("events").select("id", { count: "exact", head: true }).eq("is_active", true),
-      ]);
+      supabase.from("students").select("id", { count: "exact", head: true }).eq("is_active", true),
+      supabase.from("teachers").select("id", { count: "exact", head: true }).eq("is_active", true),
+      supabase.from("events").select("id", { count: "exact", head: true }).eq("is_active", true)]
+      );
       return { students: students.count || 0, faculty: teachers.count || 0, events: events.count || 0 };
-    },
+    }
   });
 
   const { data: topStudents = [] } = useQuery({
@@ -128,7 +128,7 @@ export default function Index() {
     queryFn: async () => {
       const { data } = await supabase.from("top_students").select("*").eq("is_active", true).order("rank").limit(6);
       return data || [];
-    },
+    }
   });
 
   const { data: recentNotices = [] } = useQuery({
@@ -136,22 +136,22 @@ export default function Index() {
     queryFn: async () => {
       const { data } = await supabase.from("notices").select("title, type, created_at").eq("is_active", true).order("created_at", { ascending: false }).limit(4);
       return data || [];
-    },
+    }
   });
 
   const stats = [
-    { label: "Students Enrolled", value: liveStats?.students || 250, icon: Users, suffix: "+" },
-    { label: "Expert Faculty", value: liveStats?.faculty || 25, icon: BookOpen, suffix: "+" },
-    { label: "Years of Excellence", value: 15, icon: Award, suffix: "+" },
-    { label: "Placement Rate", value: 90, icon: Star, suffix: "%" },
-  ];
+  { label: "Students Enrolled", value: liveStats?.students || 250, icon: Users, suffix: "+" },
+  { label: "Expert Faculty", value: liveStats?.faculty || 25, icon: BookOpen, suffix: "+" },
+  { label: "Years of Excellence", value: 15, icon: Award, suffix: "+" },
+  { label: "Placement Rate", value: 90, icon: Star, suffix: "%" }];
 
-  const announcements = recentNotices.length > 0
-    ? recentNotices.map((n: any) => ({ date: new Date(n.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }), title: n.title, type: n.type }))
-    : [
-        { date: "Feb 10, 2026", title: "Admission Open for 2026-27 Academic Year", type: "Admission" },
-        { date: "Feb 5, 2026", title: "Annual Sports Day – March 15, 2026", type: "Event" },
-      ];
+
+  const announcements = recentNotices.length > 0 ?
+  recentNotices.map((n: any) => ({ date: new Date(n.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }), title: n.title, type: n.type })) :
+  [
+  { date: "Feb 10, 2026", title: "Admission Open for 2026-27 Academic Year", type: "Admission" },
+  { date: "Feb 5, 2026", title: "Annual Sports Day – March 15, 2026", type: "Event" }];
+
 
   const totalSlides = Math.ceil(testimonials.length / 2);
   const currentTestimonials = testimonials.slice(testimonialIndex * 2, testimonialIndex * 2 + 2);
@@ -179,10 +179,10 @@ export default function Index() {
             { "@type": "Course", "name": "BCA - Bachelor of Computer Applications" },
             { "@type": "Course", "name": "B.Com - Bachelor of Commerce" },
             { "@type": "Course", "name": "B.Com Professional (CA/CS/CMA)" },
-            { "@type": "Course", "name": "BBA - Bachelor of Business Administration" }
-          ]}
-        }}
-      />
+            { "@type": "Course", "name": "BBA - Bachelor of Business Administration" }]
+          }
+        }} />
+
       {/* Hero */}
       <section className="relative h-[92vh] min-h-[580px] flex items-center justify-center overflow-hidden">
         <img src={heroImage} alt="Hoysala Degree College Campus" className="absolute inset-0 w-full h-full object-cover scale-110 animate-hero-float" style={{ animationDuration: "20s" }} />
@@ -198,12 +198,12 @@ export default function Index() {
 
         {/* Grid pattern */}
         <div className="absolute inset-0 opacity-[0.05] pointer-events-none"
-          style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
+        style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
 
         <div className="relative z-10 container text-center text-primary-foreground px-4">
           {/* Animated badge */}
           <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-primary-foreground/20 mb-6 animate-fade-in backdrop-blur-md badge-float"
-            style={{ background: "rgba(255,255,255,0.08)" }}>
+          style={{ background: "rgba(255,255,255,0.08)" }}>
             <Sparkles className="w-3.5 h-3.5 text-secondary animate-sparkle" />
             <span className="font-body text-xs tracking-[0.2em] uppercase text-secondary font-bold">Excellence in Education Since 2017</span>
             <Sparkles className="w-3.5 h-3.5 text-secondary animate-sparkle animation-delay-300" />
@@ -217,7 +217,7 @@ export default function Index() {
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
-              animation: "gradient-text 4s linear infinite",
+              animation: "gradient-text 4s linear infinite"
             }}> College</span>
           </h1>
 
@@ -231,7 +231,7 @@ export default function Index() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up animation-delay-500">
             <Link to="/admissions">
               <button className="relative group w-full sm:w-auto overflow-hidden px-8 sm:px-10 py-4 rounded-2xl font-body text-sm sm:text-base font-bold text-foreground shadow-2xl btn-magnetic"
-                style={{ background: "linear-gradient(135deg, hsl(42,87%,58%), hsl(38,92%,48%), hsl(42,87%,65%))", boxShadow: "0 8px 40px hsla(42,87%,52%,0.5), 0 2px 0 rgba(255,255,255,0.2) inset" }}>
+              style={{ background: "linear-gradient(135deg, hsl(42,87%,58%), hsl(38,92%,48%), hsl(42,87%,65%))", boxShadow: "0 8px 40px hsla(42,87%,52%,0.5), 0 2px 0 rgba(255,255,255,0.2) inset" }}>
                 <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/0 via-white/25 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                 <span className="relative flex items-center justify-center gap-2">
                   <Sparkles className="w-4 h-4 group-hover:animate-spin" />
@@ -242,7 +242,7 @@ export default function Index() {
             </Link>
             <Link to="/courses">
               <button className="relative group w-full sm:w-auto overflow-hidden px-8 sm:px-10 py-4 rounded-2xl font-body text-sm sm:text-base font-bold text-white btn-magnetic"
-                style={{ background: "rgba(255,255,255,0.1)", border: "1.5px solid rgba(255,255,255,0.25)", backdropFilter: "blur(16px)", boxShadow: "0 8px 32px rgba(0,0,0,0.2), 0 1px 0 rgba(255,255,255,0.2) inset" }}>
+              style={{ background: "rgba(255,255,255,0.1)", border: "1.5px solid rgba(255,255,255,0.25)", backdropFilter: "blur(16px)", boxShadow: "0 8px 32px rgba(0,0,0,0.2), 0 1px 0 rgba(255,255,255,0.2) inset" }}>
                 <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/0 via-white/12 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                 <span className="relative flex items-center justify-center gap-2">
                   <GraduationCap className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
@@ -254,12 +254,12 @@ export default function Index() {
           </div>
 
           {/* Scroll indicator */}
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50 animate-float">
-            <span className="font-body text-[10px] tracking-widest uppercase text-primary-foreground">Scroll</span>
-            <div className="w-5 h-8 rounded-full border border-primary-foreground/30 flex items-start justify-center pt-1.5">
-              <div className="w-1 h-2 rounded-full bg-secondary animate-bounce" />
-            </div>
-          </div>
+          
+
+
+
+
+
         </div>
       </section>
 
@@ -269,7 +269,7 @@ export default function Index() {
       <section className="bg-primary py-12 sm:py-16 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary to-navy-dark opacity-70" />
         <div className="absolute inset-0 opacity-[0.04]"
-          style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
+        style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
         <div className="relative container grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 px-4">
           {stats.map((s, i) => <AnimatedStat key={i} value={s.value} label={s.label} icon={s.icon} suffix={s.suffix} />)}
         </div>
@@ -284,14 +284,14 @@ export default function Index() {
             <SectionHeading title="Courses We Offer" subtitle="Choose from our carefully designed undergraduate programs & professional coaching" />
           </ScrollReveal>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 sm:gap-6">
-            {courses.map((c, i) => (
-              <ScrollReveal key={c.name} delay={i * 80}>
+            {courses.map((c, i) =>
+            <ScrollReveal key={c.name} delay={i * 80}>
                 <Link to="/courses">
                   <div
-                    className="relative premium-card p-6 sm:p-7 cursor-pointer h-full group overflow-hidden border-glow"
-                    onMouseEnter={() => setHoveredCard(i)}
-                    onMouseLeave={() => setHoveredCard(null)}
-                  >
+                  className="relative premium-card p-6 sm:p-7 cursor-pointer h-full group overflow-hidden border-glow"
+                  onMouseEnter={() => setHoveredCard(i)}
+                  onMouseLeave={() => setHoveredCard(null)}>
+
                     <div className={`absolute inset-0 bg-gradient-to-br ${c.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl`} />
                     <div className="absolute top-0 left-4 right-4 h-0.5 bg-gradient-to-r from-transparent via-secondary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
@@ -310,7 +310,7 @@ export default function Index() {
                   </div>
                 </Link>
               </ScrollReveal>
-            ))}
+            )}
           </div>
         </div>
       </section>
@@ -323,8 +323,8 @@ export default function Index() {
             <SectionHeading title="Why Hoysala?" subtitle="Key highlights that set us apart from the rest" />
           </ScrollReveal>
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
-            {highlights.map((h, i) => (
-              <ScrollReveal key={h.label} delay={i * 40}>
+            {highlights.map((h, i) =>
+            <ScrollReveal key={h.label} delay={i * 40}>
                 <div className="relative premium-card p-5 sm:p-6 cursor-default group spotlight border-glow overflow-hidden h-full">
                   <div className="absolute inset-0 bg-gradient-to-br from-secondary/6 to-primary/4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
                   <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/0 via-secondary/30 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -339,7 +339,7 @@ export default function Index() {
                   </div>
                 </div>
               </ScrollReveal>
-            ))}
+            )}
           </div>
         </div>
       </section>
@@ -352,12 +352,12 @@ export default function Index() {
             <SectionHeading title="Campus Gallery" subtitle="Take a virtual tour of our world-class facilities" />
           </ScrollReveal>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5">
-            {galleryImages.map((img, i) => (
-              <ScrollReveal key={img.title} delay={i * 60}>
+            {galleryImages.map((img, i) =>
+            <ScrollReveal key={img.title} delay={i * 60}>
                 <div
-                  className="relative group cursor-pointer overflow-hidden rounded-2xl border border-border aspect-[4/3] hover:shadow-2xl transition-all duration-500"
-                  onClick={() => setLightboxIdx(i)}
-                >
+                className="relative group cursor-pointer overflow-hidden rounded-2xl border border-border aspect-[4/3] hover:shadow-2xl transition-all duration-500"
+                onClick={() => setLightboxIdx(i)}>
+
                   <img src={img.src} alt={img.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" />
                   <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
@@ -369,7 +369,7 @@ export default function Index() {
                   </div>
                 </div>
               </ScrollReveal>
-            ))}
+            )}
           </div>
           <div className="text-center mt-8">
             <Link to="/gallery" className="inline-flex items-center gap-2 font-body text-sm font-semibold text-primary hover:underline">
@@ -380,18 +380,18 @@ export default function Index() {
       </section>
 
       {/* Full-screen Lightbox */}
-      {lightboxIdx !== null && (
-        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center animate-fade-in" onClick={() => setLightboxIdx(null)}>
+      {lightboxIdx !== null &&
+      <div className="fixed inset-0 bg-black z-50 flex items-center justify-center animate-fade-in" onClick={() => setLightboxIdx(null)}>
           <button className="absolute top-4 right-4 sm:top-6 sm:right-6 w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
-            onClick={(e) => { e.stopPropagation(); setLightboxIdx(null); }}>
+        onClick={(e) => {e.stopPropagation();setLightboxIdx(null);}}>
             <X className="w-6 h-6" />
           </button>
           <button className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
-            onClick={(e) => { e.stopPropagation(); setLightboxIdx((lightboxIdx - 1 + galleryImages.length) % galleryImages.length); }}>
+        onClick={(e) => {e.stopPropagation();setLightboxIdx((lightboxIdx - 1 + galleryImages.length) % galleryImages.length);}}>
             <ChevronLeft className="w-6 h-6" />
           </button>
           <button className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
-            onClick={(e) => { e.stopPropagation(); setLightboxIdx((lightboxIdx + 1) % galleryImages.length); }}>
+        onClick={(e) => {e.stopPropagation();setLightboxIdx((lightboxIdx + 1) % galleryImages.length);}}>
             <ChevronRight className="w-6 h-6" />
           </button>
           <div className="w-full h-full flex items-center justify-center p-4 sm:p-8" onClick={(e) => e.stopPropagation()}>
@@ -402,7 +402,7 @@ export default function Index() {
             <p className="font-body text-xs text-white/60 mt-1">{lightboxIdx + 1} / {galleryImages.length}</p>
           </div>
         </div>
-      )}
+      }
 
       {/* Principal's Message */}
       <section className="py-16 sm:py-24 bg-background">
@@ -472,8 +472,8 @@ export default function Index() {
             </div>
           </ScrollReveal>
           <div className="space-y-2.5 max-w-2xl">
-            {announcements.map((a, i) => (
-              <ScrollReveal key={i} delay={i * 80}>
+            {announcements.map((a, i) =>
+            <ScrollReveal key={i} delay={i * 80}>
                 <Link to="/notices">
                   <div className="group flex items-start gap-4 p-4 bg-card rounded-2xl border border-border hover:border-primary/25 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden">
                     <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-secondary to-primary/50 rounded-r-full" />
@@ -489,7 +489,7 @@ export default function Index() {
                   </div>
                 </Link>
               </ScrollReveal>
-            ))}
+            )}
           </div>
         </div>
       </section>
@@ -503,8 +503,8 @@ export default function Index() {
             <SectionHeading title="What Our Students Say" subtitle="Real stories from the Hoysala family" />
           </ScrollReveal>
           <div className="grid sm:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto">
-            {currentTestimonials.map((t, i) => (
-              <div key={t.name} className="relative premium-card p-7 sm:p-8 group animate-fade-in-up card-stack border-glow overflow-hidden" style={{ animationDelay: `${i * 150}ms` }}>
+            {currentTestimonials.map((t, i) =>
+            <div key={t.name} className="relative premium-card p-7 sm:p-8 group animate-fade-in-up card-stack border-glow overflow-hidden" style={{ animationDelay: `${i * 150}ms` }}>
                 {/* Ambient glow on hover */}
                 <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-primary/3 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
                 <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-secondary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -513,9 +513,9 @@ export default function Index() {
                 </div>
                 <div className="relative z-10">
                   <div className="flex gap-0.5 mb-4">
-                    {Array.from({ length: t.rating }).map((_, j) => (
-                      <Star key={j} className="w-4 h-4 text-secondary fill-secondary group-hover:scale-110 transition-transform duration-300" style={{ transitionDelay: `${j * 50}ms` }} />
-                    ))}
+                    {Array.from({ length: t.rating }).map((_, j) =>
+                  <Star key={j} className="w-4 h-4 text-secondary fill-secondary group-hover:scale-110 transition-transform duration-300" style={{ transitionDelay: `${j * 50}ms` }} />
+                  )}
                   </div>
                   <p className="font-body text-sm text-muted-foreground leading-relaxed italic mb-5">"{t.text}"</p>
                   <div className="flex items-center gap-3 pt-4 border-t border-border/60">
@@ -529,15 +529,15 @@ export default function Index() {
                   </div>
                 </div>
               </div>
-            ))}
+            )}
           </div>
 
           {/* Testimonial dots */}
           <div className="flex justify-center gap-2 mt-8">
-            {Array.from({ length: totalSlides }).map((_, i) => (
-              <button key={i} onClick={() => setTestimonialIndex(i)}
-                className={`rounded-full transition-all duration-400 ${i === testimonialIndex ? "bg-secondary w-8 h-2.5" : "bg-muted w-2.5 h-2.5 hover:bg-muted-foreground/40"}`} />
-            ))}
+            {Array.from({ length: totalSlides }).map((_, i) =>
+            <button key={i} onClick={() => setTestimonialIndex(i)}
+            className={`rounded-full transition-all duration-400 ${i === testimonialIndex ? "bg-secondary w-8 h-2.5" : "bg-muted w-2.5 h-2.5 hover:bg-muted-foreground/40"}`} />
+            )}
           </div>
         </div>
       </section>
@@ -546,7 +546,7 @@ export default function Index() {
       <section className="py-16 sm:py-20 relative overflow-hidden">
         <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--navy-dark)))" }} />
         <div className="absolute inset-0 opacity-[0.06]"
-          style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
+        style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-secondary/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative container px-4 text-center text-primary-foreground">
@@ -561,14 +561,14 @@ export default function Index() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/admissions">
                 <button className="relative group overflow-hidden px-10 py-4 rounded-2xl font-body font-bold text-foreground shadow-2xl btn-magnetic"
-                  style={{ background: "linear-gradient(135deg, hsl(42,87%,58%), hsl(38,92%,48%))", boxShadow: "0 8px 32px hsla(42,87%,52%,0.4)" }}>
+                style={{ background: "linear-gradient(135deg, hsl(42,87%,58%), hsl(38,92%,48%))", boxShadow: "0 8px 32px hsla(42,87%,52%,0.4)" }}>
                   <span className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <span className="relative flex items-center gap-2"><TrendingUp className="w-4 h-4" /> Apply Now</span>
                 </button>
               </Link>
               <Link to="/contact">
                 <button className="relative group overflow-hidden px-10 py-4 rounded-2xl font-body font-bold text-white btn-magnetic"
-                  style={{ background: "rgba(255,255,255,0.1)", border: "1.5px solid rgba(255,255,255,0.3)", backdropFilter: "blur(12px)" }}>
+                style={{ background: "rgba(255,255,255,0.1)", border: "1.5px solid rgba(255,255,255,0.3)", backdropFilter: "blur(12px)" }}>
                   <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <span className="relative flex items-center gap-2"><MessageSquare className="w-4 h-4" /> Contact Us</span>
                 </button>
@@ -577,6 +577,6 @@ export default function Index() {
           </ScrollReveal>
         </div>
       </section>
-    </div>
-  );
+    </div>);
+
 }
