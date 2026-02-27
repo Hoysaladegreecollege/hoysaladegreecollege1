@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import SEOHead from "@/components/SEOHead";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -32,10 +32,16 @@ export default function Notices() {
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
   const [selectedNotice, setSelectedNotice] = useState<any>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const triggerRef = useRef<HTMLDivElement | null>(null);
 
-  const openNotice = (n: any) => {
-    setSelectedNotice(n);
-  };
+  const openNotice = useCallback((n: any, e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Inline expand instead of popup
+    setExpandedId(prev => prev === n.id ? null : n.id);
+    setSelectedNotice(null);
+  }, []);
 
   const { data: dbNotices = [], isLoading } = useQuery({
     queryKey: ["public-notices"],
@@ -55,12 +61,6 @@ export default function Notices() {
     const matchesSearch = !search || n.title.toLowerCase().includes(search.toLowerCase()) || n.content?.toLowerCase().includes(search.toLowerCase());
     return matchesType && matchesSearch;
   });
-
-  const isMobilePopup = typeof window !== "undefined" && window.innerWidth < 640;
-  const viewportWidth = typeof window !== "undefined" ? window.innerWidth : 1024;
-  const viewportHeight = typeof window !== "undefined" ? window.innerHeight : 768;
-  const noticeWidth = isMobilePopup ? Math.min(viewportWidth - 16, 430) : Math.min(viewportWidth - 48, 720);
-  const noticeMaxHeight = isMobilePopup ? Math.min(viewportHeight - 24, 640) : Math.min(viewportHeight - 56, 760);
 
   const pinnedCount = notices.filter((n: any) => n.pinned).length;
 
@@ -147,18 +147,22 @@ export default function Notices() {
             <div className="space-y-3">
               {filtered.map((n: any, i: number) => {
                 const tc = typeColors[n.type] || typeColors.General;
+                const isExpanded = expandedId === n.id;
                 return (
                   <ScrollReveal key={n.id || i} delay={i * 40}>
                     <div
-                      onClick={() => openNotice(n)}
-                      className={`relative overflow-hidden premium-card p-5 sm:p-6 group cursor-pointer border-glow card-stack ${n.pinned ? "ring-1 ring-secondary/20" : ""}`}
+                      ref={isExpanded ? triggerRef : undefined}
+                      onClick={(e) => openNotice(n, e)}
+                      className={`relative overflow-hidden premium-card p-5 sm:p-6 group cursor-pointer border-glow card-stack ${n.pinned ? "ring-1 ring-secondary/20" : ""} ${isExpanded ? "ring-2 ring-primary/30" : ""}`}
+                      role="button"
+                      tabIndex={0}
+                      aria-expanded={isExpanded}
+                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setExpandedId(prev => prev === n.id ? null : n.id); } }}
                     >
                       {/* Left accent bar */}
-                      <div className={`absolute left-0 top-0 bottom-0 w-1 rounded-l-2xl transition-all duration-300 ${n.pinned ? "bg-secondary/60" : "bg-primary/10 group-hover:bg-primary/30"}`} />
+                      <div className={`absolute left-0 top-0 bottom-0 w-1 rounded-l-2xl transition-all duration-300 ${n.pinned ? "bg-secondary/60" : isExpanded ? "bg-primary/50" : "bg-primary/10 group-hover:bg-primary/30"}`} />
                       {/* Hover glow */}
                       <div className="absolute inset-0 bg-gradient-to-br from-primary/2 to-secondary/2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
-                      {/* Top shimmer on hover */}
-                      <div className="absolute top-0 left-4 right-4 h-0.5 bg-gradient-to-r from-transparent via-secondary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                       <div className="relative pl-3 flex items-start justify-between gap-3">
                         <div className="flex-1">
@@ -176,10 +180,32 @@ export default function Notices() {
                             </span>
                           </div>
                           <h3 className="font-display text-base font-semibold text-foreground group-hover:text-primary transition-colors duration-300 leading-snug">{n.title}</h3>
-                          <p className="font-body text-sm text-muted-foreground mt-1.5 leading-relaxed line-clamp-2">{n.content}</p>
+                          {!isExpanded && <p className="font-body text-sm text-muted-foreground mt-1.5 leading-relaxed line-clamp-2">{n.content}</p>}
                         </div>
-                        <div className="shrink-0 w-9 h-9 rounded-xl bg-primary/5 group-hover:bg-primary/12 flex items-center justify-center transition-all duration-300 group-hover:scale-110 mt-1 border border-border/50 group-hover:border-primary/20">
+                        <div className={`shrink-0 w-9 h-9 rounded-xl bg-primary/5 group-hover:bg-primary/12 flex items-center justify-center transition-all duration-300 group-hover:scale-110 mt-1 border border-border/50 group-hover:border-primary/20 ${isExpanded ? "rotate-45" : ""}`}>
                           <ExternalLink className="w-3.5 h-3.5 text-primary opacity-50 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                      </div>
+
+                      {/* Inline expanded content */}
+                      <div
+                        className={`overflow-hidden transition-all duration-400 ease-out ${isExpanded ? "max-h-[600px] opacity-100 mt-4" : "max-h-0 opacity-0 mt-0"}`}
+                        style={{ transitionProperty: "max-height, opacity, margin-top" }}
+                      >
+                        <div className="pl-3 border-t border-border/50 pt-4">
+                          <div className="flex items-center gap-2 mb-3 p-3 rounded-xl bg-muted/50 border border-border/50">
+                            <Bell className="w-4 h-4 text-primary shrink-0" />
+                            <span className="font-body text-xs text-muted-foreground flex items-center gap-1">
+                              <Calendar className="w-3 h-3" /> Posted on {n.date}
+                            </span>
+                          </div>
+                          <p className="font-body text-sm text-foreground leading-relaxed whitespace-pre-line">{n.content}</p>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setExpandedId(null); }}
+                            className="mt-4 w-full py-2.5 rounded-xl border border-border font-body text-sm font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-all duration-200"
+                          >
+                            Close
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -200,63 +226,6 @@ export default function Notices() {
           )}
         </div>
       </section>
-
-      {/* Notice Detail Dialog */}
-      {selectedNotice && (
-        <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm z-50 animate-fade-in p-3 sm:p-6 flex items-center justify-center" onClick={() => setSelectedNotice(null)}>
-          <div
-            className="relative bg-card rounded-3xl border border-border shadow-2xl overflow-hidden flex flex-col w-full"
-            style={{
-              maxWidth: `${noticeWidth}px`,
-              maxHeight: `${noticeMaxHeight}px`,
-              animation: "popup-expand 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Dialog Header */}
-            <div className="relative p-6 border-b border-border bg-gradient-to-br from-primary/4 to-secondary/3 overflow-hidden shrink-0">
-              <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-secondary/50 to-transparent" />
-              <div className="absolute top-0 right-0 w-24 h-24 bg-secondary/8 rounded-full blur-2xl" />
-              <div className="relative flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2 flex-wrap">
-                    {selectedNotice.pinned && (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-body font-bold px-2 py-0.5 rounded-full bg-secondary/15 text-amber-700 border border-secondary/25">
-                        <Pin className="w-2.5 h-2.5" /> Pinned
-                      </span>
-                    )}
-                    <span className={`text-[10px] font-body font-bold px-2.5 py-0.5 rounded-full border ${(typeColors[selectedNotice.type] || typeColors.General).bg} ${(typeColors[selectedNotice.type] || typeColors.General).text} ${(typeColors[selectedNotice.type] || typeColors.General).border}`}>
-                      {selectedNotice.type}
-                    </span>
-                  </div>
-                  <h3 className="font-display text-lg font-bold text-foreground leading-snug">{selectedNotice.title}</h3>
-                </div>
-                <button onClick={() => setSelectedNotice(null)} className="p-2 rounded-xl hover:bg-muted transition-all duration-200 hover:scale-110 shrink-0 mt-1">
-                  <X className="w-5 h-5 text-muted-foreground" />
-                </button>
-              </div>
-            </div>
-
-            {/* Dialog Body */}
-            <div className="p-6 overflow-y-auto flex-1">
-              <div className="flex items-center gap-2 mb-5 p-3 rounded-xl bg-muted/50 border border-border/50">
-                <Bell className="w-4 h-4 text-primary shrink-0" />
-                <span className="font-body text-xs text-muted-foreground flex items-center gap-1">
-                  <Calendar className="w-3 h-3" /> Posted on {selectedNotice.date}
-                </span>
-              </div>
-              <p className="font-body text-sm text-foreground leading-relaxed whitespace-pre-line">{selectedNotice.content}</p>
-            </div>
-
-            <div className="p-5 pt-0 shrink-0">
-              <button onClick={() => setSelectedNotice(null)}
-                className="w-full py-3 rounded-2xl border-2 border-border font-body text-sm font-semibold text-muted-foreground hover:bg-muted hover:text-foreground hover:border-primary/30 transition-all duration-200">
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

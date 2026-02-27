@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useState, useEffect, useRef } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import ActionCenter from "@/components/ActionCenter";
 
 function useAnimatedCounter(target: number, duration = 1400) {
   const [count, setCount] = useState(0);
@@ -56,6 +57,7 @@ export default function PrincipalDashboard() {
 
   const { data: counts, isLoading } = useQuery({
     queryKey: ["principal-stats"],
+    refetchInterval: 30000,
     queryFn: async () => {
       const [students, teachers, courses, notices] = await Promise.all([
         supabase.from("students").select("id, semester", { count: "exact" }).eq("is_active", true),
@@ -109,6 +111,9 @@ export default function PrincipalDashboard() {
           <p className="font-body text-sm text-muted-foreground mt-2">Full administrative control — manage faculty, students, courses, and content.</p>
         </div>
       </div>
+
+      {/* Action Center */}
+      <ActionCenter role="principal" />
 
       {/* Stats Grid */}
       {isLoading ? (
