@@ -156,11 +156,16 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           <DarkModeToggle className="hidden sm:flex" />
           <Link to="/login" className="hidden xl:block">
-            <button className="relative group overflow-hidden px-5 py-2 rounded-xl font-body text-xs font-bold text-primary-foreground shadow-md hover:shadow-lg hover:scale-105 hover:-translate-y-0.5 active:scale-100 transition-all duration-300"
-              style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--navy-dark)))" }}>
-              <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/15 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-600" />
-              <span className="relative flex items-center gap-1.5">
-                <Sparkles className="w-3 h-3 group-hover:rotate-12 transition-transform duration-300" />
+            <button className="relative group overflow-hidden px-6 py-2.5 rounded-full font-body text-xs font-bold tracking-wider uppercase text-white shadow-[0_0_20px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_30px_hsl(var(--primary)/0.5)] hover:scale-105 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-400 border border-white/10 hover:border-white/20"
+              style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(230,20%,12%))" }}>
+              {/* Animated shimmer sweep */}
+              <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+              {/* Inner glow top edge */}
+              <span className="absolute top-0 left-[20%] right-[20%] h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+              {/* Gold accent bottom */}
+              <span className="absolute bottom-0 left-[30%] right-[30%] h-px bg-gradient-to-r from-transparent via-[hsl(var(--gold))]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <span className="relative flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5 group-hover:rotate-12 group-hover:scale-110 transition-all duration-400 text-[hsl(var(--gold))]" />
                 Login
               </span>
             </button>
