@@ -163,15 +163,18 @@ export default function About() {
             <div className="absolute inset-0 section-pattern opacity-50" />
             <div className="container px-4 relative">
               <ScrollReveal><SectionHeading title="Quick Facts" subtitle="Numbers that define our institution" /></ScrollReveal>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-5 sm:gap-6 max-w-4xl mx-auto">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5 max-w-5xl mx-auto">
                 {quickFacts.map((f, i) => (
                   <ScrollReveal key={f.label} delay={i * 80}>
-                    <div className="bg-card rounded-2xl p-6 sm:p-7 text-center group relative overflow-hidden border border-border/50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
-                      <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500" style={{ background: "linear-gradient(135deg, hsla(var(--secondary), 0.08), hsla(var(--primary), 0.05))", backdropFilter: "blur(8px)" }} />
-                      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-secondary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="premium-card bg-card rounded-2xl p-5 sm:p-6 text-center group relative overflow-hidden border border-border/50 shadow-sm cursor-default">
+                      {/* Top accent line */}
+                      <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-secondary/40 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center" />
+                      {/* Shimmer sweep */}
                       <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/8 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 rounded-2xl pointer-events-none" />
-                      <p className="font-display text-2xl sm:text-3xl font-bold text-foreground group-hover:text-primary transition-colors duration-400 relative z-10">{f.value}</p>
-                      <p className="font-body text-xs text-muted-foreground mt-2 uppercase tracking-widest relative z-10 font-semibold">{f.label}</p>
+                      {/* Soft radial glow on hover */}
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl" style={{ background: "radial-gradient(circle at 50% 40%, hsl(var(--secondary) / 0.08), transparent 70%)" }} />
+                      <p className="font-display text-xl sm:text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300 relative z-10 group-hover:scale-105 transform origin-center" style={{ transition: "color 0.3s, transform 0.4s cubic-bezier(0.16,1,0.3,1)" }}>{f.value}</p>
+                      <p className="font-body text-[10px] sm:text-xs text-muted-foreground mt-2 uppercase tracking-widest relative z-10 font-semibold">{f.label}</p>
                     </div>
                   </ScrollReveal>
                 ))}
