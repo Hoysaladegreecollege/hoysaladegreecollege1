@@ -154,7 +154,7 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-2">
-          <DarkModeToggle className="hidden sm:flex" />
+          <DarkModeToggle />
           <Link to="/login" className="hidden xl:block">
             <button className="relative group overflow-hidden px-6 py-2.5 rounded-full font-body text-xs font-bold tracking-wider uppercase text-white shadow-[0_0_20px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_30px_hsl(var(--primary)/0.5)] hover:scale-105 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-400 border border-white/10 hover:border-white/20"
               style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(230,20%,12%))" }}>

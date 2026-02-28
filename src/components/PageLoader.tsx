@@ -14,7 +14,7 @@ export default function PageLoader() {
     if (isInitial) {
       sessionStorage.setItem("hdc-loaded", "1");
       setShowLogo(true);
-      setTimeout(() => setShowLogo(false), 1600);
+      setTimeout(() => setShowLogo(false), 2500);
     }
   }, []);
 
@@ -35,7 +35,7 @@ export default function PageLoader() {
       {/* Initial logo splash */}
       {showLogo && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-background"
-          style={{ animation: "logo-splash-out 0.5s cubic-bezier(0.16,1,0.3,1) 1.1s forwards" }}>
+          style={{ animation: "logo-splash-out 0.5s cubic-bezier(0.16,1,0.3,1) 2s forwards" }}>
           <div className="flex flex-col items-center gap-4" style={{ animation: "logo-splash-in 0.6s cubic-bezier(0.16,1,0.3,1) forwards" }}>
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-navy-dark flex items-center justify-center shadow-2xl"
               style={{ animation: "logo-spin-in 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards" }}>
@@ -47,7 +47,7 @@ export default function PageLoader() {
             </div>
             <div className="w-32 h-0.5 bg-muted rounded-full overflow-hidden mt-2 animate-fade-in animation-delay-400">
               <div className="h-full bg-gradient-to-r from-secondary to-primary rounded-full"
-                style={{ animation: "logo-progress 1s cubic-bezier(0.4,0,0.2,1) 0.3s forwards", width: "0%" }} />
+                style={{ animation: "logo-progress 1.8s cubic-bezier(0.4,0,0.2,1) 0.3s forwards", width: "0%" }} />
             </div>
           </div>
         </div>

@@ -3,9 +3,11 @@ import { useEffect, useState, useCallback } from "react";
 
 export default function DarkModeToggle({ className = "" }: { className?: string }) {
   const [dark, setDark] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return document.documentElement.classList.contains("dark") ||
-      (!localStorage.getItem("theme") && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    if (typeof window === "undefined") return true;
+    const saved = localStorage.getItem("theme");
+    if (saved === "light") return false;
+    // Default to dark theme
+    return true;
   });
 
   const [transitioning, setTransitioning] = useState(false);
