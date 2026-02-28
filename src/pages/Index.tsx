@@ -254,12 +254,12 @@ export default function Index() {
           </div>
 
           {/* Scroll indicator */}
-          
-
-
-
-
-
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-fade-in animation-delay-800">
+            <span className="font-body text-[10px] tracking-[0.25em] uppercase text-primary-foreground/40">Scroll</span>
+            <div className="w-6 h-10 rounded-full border-2 border-primary-foreground/20 flex justify-center pt-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-secondary animate-scroll-bounce" />
+            </div>
+          </div>
         </div>
       </section>
 
