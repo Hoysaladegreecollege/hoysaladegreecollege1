@@ -228,20 +228,20 @@ export default function Index() {
             College Code: BU 26 • Nelamangala Town, Bengaluru Rural - 562 123
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center animate-slide-up animation-delay-500 px-2">
-            <Link to="/admissions" className="w-full sm:w-auto">
-              <button className="relative group w-full sm:w-auto overflow-hidden px-8 sm:px-10 py-4 sm:py-4 rounded-2xl font-body text-sm sm:text-base font-bold text-foreground shadow-2xl btn-magnetic active:scale-[0.97] touch-manipulation"
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center animate-slide-up animation-delay-500 px-4 sm:px-2">
+            <Link to="/admissions" className="w-full sm:w-[220px]">
+              <button className="relative group w-full h-14 overflow-hidden rounded-2xl font-body text-sm font-bold text-foreground shadow-2xl btn-magnetic active:scale-[0.97] touch-manipulation"
               style={{ background: "linear-gradient(135deg, hsl(42,87%,58%), hsl(38,92%,48%), hsl(42,87%,65%))", boxShadow: "0 8px 40px hsla(42,87%,52%,0.5), 0 2px 0 rgba(255,255,255,0.2) inset" }}>
                 <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/0 via-white/25 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                 <span className="relative flex items-center justify-center gap-2">
                   <Sparkles className="w-4 h-4" />
-                  Apply Now — 2026-27
+                  Apply Now
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" />
                 </span>
               </button>
             </Link>
-            <Link to="/courses" className="w-full sm:w-auto">
-              <button className="relative group w-full sm:w-auto overflow-hidden px-8 sm:px-10 py-4 sm:py-4 rounded-2xl font-body text-sm sm:text-base font-bold text-white btn-magnetic active:scale-[0.97] touch-manipulation"
+            <Link to="/courses" className="w-full sm:w-[220px]">
+              <button className="relative group w-full h-14 overflow-hidden rounded-2xl font-body text-sm font-bold text-white btn-magnetic active:scale-[0.97] touch-manipulation"
               style={{ background: "rgba(255,255,255,0.1)", border: "1.5px solid rgba(255,255,255,0.25)", backdropFilter: "blur(16px)", boxShadow: "0 8px 32px rgba(0,0,0,0.2), 0 1px 0 rgba(255,255,255,0.2) inset" }}>
                 <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/0 via-white/12 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                 <span className="relative flex items-center justify-center gap-2">
