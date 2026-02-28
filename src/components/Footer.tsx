@@ -14,7 +14,7 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer className="bg-gradient-to-b from-primary to-navy-dark text-primary-foreground relative overflow-hidden">
+    <footer className="bg-[hsl(228,14%,8%)] dark:bg-[hsl(230,15%,5%)] text-white/90 relative overflow-hidden">
       {/* Decorative */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-secondary/40 to-transparent" />
       <div className="absolute top-10 right-10 w-64 h-64 rounded-full bg-secondary/3 blur-3xl" />
