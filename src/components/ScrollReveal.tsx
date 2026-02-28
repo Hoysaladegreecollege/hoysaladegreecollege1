@@ -10,6 +10,9 @@ export default function ScrollReveal({ children, className = "", delay = 0 }: Pr
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -19,9 +22,10 @@ export default function ScrollReveal({ children, className = "", delay = 0 }: Pr
           observer.unobserve(entry.target);
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.08, rootMargin: "0px 0px -40px 0px" }
     );
-    if (ref.current) observer.observe(ref.current);
+
+    observer.observe(el);
     return () => observer.disconnect();
   }, [delay]);
 
