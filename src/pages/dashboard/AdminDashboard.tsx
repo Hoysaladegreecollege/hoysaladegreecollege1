@@ -152,6 +152,7 @@ export default function AdminDashboard() {
   ];
 
   const quickActions = [
+    { icon: BookOpen, label: "Courses", desc: "Add & edit courses", path: "/dashboard/admin/courses" },
     { icon: Megaphone, label: "Post Notice", desc: "Publish announcements", path: "/dashboard/admin/post-notice" },
     { icon: ArrowUpCircle, label: "Semester Promotion", desc: "Promote students", path: "/dashboard/admin/semester-promotion" },
     { icon: CalendarDays, label: "Academic Years", desc: "Manage sessions", path: "/dashboard/admin/academic-years" },
