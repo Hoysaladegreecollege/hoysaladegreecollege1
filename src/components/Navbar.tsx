@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, GraduationCap, ChevronDown, Phone, Mail, Sparkles } from "lucide-react";
+import { GraduationCap, ChevronDown, Phone, Mail, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DarkModeToggle from "./DarkModeToggle";
 
@@ -171,15 +171,60 @@ export default function Navbar() {
             </button>
           </Link>
 
-          {/* Hamburger */}
+          {/* Hamburger — premium toggle */}
           <button
             onClick={() => setOpen(!open)}
-            className="xl:hidden relative p-2 rounded-xl hover:bg-primary/5 transition-all duration-300 text-foreground"
+            className="xl:hidden relative w-[40px] h-[40px] rounded-xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group/burger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-90"
             aria-label="Toggle menu"
+            style={{
+              background: open
+                ? "linear-gradient(135deg, hsl(var(--primary)), hsl(230,18%,14%))"
+                : "linear-gradient(135deg, hsl(230,18%,14%), hsl(230,16%,18%))",
+              boxShadow: open
+                ? "0 2px 12px hsl(var(--primary) / 0.3), inset 0 1px 0 rgba(255,255,255,0.06)"
+                : "0 1px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04), 0 0 8px rgba(198,167,94,0.04)",
+              border: open ? "1px solid hsl(var(--primary) / 0.3)" : "1px solid rgba(255,255,255,0.06)",
+            }}
           >
-            <div className="relative w-5 h-5">
-              <Menu className={`w-5 h-5 absolute transition-all duration-300 ${open ? "opacity-0 rotate-90 scale-75" : "opacity-100 rotate-0 scale-100"}`} />
-              <X className={`w-5 h-5 absolute transition-all duration-300 ${open ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-75"}`} />
+            {/* Ambient glow */}
+            <span
+              className="absolute inset-0 rounded-xl transition-opacity duration-500"
+              style={{
+                background: open
+                  ? "radial-gradient(circle at center, hsl(var(--primary) / 0.15), transparent 70%)"
+                  : "radial-gradient(circle at center, hsl(var(--gold) / 0.06), transparent 70%)",
+                opacity: open ? 1 : 0,
+              }}
+            />
+            {/* Animated bars → X */}
+            <div className="relative w-[18px] h-[14px] mx-auto">
+              <span
+                className="absolute left-0 h-[1.5px] rounded-full transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                style={{
+                  width: open ? 18 : 18,
+                  top: open ? 6 : 0,
+                  transform: open ? "rotate(45deg)" : "rotate(0)",
+                  background: open ? "hsl(var(--gold))" : "hsl(var(--foreground) / 0.7)",
+                }}
+              />
+              <span
+                className="absolute left-0 top-[6px] h-[1.5px] rounded-full transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                style={{
+                  width: open ? 0 : 12,
+                  opacity: open ? 0 : 1,
+                  transform: open ? "translateX(8px)" : "translateX(0)",
+                  background: "hsl(var(--gold) / 0.5)",
+                }}
+              />
+              <span
+                className="absolute left-0 h-[1.5px] rounded-full transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                style={{
+                  width: open ? 18 : 15,
+                  top: open ? 6 : 12,
+                  transform: open ? "rotate(-45deg)" : "rotate(0)",
+                  background: open ? "hsl(var(--gold))" : "hsl(var(--foreground) / 0.5)",
+                }}
+              />
             </div>
           </button>
         </div>
