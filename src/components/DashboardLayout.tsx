@@ -4,8 +4,8 @@ import {
   LayoutDashboard, User, BookOpen, Calendar, FileText,
   Bell, Clock, LogOut, GraduationCap, Users, Upload,
   BarChart3, Settings, Award, Image, Megaphone, Shield,
-  UserCog, Menu, X, Mail, Trophy, ChevronRight, Sparkles, UserCheck,
-  DollarSign, Book, ArrowUpCircle, Cake, ImagePlus
+  UserCog, Menu, X, Mail, Trophy, UserCheck,
+  DollarSign, Book, ArrowUpCircle, Cake, ImagePlus, ChevronLeft, ExternalLink
 } from "lucide-react";
 import { useState } from "react";
 import PageLoader from "./PageLoader";
@@ -81,95 +81,118 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     : adminNav;
 
   const roleLabel = role ? role.charAt(0).toUpperCase() + role.slice(1) : "";
-  const roleEmoji = role === "admin" ? "⚙️" : role === "principal" ? "🏛️" : role === "teacher" ? "📚" : "🎓";
 
   const handleLogout = async () => { await signOut(); navigate("/"); };
 
+  // Find current page title
+  const currentPage = navItems.find(item => location.pathname === item.path)?.label || roleLabel + " Dashboard";
+
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="min-h-screen flex bg-muted/30 dark:bg-background">
       <ScrollToTop />
       <PageLoader />
+
+      {/* Mobile overlay */}
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-foreground/40 backdrop-blur-sm z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+        <div
+          className="fixed inset-0 bg-foreground/20 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-200"
+          onClick={() => setSidebarOpen(false)}
+        />
       )}
 
-      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-[252px] sm:w-[266px] bg-primary text-primary-foreground transform transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col border-r border-primary-foreground/10 shadow-2xl`}>
-        {/* Decorative sidebar glow */}
-        <div className="absolute top-20 -right-10 w-20 h-40 bg-secondary/12 blur-3xl rounded-full" />
-        
-        <div className="p-4 sm:p-5 border-b border-primary-foreground/8 shrink-0 relative">
+      {/* Sidebar — Apple dark style */}
+      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-[240px] bg-[hsl(220,20%,10%)] dark:bg-[hsl(0,0%,7%)] text-white/90 transform transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col`}>
+        {/* Brand */}
+        <div className="px-5 pt-5 pb-4 shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-secondary to-secondary/80 flex items-center justify-center shadow-lg">
-                <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+              <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+                <GraduationCap className="w-4 h-4 text-white/80" />
               </div>
               <div>
-                <p className="font-display text-xs sm:text-sm font-bold leading-tight">Hoysala College</p>
-                <p className="text-[9px] sm:text-[10px] font-body opacity-40 mt-0.5 flex items-center gap-1">{roleLabel} Portal {roleEmoji}</p>
+                <p className="font-body text-[13px] font-semibold text-white/90 leading-tight">Hoysala College</p>
+                <p className="font-body text-[10px] text-white/35 mt-0.5">{roleLabel} Portal</p>
               </div>
             </div>
-            <button className="lg:hidden p-1 rounded-lg hover:bg-primary-foreground/10 transition-colors" onClick={() => setSidebarOpen(false)}><X className="w-5 h-5" /></button>
+            <button className="lg:hidden p-1.5 rounded-lg hover:bg-white/10 transition-colors" onClick={() => setSidebarOpen(false)}>
+              <X className="w-4 h-4 text-white/60" />
+            </button>
           </div>
         </div>
 
-        <nav className="flex-1 overflow-y-auto py-3 px-2 sm:px-3 space-y-0.5">
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto px-3 pb-3 space-y-0.5">
           {navItems.map((item) => {
             const active = location.pathname === item.path;
             return (
-              <Link key={item.path} to={item.path} onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-body text-[12px] sm:text-[13px] transition-all duration-300 group relative border ${
+              <Link
+                key={item.path}
+                to={item.path}
+                onClick={() => setSidebarOpen(false)}
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg font-body text-[13px] transition-all duration-200 ${
                   active
-                    ? "bg-secondary text-secondary-foreground font-semibold shadow-lg shadow-secondary/20 border-secondary/30"
-                    : "text-primary-foreground/75 border-transparent hover:bg-primary-foreground/8 hover:text-primary-foreground hover:border-primary-foreground/15"
-                }`}>
-                {active && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-secondary rounded-r-full" />}
-                <span className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${active ? "bg-secondary-foreground/10" : "bg-primary-foreground/5 group-hover:bg-primary-foreground/12"}`}>
-                  <item.icon className={`w-4 h-4 sm:w-[18px] sm:h-[18px] shrink-0 transition-all duration-300 ${active ? "" : "group-hover:scale-110 group-hover:text-secondary"}`} />
-                </span>
-                <span className="flex-1 truncate">{item.label}</span>
-                {active && <ChevronRight className="w-3 h-3 opacity-70 shrink-0" />}
+                    ? "bg-white/12 text-white font-medium"
+                    : "text-white/50 hover:bg-white/6 hover:text-white/80"
+                }`}
+              >
+                <item.icon className={`w-[16px] h-[16px] shrink-0 ${active ? "text-white/90" : "text-white/40"}`} />
+                <span className="truncate">{item.label}</span>
               </Link>
             );
           })}
         </nav>
 
-        <div className="p-3 sm:p-4 border-t border-primary-foreground/8 shrink-0">
-          <div className="flex items-center gap-2.5 mb-3 px-1">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-primary-foreground/10 to-primary-foreground/5 flex items-center justify-center shrink-0">
-              <User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+        {/* User + Logout */}
+        <div className="px-3 py-4 border-t border-white/8 shrink-0">
+          <div className="flex items-center gap-2.5 px-3 mb-3">
+            <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center shrink-0">
+              <User className="w-3.5 h-3.5 text-white/60" />
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-body text-[11px] sm:text-xs font-semibold truncate">{profile?.full_name || "User"}</p>
-              <p className="font-body text-[9px] sm:text-[10px] opacity-30 truncate">{profile?.email}</p>
+            <div className="min-w-0 flex-1">
+              <p className="font-body text-[12px] font-medium text-white/80 truncate">{profile?.full_name || "User"}</p>
+              <p className="font-body text-[10px] text-white/30 truncate">{profile?.email}</p>
             </div>
           </div>
-          <button onClick={handleLogout} className="flex items-center gap-2 w-full px-3 py-2.5 rounded-xl text-[12px] sm:text-[13px] font-body text-primary-foreground/50 hover:bg-destructive/20 hover:text-primary-foreground transition-all duration-300">
-            <LogOut className="w-4 h-4" /> Sign Out
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 w-full px-3 py-2 rounded-lg font-body text-[12px] text-white/40 hover:bg-white/6 hover:text-white/70 transition-all duration-200"
+          >
+            <LogOut className="w-3.5 h-3.5" /> Sign Out
           </button>
         </div>
       </aside>
 
+      {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="bg-card border-b border-border px-4 sm:px-6 py-3.5 flex items-center justify-between sticky top-0 z-30 shadow-sm">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <button className="lg:hidden p-2 rounded-xl hover:bg-muted transition-colors" onClick={() => setSidebarOpen(true)}><Menu className="w-5 h-5 text-foreground" /></button>
+        {/* Top header — clean minimal */}
+        <header className="bg-card/80 dark:bg-card/60 backdrop-blur-lg border-b border-border/60 px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between sticky top-0 z-30">
+          <div className="flex items-center gap-3">
+            <button
+              className="lg:hidden p-2 -ml-1 rounded-lg hover:bg-muted transition-colors duration-200"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <Menu className="w-5 h-5 text-foreground/70" />
+            </button>
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="font-display text-base sm:text-lg font-bold text-foreground flex items-center gap-2">{roleLabel} Dashboard <Sparkles className="w-4 h-4 text-secondary" /></h1>
-                <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-body font-semibold bg-primary/8 text-primary border border-primary/15">Live</span>
-              </div>
-              <p className="font-body text-[9px] sm:text-[10px] text-muted-foreground hidden sm:block">Hoysala Degree College • Management Portal</p>
+              <h1 className="font-body text-[15px] sm:text-base font-semibold text-foreground tracking-[-0.01em]">{currentPage}</h1>
+              <p className="font-body text-[11px] text-muted-foreground hidden sm:block">Hoysala Degree College</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <DarkModeToggle />
-            <Link to="/" className="font-body text-[11px] sm:text-xs text-muted-foreground hover:text-primary transition-all duration-300 px-3 py-1.5 rounded-xl hover:bg-primary/5 flex items-center gap-1 border border-transparent hover:border-primary/15">
-              ← Website
+            <Link
+              to="/"
+              className="font-body text-[12px] text-muted-foreground hover:text-foreground transition-colors duration-200 px-3 py-1.5 rounded-lg hover:bg-muted flex items-center gap-1.5"
+            >
+              <ExternalLink className="w-3 h-3" />
+              <span className="hidden sm:inline">Website</span>
             </Link>
           </div>
         </header>
-        <main className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 overflow-auto">
-          <div className="animate-fade-in-up">{children}</div>
+
+        {/* Page content */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
+          <div className="max-w-7xl mx-auto animate-fade-in">{children}</div>
         </main>
       </div>
     </div>

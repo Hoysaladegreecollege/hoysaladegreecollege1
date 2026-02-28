@@ -10,9 +10,9 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import ActionCenter from "@/components/ActionCenter";
 
-const CHART_COLORS = ["hsl(217, 72%, 18%)", "hsl(42, 87%, 55%)", "hsl(217, 50%, 30%)", "hsl(142, 70%, 40%)"];
+const CHART_COLORS = ["hsl(var(--primary))", "hsl(var(--secondary))", "hsl(217, 50%, 40%)", "hsl(142, 50%, 40%)"];
 
-function useAnimatedCounter(target: number, duration = 1500) {
+function useAnimatedCounter(target: number, duration = 1200) {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
   const started = useRef(false);
@@ -37,15 +37,17 @@ function useAnimatedCounter(target: number, duration = 1500) {
   return { count, ref };
 }
 
-function AnimatedStatCard({ label, value, icon: Icon, gradient, iconBg }: any) {
+function StatCard({ label, value, icon: Icon }: { label: string; value: string; icon: React.ElementType }) {
   const { count, ref } = useAnimatedCounter(parseInt(value) || 0);
   return (
-    <div ref={ref} className={`bg-gradient-to-br ${gradient} border border-border rounded-2xl p-4 sm:p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group`}>
-      <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl ${iconBg} flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-300`}>
-        <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+    <div ref={ref} className="bg-card border border-border/60 rounded-2xl p-5 hover:border-border transition-colors duration-200">
+      <div className="flex items-center justify-between mb-4">
+        <div className="w-9 h-9 rounded-xl bg-muted/60 flex items-center justify-center">
+          <Icon className="w-[18px] h-[18px] text-muted-foreground" />
+        </div>
       </div>
-      <p className="font-display text-2xl sm:text-3xl font-bold text-foreground">{count}</p>
-      <p className="font-body text-[10px] sm:text-xs text-muted-foreground mt-1">{label}</p>
+      <p className="font-body text-[28px] font-semibold text-foreground tracking-tight tabular-nums leading-none">{count}</p>
+      <p className="font-body text-[12px] text-muted-foreground mt-1.5">{label}</p>
     </div>
   );
 }
@@ -65,7 +67,6 @@ export default function AdminDashboard() {
         supabase.from("admission_applications").select("id", { count: "exact", head: true }).eq("status", "pending"),
         supabase.from("contact_submissions").select("id", { count: "exact", head: true }).eq("status", "new"),
       ]);
-      // semester breakdown
       const semCounts: Record<number, number> = {};
       (students.data || []).forEach((s: any) => { semCounts[s.semester] = (semCounts[s.semester] || 0) + 1; });
       return { students: students.count || 0, teachers: teachers.count || 0, courses: courses.count || 0, events: events.count || 0, pendingApps: pendingApps.count || 0, newContacts: contacts.count || 0, semesterBreakdown: semCounts };
@@ -109,20 +110,12 @@ export default function AdminDashboard() {
     },
   });
 
-  // Fee defaulters query
   const { data: feeDefaulters = [] } = useQuery({
     queryKey: ["admin-fee-defaulters"],
     queryFn: async () => {
-      const { data: students } = await supabase
-        .from("students")
-        .select("id, roll_number, total_fee, fee_paid, fee_due_date, user_id, courses(name, code)")
-        .eq("is_active", true)
-        .gt("total_fee", 0);
+      const { data: students } = await supabase.from("students").select("id, roll_number, total_fee, fee_paid, fee_due_date, user_id, courses(name, code)").eq("is_active", true).gt("total_fee", 0);
       if (!students) return [];
-      const defaulters = students.filter((s: any) => {
-        const due = (s.total_fee || 0) - (s.fee_paid || 0);
-        return due > 0;
-      });
+      const defaulters = students.filter((s: any) => ((s.total_fee || 0) - (s.fee_paid || 0)) > 0);
       if (defaulters.length === 0) return [];
       const userIds = defaulters.map((s: any) => s.user_id);
       const { data: profiles } = await supabase.from("profiles").select("user_id, full_name").in("user_id", userIds);
@@ -134,280 +127,206 @@ export default function AdminDashboard() {
     },
   });
 
-  // Export students to CSV
   const exportStudentsCSV = async () => {
     toast.info("Generating CSV...");
-    const { data: students } = await supabase
-      .from("students")
-      .select("roll_number, semester, year_level, admission_year, parent_phone, phone, total_fee, fee_paid, fee_due_date, user_id, courses(name, code)")
-      .eq("is_active", true)
-      .order("roll_number");
+    const { data: students } = await supabase.from("students").select("roll_number, semester, year_level, admission_year, parent_phone, phone, total_fee, fee_paid, fee_due_date, user_id, courses(name, code)").eq("is_active", true).order("roll_number");
     if (!students || students.length === 0) { toast.error("No students to export"); return; }
     const userIds = students.map(s => s.user_id);
     const { data: profiles } = await supabase.from("profiles").select("user_id, full_name, email, phone").in("user_id", userIds);
     const rows = students.map((s: any) => {
       const p = profiles?.find((pr: any) => pr.user_id === s.user_id);
-      return [
-        s.roll_number, p?.full_name || "", p?.email || "", p?.phone || s.phone || "",
-        s.courses?.name || "", s.courses?.code || "", s.semester, s.year_level,
-        s.admission_year, s.parent_phone || "", s.total_fee || 0, s.fee_paid || 0,
-        (s.total_fee || 0) - (s.fee_paid || 0), s.fee_due_date || ""
-      ].join(",");
+      return [s.roll_number, p?.full_name || "", p?.email || "", p?.phone || s.phone || "", s.courses?.name || "", s.courses?.code || "", s.semester, s.year_level, s.admission_year, s.parent_phone || "", s.total_fee || 0, s.fee_paid || 0, (s.total_fee || 0) - (s.fee_paid || 0), s.fee_due_date || ""].join(",");
     });
     const csv = "Roll,Name,Email,Phone,Course,Code,Semester,Year,AdmissionYear,ParentPhone,TotalFee,FeePaid,FeeDue,DueDate\n" + rows.join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = `students_export_${new Date().toISOString().split("T")[0]}.csv`;
-    a.click(); URL.revokeObjectURL(url);
+    const a = document.createElement("a"); a.href = url; a.download = `students_export_${new Date().toISOString().split("T")[0]}.csv`; a.click(); URL.revokeObjectURL(url);
     toast.success("CSV downloaded!");
   };
 
   const stats = [
-    { label: "Total Students", value: String(counts?.students ?? 0), icon: Users, gradient: "from-primary/8 to-primary/3", iconBg: "bg-primary/10" },
-    { label: "Total Teachers", value: String(counts?.teachers ?? 0), icon: GraduationCap, gradient: "from-secondary/8 to-secondary/3", iconBg: "bg-secondary/10" },
-    { label: "Active Courses", value: String(counts?.courses ?? 0), icon: BookOpen, gradient: "from-primary/8 to-primary/3", iconBg: "bg-primary/10" },
-    { label: "Total Events", value: String(counts?.events ?? 0), icon: Calendar, gradient: "from-secondary/8 to-secondary/3", iconBg: "bg-secondary/10" },
+    { label: "Total Students", value: String(counts?.students ?? 0), icon: Users },
+    { label: "Total Teachers", value: String(counts?.teachers ?? 0), icon: GraduationCap },
+    { label: "Active Courses", value: String(counts?.courses ?? 0), icon: BookOpen },
+    { label: "Total Events", value: String(counts?.events ?? 0), icon: Calendar },
   ];
 
   const quickActions = [
-    { icon: Megaphone, label: "Post Notice", desc: "Publish announcements instantly", path: "/dashboard/admin/post-notice", highlight: true },
-    { icon: ArrowUpCircle, label: "Semester Promotion", desc: "Promote students in bulk", path: "/dashboard/admin/semester-promotion", highlight: true },
-    { icon: CalendarDays, label: "Academic Years", desc: "Manage academic sessions", path: "/dashboard/admin/academic-years", highlight: true },
-    { icon: UserX, label: "Absent Report", desc: "View absent students", path: "/dashboard/admin/absent-report", highlight: true },
-    { icon: Download, label: "Export Student Data", desc: "Download CSV report", path: "/dashboard/admin/settings", highlight: false },
-    { icon: FileText, label: "Admission Applications", desc: `${counts?.pendingApps || 0} pending`, path: "/dashboard/admin/applications", badge: counts?.pendingApps },
-    { icon: Mail, label: "Contact Messages", desc: `${counts?.newContacts || 0} new`, path: "/dashboard/admin/contacts", badge: counts?.newContacts },
-    { icon: Users, label: "Manage Users", desc: "View, edit & delete users", path: "/dashboard/admin/users" },
-    { icon: UserPlus, label: "Add Staff", desc: "Create teacher/admin/principal", path: "/dashboard/admin/add-staff", highlight: true },
-    { icon: Calendar, label: "Upload Timetable", desc: "Manage class schedules", path: "/dashboard/admin/timetable" },
-    { icon: Image, label: "Upload Events", desc: "Post events & gallery", path: "/dashboard/admin/events" },
-    { icon: Shield, label: "Roles & Permissions", desc: "View role distribution", path: "/dashboard/admin/roles" },
-    { icon: Settings, label: "System Settings", desc: "Analytics & health", path: "/dashboard/admin/settings" },
+    { icon: Megaphone, label: "Post Notice", desc: "Publish announcements", path: "/dashboard/admin/post-notice" },
+    { icon: ArrowUpCircle, label: "Semester Promotion", desc: "Promote students", path: "/dashboard/admin/semester-promotion" },
+    { icon: CalendarDays, label: "Academic Years", desc: "Manage sessions", path: "/dashboard/admin/academic-years" },
+    { icon: UserX, label: "Absent Report", desc: "View absent students", path: "/dashboard/admin/absent-report" },
+    { icon: FileText, label: "Applications", desc: `${counts?.pendingApps || 0} pending`, path: "/dashboard/admin/applications", badge: counts?.pendingApps },
+    { icon: Mail, label: "Messages", desc: `${counts?.newContacts || 0} new`, path: "/dashboard/admin/contacts", badge: counts?.newContacts },
+    { icon: Users, label: "Manage Users", desc: "View & edit users", path: "/dashboard/admin/users" },
+    { icon: UserPlus, label: "Add Staff", desc: "Create accounts", path: "/dashboard/admin/add-staff" },
+    { icon: Calendar, label: "Timetable", desc: "Class schedules", path: "/dashboard/admin/timetable" },
+    { icon: Image, label: "Events", desc: "Post events", path: "/dashboard/admin/events" },
+    { icon: Shield, label: "Roles", desc: "Role distribution", path: "/dashboard/admin/roles" },
+    { icon: Settings, label: "Settings", desc: "System health", path: "/dashboard/admin/settings" },
   ];
 
-  const inputClass = "w-full border border-border rounded-xl px-3 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all";
-
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* Welcome Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-primary/10 via-card to-secondary/10 border border-border rounded-2xl p-6 md:p-8">
-        <div className="absolute top-0 right-0 w-40 h-40 bg-secondary/8 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/5 rounded-full translate-y-1/2 -translate-x-1/4 blur-2xl" />
-        <div className="relative">
-          <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-3 py-1 mb-3">
-            <Shield className="w-3 h-3 text-primary" />
-            <span className="font-body text-[11px] text-primary font-semibold uppercase tracking-wider">Super Admin</span>
-          </div>
-          <h2 className="font-display text-xl sm:text-2xl md:text-3xl font-bold text-foreground">Super Admin Panel ⚙️</h2>
-          <p className="font-body text-sm text-muted-foreground mt-2">Welcome back, {profile?.full_name || "Admin"}. Full system control and content management.</p>
-          {(counts?.pendingApps || counts?.newContacts) ? (
-            <div className="mt-4 flex flex-wrap gap-2">
-              {counts?.pendingApps ? (
-                <Link to="/dashboard/admin/applications" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary/15 text-sm font-body font-semibold text-foreground hover:bg-secondary/25 transition-colors">
-                  📋 {counts.pendingApps} pending application{counts.pendingApps > 1 ? "s" : ""}
-                </Link>
-              ) : null}
-              {counts?.newContacts ? (
-                <Link to="/dashboard/admin/contacts" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 text-sm font-body font-semibold text-foreground hover:bg-primary/15 transition-colors">
-                  ✉️ {counts.newContacts} new message{counts.newContacts > 1 ? "s" : ""}
-                </Link>
-              ) : null}
-            </div>
-          ) : null}
-        </div>
+    <div className="space-y-6">
+      {/* Welcome */}
+      <div>
+        <h2 className="font-body text-xl sm:text-2xl font-semibold text-foreground tracking-tight">
+          Welcome back, {profile?.full_name?.split(" ")[0] || "Admin"}
+        </h2>
+        <p className="font-body text-[13px] text-muted-foreground mt-1">Here's an overview of your institution.</p>
       </div>
 
       {/* Action Center */}
       <ActionCenter role="admin" />
 
-      {/* Command Center */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-        <Link to="/dashboard/admin/applications" className="premium-card p-4 sm:p-5 group">
-          <p className="font-body text-[11px] uppercase tracking-wider text-muted-foreground">Pending Applications</p>
-          <div className="mt-2 flex items-center justify-between">
-            <p className="font-display text-3xl font-bold text-foreground">{counts?.pendingApps || 0}</p>
-            <FileText className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
-          </div>
+      {/* KPI Strip */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <Link to="/dashboard/admin/applications" className="bg-card border border-border/60 rounded-2xl p-4 hover:border-border transition-colors duration-200 group">
+          <p className="font-body text-[11px] text-muted-foreground uppercase tracking-wider">Pending Apps</p>
+          <p className="font-body text-2xl font-semibold text-foreground mt-1 tabular-nums">{counts?.pendingApps || 0}</p>
         </Link>
-        <Link to="/dashboard/admin/contacts" className="premium-card p-4 sm:p-5 group">
-          <p className="font-body text-[11px] uppercase tracking-wider text-muted-foreground">New Messages</p>
-          <div className="mt-2 flex items-center justify-between">
-            <p className="font-display text-3xl font-bold text-foreground">{counts?.newContacts || 0}</p>
-            <Mail className="w-5 h-5 text-secondary group-hover:scale-110 transition-transform" />
-          </div>
+        <Link to="/dashboard/admin/contacts" className="bg-card border border-border/60 rounded-2xl p-4 hover:border-border transition-colors duration-200 group">
+          <p className="font-body text-[11px] text-muted-foreground uppercase tracking-wider">New Messages</p>
+          <p className="font-body text-2xl font-semibold text-foreground mt-1 tabular-nums">{counts?.newContacts || 0}</p>
         </Link>
-        <div className="premium-card p-4 sm:p-5">
-          <p className="font-body text-[11px] uppercase tracking-wider text-muted-foreground">Attendance Health</p>
-          <div className="mt-2 flex items-center justify-between">
-            <p className="font-display text-3xl font-bold text-foreground">{attendanceStats?.percentage || 0}%</p>
-            <Activity className="w-5 h-5 text-primary" />
-          </div>
+        <div className="bg-card border border-border/60 rounded-2xl p-4">
+          <p className="font-body text-[11px] text-muted-foreground uppercase tracking-wider">Attendance</p>
+          <p className="font-body text-2xl font-semibold text-foreground mt-1 tabular-nums">{attendanceStats?.percentage || 0}%</p>
         </div>
       </div>
 
       {/* Stats Grid */}
       {countsLoading ? (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-          {[1,2,3,4].map(i => <Skeleton key={i} className="h-32 rounded-2xl" />)}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[1,2,3,4].map(i => <Skeleton key={i} className="h-28 rounded-2xl" />)}
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-          {stats.map((s) => <AnimatedStatCard key={s.label} {...s} />)}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {stats.map((s) => <StatCard key={s.label} {...s} />)}
         </div>
       )}
 
-      {/* Charts Row - Course-based bar chart */}
-      <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
-        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6">
-          <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-            <BarChart3 className="w-4 h-4 text-primary" /> Students by Course
-          </h3>
-          <div className="h-48 sm:h-56">
+      {/* Charts */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+          <h3 className="font-body text-[13px] font-semibold text-foreground mb-5">Students by Course</h3>
+          <div className="h-48">
             {courseDistribution.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={courseDistribution} barSize={32}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(214, 20%, 88%)" />
-                  <XAxis dataKey="name" tick={{ fontSize: 11, fontFamily: "Inter" }} stroke="hsl(220, 10%, 45%)" />
-                  <YAxis tick={{ fontSize: 11, fontFamily: "Inter" }} stroke="hsl(220, 10%, 45%)" />
-                  <Tooltip contentStyle={{ borderRadius: 12, fontFamily: "Inter", fontSize: 12, border: "1px solid hsl(214, 20%, 88%)" }} />
-                  <Bar dataKey="count" fill="hsl(217, 72%, 18%)" radius={[6, 6, 0, 0]} />
+                <BarChart data={courseDistribution} barSize={28}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                  <XAxis dataKey="name" tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={{ borderRadius: 12, fontFamily: "Inter", fontSize: 12, border: "1px solid hsl(var(--border))", background: "hsl(var(--card))", color: "hsl(var(--foreground))", boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }} cursor={{ fill: "hsl(var(--muted) / 0.5)" }} />
+                  <Bar dataKey="count" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : <Skeleton className="w-full h-full rounded-xl" />}
           </div>
         </div>
 
-        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6">
-          <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-            <PieChart className="w-4 h-4 text-secondary" /> User Roles
-          </h3>
-          <div className="h-48 sm:h-56 flex items-center justify-center">
+        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+          <h3 className="font-body text-[13px] font-semibold text-foreground mb-5">User Roles</h3>
+          <div className="h-48 flex items-center justify-center">
             {roleDistribution.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <RePieChart>
-                  <Pie data={roleDistribution} cx="50%" cy="50%" innerRadius={40} outerRadius={70} paddingAngle={4} dataKey="value" label={({ name, value }) => `${name}: ${value}`} style={{ fontSize: 11, fontFamily: "Inter" }}>
+                  <Pie data={roleDistribution} cx="50%" cy="50%" innerRadius={40} outerRadius={65} paddingAngle={3} dataKey="value" label={({ name, value }) => `${name}: ${value}`} style={{ fontSize: 11, fontFamily: "Inter" }}>
                     {roleDistribution.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
                   </Pie>
-                  <Tooltip contentStyle={{ borderRadius: 12, fontFamily: "Inter", fontSize: 12 }} />
+                  <Tooltip contentStyle={{ borderRadius: 12, fontFamily: "Inter", fontSize: 12, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }} />
                 </RePieChart>
               </ResponsiveContainer>
-            ) : <Skeleton className="w-48 h-48 rounded-full" />}
+            ) : <Skeleton className="w-40 h-40 rounded-full" />}
           </div>
         </div>
       </div>
 
-      {/* Attendance + Semester Breakdown */}
-      <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
-        {/* Attendance Overview */}
-        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6">
-          <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-primary" /> Attendance Overview
-          </h3>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="text-center p-4 rounded-xl bg-primary/5">
-              <p className="font-display text-2xl font-bold text-foreground">{attendanceStats?.total || 0}</p>
-              <p className="font-body text-xs text-muted-foreground">Total Records</p>
+      {/* Attendance + Semester */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+          <h3 className="font-body text-[13px] font-semibold text-foreground mb-4">Attendance Overview</h3>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="text-center p-3 rounded-xl bg-muted/40">
+              <p className="font-body text-xl font-semibold text-foreground tabular-nums">{attendanceStats?.total || 0}</p>
+              <p className="font-body text-[11px] text-muted-foreground mt-0.5">Total</p>
             </div>
-            <div className="text-center p-4 rounded-xl bg-primary/5">
-              <p className="font-display text-2xl font-bold text-primary">{attendanceStats?.present || 0}</p>
-              <p className="font-body text-xs text-muted-foreground">Present</p>
+            <div className="text-center p-3 rounded-xl bg-muted/40">
+              <p className="font-body text-xl font-semibold text-primary tabular-nums">{attendanceStats?.present || 0}</p>
+              <p className="font-body text-[11px] text-muted-foreground mt-0.5">Present</p>
             </div>
-            <div className="text-center p-4 rounded-xl bg-secondary/10">
-              <p className="font-display text-2xl font-bold text-secondary">{attendanceStats?.percentage || 0}%</p>
-              <p className="font-body text-xs text-muted-foreground">Attendance Rate</p>
+            <div className="text-center p-3 rounded-xl bg-muted/40">
+              <p className="font-body text-xl font-semibold text-foreground tabular-nums">{attendanceStats?.percentage || 0}%</p>
+              <p className="font-body text-[11px] text-muted-foreground mt-0.5">Rate</p>
             </div>
           </div>
         </div>
 
-        {/* Semester-wise Breakdown */}
-        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6">
-          <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-            <GraduationCap className="w-4 h-4 text-secondary" /> Students by Semester
-          </h3>
+        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+          <h3 className="font-body text-[13px] font-semibold text-foreground mb-4">Students by Semester</h3>
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
             {[1,2,3,4,5,6].map(sem => (
-              <div key={sem} className="text-center p-3 rounded-xl bg-gradient-to-br from-primary/8 to-primary/3 border border-border hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group">
-                <p className="font-display text-xl font-bold text-primary group-hover:scale-110 transition-transform">{counts?.semesterBreakdown?.[sem] || 0}</p>
-                <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider mt-1">Sem {sem}</p>
+              <div key={sem} className="text-center p-2.5 rounded-xl bg-muted/40 hover:bg-muted/60 transition-colors duration-200">
+                <p className="font-body text-lg font-semibold text-foreground tabular-nums">{counts?.semesterBreakdown?.[sem] || 0}</p>
+                <p className="font-body text-[10px] text-muted-foreground mt-0.5">Sem {sem}</p>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Fee Defaulters Alert + Export */}
-      <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
-        {/* Fee Defaulters */}
-        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6">
-          <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-destructive" /> Fee Defaulters
-            {feeDefaulters.length > 0 && <span className="text-xs px-2 py-0.5 rounded-full bg-destructive/10 text-destructive font-body">{feeDefaulters.length}</span>}
+      {/* Fee Defaulters + Export */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+          <h3 className="font-body text-[13px] font-semibold text-foreground mb-4 flex items-center gap-2">
+            Fee Defaulters
+            {feeDefaulters.length > 0 && <span className="font-body text-[11px] px-1.5 py-0.5 rounded-md bg-destructive/10 text-destructive">{feeDefaulters.length}</span>}
           </h3>
           {feeDefaulters.length === 0 ? (
-            <p className="font-body text-sm text-muted-foreground text-center py-6">No fee defaulters found 🎉</p>
+            <p className="font-body text-[13px] text-muted-foreground text-center py-8">No fee defaulters found</p>
           ) : (
-            <div className="space-y-2 max-h-[280px] overflow-y-auto">
+            <div className="space-y-1.5 max-h-[260px] overflow-y-auto">
               {feeDefaulters.map((s: any) => (
-                <div key={s.id} className="flex items-center justify-between p-3 rounded-xl bg-destructive/5 border border-destructive/10 hover:shadow-sm transition-all">
+                <div key={s.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors duration-200">
                   <div className="min-w-0">
-                    <p className="font-body text-sm font-semibold text-foreground truncate">{s.name}</p>
-                    <p className="font-body text-xs text-muted-foreground">{s.roll_number} • {s.courses?.code || "—"}</p>
+                    <p className="font-body text-[13px] font-medium text-foreground truncate">{s.name}</p>
+                    <p className="font-body text-[11px] text-muted-foreground">{s.roll_number} · {s.courses?.code || "—"}</p>
                   </div>
-                  <div className="text-right shrink-0 ml-3">
-                    <p className="font-display text-sm font-bold text-destructive">₹{s.due.toLocaleString()}</p>
-                    <p className="font-body text-[10px] text-muted-foreground">due</p>
-                  </div>
+                  <p className="font-body text-[13px] font-semibold text-destructive shrink-0 ml-3 tabular-nums">₹{s.due.toLocaleString()}</p>
                 </div>
               ))}
             </div>
           )}
         </div>
 
-        {/* Data Export */}
-        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6">
-          <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-            <Download className="w-4 h-4 text-primary" /> Data Export
-          </h3>
-          <p className="font-body text-xs text-muted-foreground mb-4">Export student data with fee details, contact info, and course assignments as CSV.</p>
-          <Button onClick={exportStudentsCSV} className="w-full rounded-xl font-body">
-            <Download className="w-4 h-4 mr-2" /> Export All Students to CSV
+        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+          <h3 className="font-body text-[13px] font-semibold text-foreground mb-4">Data Export</h3>
+          <p className="font-body text-[12px] text-muted-foreground mb-5">Export student data with fee details, contact info, and course assignments.</p>
+          <Button onClick={exportStudentsCSV} className="w-full rounded-xl font-body text-[13px] h-10">
+            <Download className="w-4 h-4 mr-2" /> Export Students CSV
           </Button>
-          <div className="mt-4 p-3 rounded-xl bg-primary/5 border border-primary/10">
-            <p className="font-body text-xs text-muted-foreground">
-              <IndianRupee className="w-3 h-3 inline mr-1" />
-              CSV includes: Roll, Name, Email, Phone, Course, Semester, Fee details, Parent contact
-            </p>
-          </div>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-sm">
-        <h3 className="font-display text-sm font-bold text-foreground mb-5 flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-primary" /> Quick Actions
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {quickActions.map((a: any, i: number) => (
-            <Link key={a.label} to={a.path}
-              className={`relative flex items-center gap-3 p-4 rounded-xl border transition-all duration-300 group border-glow hover:shadow-lg hover:-translate-y-1 ${
-                a.highlight
-                  ? "border-secondary/40 bg-gradient-to-br from-secondary/8 to-primary/5 hover:border-secondary/60 hover:from-secondary/15"
-                  : "border-border hover:bg-primary/5 hover:border-primary/20"
-              }`}
-              style={{ animationDelay: `${i * 40}ms` }}
+      <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+        <h3 className="font-body text-[13px] font-semibold text-foreground mb-4">Quick Actions</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+          {quickActions.map((a: any) => (
+            <Link
+              key={a.label}
+              to={a.path}
+              className="relative flex items-center gap-2.5 p-3.5 rounded-xl bg-muted/30 hover:bg-muted/60 transition-all duration-200 group"
             >
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-all duration-300 ${
-                a.highlight ? "bg-secondary/20 group-hover:bg-secondary/30" : "bg-primary/10 group-hover:bg-primary/20"
-              }`}>
-                <a.icon className={`w-5 h-5 ${a.highlight ? "text-secondary-foreground" : "text-primary"}`} />
+              <div className="w-8 h-8 rounded-lg bg-card flex items-center justify-center shrink-0">
+                <a.icon className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors duration-200" />
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="font-body text-sm font-semibold text-foreground">{a.label}</p>
-                <p className="font-body text-[11px] text-muted-foreground">{a.desc}</p>
+              <div className="min-w-0">
+                <p className="font-body text-[12px] font-medium text-foreground truncate">{a.label}</p>
+                <p className="font-body text-[10px] text-muted-foreground truncate">{a.desc}</p>
               </div>
               {a.badge ? (
-                <span className="absolute top-2 right-2 w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center animate-pulse">{a.badge}</span>
+                <span className="absolute top-2 right-2 w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-semibold flex items-center justify-center">{a.badge}</span>
               ) : null}
             </Link>
           ))}
