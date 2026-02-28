@@ -67,28 +67,37 @@ export default function Navbar() {
       <div className="absolute top-0 left-0 h-[2px] bg-gradient-to-r from-secondary via-primary to-secondary transition-all duration-100 z-50"
         style={{ width: `${progress * 100}%`, opacity: progress > 0 ? 1 : 0 }} />
 
-      {/* Top bar — premium dark */}
-      <div className="relative bg-[hsl(230,15%,6%)] dark:bg-[hsl(230,15%,4%)] text-white/90 py-2.5 overflow-hidden border-b border-white/[0.06]">
-        {/* Subtle shimmer */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent translate-x-[-100%] animate-[shimmer_6s_linear_infinite]" />
-        {/* Accent line at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[hsl(var(--gold))]/20 to-transparent" />
+      {/* Top bar — premium */}
+      <div className="relative bg-gradient-to-r from-[hsl(230,18%,8%)] via-[hsl(228,16%,10%)] to-[hsl(230,18%,8%)] text-white py-2.5 overflow-hidden">
+        {/* Animated shimmer sweep */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent animate-[shimmer_5s_linear_infinite]" />
+        {/* Floating ambient orbs */}
+        <div className="absolute -top-6 left-[10%] w-24 h-24 rounded-full bg-[hsl(var(--gold))]/[0.06] blur-2xl animate-float" />
+        <div className="absolute -bottom-4 right-[15%] w-20 h-20 rounded-full bg-[hsl(var(--gold))]/[0.04] blur-2xl animate-float animation-delay-300" />
+        {/* Top gold accent line */}
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[hsl(var(--gold))]/25 to-transparent" />
+        {/* Bottom gold accent line */}
+        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[hsl(var(--gold))]/15 to-transparent" />
+
         <div className="container px-4 relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0">
-          <p className="font-display text-xs sm:text-sm font-bold tracking-wide text-center sm:text-left text-white">
+          <p className="font-display text-xs sm:text-sm font-bold tracking-wide text-center sm:text-left text-white animate-fade-in">
             ಶ್ರೀಶಿರಡಿ ಸಾಯಿ ಎಜುಕೇಷನಲ್ ಟ್ರಸ್ಟ್ (ರಿ.)
           </p>
-          <div className="flex items-center gap-3 sm:gap-5 flex-wrap justify-center sm:justify-end text-[10px] sm:text-xs">
-            <span className="text-[hsl(var(--gold))] font-semibold flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--gold))] animate-pulse" />
+          <div className="flex items-center gap-3 sm:gap-4 flex-wrap justify-center sm:justify-end text-[10px] sm:text-xs animate-fade-in animation-delay-200">
+            <span className="text-[hsl(var(--gold))] font-semibold flex items-center gap-1.5 group">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[hsl(var(--gold))]/60" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[hsl(var(--gold))]" />
+              </span>
               Recognized by Govt. of Karnataka
             </span>
-            <span className="hidden sm:block w-px h-3 bg-white/10" />
-            <a href="tel:7676272167" className="text-white/60 hover:text-white transition-colors hidden sm:inline-flex items-center gap-1 group">
-              <Phone className="w-3 h-3 group-hover:scale-110 transition-transform" /> 7676272167
+            <span className="hidden sm:block w-px h-3.5 bg-white/10" />
+            <a href="tel:7676272167" className="text-white/50 hover:text-[hsl(var(--gold))] transition-all duration-300 hidden sm:inline-flex items-center gap-1.5 group hover:translate-y-[-1px]">
+              <Phone className="w-3 h-3 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300" /> 7676272167
             </a>
-            <span className="hidden sm:block w-px h-3 bg-white/10" />
-            <a href="mailto:principal.hoysaladegreecollege@gmail.com" className="text-white/60 hover:text-white transition-colors hidden sm:inline-flex items-center gap-1 group">
-              <Mail className="w-3 h-3 group-hover:scale-110 transition-transform" /> Mail Us
+            <span className="hidden sm:block w-px h-3.5 bg-white/10" />
+            <a href="mailto:principal.hoysaladegreecollege@gmail.com" className="text-white/50 hover:text-[hsl(var(--gold))] transition-all duration-300 hidden sm:inline-flex items-center gap-1.5 group hover:translate-y-[-1px]">
+              <Mail className="w-3 h-3 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300" /> Mail Us
             </a>
           </div>
         </div>
