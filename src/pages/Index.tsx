@@ -183,33 +183,33 @@ export default function Index() {
           }
         }} />
 
-      {/* Hero */}
-      <section className="relative h-[92vh] min-h-[580px] flex items-center justify-center overflow-hidden">
-        <img src={heroImage} alt="Hoysala Degree College Campus" className="absolute inset-0 w-full h-full object-cover scale-110 animate-hero-float" style={{ animationDuration: "20s" }} />
+      {/* Hero — full-screen on mobile */}
+      <section className="relative h-[100svh] min-h-[600px] flex items-center justify-center overflow-hidden">
+        <img src={heroImage} alt="Hoysala Degree College Campus" className="absolute inset-0 w-full h-full object-cover scale-105 animate-hero-float" style={{ animationDuration: "20s" }} loading="eager" />
         
         {/* Multi-layer overlay */}
-        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, hsla(217,72%,8%,0.94), hsla(217,72%,15%,0.78), hsla(217,72%,22%,0.50))" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, hsla(217,72%,8%,0.92), hsla(217,72%,15%,0.78), hsla(217,72%,22%,0.50))" }} />
         <div className="absolute inset-0 bg-gradient-to-t from-background/30 via-transparent to-transparent" />
 
         {/* Floating ambient orbs */}
-        <div className="absolute top-16 left-[8%] w-56 h-56 rounded-full bg-secondary/8 blur-[80px] animate-float pointer-events-none" />
-        <div className="absolute bottom-16 right-[8%] w-72 h-72 rounded-full bg-secondary/5 blur-[100px] animate-float animation-delay-400 pointer-events-none" />
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[400px] rounded-full bg-primary/20 blur-[120px] pointer-events-none" />
+        <div className="absolute top-16 left-[8%] w-40 sm:w-56 h-40 sm:h-56 rounded-full bg-secondary/8 blur-[60px] sm:blur-[80px] animate-float pointer-events-none" />
+        <div className="absolute bottom-16 right-[8%] w-52 sm:w-72 h-52 sm:h-72 rounded-full bg-secondary/5 blur-[80px] sm:blur-[100px] animate-float animation-delay-400 pointer-events-none" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[400px] sm:w-[700px] h-[250px] sm:h-[400px] rounded-full bg-primary/20 blur-[100px] sm:blur-[120px] pointer-events-none" />
 
         {/* Grid pattern */}
-        <div className="absolute inset-0 opacity-[0.05] pointer-events-none"
+        <div className="absolute inset-0 opacity-[0.04] pointer-events-none"
         style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
 
-        <div className="relative z-10 container text-center text-primary-foreground px-4">
+        <div className="relative z-10 container text-center text-primary-foreground px-5 sm:px-4">
           {/* Animated badge */}
-          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-primary-foreground/20 mb-6 animate-fade-in backdrop-blur-md badge-float"
+          <div className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full border border-primary-foreground/20 mb-6 sm:mb-6 animate-fade-in backdrop-blur-md badge-float"
           style={{ background: "rgba(255,255,255,0.08)" }}>
-            <Sparkles className="w-3.5 h-3.5 text-secondary animate-sparkle" />
-            <span className="font-body text-xs tracking-[0.2em] uppercase text-secondary font-bold">Excellence in Education Since 2017</span>
-            <Sparkles className="w-3.5 h-3.5 text-secondary animate-sparkle animation-delay-300" />
+            <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-secondary animate-sparkle" />
+            <span className="font-body text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] uppercase text-secondary font-bold">Excellence Since 2017</span>
+            <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-secondary animate-sparkle animation-delay-300" />
           </div>
 
-          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.08] mb-5 animate-slide-up">
+          <h1 className="font-display text-[2.5rem] leading-[1.1] sm:text-5xl md:text-6xl lg:text-7xl font-bold sm:leading-[1.08] mb-5 animate-slide-up">
             Hoysala Degree<br className="hidden sm:block" />
             <span className="inline-block" style={{
               backgroundImage: "linear-gradient(135deg, hsl(42,87%,80%), hsl(42,87%,60%), hsl(38,92%,50%), hsl(42,87%,70%))",
@@ -221,31 +221,31 @@ export default function Index() {
             }}> College</span>
           </h1>
 
-          <p className="font-body text-xs sm:text-sm max-w-2xl mx-auto opacity-70 mb-1.5 animate-fade-in-up animation-delay-300 leading-relaxed">
+          <p className="font-body text-xs sm:text-sm max-w-2xl mx-auto opacity-70 mb-1.5 animate-fade-in-up animation-delay-300 leading-relaxed px-2">
             Affiliated To Bangalore University & Approved by AICTE New Delhi
           </p>
-          <p className="font-body text-[11px] sm:text-xs max-w-xl mx-auto opacity-40 mb-10 animate-fade-in-up animation-delay-400">
-            College Code: BU 26 • K.R.P. Arcade, Nelamangala Town, Bengaluru Rural Dist. - 562 123
+          <p className="font-body text-[11px] sm:text-xs max-w-xl mx-auto opacity-40 mb-10 animate-fade-in-up animation-delay-400 px-4">
+            College Code: BU 26 • Nelamangala Town, Bengaluru Rural - 562 123
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up animation-delay-500">
-            <Link to="/admissions">
-              <button className="relative group w-full sm:w-auto overflow-hidden px-8 sm:px-10 py-4 rounded-2xl font-body text-sm sm:text-base font-bold text-foreground shadow-2xl btn-magnetic"
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center animate-slide-up animation-delay-500 px-2">
+            <Link to="/admissions" className="w-full sm:w-auto">
+              <button className="relative group w-full sm:w-auto overflow-hidden px-8 sm:px-10 py-4 sm:py-4 rounded-2xl font-body text-sm sm:text-base font-bold text-foreground shadow-2xl btn-magnetic active:scale-[0.97] touch-manipulation"
               style={{ background: "linear-gradient(135deg, hsl(42,87%,58%), hsl(38,92%,48%), hsl(42,87%,65%))", boxShadow: "0 8px 40px hsla(42,87%,52%,0.5), 0 2px 0 rgba(255,255,255,0.2) inset" }}>
                 <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/0 via-white/25 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                 <span className="relative flex items-center justify-center gap-2">
-                  <Sparkles className="w-4 h-4 group-hover:animate-spin" />
+                  <Sparkles className="w-4 h-4" />
                   Apply Now — 2026-27
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" />
                 </span>
               </button>
             </Link>
-            <Link to="/courses">
-              <button className="relative group w-full sm:w-auto overflow-hidden px-8 sm:px-10 py-4 rounded-2xl font-body text-sm sm:text-base font-bold text-white btn-magnetic"
+            <Link to="/courses" className="w-full sm:w-auto">
+              <button className="relative group w-full sm:w-auto overflow-hidden px-8 sm:px-10 py-4 sm:py-4 rounded-2xl font-body text-sm sm:text-base font-bold text-white btn-magnetic active:scale-[0.97] touch-manipulation"
               style={{ background: "rgba(255,255,255,0.1)", border: "1.5px solid rgba(255,255,255,0.25)", backdropFilter: "blur(16px)", boxShadow: "0 8px 32px rgba(0,0,0,0.2), 0 1px 0 rgba(255,255,255,0.2) inset" }}>
                 <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/0 via-white/12 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                 <span className="relative flex items-center justify-center gap-2">
-                  <GraduationCap className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
+                  <GraduationCap className="w-4 h-4" />
                   Explore Courses
                   <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
                 </span>
@@ -253,11 +253,11 @@ export default function Index() {
             </Link>
           </div>
 
-          {/* Scroll indicator */}
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-fade-in animation-delay-800">
-            <span className="font-body text-[10px] tracking-[0.25em] uppercase text-primary-foreground/40">Scroll</span>
-            <div className="w-6 h-10 rounded-full border-2 border-primary-foreground/20 flex justify-center pt-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-secondary animate-scroll-bounce" />
+          {/* Scroll indicator — hidden on very small screens */}
+          <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 sm:gap-2 animate-fade-in animation-delay-800">
+            <span className="font-body text-[9px] sm:text-[10px] tracking-[0.25em] uppercase text-primary-foreground/35">Scroll</span>
+            <div className="w-5 h-8 sm:w-6 sm:h-10 rounded-full border-2 border-primary-foreground/15 flex justify-center pt-1.5 sm:pt-2">
+              <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-secondary animate-scroll-bounce" />
             </div>
           </div>
         </div>
@@ -266,29 +266,29 @@ export default function Index() {
       <InfoSlider />
 
       {/* Stats */}
-      <section className="bg-primary py-12 sm:py-16 relative overflow-hidden">
+      <section className="bg-primary py-10 sm:py-16 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary to-navy-dark opacity-70" />
         <div className="absolute inset-0 opacity-[0.04]"
         style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
-        <div className="relative container grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 px-4">
+        <div className="relative container grid grid-cols-2 md:grid-cols-4 gap-5 sm:gap-8 px-5 sm:px-4">
           {stats.map((s, i) => <AnimatedStat key={i} value={s.value} label={s.label} icon={s.icon} suffix={s.suffix} />)}
         </div>
       </section>
 
       {/* Courses */}
-      <section className="py-20 sm:py-28 bg-background relative overflow-hidden">
+      <section className="py-14 sm:py-28 bg-background relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/3 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/4 rounded-full blur-3xl pointer-events-none" />
-        <div className="container px-4 relative">
+        <div className="container px-5 sm:px-4 relative">
           <ScrollReveal>
             <SectionHeading title="Courses We Offer" subtitle="Choose from our carefully designed undergraduate programs & professional coaching" />
           </ScrollReveal>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
             {courses.map((c, i) =>
             <ScrollReveal key={c.name} delay={i * 80}>
                 <Link to="/courses">
                   <div
-                  className="relative premium-card p-6 sm:p-7 cursor-pointer h-full group overflow-hidden border-glow"
+                  className="relative premium-card p-5 sm:p-7 cursor-pointer h-full group overflow-hidden border-glow active:scale-[0.98] transition-transform touch-manipulation"
                   onMouseEnter={() => setHoveredCard(i)}
                   onMouseLeave={() => setHoveredCard(null)}>
 
@@ -296,11 +296,11 @@ export default function Index() {
                     <div className="absolute top-0 left-4 right-4 h-0.5 bg-gradient-to-r from-transparent via-secondary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                     <div className="relative z-10">
-                      <div className="text-4xl sm:text-5xl mb-4 group-hover:scale-125 group-hover:-rotate-6 transition-all duration-400 inline-block filter group-hover:drop-shadow-lg">{c.icon}</div>
-                      <h3 className="font-display text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">{c.name}</h3>
-                      <p className="font-body text-xs text-muted-foreground mt-1.5 font-medium">{c.full}</p>
-                      <p className="font-body text-sm text-muted-foreground mt-3 leading-relaxed line-clamp-2">{c.desc}</p>
-                      <div className="mt-5 flex items-center justify-between">
+                      <div className="text-3xl sm:text-5xl mb-3 sm:mb-4 group-hover:scale-125 group-hover:-rotate-6 transition-all duration-400 inline-block filter group-hover:drop-shadow-lg">{c.icon}</div>
+                      <h3 className="font-display text-lg sm:text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">{c.name}</h3>
+                      <p className="font-body text-xs text-muted-foreground mt-1 sm:mt-1.5 font-medium">{c.full}</p>
+                      <p className="font-body text-sm text-muted-foreground mt-2 sm:mt-3 leading-relaxed line-clamp-2">{c.desc}</p>
+                      <div className="mt-4 sm:mt-5 flex items-center justify-between">
                         <span className="text-[10px] font-body text-secondary font-bold bg-secondary/10 px-3 py-1.5 rounded-full border border-secondary/20">{c.duration}</span>
                         <span className="text-primary text-xs font-body font-semibold flex items-center gap-1 group-hover:gap-2 transition-all duration-300">
                           Details <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
@@ -316,16 +316,16 @@ export default function Index() {
       </section>
 
       {/* Key Highlights */}
-      <section className="py-20 sm:py-28 bg-cream relative overflow-hidden">
+      <section className="py-14 sm:py-28 bg-cream relative overflow-hidden">
         <div className="absolute inset-0 section-pattern opacity-60" />
-        <div className="container px-4 relative">
+        <div className="container px-5 sm:px-4 relative">
           <ScrollReveal>
             <SectionHeading title="Why Hoysala?" subtitle="Key highlights that set us apart from the rest" />
           </ScrollReveal>
-       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5">
             {highlights.map((h, i) =>
             <ScrollReveal key={h.label} delay={i * 40}>
-                <div className="relative premium-card p-5 sm:p-6 cursor-default group overflow-hidden h-full border border-border/40 rounded-2xl"
+                <div className="relative premium-card p-4 sm:p-6 cursor-default group overflow-hidden h-full border border-border/40 rounded-2xl active:scale-[0.97] touch-manipulation"
                   style={{ transition: "all 0.5s cubic-bezier(0.4,0,0.2,1)" }}>
                   {/* Glass overlay on hover */}
                   <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500"
@@ -333,15 +333,14 @@ export default function Index() {
                   <div className="absolute inset-0 border border-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-secondary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  {/* Shimmer sweep */}
                   <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 rounded-2xl pointer-events-none" />
-                  <div className="relative flex flex-col items-center text-center gap-3 z-10">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-sm border border-border/30 group-hover:border-secondary/40 group-hover:shadow-xl group-hover:shadow-secondary/15">
+                  <div className="relative flex flex-col items-center text-center gap-2.5 sm:gap-3 z-10">
+                    <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-sm border border-border/30 group-hover:border-secondary/40 group-hover:shadow-xl group-hover:shadow-secondary/15">
                       <h.icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary group-hover:text-secondary transition-colors duration-300" />
                     </div>
                     <div>
-                      <span className="font-body text-sm font-bold text-foreground block group-hover:text-primary transition-colors duration-300">{h.label}</span>
-                      <span className="font-body text-xs text-muted-foreground mt-1 block leading-relaxed">{h.desc}</span>
+                      <span className="font-body text-[13px] sm:text-sm font-bold text-foreground block group-hover:text-primary transition-colors duration-300 leading-snug">{h.label}</span>
+                      <span className="font-body text-[11px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1 block leading-relaxed">{h.desc}</span>
                     </div>
                   </div>
                 </div>
@@ -352,34 +351,34 @@ export default function Index() {
       </section>
 
       {/* Campus Gallery with Lightbox */}
-      <section className="py-20 sm:py-28 bg-background relative overflow-hidden">
+      <section className="py-14 sm:py-28 bg-background relative overflow-hidden">
         <div className="absolute top-0 left-0 w-72 h-72 bg-primary/4 rounded-full blur-3xl pointer-events-none" />
-        <div className="container px-4 relative">
+        <div className="container px-5 sm:px-4 relative">
           <ScrollReveal>
             <SectionHeading title="Campus Gallery" subtitle="Take a virtual tour of our world-class facilities" />
           </ScrollReveal>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-5">
             {galleryImages.map((img, i) =>
             <ScrollReveal key={img.title} delay={i * 60}>
                 <div
-                className="relative group cursor-pointer overflow-hidden rounded-2xl border border-border aspect-[4/3] hover:shadow-2xl transition-all duration-500"
+                className="relative group cursor-pointer overflow-hidden rounded-xl sm:rounded-2xl border border-border aspect-[4/3] hover:shadow-2xl active:scale-[0.97] transition-all duration-500 touch-manipulation"
                 onClick={() => { setLightboxIdx(i); document.body.style.overflow = "hidden"; }}>
 
                   <img src={img.src} alt={img.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" />
                   <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
-                    <span className="inline-block text-[10px] px-2 py-0.5 rounded-full bg-secondary/90 text-primary-foreground font-body font-bold mb-1">{img.category}</span>
-                    <p className="font-display text-sm sm:text-base font-bold text-white">{img.title}</p>
+                  <div className="absolute bottom-0 left-0 right-0 p-2.5 sm:p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+                    <span className="inline-block text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full bg-secondary/90 text-primary-foreground font-body font-bold mb-0.5 sm:mb-1">{img.category}</span>
+                    <p className="font-display text-xs sm:text-base font-bold text-white">{img.title}</p>
                   </div>
-                  <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                    <Camera className="w-4 h-4 text-white" />
+                  <div className="absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    <Camera className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                   </div>
                 </div>
               </ScrollReveal>
             )}
           </div>
-          <div className="text-center mt-8">
-            <Link to="/gallery" className="inline-flex items-center gap-2 font-body text-sm font-semibold text-primary hover:underline">
+          <div className="text-center mt-6 sm:mt-8">
+            <Link to="/gallery" className="inline-flex items-center gap-2 font-body text-sm font-semibold text-primary hover:underline active:opacity-70 touch-manipulation">
               View Full Gallery <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
@@ -436,25 +435,22 @@ export default function Index() {
       }
 
       {/* Principal's Message */}
-      <section className="py-16 sm:py-24 bg-background">
-        <div className="container px-4">
-          <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center max-w-5xl mx-auto">
+      <section className="py-14 sm:py-24 bg-background">
+        <div className="container px-5 sm:px-4">
+          <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-center max-w-5xl mx-auto">
             <ScrollReveal>
               <div className="relative group">
-                <div className="absolute -inset-6 bg-gradient-to-br from-secondary/15 to-primary/5 rounded-3xl blur-3xl opacity-70 group-hover:opacity-100 transition-opacity duration-700" />
-                <div className="absolute -top-3 -left-3 w-20 h-20 border-t-2 border-l-2 border-secondary/40 rounded-tl-3xl z-20 group-hover:border-secondary/70 transition-colors duration-500" />
-                <div className="absolute -bottom-3 -right-3 w-20 h-20 border-b-2 border-r-2 border-secondary/40 rounded-br-3xl z-20 group-hover:border-secondary/70 transition-colors duration-500" />
-                {/* Glass effect on hover */}
+                <div className="absolute -inset-4 sm:-inset-6 bg-gradient-to-br from-secondary/15 to-primary/5 rounded-3xl blur-3xl opacity-70 group-hover:opacity-100 transition-opacity duration-700" />
+                <div className="absolute -top-2 -left-2 sm:-top-3 sm:-left-3 w-14 h-14 sm:w-20 sm:h-20 border-t-2 border-l-2 border-secondary/40 rounded-tl-2xl sm:rounded-tl-3xl z-20 group-hover:border-secondary/70 transition-colors duration-500" />
+                <div className="absolute -bottom-2 -right-2 sm:-bottom-3 sm:-right-3 w-14 h-14 sm:w-20 sm:h-20 border-b-2 border-r-2 border-secondary/40 rounded-br-2xl sm:rounded-br-3xl z-20 group-hover:border-secondary/70 transition-colors duration-500" />
                 <div className="relative overflow-hidden rounded-2xl z-10">
-                  <img alt="Principal" className="w-full max-w-sm mx-auto shadow-2xl group-hover:scale-[1.03] transition-transform duration-700" src="/lovable-uploads/bacc5b2d-3f25-473a-a2ee-a0d75a0cb7e3.png" />
-                  {/* Glassmorphism overlay on hover */}
+                  <img alt="Principal" className="w-full max-w-xs sm:max-w-sm mx-auto shadow-2xl group-hover:scale-[1.03] transition-transform duration-700" src="/lovable-uploads/bacc5b2d-3f25-473a-a2ee-a0d75a0cb7e3.png" />
                   <div className="absolute inset-0 bg-gradient-to-t from-primary/40 via-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="absolute inset-0 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
-                    <p className="font-display text-base font-bold text-white drop-shadow-lg">Sri Gopal H.R</p>
-                    <p className="font-body text-xs text-white/80">Principal · M.Sc, M.Ed, Ph.D</p>
+                  <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+                    <p className="font-display text-sm sm:text-base font-bold text-white drop-shadow-lg">Sri Gopal H.R</p>
+                    <p className="font-body text-[11px] sm:text-xs text-white/80">Principal · M.Sc, M.Ed, Ph.D</p>
                   </div>
-                  {/* Shimmer sweep */}
                   <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                 </div>
               </div>
@@ -466,20 +462,20 @@ export default function Index() {
                   <span className="font-body text-xs font-semibold text-secondary">From the Principal's Desk</span>
                 </div>
                 <SectionHeading title="Principal's Message" centered={false} />
-                <div className="mt-6 relative">
-                  <div className="absolute -left-4 top-0 bottom-0 w-1 bg-gradient-to-b from-secondary via-primary/40 to-transparent rounded-full" />
-                  <div className="pl-6">
-                    <Quote className="w-8 h-8 text-secondary/30 mb-3" />
-                    <p className="font-body text-muted-foreground leading-relaxed text-sm sm:text-base italic">
+                <div className="mt-4 sm:mt-6 relative">
+                  <div className="absolute -left-3 sm:-left-4 top-0 bottom-0 w-1 bg-gradient-to-b from-secondary via-primary/40 to-transparent rounded-full" />
+                  <div className="pl-4 sm:pl-6">
+                    <Quote className="w-6 h-6 sm:w-8 sm:h-8 text-secondary/30 mb-2 sm:mb-3" />
+                    <p className="font-body text-muted-foreground leading-relaxed text-[13px] sm:text-base italic">
                       It gives me immense pleasure to welcome you to HOYSALA DEGREE COLLEGE. Our college combines modern teaching methodologies with traditional values, creating an environment where students develop both professionally and personally.
                     </p>
-                    <div className="mt-5 flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-secondary/15 flex items-center justify-center">
-                        <GraduationCap className="w-5 h-5 text-secondary" />
+                    <div className="mt-4 sm:mt-5 flex items-center gap-3">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-secondary/15 flex items-center justify-center">
+                        <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 text-secondary" />
                       </div>
                       <div>
                         <p className="font-display text-sm font-bold text-foreground">Sri Gopal H.R</p>
-                        <p className="font-body text-xs text-muted-foreground">M.Sc, M.Ed, TET, KSET, Ph.D | Principal</p>
+                        <p className="font-body text-[11px] sm:text-xs text-muted-foreground">M.Sc, M.Ed, TET, KSET, Ph.D | Principal</p>
                       </div>
                     </div>
                   </div>
@@ -493,36 +489,36 @@ export default function Index() {
       {/* Notices / Announcements */}
       <section className="py-12 sm:py-16 bg-cream relative overflow-hidden">
         <div className="absolute inset-0 section-pattern opacity-40" />
-        <div className="container px-4 relative">
+        <div className="container px-5 sm:px-4 relative">
           <ScrollReveal>
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-md">
-                  <Zap className="w-4 h-4 text-secondary" />
+            <div className="flex items-center justify-between mb-5 sm:mb-6">
+              <div className="flex items-center gap-2.5 sm:gap-3">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-primary flex items-center justify-center shadow-md">
+                  <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-secondary" />
                 </div>
                 <div>
-                  <h2 className="font-display text-xl font-bold text-foreground">Latest Announcements</h2>
-                  <p className="font-body text-xs text-muted-foreground">Stay updated with the latest news</p>
+                  <h2 className="font-display text-lg sm:text-xl font-bold text-foreground">Latest Announcements</h2>
+                  <p className="font-body text-[11px] sm:text-xs text-muted-foreground">Stay updated with the latest news</p>
                 </div>
               </div>
-              <Link to="/notices" className="font-body text-xs font-semibold text-primary hover:underline flex items-center gap-1">
+              <Link to="/notices" className="font-body text-xs font-semibold text-primary hover:underline flex items-center gap-1 active:opacity-70 touch-manipulation">
                 View All <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           </ScrollReveal>
-          <div className="space-y-2.5 max-w-2xl">
+          <div className="space-y-2 sm:space-y-2.5 max-w-2xl">
             {announcements.map((a, i) =>
             <ScrollReveal key={i} delay={i * 80}>
                 <Link to="/notices">
-                  <div className="group flex items-start gap-4 p-4 bg-card rounded-2xl border border-border hover:border-primary/25 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden">
+                  <div className="group flex items-start gap-3 sm:gap-4 p-3.5 sm:p-4 bg-card rounded-xl sm:rounded-2xl border border-border hover:border-primary/25 hover:shadow-md active:scale-[0.98] transition-all duration-300 relative overflow-hidden touch-manipulation">
                     <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-secondary to-primary/50 rounded-r-full" />
-                    <div className="text-center shrink-0 ml-2">
-                      <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wide">{a.date.split(" ")[0]}</p>
-                      <p className="font-display text-lg font-bold text-primary leading-none">{a.date.split(" ")[1]?.replace(",", "")}</p>
+                    <div className="text-center shrink-0 ml-1.5 sm:ml-2">
+                      <p className="font-body text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-wide">{a.date.split(" ")[0]}</p>
+                      <p className="font-display text-base sm:text-lg font-bold text-primary leading-none">{a.date.split(" ")[1]?.replace(",", "")}</p>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <span className="inline-block font-body text-[10px] font-bold text-secondary bg-secondary/10 px-2 py-0.5 rounded-full mb-1">{a.type}</span>
-                      <p className="font-body text-sm font-semibold text-foreground group-hover:text-primary transition-colors duration-200">{a.title}</p>
+                      <span className="inline-block font-body text-[9px] sm:text-[10px] font-bold text-secondary bg-secondary/10 px-2 py-0.5 rounded-full mb-0.5 sm:mb-1">{a.type}</span>
+                      <p className="font-body text-[13px] sm:text-sm font-semibold text-foreground group-hover:text-primary transition-colors duration-200 leading-snug">{a.title}</p>
                     </div>
                     <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 group-hover:translate-x-1 transition-transform duration-200 mt-0.5" />
                   </div>
@@ -534,36 +530,35 @@ export default function Index() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 sm:py-28 bg-background relative overflow-hidden">
+      <section className="py-14 sm:py-28 bg-background relative overflow-hidden">
         <div className="absolute top-0 left-0 w-96 h-96 bg-secondary/4 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 right-0 w-64 h-64 bg-primary/3 rounded-full blur-3xl pointer-events-none" />
-        <div className="container px-4 relative">
+        <div className="container px-5 sm:px-4 relative">
           <ScrollReveal>
             <SectionHeading title="What Our Students Say" subtitle="Real stories from the Hoysala family" />
           </ScrollReveal>
-          <div className="grid sm:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto">
+          <div className="grid sm:grid-cols-2 gap-4 sm:gap-8 max-w-4xl mx-auto">
             {currentTestimonials.map((t, i) =>
-            <div key={t.name} className="relative premium-card p-7 sm:p-8 group animate-fade-in-up card-stack border-glow overflow-hidden" style={{ animationDelay: `${i * 150}ms` }}>
-                {/* Ambient glow on hover */}
+            <div key={t.name} className="relative premium-card p-5 sm:p-8 group animate-fade-in-up card-stack border-glow overflow-hidden" style={{ animationDelay: `${i * 150}ms` }}>
                 <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-primary/3 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
                 <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-secondary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="absolute top-5 right-5 text-secondary/10 group-hover:text-secondary/20 transition-colors duration-500">
-                  <Quote className="w-12 h-12" />
+                <div className="absolute top-4 right-4 sm:top-5 sm:right-5 text-secondary/10 group-hover:text-secondary/20 transition-colors duration-500">
+                  <Quote className="w-8 h-8 sm:w-12 sm:h-12" />
                 </div>
                 <div className="relative z-10">
-                  <div className="flex gap-0.5 mb-4">
+                  <div className="flex gap-0.5 mb-3 sm:mb-4">
                     {Array.from({ length: t.rating }).map((_, j) =>
-                  <Star key={j} className="w-4 h-4 text-secondary fill-secondary group-hover:scale-110 transition-transform duration-300" style={{ transitionDelay: `${j * 50}ms` }} />
+                  <Star key={j} className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-secondary fill-secondary" />
                   )}
                   </div>
-                  <p className="font-body text-sm text-muted-foreground leading-relaxed italic mb-5">"{t.text}"</p>
-                  <div className="flex items-center gap-3 pt-4 border-t border-border/60">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center border border-border group-hover:scale-110 transition-transform duration-300 shadow-sm">
-                      <span className="font-display text-sm font-bold text-primary">{t.name[0]}</span>
+                  <p className="font-body text-[13px] sm:text-sm text-muted-foreground leading-relaxed italic mb-4 sm:mb-5">"{t.text}"</p>
+                  <div className="flex items-center gap-2.5 sm:gap-3 pt-3 sm:pt-4 border-t border-border/60">
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center border border-border shadow-sm">
+                      <span className="font-display text-xs sm:text-sm font-bold text-primary">{t.name[0]}</span>
                     </div>
                     <div>
-                      <p className="font-body text-sm font-bold text-foreground group-hover:text-primary transition-colors duration-300">{t.name}</p>
-                      <p className="font-body text-xs text-muted-foreground">{t.course}</p>
+                      <p className="font-body text-[13px] sm:text-sm font-bold text-foreground">{t.name}</p>
+                      <p className="font-body text-[11px] sm:text-xs text-muted-foreground">{t.course}</p>
                     </div>
                   </div>
                 </div>
@@ -572,44 +567,44 @@ export default function Index() {
           </div>
 
           {/* Testimonial dots */}
-          <div className="flex justify-center gap-2 mt-8">
+          <div className="flex justify-center gap-2 mt-6 sm:mt-8">
             {Array.from({ length: totalSlides }).map((_, i) =>
             <button key={i} onClick={() => setTestimonialIndex(i)}
-            className={`rounded-full transition-all duration-400 ${i === testimonialIndex ? "bg-secondary w-8 h-2.5" : "bg-muted w-2.5 h-2.5 hover:bg-muted-foreground/40"}`} />
+            className={`rounded-full transition-all duration-400 touch-manipulation ${i === testimonialIndex ? "bg-secondary w-7 sm:w-8 h-2.5" : "bg-muted w-2.5 h-2.5 hover:bg-muted-foreground/40"}`} />
             )}
           </div>
         </div>
       </section>
 
       {/* CTA Banner */}
-      <section className="py-16 sm:py-20 relative overflow-hidden">
+      <section className="py-14 sm:py-20 relative overflow-hidden">
         <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--navy-dark)))" }} />
         <div className="absolute inset-0 opacity-[0.06]"
         style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-secondary/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] sm:w-[600px] h-[200px] sm:h-[300px] bg-secondary/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative container px-4 text-center text-primary-foreground">
+        <div className="relative container px-5 sm:px-4 text-center text-primary-foreground">
           <ScrollReveal>
-            <Sparkles className="w-10 h-10 text-secondary mx-auto mb-4 animate-float" />
-            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
+            <Sparkles className="w-8 h-8 sm:w-10 sm:h-10 text-secondary mx-auto mb-3 sm:mb-4 animate-float" />
+            <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">
               Begin Your Journey at Hoysala
             </h2>
-            <p className="font-body text-sm sm:text-base opacity-70 max-w-xl mx-auto mb-8 leading-relaxed">
+            <p className="font-body text-[13px] sm:text-base opacity-70 max-w-xl mx-auto mb-7 sm:mb-8 leading-relaxed px-2">
               Join 250+ students building their future. Admissions open for 2026–27 academic year.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/admissions">
-                <button className="relative group overflow-hidden px-10 py-4 rounded-2xl font-body font-bold text-foreground shadow-2xl btn-magnetic"
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+              <Link to="/admissions" className="w-full sm:w-auto">
+                <button className="relative group overflow-hidden w-full sm:w-auto px-8 sm:px-10 py-4 rounded-2xl font-body font-bold text-foreground shadow-2xl btn-magnetic active:scale-[0.97] touch-manipulation"
                 style={{ background: "linear-gradient(135deg, hsl(42,87%,58%), hsl(38,92%,48%))", boxShadow: "0 8px 32px hsla(42,87%,52%,0.4)" }}>
                   <span className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <span className="relative flex items-center gap-2"><TrendingUp className="w-4 h-4" /> Apply Now</span>
+                  <span className="relative flex items-center justify-center gap-2"><TrendingUp className="w-4 h-4" /> Apply Now</span>
                 </button>
               </Link>
-              <Link to="/contact">
-                <button className="relative group overflow-hidden px-10 py-4 rounded-2xl font-body font-bold text-white btn-magnetic"
+              <Link to="/contact" className="w-full sm:w-auto">
+                <button className="relative group overflow-hidden w-full sm:w-auto px-8 sm:px-10 py-4 rounded-2xl font-body font-bold text-white btn-magnetic active:scale-[0.97] touch-manipulation"
                 style={{ background: "rgba(255,255,255,0.1)", border: "1.5px solid rgba(255,255,255,0.3)", backdropFilter: "blur(12px)" }}>
                   <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <span className="relative flex items-center gap-2"><MessageSquare className="w-4 h-4" /> Contact Us</span>
+                  <span className="relative flex items-center justify-center gap-2"><MessageSquare className="w-4 h-4" /> Contact Us</span>
                 </button>
               </Link>
             </div>
