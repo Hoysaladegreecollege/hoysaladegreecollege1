@@ -1,5 +1,5 @@
 import { Moon, Sun } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 export default function DarkModeToggle({ className = "" }: { className?: string }) {
   const [dark, setDark] = useState(() => {
@@ -8,15 +8,21 @@ export default function DarkModeToggle({ className = "" }: { className?: string 
       (!localStorage.getItem("theme") && window.matchMedia("(prefers-color-scheme: dark)").matches);
   });
 
-  useEffect(() => {
-    if (dark) {
+  const [transitioning, setTransitioning] = useState(false);
+
+  const applyTheme = useCallback((isDark: boolean) => {
+    if (isDark) {
       document.documentElement.classList.add("dark");
       localStorage.setItem("theme", "dark");
     } else {
       document.documentElement.classList.remove("dark");
       localStorage.setItem("theme", "light");
     }
-  }, [dark]);
+  }, []);
+
+  useEffect(() => {
+    applyTheme(dark);
+  }, [dark, applyTheme]);
 
   // Init on mount
   useEffect(() => {
@@ -27,18 +33,52 @@ export default function DarkModeToggle({ className = "" }: { className?: string 
     }
   }, []);
 
+  const toggle = () => {
+    setTransitioning(true);
+    setTimeout(() => {
+      setDark(prev => !prev);
+      setTimeout(() => setTransitioning(false), 400);
+    }, 50);
+  };
+
   return (
-    <button
-      onClick={() => setDark(!dark)}
-      className={`relative w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 border ${
-        dark
-          ? "bg-primary/10 border-primary/20 text-primary"
-          : "bg-muted/50 border-border text-muted-foreground hover:text-foreground"
-      } ${className}`}
-      aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
-    >
-      <Sun className={`w-4 h-4 absolute transition-all duration-300 ${dark ? "opacity-0 rotate-90 scale-0" : "opacity-100 rotate-0 scale-100"}`} />
-      <Moon className={`w-4 h-4 absolute transition-all duration-300 ${dark ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-0"}`} />
-    </button>
+    <>
+      {/* Soft full-screen flash overlay for theme transition */}
+      {transitioning && (
+        <div
+          className="fixed inset-0 z-[9999] pointer-events-none animate-fade-in"
+          style={{
+            background: dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)",
+            animation: "theme-flash 0.5s ease-out forwards",
+          }}
+        />
+      )}
+      <button
+        onClick={toggle}
+        className={`relative w-14 h-7 rounded-full p-0.5 transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+          dark
+            ? "bg-muted border border-border"
+            : "bg-secondary/20 border border-secondary/30"
+        } ${className}`}
+        aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+      >
+        {/* Icons on each side */}
+        <Sun className={`w-3 h-3 absolute left-1.5 top-1/2 -translate-y-1/2 transition-all duration-300 ${
+          dark ? "text-muted-foreground opacity-50" : "text-secondary opacity-100"
+        }`} />
+        <Moon className={`w-3 h-3 absolute right-1.5 top-1/2 -translate-y-1/2 transition-all duration-300 ${
+          dark ? "text-secondary opacity-100" : "text-muted-foreground opacity-50"
+        }`} />
+
+        {/* Sliding knob */}
+        <span
+          className={`block w-6 h-6 rounded-full shadow-md transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            dark
+              ? "translate-x-7 bg-card border border-border shadow-[0_0_8px_hsl(var(--gold)/0.2)]"
+              : "translate-x-0 bg-white border border-secondary/20 shadow-[0_0_8px_hsl(var(--secondary)/0.15)]"
+          }`}
+        />
+      </button>
+    </>
   );
 }
