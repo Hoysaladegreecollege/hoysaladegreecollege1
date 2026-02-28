@@ -62,11 +62,11 @@ export default function Admissions() {
     let photoUrl: string | null = null;
     if (photoFile) {
       const ext = photoFile.name.split(".").pop();
-      const path = `applications/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const { error: uploadErr } = await supabase.storage.from("uploads").upload(path, photoFile);
+      const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error: uploadErr } = await supabase.storage.from("admission-photos").upload(path, photoFile);
       if (!uploadErr) {
-        const { data: urlData } = supabase.storage.from("uploads").getPublicUrl(path);
-        photoUrl = urlData.publicUrl;
+        // Store the path only - admin will use signed URLs to view
+        photoUrl = path;
       }
     }
 
