@@ -253,13 +253,6 @@ export default function Index() {
             </Link>
           </div>
 
-          {/* Scroll indicator — hidden on very small screens */}
-          <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 sm:gap-2 animate-fade-in animation-delay-800">
-            <span className="font-body text-[9px] sm:text-[10px] tracking-[0.25em] uppercase text-primary-foreground/35">Scroll</span>
-            <div className="w-5 h-8 sm:w-6 sm:h-10 rounded-full border-2 border-primary-foreground/15 flex justify-center pt-1.5 sm:pt-2">
-              <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-secondary animate-scroll-bounce" />
-            </div>
-          </div>
         </div>
       </section>
 
