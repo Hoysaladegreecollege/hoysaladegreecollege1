@@ -148,7 +148,7 @@ export default function About() {
               <ScrollReveal delay={200}>
                 <div className="relative mt-10 bg-gradient-to-br from-primary/3 to-secondary/3 rounded-3xl p-8 sm:p-10 border border-border/50">
                   <div className="absolute top-0 left-6 right-6 h-0.5 bg-gradient-to-r from-transparent via-secondary/40 to-transparent" />
-                  <div className="font-body text-muted-foreground leading-relaxed space-y-4 text-sm sm:text-base">
+                  <div className="font-body text-foreground leading-relaxed space-y-4 text-sm sm:text-base">
                     <p>Hoysala Degree College, established in 2017 under Shri Shirdi Sai Educational Trust(R), is located in Nelamangala Town, Bengaluru Rural District. Affiliated to Bangalore University and approved by AICTE New Delhi, the college offers BCA, B.Com (Regular & Professional), and BBA programs.</p>
                     <p>Our institution combines modern teaching methodologies with traditional values, creating an environment where students develop both professionally and personally. With experienced faculty, state-of-the-art infrastructure, and a strong focus on placements, we ensure every student is career-ready.</p>
                   </div>
@@ -163,14 +163,15 @@ export default function About() {
             <div className="absolute inset-0 section-pattern opacity-50" />
             <div className="container px-4 relative">
               <ScrollReveal><SectionHeading title="Quick Facts" subtitle="Numbers that define our institution" /></ScrollReveal>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5 max-w-5xl mx-auto">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-5 sm:gap-6 max-w-4xl mx-auto">
                 {quickFacts.map((f, i) => (
                   <ScrollReveal key={f.label} delay={i * 80}>
-                    <div className="premium-card p-5 sm:p-6 text-center group relative overflow-hidden border-glow card-stack">
-                      <div className="absolute inset-0 bg-gradient-to-br from-secondary/8 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
-                      <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-secondary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                      <p className="font-display text-2xl sm:text-3xl font-bold text-primary group-hover:text-secondary transition-colors duration-400 relative">{f.value}</p>
-                      <p className="font-body text-[10px] sm:text-xs text-muted-foreground mt-2 uppercase tracking-widest relative">{f.label}</p>
+                    <div className="bg-card rounded-2xl p-6 sm:p-7 text-center group relative overflow-hidden border border-border/50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
+                      <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500" style={{ background: "linear-gradient(135deg, hsla(var(--secondary), 0.08), hsla(var(--primary), 0.05))", backdropFilter: "blur(8px)" }} />
+                      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-secondary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/8 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 rounded-2xl pointer-events-none" />
+                      <p className="font-display text-2xl sm:text-3xl font-bold text-foreground group-hover:text-primary transition-colors duration-400 relative z-10">{f.value}</p>
+                      <p className="font-body text-xs text-muted-foreground mt-2 uppercase tracking-widest relative z-10 font-semibold">{f.label}</p>
                     </div>
                   </ScrollReveal>
                 ))}
@@ -320,27 +321,33 @@ export default function About() {
           </section>
 
           {/* Contact Info */}
-          <section id="contact" className="py-16 bg-cream scroll-mt-24">
-            <div className="container max-w-3xl px-4">
+          <section id="contact" className="py-20 sm:py-28 bg-cream scroll-mt-24">
+            <div className="container max-w-4xl px-4">
               <ScrollReveal><SectionHeading title="Reach Us" subtitle="We're always here to help" /></ScrollReveal>
               <ScrollReveal delay={150}>
-                <div className="premium-card p-6 sm:p-8 space-y-3">
+                <div className="grid sm:grid-cols-2 gap-4 sm:gap-5">
                   {[
-                    { icon: MapPin, text: "K.R.P. Arcade, UCO Bank Building, Paramanna Layout, Nelamangala Town, Bengaluru Rural Dist. - 562 123", href: "https://maps.app.goo.gl/YGNgC5ev7v4pJWve9", external: true, color: "bg-blue-500/10", iconColor: "text-blue-600" },
-                    { icon: Phone, text: "7676272167 / 7975344252 / 8618181383", href: "tel:7676272167", color: "bg-emerald-500/10", iconColor: "text-emerald-600" },
-                    { icon: Mail, text: "principal.hoysaladegreecollege@gmail.com", href: "mailto:principal.hoysaladegreecollege@gmail.com", color: "bg-primary/10", iconColor: "text-primary" },
-                    { icon: Clock, text: "Monday - Saturday: 9:00 AM - 5:00 PM", href: undefined, color: "bg-secondary/15", iconColor: "text-secondary-foreground" },
+                    { icon: MapPin, label: "Address", text: "K.R.P. Arcade, UCO Bank Building, Paramanna Layout, Nelamangala Town, Bengaluru Rural Dist. - 562 123", href: "https://maps.app.goo.gl/YGNgC5ev7v4pJWve9", external: true, color: "from-blue-500/15 to-blue-500/5", iconBg: "bg-blue-500/10", iconColor: "text-blue-600" },
+                    { icon: Phone, label: "Phone", text: "7676272167 / 7975344252 / 8618181383", href: "tel:7676272167", color: "from-emerald-500/15 to-emerald-500/5", iconBg: "bg-emerald-500/10", iconColor: "text-emerald-600" },
+                    { icon: Mail, label: "Email", text: "principal.hoysaladegreecollege@gmail.com", href: "mailto:principal.hoysaladegreecollege@gmail.com", color: "from-primary/12 to-primary/3", iconBg: "bg-primary/10", iconColor: "text-primary" },
+                    { icon: Clock, label: "Working Hours", text: "Monday - Saturday: 9:00 AM - 5:00 PM", href: undefined, color: "from-secondary/15 to-secondary/5", iconBg: "bg-secondary/15", iconColor: "text-secondary-foreground" },
                   ].map((item, i) => (
-                    <div key={i} className="flex items-start gap-3 group p-3 rounded-xl hover:bg-muted/50 transition-all duration-300">
-                      <div className={`w-9 h-9 rounded-xl ${item.color} flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-110 transition-transform duration-300`}>
-                        <item.icon className={`w-4 h-4 ${item.iconColor}`} />
+                    <div key={i} className={`bg-card rounded-2xl p-5 sm:p-6 group relative overflow-hidden border border-border/50 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-500`}>
+                      <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl`} />
+                      <div className="relative z-10 flex items-start gap-4">
+                        <div className={`w-11 h-11 rounded-xl ${item.iconBg} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300`}>
+                          <item.icon className={`w-5 h-5 ${item.iconColor}`} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-body text-xs font-bold text-foreground uppercase tracking-wider mb-1">{item.label}</p>
+                          {item.href ? (
+                            <a href={item.href} target={item.external ? "_blank" : undefined} rel={item.external ? "noopener noreferrer" : undefined}
+                              className="font-body text-sm text-muted-foreground hover:text-primary transition-colors duration-200 break-words">{item.text}</a>
+                          ) : (
+                            <p className="font-body text-sm text-muted-foreground">{item.text}</p>
+                          )}
+                        </div>
                       </div>
-                      {item.href ? (
-                        <a href={item.href} target={item.external ? "_blank" : undefined} rel={item.external ? "noopener noreferrer" : undefined}
-                          className="font-body text-sm text-muted-foreground hover:text-primary transition-colors duration-200 pt-1.5">{item.text}</a>
-                      ) : (
-                        <p className="font-body text-sm text-muted-foreground pt-1.5">{item.text}</p>
-                      )}
                     </div>
                   ))}
                 </div>
