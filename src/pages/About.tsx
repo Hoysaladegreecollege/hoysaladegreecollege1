@@ -192,7 +192,7 @@ export default function About() {
                       <img src={principalImage} alt="Principal Sri Gopal H.R" className="w-full shadow-2xl group-hover:scale-[1.03] transition-transform duration-700" />
                       {/* Glass overlay on hover */}
                       <div className="absolute inset-0 bg-gradient-to-t from-primary/40 via-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                      <div className="absolute inset-0 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      {/* Removed backdrop-blur to keep image clear on hover */}
                       <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
                         <p className="font-display text-base font-bold text-white drop-shadow-lg">Sri Gopal H.R</p>
                         <p className="font-body text-xs text-white/80">Principal · M.Sc, M.Ed, Ph.D</p>
