@@ -362,7 +362,7 @@ export default function Index() {
             <ScrollReveal key={img.title} delay={i * 60}>
                 <div
                 className="relative group cursor-pointer overflow-hidden rounded-xl sm:rounded-2xl border border-border aspect-[4/3] hover:shadow-2xl active:scale-[0.97] transition-all duration-500 touch-manipulation"
-                onClick={() => { setLightboxIdx(i); document.body.style.overflow = "hidden"; }}>
+                onClick={() => { setLightboxIdx(i); document.body.style.overflow = "hidden"; document.documentElement.style.overflow = "hidden"; }}>
 
                   <img src={img.src} alt={img.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" />
                   <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -388,10 +388,10 @@ export default function Index() {
       {/* Full-screen Lightbox */}
       {lightboxIdx !== null &&
       <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md animate-fade-in flex items-center justify-center"
-        onClick={() => { setLightboxIdx(null); document.body.style.overflow = ""; }}
+        onClick={() => { setLightboxIdx(null); document.body.style.removeProperty("overflow"); document.documentElement.style.removeProperty("overflow"); }}
         role="dialog" aria-modal="true" aria-label="Image lightbox"
         onKeyDown={(e) => {
-          if (e.key === "Escape") { setLightboxIdx(null); document.body.style.overflow = ""; }
+          if (e.key === "Escape") { setLightboxIdx(null); document.body.style.removeProperty("overflow"); document.documentElement.style.removeProperty("overflow"); }
           if (e.key === "ArrowRight") setLightboxIdx((lightboxIdx + 1) % galleryImages.length);
           if (e.key === "ArrowLeft") setLightboxIdx((lightboxIdx - 1 + galleryImages.length) % galleryImages.length);
         }}
@@ -411,7 +411,7 @@ export default function Index() {
             }}>
             {/* Close button - positioned at top-right of image container */}
             <button className="absolute -top-2 -right-2 sm:top-0 sm:right-0 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 z-20 shadow-lg border border-white/10"
-              onClick={() => { setLightboxIdx(null); document.body.style.overflow = ""; }}>
+              onClick={() => { setLightboxIdx(null); document.body.style.removeProperty("overflow"); document.documentElement.style.removeProperty("overflow"); }}>
               <X className="w-5 h-5" />
             </button>
             {/* Nav buttons */}

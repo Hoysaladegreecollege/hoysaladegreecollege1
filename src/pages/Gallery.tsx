@@ -44,11 +44,23 @@ export default function Gallery() {
   const openLightbox = useCallback((index: number) => {
     setLightboxIdx(index);
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
   }, []);
 
   const closeLightbox = useCallback(() => {
     setLightboxIdx(null);
     document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
+    document.body.style.removeProperty("overflow");
+    document.documentElement.style.removeProperty("overflow");
+  }, []);
+
+  // Cleanup on unmount to ensure scroll is always restored
+  useEffect(() => {
+    return () => {
+      document.body.style.removeProperty("overflow");
+      document.documentElement.style.removeProperty("overflow");
+    };
   }, []);
 
   const goNext = useCallback(() => {
