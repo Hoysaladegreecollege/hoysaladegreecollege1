@@ -322,17 +322,21 @@ export default function Index() {
           <ScrollReveal>
             <SectionHeading title="Why Hoysala?" subtitle="Key highlights that set us apart from the rest" />
           </ScrollReveal>
-           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
             {highlights.map((h, i) =>
             <ScrollReveal key={h.label} delay={i * 40}>
-                <div className="relative premium-card p-5 sm:p-6 cursor-default group spotlight border-glow overflow-hidden h-full transition-all duration-500 hover:bg-card/80 hover:backdrop-blur-xl hover:shadow-[0_8px_40px_-12px_hsl(var(--primary)/0.15)]"
+                <div className="relative premium-card p-5 sm:p-6 cursor-default group overflow-hidden h-full border border-border/40 rounded-2xl"
                   style={{ transition: "all 0.5s cubic-bezier(0.4,0,0.2,1)" }}>
-                  {/* Glassmorphism hover overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-secondary/5 to-primary/3 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl backdrop-blur-sm" />
-                  <div className="absolute inset-0 border border-white/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/0 via-secondary/40 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="relative flex flex-col items-center text-center gap-3">
-                    <div className="icon-glow w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-400 shadow-sm border border-border/30 group-hover:border-secondary/30 group-hover:shadow-lg group-hover:shadow-secondary/10">
+                  {/* Glass overlay on hover */}
+                  <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500"
+                    style={{ background: "linear-gradient(135deg, hsla(var(--primary), 0.06), hsla(var(--secondary), 0.08), hsla(var(--primary), 0.04))", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }} />
+                  <div className="absolute inset-0 border border-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-secondary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  {/* Shimmer sweep */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 rounded-2xl pointer-events-none" />
+                  <div className="relative flex flex-col items-center text-center gap-3 z-10">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-sm border border-border/30 group-hover:border-secondary/40 group-hover:shadow-xl group-hover:shadow-secondary/15">
                       <h.icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary group-hover:text-secondary transition-colors duration-300" />
                     </div>
                     <div>
@@ -384,40 +388,48 @@ export default function Index() {
 
       {/* Full-screen Lightbox */}
       {lightboxIdx !== null &&
-      <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md animate-fade-in"
-        onClick={() => { setLightboxIdx(null); document.body.style.overflow = ""; }}>
-          {/* Content container - viewport centered */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            {/* Close button - relative to image area */}
-            <button className="absolute top-4 right-4 sm:top-6 sm:right-6 w-11 h-11 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/25 transition-colors z-[110]"
-              onClick={(e) => {e.stopPropagation(); setLightboxIdx(null); document.body.style.overflow = "";}}>
+      <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md animate-fade-in flex items-center justify-center"
+        onClick={() => { setLightboxIdx(null); document.body.style.overflow = ""; }}
+        role="dialog" aria-modal="true" aria-label="Image lightbox"
+        onKeyDown={(e) => {
+          if (e.key === "Escape") { setLightboxIdx(null); document.body.style.overflow = ""; }
+          if (e.key === "ArrowRight") setLightboxIdx((lightboxIdx + 1) % galleryImages.length);
+          if (e.key === "ArrowLeft") setLightboxIdx((lightboxIdx - 1 + galleryImages.length) % galleryImages.length);
+        }}
+        tabIndex={0}
+        ref={(el) => el?.focus()}>
+          {/* Image container with relative close button */}
+          <div className="relative flex flex-col items-center max-w-[90vw] sm:max-w-[80vw] max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+            onTouchStart={(e) => { (window as any).__touchStartX = e.touches[0].clientX; }}
+            onTouchEnd={(e) => {
+              const startX = (window as any).__touchStartX;
+              if (startX == null) return;
+              const diff = e.changedTouches[0].clientX - startX;
+              if (Math.abs(diff) > 50) {
+                diff > 0 ? setLightboxIdx((lightboxIdx - 1 + galleryImages.length) % galleryImages.length) : setLightboxIdx((lightboxIdx + 1) % galleryImages.length);
+              }
+            }}>
+            {/* Close button - positioned at top-right of image container */}
+            <button className="absolute -top-2 -right-2 sm:top-0 sm:right-0 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 z-20 shadow-lg border border-white/10"
+              onClick={() => { setLightboxIdx(null); document.body.style.overflow = ""; }}>
               <X className="w-5 h-5" />
             </button>
             {/* Nav buttons */}
-            <button className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/25 transition-colors z-[110]"
-              onClick={(e) => {e.stopPropagation();setLightboxIdx((lightboxIdx - 1 + galleryImages.length) % galleryImages.length);}}>
-              <ChevronLeft className="w-6 h-6" />
+            <button className="absolute left-0 sm:-left-14 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/25 transition-colors z-20"
+              onClick={() => setLightboxIdx((lightboxIdx - 1 + galleryImages.length) % galleryImages.length)}>
+              <ChevronLeft className="w-5 h-5" />
             </button>
-            <button className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/25 transition-colors z-[110]"
-              onClick={(e) => {e.stopPropagation();setLightboxIdx((lightboxIdx + 1) % galleryImages.length);}}>
-              <ChevronRight className="w-6 h-6" />
+            <button className="absolute right-0 sm:-right-14 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/25 transition-colors z-20"
+              onClick={() => setLightboxIdx((lightboxIdx + 1) % galleryImages.length)}>
+              <ChevronRight className="w-5 h-5" />
             </button>
-            {/* Image + caption */}
-            <div className="flex flex-col items-center px-14 sm:px-20 max-w-full max-h-full" onClick={(e) => e.stopPropagation()}
-              onTouchStart={(e) => { (window as any).__touchStartX = e.touches[0].clientX; }}
-              onTouchEnd={(e) => {
-                const startX = (window as any).__touchStartX;
-                if (startX == null) return;
-                const diff = e.changedTouches[0].clientX - startX;
-                if (Math.abs(diff) > 50) {
-                  diff > 0 ? setLightboxIdx((lightboxIdx - 1 + galleryImages.length) % galleryImages.length) : setLightboxIdx((lightboxIdx + 1) % galleryImages.length);
-                }
-              }}>
-              <img src={galleryImages[lightboxIdx].src} alt={galleryImages[lightboxIdx].title} className="max-w-full max-h-[70vh] object-contain rounded-xl shadow-2xl animate-scale-bounce" key={lightboxIdx} />
-              <div className="mt-4 text-center">
-                <p className="font-display text-lg sm:text-xl font-bold text-white">{galleryImages[lightboxIdx].title}</p>
-                <p className="font-body text-xs text-white/50 mt-1">{galleryImages[lightboxIdx].category} • {lightboxIdx + 1} / {galleryImages.length}</p>
-              </div>
+            {/* Image */}
+            <img src={galleryImages[lightboxIdx].src} alt={galleryImages[lightboxIdx].title} className="max-w-full max-h-[72vh] object-contain rounded-2xl shadow-2xl animate-scale-bounce" key={lightboxIdx} />
+            {/* Caption below image */}
+            <div className="mt-4 text-center bg-black/40 backdrop-blur-sm px-6 py-3 rounded-xl border border-white/10">
+              <p className="font-display text-base sm:text-lg font-bold text-white">{galleryImages[lightboxIdx].title}</p>
+              <p className="font-body text-xs text-white/60 mt-1">{galleryImages[lightboxIdx].category} • {lightboxIdx + 1} / {galleryImages.length}</p>
             </div>
           </div>
         </div>
