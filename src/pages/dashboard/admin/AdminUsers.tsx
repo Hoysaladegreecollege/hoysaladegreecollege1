@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { Search, Trash2, Edit3, X, Save, Users, Phone, UserPlus, Eye, ArrowLeft, KeyRound } from "lucide-react";
+import { validatePassword, PASSWORD_REQUIREMENTS } from "@/lib/password-validation";
 import { useAuth } from "@/contexts/AuthContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
@@ -112,6 +113,8 @@ export default function AdminUsers() {
 
   const addStudentMutation = useMutation({
     mutationFn: async () => {
+      const pwCheck = validatePassword(newStudent.password);
+      if (!pwCheck.valid) throw new Error(pwCheck.message);
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: newStudent.email,
         password: newStudent.password,
@@ -247,7 +250,7 @@ export default function AdminUsers() {
             </div>
             <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Full Name *</label><input value={newStudent.full_name} onChange={(e) => setNewStudent({ ...newStudent, full_name: e.target.value })} required className={inputClass} /></div>
             <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Email *</label><input type="email" value={newStudent.email} onChange={(e) => setNewStudent({ ...newStudent, email: e.target.value })} required className={inputClass} /></div>
-            <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Password *</label><input type="password" value={newStudent.password} onChange={(e) => setNewStudent({ ...newStudent, password: e.target.value })} required minLength={6} className={inputClass} /></div>
+            <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Password *</label><input type="password" value={newStudent.password} onChange={(e) => setNewStudent({ ...newStudent, password: e.target.value })} required minLength={8} placeholder={PASSWORD_REQUIREMENTS} className={inputClass} /></div>
             <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Student Phone</label><input value={newStudent.phone} onChange={(e) => setNewStudent({ ...newStudent, phone: e.target.value })} className={inputClass} /></div>
             <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Date of Birth</label><input type="date" value={newStudent.date_of_birth} onChange={(e) => setNewStudent({ ...newStudent, date_of_birth: e.target.value })} className={inputClass} /></div>
             <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Roll Number</label><input value={newStudent.roll_number} onChange={(e) => setNewStudent({ ...newStudent, roll_number: e.target.value })} placeholder="Auto-generated if empty" className={inputClass} /></div>
@@ -475,10 +478,10 @@ export default function AdminUsers() {
               Set a new password for <strong>{resetPwUser?.full_name || resetPwUser?.email}</strong>
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={(e) => { e.preventDefault(); resetPasswordMutation.mutate({ userId: resetPwUser.user_id, password: newPassword }); }} className="space-y-4 mt-2">
+          <form onSubmit={(e) => { e.preventDefault(); const pwCheck = validatePassword(newPassword); if (!pwCheck.valid) { toast.error(pwCheck.message); return; } resetPasswordMutation.mutate({ userId: resetPwUser.user_id, password: newPassword }); }} className="space-y-4 mt-2">
             <div>
               <label className="font-body text-xs font-semibold text-foreground block mb-1.5">New Password *</label>
-              <Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required minLength={6} placeholder="Minimum 6 characters" className="rounded-xl" />
+              <Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required minLength={8} placeholder={PASSWORD_REQUIREMENTS} className="rounded-xl" />
             </div>
             <div className="flex gap-3">
               <Button type="button" variant="outline" onClick={() => setResetPwUser(null)} className="flex-1 rounded-xl font-body">Cancel</Button>

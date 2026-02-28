@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { validatePassword, PASSWORD_REQUIREMENTS } from "@/lib/password-validation";
 
 type Role = "student" | "teacher" | "principal" | "admin";
 
@@ -44,6 +45,10 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) { toast.error("Please fill in all fields"); return; }
+    if (mode === "signup") {
+      const pwCheck = validatePassword(password);
+      if (!pwCheck.valid) { toast.error(pwCheck.message); return; }
+    }
     setLoading(true);
     if (mode === "login") {
       const { error } = await signIn(email, password);
@@ -156,7 +161,7 @@ export default function Login() {
                   <input
                     type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)}
                     className={`${inputClass("password")} pl-11 pr-12`}
-                    placeholder="••••••••"
+                    placeholder="••••••••" minLength={8}
                     onFocus={() => setFocused("password")} onBlur={() => setFocused(null)}
                   />
                   <button type="button" onClick={() => setShowPassword(!showPassword)}

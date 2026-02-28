@@ -29,7 +29,10 @@ Deno.serve(async (req) => {
 
     const { userId, newPassword } = await req.json();
     if (!userId) throw new Error("userId required");
-    if (!newPassword || newPassword.length < 6) throw new Error("Password must be at least 6 characters");
+    if (!newPassword || newPassword.length < 8) throw new Error("Password must be at least 8 characters");
+    if (!/[A-Z]/.test(newPassword)) throw new Error("Password must contain an uppercase letter");
+    if (!/[a-z]/.test(newPassword)) throw new Error("Password must contain a lowercase letter");
+    if (!/[0-9]/.test(newPassword)) throw new Error("Password must contain a number");
 
     const { error } = await adminClient.auth.admin.updateUserById(userId, { password: newPassword });
     if (error) throw error;
@@ -44,8 +47,8 @@ Deno.serve(async (req) => {
       ? "Unauthorized"
       : msg.includes("Only admin")
       ? "Insufficient permissions"
-      : msg.includes("Password must be")
-      ? "Password must be at least 6 characters"
+      : msg.includes("Password must")
+      ? msg
       : msg.includes("userId required")
       ? "User ID is required"
       : "An error occurred while resetting the password";
