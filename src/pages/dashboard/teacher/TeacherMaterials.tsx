@@ -23,6 +23,7 @@ export default function TeacherMaterials() {
   const [materialFiles, setMaterialFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [semesterFilter, setSemesterFilter] = useState<string>("");
 
   const { data: courses = [] } = useQuery({
     queryKey: ["courses-list"],
@@ -179,6 +180,19 @@ export default function TeacherMaterials() {
             {uploading ? `Uploading ${uploadProgress}%...` : <><Upload className="w-4 h-4 mr-2" /> Upload {materialFiles.length > 1 ? `${materialFiles.length} Files` : "Material"}</>}
           </Button>
         </form>
+      </div>
+
+      {/* Semester filter */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <label className="font-body text-sm font-semibold text-foreground">Filter by Semester:</label>
+        <div className="flex gap-2 flex-wrap">
+          <button onClick={() => setSemesterFilter("")} className={`px-3 py-1.5 rounded-full font-body text-xs font-semibold border transition-all duration-300 ${!semesterFilter ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border text-muted-foreground hover:bg-muted"}`}>All</button>
+          {[1,2,3,4,5,6].map(s => (
+            <button key={s} onClick={() => setSemesterFilter(String(s))} className={`px-3 py-1.5 rounded-full font-body text-xs font-semibold border transition-all duration-300 ${semesterFilter === String(s) ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border text-muted-foreground hover:bg-muted"}`}>
+              Sem {s}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Materials grouped by course */}

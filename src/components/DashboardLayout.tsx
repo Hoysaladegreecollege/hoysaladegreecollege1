@@ -9,6 +9,8 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import PageLoader from "./PageLoader";
+import DarkModeToggle from "./DarkModeToggle";
+import ScrollToTop from "./ScrollToTop";
 
 interface NavItem { label: string; path: string; icon: React.ElementType; }
 
@@ -85,6 +87,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="min-h-screen flex bg-background">
+      <ScrollToTop />
       <PageLoader />
       {sidebarOpen && (
         <div className="fixed inset-0 bg-foreground/40 backdrop-blur-sm z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
@@ -158,9 +161,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <p className="font-body text-[9px] sm:text-[10px] text-muted-foreground hidden sm:block">Hoysala Degree College • Management Portal</p>
             </div>
           </div>
-          <Link to="/" className="font-body text-[11px] sm:text-xs text-muted-foreground hover:text-primary transition-all duration-300 px-3 py-1.5 rounded-xl hover:bg-primary/5 flex items-center gap-1 border border-transparent hover:border-primary/15">
-            ← Website
-          </Link>
+          <div className="flex items-center gap-2">
+            <DarkModeToggle />
+            <Link to="/" className="font-body text-[11px] sm:text-xs text-muted-foreground hover:text-primary transition-all duration-300 px-3 py-1.5 rounded-xl hover:bg-primary/5 flex items-center gap-1 border border-transparent hover:border-primary/15">
+              ← Website
+            </Link>
+          </div>
         </header>
         <main className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 overflow-auto">
           <div className="animate-fade-in-up">{children}</div>

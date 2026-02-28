@@ -132,66 +132,60 @@ export default function Gallery() {
       {/* Full-screen Lightbox - viewport centered */}
       {lightboxIdx !== null && (
         <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center animate-fade-in"
+          className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center animate-fade-in"
           onClick={closeLightbox}
           role="dialog"
           aria-modal="true"
           aria-label="Image lightbox"
         >
-          <div
-            className="relative w-[calc(100vw-2rem)] sm:w-[calc(100vw-4rem)] max-w-[980px] h-[calc(100vh-4rem)] sm:h-[calc(100vh-6rem)] max-h-[740px] rounded-2xl border border-white/10 bg-black/95 shadow-2xl overflow-hidden animate-scale-in"
-            onClick={(e) => e.stopPropagation()}
+          {/* Close button - fixed to viewport top-right */}
+          <button
+            className="fixed top-4 right-4 sm:top-6 sm:right-6 w-11 h-11 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/25 transition-colors z-[110]"
+            onClick={(e) => { e.stopPropagation(); closeLightbox(); }}
+            aria-label="Close lightbox"
           >
-            {/* Close button */}
-            <button
-              className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-colors z-20"
-              onClick={closeLightbox}
-              aria-label="Close lightbox"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <X className="w-5 h-5" />
+          </button>
 
-            {/* Nav buttons */}
-            <button
-              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-colors z-20"
-              onClick={goPrev}
-              aria-label="Previous image"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
-              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-colors z-20"
-              onClick={goNext}
-              aria-label="Next image"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
+          {/* Nav buttons - fixed to viewport */}
+          <button
+            className="fixed left-3 sm:left-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/25 transition-colors z-[110]"
+            onClick={(e) => { e.stopPropagation(); goPrev(); }}
+            aria-label="Previous image"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            className="fixed right-3 sm:right-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/25 transition-colors z-[110]"
+            onClick={(e) => { e.stopPropagation(); goNext(); }}
+            aria-label="Next image"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
 
-            {/* Image content */}
-            <div
-              className="h-full w-full flex flex-col"
-              onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
-              onTouchEnd={(e) => {
-                if (touchStartX === null) return;
-                const diff = e.changedTouches[0].clientX - touchStartX;
-                if (Math.abs(diff) > 50) {
-                  diff > 0 ? goPrev() : goNext();
-                }
-                setTouchStartX(null);
-              }}
-            >
-              <div className="flex-1 p-4 sm:p-8 flex items-center justify-center">
-                <img
-                  src={(filtered[lightboxIdx] as any).image_url}
-                  alt={(filtered[lightboxIdx] as any).title}
-                  className="max-w-full max-h-full object-contain rounded-xl"
-                  key={lightboxIdx}
-                />
-              </div>
-              <div className="pb-4 px-4 text-center pointer-events-none">
-                <p className="font-display text-base sm:text-lg font-bold text-white">{(filtered[lightboxIdx] as any).title}</p>
-                <p className="font-body text-xs text-white/60 mt-1">{lightboxIdx + 1} / {filtered.length}</p>
-              </div>
+          {/* Image content - centered in viewport */}
+          <div
+            className="flex flex-col items-center justify-center w-full h-full px-14 sm:px-20 py-16"
+            onClick={(e) => e.stopPropagation()}
+            onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
+            onTouchEnd={(e) => {
+              if (touchStartX === null) return;
+              const diff = e.changedTouches[0].clientX - touchStartX;
+              if (Math.abs(diff) > 50) {
+                diff > 0 ? goPrev() : goNext();
+              }
+              setTouchStartX(null);
+            }}
+          >
+            <img
+              src={(filtered[lightboxIdx] as any).image_url}
+              alt={(filtered[lightboxIdx] as any).title}
+              className="max-w-full max-h-[70vh] object-contain rounded-xl shadow-2xl animate-scale-bounce"
+              key={lightboxIdx}
+            />
+            <div className="mt-4 text-center">
+              <p className="font-display text-lg sm:text-xl font-bold text-white">{(filtered[lightboxIdx] as any).title}</p>
+              <p className="font-body text-xs text-white/50 mt-1">{(filtered[lightboxIdx] as any).category} • {lightboxIdx + 1} / {filtered.length}</p>
             </div>
           </div>
         </div>

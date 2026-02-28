@@ -132,10 +132,10 @@ export default function Admissions() {
                 <p className="font-body text-sm text-muted-foreground mt-1">Apply for BCA, B.Com, BBA, CA & CS programs</p>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+            <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto items-stretch sm:items-center">
               <button
                 onClick={() => setShowForm(true)}
-                className="relative group overflow-hidden px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-body text-sm sm:text-base font-bold text-primary-foreground shadow-2xl transition-all duration-500 hover:scale-105 hover:-translate-y-0.5 w-full sm:w-auto text-center"
+                className="relative group overflow-hidden px-6 sm:px-8 py-3.5 rounded-2xl font-body text-sm sm:text-base font-bold text-primary-foreground shadow-2xl transition-all duration-500 hover:scale-105 hover:-translate-y-0.5 w-full sm:w-auto text-center"
                 style={{ background: "linear-gradient(135deg, hsl(42,87%,52%), hsl(38,92%,44%), hsl(42,87%,60%))", boxShadow: "0 8px 32px hsla(42,87%,52%,0.4), inset 0 1px 0 rgba(255,255,255,0.2)" }}>
 
                 <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
@@ -146,7 +146,7 @@ export default function Admissions() {
                 </span>
               </button>
               <Link to="/application-status" className="w-full sm:w-auto">
-                <Button variant="outline" size="lg" className="font-body rounded-2xl w-full py-3 sm:py-4 hover:bg-primary/5 hover:border-primary/30 transition-all duration-300 text-sm sm:text-base">
+                <Button variant="outline" className="font-body rounded-2xl w-full h-full py-3.5 hover:bg-primary/5 hover:border-primary/30 transition-all duration-300 text-sm sm:text-base">
                   <FileText className="w-4 h-4 mr-2" /> Track Application
                 </Button>
               </Link>
@@ -187,9 +187,9 @@ export default function Admissions() {
 
       {/* Application Form Modal */}
       {showForm &&
-      <div className="fixed inset-0 bg-foreground/60 backdrop-blur-md z-50 flex items-center justify-center p-0 sm:p-4 animate-fade-in"
+      <div className="fixed inset-0 bg-foreground/60 backdrop-blur-md z-50 flex items-start sm:items-center justify-center p-0 sm:p-4 animate-fade-in overflow-y-auto"
       onClick={(e) => {if (e.target === e.currentTarget) setShowForm(false);}}>
-          <div className="bg-card sm:rounded-2xl border-0 sm:border border-border w-full max-w-2xl h-full sm:h-auto sm:max-h-[92vh] overflow-y-auto shadow-2xl animate-scale-bounce relative">
+          <div className="bg-card sm:rounded-2xl border-0 sm:border border-border w-full max-w-3xl min-h-screen sm:min-h-0 sm:max-h-[92vh] overflow-y-auto shadow-2xl animate-scale-bounce relative">
             {/* Modal header */}
             <div className="sticky top-0 bg-card/95 backdrop-blur-sm border-b border-border px-6 py-4 flex items-center justify-between z-10 rounded-t-2xl">
               <div className="flex items-center gap-3">

@@ -1,9 +1,18 @@
 import { Link } from "react-router-dom";
-import { GraduationCap, MapPin, Phone, Mail, Facebook, Twitter, Instagram, Youtube, ArrowUpRight, Heart } from "lucide-react";
+import { GraduationCap, MapPin, Phone, Mail, Facebook, Twitter, Instagram, Youtube, ArrowUpRight, Heart, ArrowUp } from "lucide-react";
+import { useState, useEffect } from "react";
 
 const MAPS_LINK = "https://maps.app.goo.gl/YGNgC5ev7v4pJWve9";
 
 export default function Footer() {
+  const [showTop, setShowTop] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 400);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <footer className="bg-gradient-to-b from-primary to-navy-dark text-primary-foreground relative overflow-hidden">
       {/* Decorative */}
@@ -29,8 +38,13 @@ export default function Footer() {
             </p>
             <p className="text-[11px] sm:text-xs font-body opacity-50">College Code: BU 26 (P21GEF0099)</p>
             <div className="flex gap-2 mt-5">
-              {[Facebook, Twitter, Instagram, Youtube].map((Icon, i) => (
-                <a key={i} href="#" className="w-9 h-9 rounded-xl bg-primary-foreground/5 border border-primary-foreground/10 flex items-center justify-center hover:bg-secondary hover:text-primary hover:border-secondary hover:scale-110 transition-all duration-300">
+              {[
+                { Icon: Facebook, label: "Facebook" },
+                { Icon: Twitter, label: "Twitter" },
+                { Icon: Instagram, label: "Instagram" },
+                { Icon: Youtube, label: "YouTube" },
+              ].map(({ Icon, label }) => (
+                <a key={label} href="#" aria-label={label} className="w-9 h-9 rounded-xl bg-primary-foreground/5 border border-primary-foreground/10 flex items-center justify-center hover:bg-secondary hover:text-primary hover:border-secondary hover:scale-110 hover:shadow-lg hover:shadow-secondary/20 transition-all duration-300">
                   <Icon className="w-3.5 h-3.5" />
                 </a>
               ))}
@@ -106,12 +120,22 @@ export default function Footer() {
           </div>
         </div>
       </div>
+
       <div className="border-t border-primary-foreground/8">
         <div className="container py-4 px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] sm:text-xs font-body opacity-40">
           <span>© {new Date().getFullYear()} Hoysala Degree College. All rights reserved.</span>
           <span className="flex items-center gap-1">Made with <Heart className="w-3 h-3 text-secondary fill-secondary" /> ಶ್ರೀಶಿರಡಿ ಸಾಯಿ ಎಜುಕೇಷನಲ್ ಟ್ರಸ್ಟ್ (ರಿ.)</span>
         </div>
       </div>
+
+      {/* Back to top */}
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        className={`fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-40 w-10 h-10 rounded-xl bg-primary border border-primary-foreground/15 flex items-center justify-center text-primary-foreground shadow-lg hover:bg-secondary hover:text-primary hover:scale-110 transition-all duration-300 ${showTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"}`}
+        aria-label="Back to top"
+      >
+        <ArrowUp className="w-4 h-4" />
+      </button>
     </footer>
   );
 }

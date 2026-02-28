@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import SEOHead from "@/components/SEOHead";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -113,7 +114,7 @@ function RankCard({ a, isDefault = false }: { a: any; isDefault?: boolean }) {
       </h3>
       {(a.usn || isDefault) && <p className="font-body text-xs text-muted-foreground mt-1">USN: {a.usn}</p>}
       {a.percentage && (
-        <p className="font-display text-4xl font-bold mt-4" style={{ color: ringColor }}>{a.percentage}</p>
+        <p className="font-display text-4xl font-bold mt-4 text-foreground">{a.percentage}</p>
       )}
       <p className="font-body text-sm text-foreground mt-3 font-medium">{a.course}</p>
       {(a.batch || a.year) && (
@@ -228,11 +229,11 @@ export default function Achievements() {
               <p className="font-body text-muted-foreground text-sm mb-6 leading-relaxed">
                 Join Hoysala Degree College and write your own success story. Excellence is not just an aspiration — it's a tradition here.
               </p>
-              <a href="/admissions"
+              <Link to="/admissions"
                 className="inline-flex items-center gap-2 px-8 py-3 rounded-xl font-body font-bold text-sm text-primary-foreground hover:scale-105 transition-all duration-300 shadow-lg"
                 style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--navy-dark)))" }}>
                 <Trophy className="w-4 h-4" /> Start Your Journey
-              </a>
+              </Link>
             </div>
           </ScrollReveal>
         </div>

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, GraduationCap, ChevronDown, Phone, Mail, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import DarkModeToggle from "./DarkModeToggle";
 
 const navLinks = [
   { label: "Home", path: "/" },
@@ -140,6 +141,7 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-2">
+          <DarkModeToggle className="hidden sm:flex" />
           <Link to="/login" className="hidden xl:block">
             <button className="relative group overflow-hidden px-5 py-2 rounded-xl font-body text-xs font-bold text-primary-foreground shadow-md hover:shadow-lg hover:scale-105 hover:-translate-y-0.5 active:scale-100 transition-all duration-300"
               style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--navy-dark)))" }}>
