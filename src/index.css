@@ -43,6 +43,44 @@
     --success: 142 70% 40%;
     --hero-overlay: linear-gradient(135deg, hsla(217, 72%, 18%, 0.85), hsla(217, 72%, 18%, 0.6));
   }
+
+  .dark {
+    --background: 220 20% 8%;
+    --foreground: 210 20% 92%;
+    --card: 220 18% 12%;
+    --card-foreground: 210 20% 92%;
+    --popover: 220 18% 12%;
+    --popover-foreground: 210 20% 92%;
+    --primary: 217 72% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 42 87% 55%;
+    --secondary-foreground: 220 30% 10%;
+    --muted: 220 15% 18%;
+    --muted-foreground: 210 10% 55%;
+    --accent: 42 87% 55%;
+    --accent-foreground: 220 30% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 220 15% 22%;
+    --input: 220 15% 22%;
+    --ring: 217 72% 45%;
+    --sidebar-background: 220 20% 10%;
+    --sidebar-foreground: 210 20% 90%;
+    --sidebar-primary: 42 87% 55%;
+    --sidebar-primary-foreground: 220 30% 10%;
+    --sidebar-accent: 220 18% 16%;
+    --sidebar-accent-foreground: 210 20% 90%;
+    --sidebar-border: 220 15% 20%;
+    --sidebar-ring: 42 87% 55%;
+    --gold: 42 87% 55%;
+    --gold-light: 42 80% 70%;
+    --navy: 217 72% 45%;
+    --navy-light: 217 50% 55%;
+    --navy-dark: 220 20% 6%;
+    --cream: 220 18% 10%;
+    --success: 142 70% 40%;
+    --hero-overlay: linear-gradient(135deg, hsla(220, 20%, 5%, 0.92), hsla(220, 20%, 10%, 0.7));
+  }
 }
 
 @layer base {

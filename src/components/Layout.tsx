@@ -5,10 +5,12 @@ import ChatBot from "./ChatBot";
 import PageLoader from "./PageLoader";
 import PageTransition from "./PageTransition";
 import PopupBanner from "./PopupBanner";
+import ScrollToTop from "./ScrollToTop";
 
 export default function Layout() {
   return (
     <div className="min-h-screen flex flex-col">
+      <ScrollToTop />
       <PageLoader />
       <PopupBanner />
       <Navbar />
