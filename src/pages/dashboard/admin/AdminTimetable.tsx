@@ -28,8 +28,10 @@ export default function AdminTimetable() {
   const [batchEntries, setBatchEntries] = useState(
     defaultPeriods.map(p => ({ period: p, subject: "", teacher_name: "", room: "" }))
   );
-  const [form, setForm] = useState({ title: "", day_of_week: "Monday", period: "", subject: "", teacher_name: "", room: "", course_filter: "All" });
+  const [batchSemester, setBatchSemester] = useState("");
+  const [form, setForm] = useState({ title: "", day_of_week: "Monday", period: "", subject: "", teacher_name: "", room: "", course_filter: "All", semester_filter: "" });
   const [viewCourse, setViewCourse] = useState("All");
+  const [viewSemester, setViewSemester] = useState("All");
 
   const { data: courses = [] } = useQuery({
     queryKey: ["timetable-courses"],
@@ -50,6 +52,7 @@ export default function AdminTimetable() {
   const addBatch = useMutation({
     mutationFn: async () => {
       const courseId = batchCourse || null;
+      const semesterVal = batchSemester ? parseInt(batchSemester) : null;
       const records = batchEntries
         .filter(e => e.subject.trim())
         .map(e => ({
@@ -60,6 +63,7 @@ export default function AdminTimetable() {
           teacher_name: e.teacher_name,
           room: e.room,
           course_id: courseId,
+          semester: semesterVal,
           uploaded_by: user?.id,
         }));
       if (records.length === 0) throw new Error("Please fill at least one subject");
@@ -77,6 +81,7 @@ export default function AdminTimetable() {
   const addEntry = useMutation({
     mutationFn: async () => {
       const courseId = form.course_filter !== "All" ? form.course_filter : null;
+      const semesterVal = form.semester_filter ? parseInt(form.semester_filter) : null;
       const { error } = await supabase.from("timetables").insert({
         title: form.title || `${form.day_of_week} - ${form.period}`,
         day_of_week: form.day_of_week,
@@ -85,6 +90,7 @@ export default function AdminTimetable() {
         teacher_name: form.teacher_name,
         room: form.room,
         course_id: courseId,
+        semester: semesterVal,
         uploaded_by: user?.id,
       });
       if (error) throw error;
@@ -105,7 +111,11 @@ export default function AdminTimetable() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin-timetable"] }); toast.success("Deleted"); },
   });
 
-  const filteredEntries = viewCourse === "All" ? entries : entries.filter((e: any) => e.course_id === viewCourse);
+  const filteredEntries = entries.filter((e: any) => {
+    if (viewCourse !== "All" && e.course_id !== viewCourse) return false;
+    if (viewSemester !== "All" && e.semester !== parseInt(viewSemester)) return false;
+    return true;
+  });
   const inputClass = "w-full border border-border rounded-xl px-3 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all";
 
   return (
@@ -154,6 +164,13 @@ export default function AdminTimetable() {
               <select value={batchCourse} onChange={(e) => setBatchCourse(e.target.value)} className={inputClass}>
                 <option value="">All Courses (General)</option>
                 {courses.map((c: any) => <option key={c.id} value={c.id}>{c.name} ({c.code})</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Semester</label>
+              <select value={batchSemester} onChange={(e) => setBatchSemester(e.target.value)} className={inputClass}>
+                <option value="">All Semesters</option>
+                {[1,2,3,4,5,6].map(s => <option key={s} value={s}>Semester {s}</option>)}
               </select>
             </div>
           </div>
@@ -205,6 +222,13 @@ export default function AdminTimetable() {
               </select>
             </div>
             <div>
+              <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Semester</label>
+              <select value={form.semester_filter} onChange={(e) => setForm({ ...form, semester_filter: e.target.value })} className={inputClass}>
+                <option value="">All Semesters</option>
+                {[1,2,3,4,5,6].map(s => <option key={s} value={String(s)}>Semester {s}</option>)}
+              </select>
+            </div>
+            <div>
               <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Day *</label>
               <select value={form.day_of_week} onChange={(e) => setForm({ ...form, day_of_week: e.target.value })} className={inputClass}>
                 {days.map(d => <option key={d} value={d}>{d}</option>)}
@@ -239,11 +263,18 @@ export default function AdminTimetable() {
       <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-sm">
         <div className="flex items-center justify-between flex-wrap gap-3 mb-5">
           <h3 className="font-display text-sm font-bold text-foreground">Current Timetable ({filteredEntries.length} entries)</h3>
-          <select value={viewCourse} onChange={(e) => setViewCourse(e.target.value)}
-            className="border border-border rounded-xl px-3 py-2 font-body text-xs bg-background focus:ring-2 focus:ring-primary/20 focus:outline-none">
-            <option value="All">All Courses</option>
-            {courses.map((c: any) => <option key={c.id} value={c.id}>{c.name} ({c.code})</option>)}
-          </select>
+          <div className="flex flex-wrap gap-2">
+            <select value={viewCourse} onChange={(e) => setViewCourse(e.target.value)}
+              className="border border-border rounded-xl px-3 py-2 font-body text-xs bg-background focus:ring-2 focus:ring-primary/20 focus:outline-none">
+              <option value="All">All Courses</option>
+              {courses.map((c: any) => <option key={c.id} value={c.id}>{c.name} ({c.code})</option>)}
+            </select>
+            <select value={viewSemester} onChange={(e) => setViewSemester(e.target.value)}
+              className="border border-border rounded-xl px-3 py-2 font-body text-xs bg-background focus:ring-2 focus:ring-primary/20 focus:outline-none">
+              <option value="All">All Semesters</option>
+              {[1,2,3,4,5,6].map(s => <option key={s} value={String(s)}>Semester {s}</option>)}
+            </select>
+          </div>
         </div>
 
         {isLoading ? (

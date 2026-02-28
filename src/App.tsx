@@ -4,97 +4,108 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
+import { lazy, Suspense } from "react";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardRedirect from "./components/DashboardRedirect";
 import DashboardLayout from "./components/DashboardLayout";
 import Index from "./pages/Index";
-import About from "./pages/About";
-import Courses from "./pages/Courses";
-import Admissions from "./pages/Admissions";
-import Departments from "./pages/Departments";
-import Faculty from "./pages/Faculty";
-import Events from "./pages/Events";
-import Notices from "./pages/Notices";
-import Achievements from "./pages/Achievements";
-import Contact from "./pages/Contact";
-import Support from "./pages/Support";
-import Login from "./pages/Login";
-import StudentAbsent from "./pages/StudentAbsent";
 import NotFound from "./pages/NotFound";
-import Management from "./pages/Management";
-import Committees from "./pages/Committees";
-import AddOnCourses from "./pages/AddOnCourses";
-import ApplicationStatus from "./pages/ApplicationStatus";
-import Gallery from "./pages/Gallery";
 
-// Student Dashboard
-import StudentDashboard from "./pages/dashboard/StudentDashboard";
-import StudentProfile from "./pages/dashboard/student/StudentProfile";
-import StudentAttendance from "./pages/dashboard/student/StudentAttendance";
-import StudentMarks from "./pages/dashboard/student/StudentMarks";
-import StudentTimetable from "./pages/dashboard/student/StudentTimetable";
-import StudentNotices from "./pages/dashboard/student/StudentNotices";
-import StudentMaterials from "./pages/dashboard/student/StudentMaterials";
-import StudentAnnouncements from "./pages/dashboard/student/StudentAnnouncements";
+// Lazy load public pages
+const About = lazy(() => import("./pages/About"));
+const Courses = lazy(() => import("./pages/Courses"));
+const Admissions = lazy(() => import("./pages/Admissions"));
+const Departments = lazy(() => import("./pages/Departments"));
+const Faculty = lazy(() => import("./pages/Faculty"));
+const Events = lazy(() => import("./pages/Events"));
+const Notices = lazy(() => import("./pages/Notices"));
+const Achievements = lazy(() => import("./pages/Achievements"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Support = lazy(() => import("./pages/Support"));
+const Login = lazy(() => import("./pages/Login"));
+const StudentAbsent = lazy(() => import("./pages/StudentAbsent"));
+const Management = lazy(() => import("./pages/Management"));
+const Committees = lazy(() => import("./pages/Committees"));
+const AddOnCourses = lazy(() => import("./pages/AddOnCourses"));
+const ApplicationStatus = lazy(() => import("./pages/ApplicationStatus"));
+const Gallery = lazy(() => import("./pages/Gallery"));
+const PreviousYearPapers = lazy(() => import("./pages/PreviousYearPapers"));
 
-// Teacher Dashboard
-import TeacherDashboard from "./pages/dashboard/TeacherDashboard";
-import TeacherStudents from "./pages/dashboard/teacher/TeacherStudents";
-import TeacherAttendance from "./pages/dashboard/teacher/TeacherAttendance";
-import TeacherMarks from "./pages/dashboard/teacher/TeacherMarks";
-import TeacherAbsent from "./pages/dashboard/teacher/TeacherAbsent";
-import TeacherMaterials from "./pages/dashboard/teacher/TeacherMaterials";
-import TeacherNotices from "./pages/dashboard/teacher/TeacherNotices";
-import TeacherTimetable from "./pages/dashboard/teacher/TeacherTimetable";
+// Lazy load student dashboard
+const StudentDashboard = lazy(() => import("./pages/dashboard/StudentDashboard"));
+const StudentProfile = lazy(() => import("./pages/dashboard/student/StudentProfile"));
+const StudentAttendance = lazy(() => import("./pages/dashboard/student/StudentAttendance"));
+const StudentMarks = lazy(() => import("./pages/dashboard/student/StudentMarks"));
+const StudentTimetable = lazy(() => import("./pages/dashboard/student/StudentTimetable"));
+const StudentNotices = lazy(() => import("./pages/dashboard/student/StudentNotices"));
+const StudentMaterials = lazy(() => import("./pages/dashboard/student/StudentMaterials"));
+const StudentAnnouncements = lazy(() => import("./pages/dashboard/student/StudentAnnouncements"));
 
-// Principal Dashboard
-import PrincipalDashboard from "./pages/dashboard/PrincipalDashboard";
-import PrincipalTopStudents from "./pages/dashboard/principal/PrincipalTopStudents";
-import PrincipalEvents from "./pages/dashboard/principal/PrincipalEvents";
-import PrincipalNotices from "./pages/dashboard/principal/PrincipalNotices";
-import PrincipalCourses from "./pages/dashboard/principal/PrincipalCourses";
-import PrincipalDepartments from "./pages/dashboard/principal/PrincipalDepartments";
-import PrincipalTeachers from "./pages/dashboard/principal/PrincipalTeachers";
-import PrincipalStudents from "./pages/dashboard/principal/PrincipalStudents";
+// Lazy load teacher dashboard
+const TeacherDashboard = lazy(() => import("./pages/dashboard/TeacherDashboard"));
+const TeacherStudents = lazy(() => import("./pages/dashboard/teacher/TeacherStudents"));
+const TeacherAttendance = lazy(() => import("./pages/dashboard/teacher/TeacherAttendance"));
+const TeacherMarks = lazy(() => import("./pages/dashboard/teacher/TeacherMarks"));
+const TeacherAbsent = lazy(() => import("./pages/dashboard/teacher/TeacherAbsent"));
+const TeacherMaterials = lazy(() => import("./pages/dashboard/teacher/TeacherMaterials"));
+const TeacherNotices = lazy(() => import("./pages/dashboard/teacher/TeacherNotices"));
+const TeacherTimetable = lazy(() => import("./pages/dashboard/teacher/TeacherTimetable"));
+const TeacherAnnouncements = lazy(() => import("./pages/dashboard/teacher/TeacherAnnouncements"));
+const TeacherAttendanceOverview = lazy(() => import("./pages/dashboard/teacher/TeacherAttendanceOverview"));
 
-// Admin Dashboard
-import AdminDashboard from "./pages/dashboard/AdminDashboard";
-import AdminUsers from "./pages/dashboard/admin/AdminUsers";
-import AdminRoles from "./pages/dashboard/admin/AdminRoles";
-import AdminSettings from "./pages/dashboard/admin/AdminSettings";
-import AdminApplications from "./pages/dashboard/admin/AdminApplications";
-import AdminContacts from "./pages/dashboard/admin/AdminContacts";
-import AdminTopRankers from "./pages/dashboard/admin/AdminTopRankers";
-import AdminTimetable from "./pages/dashboard/admin/AdminTimetable";
-import AdminEvents from "./pages/dashboard/admin/AdminEvents";
-import AdminFaculty from "./pages/dashboard/admin/AdminFaculty";
-import AdminBannerAndPapers from "./pages/dashboard/admin/AdminBannerAndPapers";
-import AdminFeeManagement from "./pages/dashboard/admin/AdminFeeManagement";
-import AdminPostNotice from "./pages/dashboard/admin/AdminPostNotice";
-import AdminSemesterPromotion from "./pages/dashboard/admin/AdminSemesterPromotion";
-import AdminAcademicYear from "./pages/dashboard/admin/AdminAcademicYear";
-import AdminAbsentReport from "./pages/dashboard/admin/AdminAbsentReport";
-import PreviousYearPapers from "./pages/PreviousYearPapers";
-import TeacherAnnouncements from "./pages/dashboard/teacher/TeacherAnnouncements";
-import AdminGallery from "./pages/dashboard/admin/AdminGallery";
-import AdminBirthdaySettings from "./pages/dashboard/admin/AdminBirthdaySettings";
-import AdminAddStaff from "./pages/dashboard/admin/AdminAddStaff";
-import AdminCourses from "./pages/dashboard/admin/AdminCourses";
+// Lazy load principal dashboard
+const PrincipalDashboard = lazy(() => import("./pages/dashboard/PrincipalDashboard"));
+const PrincipalTopStudents = lazy(() => import("./pages/dashboard/principal/PrincipalTopStudents"));
+const PrincipalEvents = lazy(() => import("./pages/dashboard/principal/PrincipalEvents"));
+const PrincipalNotices = lazy(() => import("./pages/dashboard/principal/PrincipalNotices"));
+const PrincipalCourses = lazy(() => import("./pages/dashboard/principal/PrincipalCourses"));
+const PrincipalDepartments = lazy(() => import("./pages/dashboard/principal/PrincipalDepartments"));
+const PrincipalTeachers = lazy(() => import("./pages/dashboard/principal/PrincipalTeachers"));
+const PrincipalStudents = lazy(() => import("./pages/dashboard/principal/PrincipalStudents"));
+
+// Lazy load admin dashboard
+const AdminDashboard = lazy(() => import("./pages/dashboard/AdminDashboard"));
+const AdminUsers = lazy(() => import("./pages/dashboard/admin/AdminUsers"));
+const AdminRoles = lazy(() => import("./pages/dashboard/admin/AdminRoles"));
+const AdminSettings = lazy(() => import("./pages/dashboard/admin/AdminSettings"));
+const AdminApplications = lazy(() => import("./pages/dashboard/admin/AdminApplications"));
+const AdminContacts = lazy(() => import("./pages/dashboard/admin/AdminContacts"));
+const AdminTopRankers = lazy(() => import("./pages/dashboard/admin/AdminTopRankers"));
+const AdminTimetable = lazy(() => import("./pages/dashboard/admin/AdminTimetable"));
+const AdminEvents = lazy(() => import("./pages/dashboard/admin/AdminEvents"));
+const AdminFaculty = lazy(() => import("./pages/dashboard/admin/AdminFaculty"));
+const AdminBannerAndPapers = lazy(() => import("./pages/dashboard/admin/AdminBannerAndPapers"));
+const AdminFeeManagement = lazy(() => import("./pages/dashboard/admin/AdminFeeManagement"));
+const AdminPostNotice = lazy(() => import("./pages/dashboard/admin/AdminPostNotice"));
+const AdminSemesterPromotion = lazy(() => import("./pages/dashboard/admin/AdminSemesterPromotion"));
+const AdminAcademicYear = lazy(() => import("./pages/dashboard/admin/AdminAcademicYear"));
+const AdminAbsentReport = lazy(() => import("./pages/dashboard/admin/AdminAbsentReport"));
+const AdminGallery = lazy(() => import("./pages/dashboard/admin/AdminGallery"));
+const AdminBirthdaySettings = lazy(() => import("./pages/dashboard/admin/AdminBirthdaySettings"));
+const AdminAddStaff = lazy(() => import("./pages/dashboard/admin/AdminAddStaff"));
+const AdminCourses = lazy(() => import("./pages/dashboard/admin/AdminCourses"));
+const AdminAttendanceOverview = lazy(() => import("./pages/dashboard/admin/AdminAttendanceOverview"));
 
 const queryClient = new QueryClient();
 
+const SuspenseWrap = ({ children }: { children: React.ReactNode }) => (
+  <Suspense fallback={<div className="flex items-center justify-center min-h-[40vh]"><div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
+    {children}
+  </Suspense>
+);
+
 const StudentRoute = ({ children }: { children: React.ReactNode }) => (
-  <ProtectedRoute allowedRoles={["student"]}><DashboardLayout>{children}</DashboardLayout></ProtectedRoute>
+  <ProtectedRoute allowedRoles={["student"]}><DashboardLayout><SuspenseWrap>{children}</SuspenseWrap></DashboardLayout></ProtectedRoute>
 );
 const TeacherRoute = ({ children }: { children: React.ReactNode }) => (
-  <ProtectedRoute allowedRoles={["teacher"]}><DashboardLayout>{children}</DashboardLayout></ProtectedRoute>
+  <ProtectedRoute allowedRoles={["teacher"]}><DashboardLayout><SuspenseWrap>{children}</SuspenseWrap></DashboardLayout></ProtectedRoute>
 );
 const PrincipalRoute = ({ children }: { children: React.ReactNode }) => (
-  <ProtectedRoute allowedRoles={["principal"]}><DashboardLayout>{children}</DashboardLayout></ProtectedRoute>
+  <ProtectedRoute allowedRoles={["principal"]}><DashboardLayout><SuspenseWrap>{children}</SuspenseWrap></DashboardLayout></ProtectedRoute>
 );
 const AdminRoute = ({ children }: { children: React.ReactNode }) => (
-  <ProtectedRoute allowedRoles={["admin"]}><DashboardLayout>{children}</DashboardLayout></ProtectedRoute>
+  <ProtectedRoute allowedRoles={["admin"]}><DashboardLayout><SuspenseWrap>{children}</SuspenseWrap></DashboardLayout></ProtectedRoute>
 );
 
 const App = () => (
@@ -108,26 +119,26 @@ const App = () => (
             {/* Public pages */}
             <Route element={<Layout />}>
               <Route path="/" element={<Index />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/courses" element={<Courses />} />
-              <Route path="/admissions" element={<Admissions />} />
-              <Route path="/departments" element={<Departments />} />
-              <Route path="/faculty" element={<Faculty />} />
-              <Route path="/events" element={<Events />} />
-              <Route path="/notices" element={<Notices />} />
-              <Route path="/achievements" element={<Achievements />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/support" element={<Support />} />
-              <Route path="/management" element={<Management />} />
-              <Route path="/committees" element={<Committees />} />
-              <Route path="/addon-courses" element={<AddOnCourses />} />
-              <Route path="/student-absent" element={<StudentAbsent />} />
-              <Route path="/application-status" element={<ApplicationStatus />} />
-              <Route path="/previous-year-papers" element={<PreviousYearPapers />} />
-              <Route path="/gallery" element={<Gallery />} />
+              <Route path="/about" element={<SuspenseWrap><About /></SuspenseWrap>} />
+              <Route path="/courses" element={<SuspenseWrap><Courses /></SuspenseWrap>} />
+              <Route path="/admissions" element={<SuspenseWrap><Admissions /></SuspenseWrap>} />
+              <Route path="/departments" element={<SuspenseWrap><Departments /></SuspenseWrap>} />
+              <Route path="/faculty" element={<SuspenseWrap><Faculty /></SuspenseWrap>} />
+              <Route path="/events" element={<SuspenseWrap><Events /></SuspenseWrap>} />
+              <Route path="/notices" element={<SuspenseWrap><Notices /></SuspenseWrap>} />
+              <Route path="/achievements" element={<SuspenseWrap><Achievements /></SuspenseWrap>} />
+              <Route path="/contact" element={<SuspenseWrap><Contact /></SuspenseWrap>} />
+              <Route path="/support" element={<SuspenseWrap><Support /></SuspenseWrap>} />
+              <Route path="/management" element={<SuspenseWrap><Management /></SuspenseWrap>} />
+              <Route path="/committees" element={<SuspenseWrap><Committees /></SuspenseWrap>} />
+              <Route path="/addon-courses" element={<SuspenseWrap><AddOnCourses /></SuspenseWrap>} />
+              <Route path="/student-absent" element={<SuspenseWrap><StudentAbsent /></SuspenseWrap>} />
+              <Route path="/application-status" element={<SuspenseWrap><ApplicationStatus /></SuspenseWrap>} />
+              <Route path="/previous-year-papers" element={<SuspenseWrap><PreviousYearPapers /></SuspenseWrap>} />
+              <Route path="/gallery" element={<SuspenseWrap><Gallery /></SuspenseWrap>} />
             </Route>
 
-            <Route path="/login" element={<Login />} />
+            <Route path="/login" element={<SuspenseWrap><Login /></SuspenseWrap>} />
 
             <Route path="/dashboard" element={
               <ProtectedRoute allowedRoles={["student", "teacher", "principal", "admin"]}>
@@ -149,6 +160,7 @@ const App = () => (
             <Route path="/dashboard/teacher" element={<TeacherRoute><TeacherDashboard /></TeacherRoute>} />
             <Route path="/dashboard/teacher/students" element={<TeacherRoute><TeacherStudents /></TeacherRoute>} />
             <Route path="/dashboard/teacher/attendance" element={<TeacherRoute><TeacherAttendance /></TeacherRoute>} />
+            <Route path="/dashboard/teacher/attendance-overview" element={<TeacherRoute><TeacherAttendanceOverview /></TeacherRoute>} />
             <Route path="/dashboard/teacher/marks" element={<TeacherRoute><TeacherMarks /></TeacherRoute>} />
             <Route path="/dashboard/teacher/absent" element={<TeacherRoute><TeacherAbsent /></TeacherRoute>} />
             <Route path="/dashboard/teacher/materials" element={<TeacherRoute><TeacherMaterials /></TeacherRoute>} />
@@ -187,6 +199,7 @@ const App = () => (
             <Route path="/dashboard/admin/birthday-settings" element={<AdminRoute><AdminBirthdaySettings /></AdminRoute>} />
             <Route path="/dashboard/admin/add-staff" element={<AdminRoute><AdminAddStaff /></AdminRoute>} />
             <Route path="/dashboard/admin/courses" element={<AdminRoute><AdminCourses /></AdminRoute>} />
+            <Route path="/dashboard/admin/attendance-overview" element={<AdminRoute><AdminAttendanceOverview /></AdminRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

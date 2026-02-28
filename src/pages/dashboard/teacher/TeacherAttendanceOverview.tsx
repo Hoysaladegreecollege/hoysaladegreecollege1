@@ -1,0 +1,167 @@
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { UserCheck, UserX, Filter, ArrowLeft, Users } from "lucide-react";
+import { Link } from "react-router-dom";
+
+export default function TeacherAttendanceOverview() {
+  const [courseFilter, setCourseFilter] = useState("all");
+  const [semesterFilter, setSemesterFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState(new Date().toISOString().split("T")[0]);
+
+  const { data: courses = [] } = useQuery({
+    queryKey: ["teacher-att-courses"],
+    queryFn: async () => {
+      const { data } = await supabase.from("courses").select("id, name, code").eq("is_active", true);
+      return data || [];
+    },
+  });
+
+  const { data: attendanceData, isLoading } = useQuery({
+    queryKey: ["teacher-att-overview", dateFilter, courseFilter, semesterFilter],
+    queryFn: async () => {
+      const { data: records } = await supabase.from("attendance").select("student_id, status").eq("date", dateFilter);
+      if (!records || records.length === 0) return { present: [], absent: [] };
+
+      const statusMap = new Map<string, string>();
+      records.forEach(r => statusMap.set(r.student_id, r.status));
+
+      const presentIds = [...statusMap.entries()].filter(([, s]) => s === "present").map(([id]) => id);
+      const absentIds = [...statusMap.entries()].filter(([, s]) => s === "absent").map(([id]) => id);
+      const allIds = [...new Set([...presentIds, ...absentIds])];
+      if (allIds.length === 0) return { present: [], absent: [] };
+
+      let query = supabase.from("students").select("id, roll_number, semester, user_id, course_id, courses(name, code)").in("id", allIds).eq("is_active", true);
+      if (courseFilter !== "all") query = query.eq("course_id", courseFilter);
+      if (semesterFilter !== "all") query = query.eq("semester", parseInt(semesterFilter));
+
+      const { data: students } = await query;
+      if (!students) return { present: [], absent: [] };
+
+      const userIds = students.map(s => s.user_id);
+      const { data: profiles } = await supabase.from("profiles").select("user_id, full_name").in("user_id", userIds);
+
+      const enrich = (s: any) => ({
+        ...s,
+        name: profiles?.find(p => p.user_id === s.user_id)?.full_name || s.roll_number,
+        courseName: (s.courses as any)?.code || "—",
+      });
+
+      return {
+        present: students.filter(s => presentIds.includes(s.id)).map(enrich),
+        absent: students.filter(s => absentIds.includes(s.id)).map(enrich),
+      };
+    },
+  });
+
+  const inputClass = "w-full border border-border rounded-xl px-3 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all";
+  const totalPresent = attendanceData?.present.length || 0;
+  const totalAbsent = attendanceData?.absent.length || 0;
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-gradient-to-r from-primary/5 to-secondary/5 border border-border rounded-2xl p-6">
+        <div className="flex items-center gap-3">
+          <Link to="/dashboard/teacher" className="p-2 rounded-xl hover:bg-muted transition-colors shrink-0"><ArrowLeft className="w-4 h-4" /></Link>
+          <div>
+            <h2 className="font-display text-xl font-bold text-foreground flex items-center gap-2">
+              <Users className="w-5 h-5 text-primary" /> Attendance Overview
+            </h2>
+            <p className="font-body text-sm text-muted-foreground mt-1">View present and absent students</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-card border border-border rounded-2xl p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <Filter className="w-4 h-4 text-primary" />
+          <h3 className="font-body text-sm font-bold text-foreground">Filters</h3>
+        </div>
+        <div className="grid sm:grid-cols-3 gap-3">
+          <div>
+            <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Date</label>
+            <input type="date" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} className={inputClass} />
+          </div>
+          <div>
+            <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Course</label>
+            <select value={courseFilter} onChange={(e) => setCourseFilter(e.target.value)} className={inputClass}>
+              <option value="all">All Courses</option>
+              {courses.map((c: any) => <option key={c.id} value={c.id}>{c.name} ({c.code})</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Semester</label>
+            <select value={semesterFilter} onChange={(e) => setSemesterFilter(e.target.value)} className={inputClass}>
+              <option value="all">All Semesters</option>
+              {[1,2,3,4,5,6].map(s => <option key={s} value={String(s)}>Semester {s}</option>)}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-card border border-border rounded-2xl p-4 text-center">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-2">
+            <UserCheck className="w-5 h-5 text-emerald-500" />
+          </div>
+          <p className="font-display text-2xl font-bold text-foreground">{totalPresent}</p>
+          <p className="font-body text-xs text-muted-foreground">Present</p>
+        </div>
+        <div className="bg-card border border-border rounded-2xl p-4 text-center">
+          <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center mx-auto mb-2">
+            <UserX className="w-5 h-5 text-destructive" />
+          </div>
+          <p className="font-display text-2xl font-bold text-foreground">{totalAbsent}</p>
+          <p className="font-body text-xs text-muted-foreground">Absent</p>
+        </div>
+      </div>
+
+      {isLoading ? (
+        <div className="space-y-2">{[1,2,3].map(i => <Skeleton key={i} className="h-14 rounded-xl" />)}</div>
+      ) : (
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="bg-card border border-border rounded-2xl p-4 sm:p-5">
+            <h3 className="font-display text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+              <UserCheck className="w-4 h-4 text-emerald-500" /> Present
+              <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 font-body ml-auto">{totalPresent}</span>
+            </h3>
+            <div className="space-y-1.5 max-h-[400px] overflow-y-auto">
+              {totalPresent === 0 ? (
+                <p className="font-body text-sm text-muted-foreground text-center py-6">No data</p>
+              ) : attendanceData?.present.map((s: any) => (
+                <div key={s.id} className="flex items-center justify-between p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+                  <div>
+                    <p className="font-body text-sm font-semibold text-foreground">{s.name}</p>
+                    <p className="font-body text-xs text-muted-foreground">{s.roll_number} • {s.courseName} • Sem {s.semester}</p>
+                  </div>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 font-body font-semibold">Present</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-card border border-border rounded-2xl p-4 sm:p-5">
+            <h3 className="font-display text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+              <UserX className="w-4 h-4 text-destructive" /> Absent
+              <span className="text-xs px-2 py-0.5 rounded-full bg-destructive/10 text-destructive font-body ml-auto">{totalAbsent}</span>
+            </h3>
+            <div className="space-y-1.5 max-h-[400px] overflow-y-auto">
+              {totalAbsent === 0 ? (
+                <p className="font-body text-sm text-muted-foreground text-center py-6">No absent students 🎉</p>
+              ) : attendanceData?.absent.map((s: any) => (
+                <div key={s.id} className="flex items-center justify-between p-3 rounded-xl bg-destructive/5 border border-destructive/10">
+                  <div>
+                    <p className="font-body text-sm font-semibold text-foreground">{s.name}</p>
+                    <p className="font-body text-xs text-muted-foreground">{s.roll_number} • {s.courseName} • Sem {s.semester}</p>
+                  </div>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-destructive/10 text-destructive font-body font-semibold">Absent</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
