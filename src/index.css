@@ -45,42 +45,42 @@
   }
 
   .dark {
-    /* Deep graphite base — #0E1016 / #141824 layered */
-    --background: 228 20% 5%;
-    --foreground: 0 0% 91%;
-    --card: 226 18% 10%;
-    --card-foreground: 0 0% 91%;
-    --popover: 226 18% 10%;
-    --popover-foreground: 0 0% 91%;
-    --primary: 217 72% 48%;
+    /* Ultra-premium dark — true deep blacks with warm undertone */
+    --background: 230 15% 4%;
+    --foreground: 210 20% 93%;
+    --card: 228 14% 8%;
+    --card-foreground: 210 20% 93%;
+    --popover: 228 14% 8%;
+    --popover-foreground: 210 20% 93%;
+    --primary: 215 90% 55%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 42 55% 42%;
+    --secondary: 42 70% 52%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 226 16% 14%;
-    --muted-foreground: 0 0% 63%;
-    --accent: 42 55% 42%;
+    --muted: 228 12% 12%;
+    --muted-foreground: 215 10% 55%;
+    --accent: 42 70% 52%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 72% 55%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 226 14% 18%;
-    --input: 226 16% 14%;
-    --ring: 217 72% 48%;
-    --sidebar-background: 228 20% 6%;
-    --sidebar-foreground: 0 0% 88%;
-    --sidebar-primary: 42 55% 42%;
+    --destructive: 0 70% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 228 10% 15%;
+    --input: 228 12% 12%;
+    --ring: 215 90% 55%;
+    --sidebar-background: 230 15% 5%;
+    --sidebar-foreground: 210 15% 85%;
+    --sidebar-primary: 42 70% 52%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 226 16% 13%;
-    --sidebar-accent-foreground: 0 0% 88%;
-    --sidebar-border: 226 14% 16%;
-    --sidebar-ring: 42 55% 42%;
-    --gold: 42 55% 42%;
-    --gold-light: 42 50% 58%;
-    --navy: 217 72% 48%;
-    --navy-light: 217 50% 58%;
-    --navy-dark: 228 20% 4%;
-    --cream: 226 16% 8%;
-    --success: 142 60% 38%;
-    --hero-overlay: linear-gradient(135deg, hsla(228, 20%, 3%, 0.94), hsla(226, 18%, 8%, 0.75));
+    --sidebar-accent: 228 12% 11%;
+    --sidebar-accent-foreground: 210 15% 85%;
+    --sidebar-border: 228 10% 14%;
+    --sidebar-ring: 42 70% 52%;
+    --gold: 42 70% 52%;
+    --gold-light: 42 60% 65%;
+    --navy: 215 90% 55%;
+    --navy-light: 215 60% 62%;
+    --navy-dark: 230 15% 3%;
+    --cream: 228 12% 7%;
+    --success: 145 65% 42%;
+    --hero-overlay: linear-gradient(135deg, hsla(230, 15%, 2%, 0.95), hsla(228, 14%, 6%, 0.8));
   }
 }
 

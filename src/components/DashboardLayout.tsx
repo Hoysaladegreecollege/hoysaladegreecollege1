@@ -53,6 +53,7 @@ const adminNav: NavItem[] = [
   { label: "Post Notice", path: "/dashboard/admin/post-notice", icon: Megaphone },
   { label: "Semester Promotion", path: "/dashboard/admin/semester-promotion", icon: ArrowUpCircle },
   { label: "Academic Years", path: "/dashboard/admin/academic-years", icon: Calendar },
+  { label: "Courses", path: "/dashboard/admin/courses", icon: BookOpen },
   { label: "Absent Report", path: "/dashboard/admin/absent-report", icon: Clock },
   { label: "Applications", path: "/dashboard/admin/applications", icon: FileText },
   { label: "Messages", path: "/dashboard/admin/contacts", icon: Mail },

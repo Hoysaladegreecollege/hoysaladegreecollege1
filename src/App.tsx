@@ -80,6 +80,7 @@ import TeacherAnnouncements from "./pages/dashboard/teacher/TeacherAnnouncements
 import AdminGallery from "./pages/dashboard/admin/AdminGallery";
 import AdminBirthdaySettings from "./pages/dashboard/admin/AdminBirthdaySettings";
 import AdminAddStaff from "./pages/dashboard/admin/AdminAddStaff";
+import AdminCourses from "./pages/dashboard/admin/AdminCourses";
 
 const queryClient = new QueryClient();
 
@@ -185,6 +186,7 @@ const App = () => (
             <Route path="/dashboard/admin/gallery" element={<AdminRoute><AdminGallery /></AdminRoute>} />
             <Route path="/dashboard/admin/birthday-settings" element={<AdminRoute><AdminBirthdaySettings /></AdminRoute>} />
             <Route path="/dashboard/admin/add-staff" element={<AdminRoute><AdminAddStaff /></AdminRoute>} />
+            <Route path="/dashboard/admin/courses" element={<AdminRoute><AdminCourses /></AdminRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
