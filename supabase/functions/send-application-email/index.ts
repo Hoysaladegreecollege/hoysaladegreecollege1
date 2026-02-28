@@ -1,16 +1,36 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // Verify caller is authenticated admin/principal
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new Error("Unauthorized");
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: { user: caller }, error: authErr } = await userClient.auth.getUser();
+    if (authErr || !caller) throw new Error("Unauthorized");
+
+    const adminClient = createClient(supabaseUrl, serviceRoleKey);
+    const { data: callerRole } = await adminClient.from("user_roles").select("role").eq("user_id", caller.id).maybeSingle();
+    if (!callerRole || !["admin", "principal"].includes(callerRole.role)) {
+      throw new Error("Insufficient permissions");
+    }
+
     const { email, fullName, applicationNumber, status } = await req.json();
 
     if (!email || !fullName || !applicationNumber || !status) {
@@ -22,7 +42,7 @@ serve(async (req) => {
 
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
     if (!RESEND_API_KEY) {
-      return new Response(JSON.stringify({ error: "RESEND_API_KEY not configured" }), {
+      return new Response(JSON.stringify({ error: "Email service not configured" }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -30,7 +50,6 @@ serve(async (req) => {
 
     const isApproved = status === "approved";
     const isSubmitted = status === "submitted";
-    const isRejected = status === "rejected";
 
     const subject = isApproved
       ? `🎉 Congratulations! Your Application ${applicationNumber} has been Approved`
@@ -176,20 +195,24 @@ serve(async (req) => {
 
     if (!res.ok) {
       console.error("Resend error:", data);
-      return new Response(JSON.stringify({ error: data.message || "Failed to send email" }), {
+      return new Response(JSON.stringify({ error: "Failed to send email" }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    return new Response(JSON.stringify({ success: true, messageId: data.id }), {
+    return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error: any) {
-    console.error("Edge function error:", error);
-    return new Response(JSON.stringify({ error: "Failed to send email. Please try again later." }), {
-      status: 500,
+    console.error("Edge function error:", error.message);
+    const msg = error.message || "";
+    const safeMessage = msg.includes("Unauthorized") ? "Unauthorized"
+      : msg.includes("Insufficient") ? "Insufficient permissions"
+      : "Failed to send email. Please try again later.";
+    return new Response(JSON.stringify({ error: safeMessage }), {
+      status: msg.includes("Unauthorized") || msg.includes("Insufficient") ? 403 : 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }

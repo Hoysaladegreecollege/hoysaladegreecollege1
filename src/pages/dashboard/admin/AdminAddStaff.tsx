@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { ArrowLeft, UserPlus, ShieldCheck, GraduationCap, Crown, Users, Eye, EyeOff } from "lucide-react";
+import { validatePassword, PASSWORD_REQUIREMENTS } from "@/lib/password-validation";
 import { Link } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -51,6 +52,8 @@ export default function AdminAddStaff() {
 
   const addStaffMutation = useMutation({
     mutationFn: async () => {
+      const pwCheck = validatePassword(form.password);
+      if (!pwCheck.valid) throw new Error(pwCheck.message);
       // Create auth user with role metadata
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: form.email,
@@ -168,7 +171,7 @@ export default function AdminAddStaff() {
               <div>
                 <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Password *</label>
                 <div className="relative">
-                  <input type={showPassword ? "text" : "password"} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required minLength={6} className={inputClass} placeholder="Min 6 characters" />
+                  <input type={showPassword ? "text" : "password"} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required minLength={8} className={inputClass} placeholder={PASSWORD_REQUIREMENTS} />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
