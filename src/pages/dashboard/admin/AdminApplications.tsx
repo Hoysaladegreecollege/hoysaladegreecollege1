@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Eye, CheckCircle, XCircle, FileText, X, Phone, ArrowLeft, Mail } from "lucide-react";
@@ -8,6 +8,18 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
+
+// Helper to get signed URL for admission photos stored in private bucket
+const getAdmissionPhotoUrl = async (photoPath: string): Promise<string | null> => {
+  if (!photoPath) return null;
+  // If it's already a full URL (legacy data from public bucket), return as-is
+  if (photoPath.startsWith("http")) return photoPath;
+  const { data, error } = await supabase.storage
+    .from("admission-photos")
+    .createSignedUrl(photoPath, 3600); // 1 hour expiry
+  if (error) return null;
+  return data.signedUrl;
+};
 
 const statusColor = (s: string) =>
   s === "approved" ? "text-emerald-700 bg-emerald-50 border border-emerald-200"
@@ -20,6 +32,8 @@ export default function AdminApplications() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [courseFilter, setCourseFilter] = useState("all");
   const [selected, setSelected] = useState<any>(null);
+  const [photoUrls, setPhotoUrls] = useState<Record<string, string>>({});
+  const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
 
   const { data: apps = [], isLoading } = useQuery({
     queryKey: ["admin-applications"],
@@ -28,6 +42,30 @@ export default function AdminApplications() {
       return data || [];
     },
   });
+
+  // Resolve signed URLs for admission photos in the table
+  useEffect(() => {
+    const resolvePhotos = async () => {
+      const urls: Record<string, string> = {};
+      for (const app of apps) {
+        if (app.photo_url) {
+          const url = await getAdmissionPhotoUrl(app.photo_url);
+          if (url) urls[app.id] = url;
+        }
+      }
+      setPhotoUrls(urls);
+    };
+    if (apps.length > 0) resolvePhotos();
+  }, [apps]);
+
+  // Resolve photo for selected application
+  useEffect(() => {
+    if (selected?.photo_url) {
+      getAdmissionPhotoUrl(selected.photo_url).then(setSelectedPhotoUrl);
+    } else {
+      setSelectedPhotoUrl(null);
+    }
+  }, [selected]);
 
   const updateStatus = useMutation({
     mutationFn: async ({ id, status, email, fullName, applicationNumber }: { id: string; status: string; email: string; fullName: string; applicationNumber: string }) => {
@@ -133,8 +171,8 @@ export default function AdminApplications() {
                   <td className="font-body text-xs p-4 font-bold text-primary">{a.application_number || "—"}</td>
                   <td className="p-4">
                     <div className="flex items-center gap-2.5">
-                      {a.photo_url
-                        ? <img src={a.photo_url} alt="" className="w-9 h-9 rounded-xl object-cover border border-border shadow-sm" />
+                      {photoUrls[a.id]
+                        ? <img src={photoUrls[a.id]} alt="" className="w-9 h-9 rounded-xl object-cover border border-border shadow-sm" />
                         : <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">{a.full_name[0]}</div>
                       }
                       <div>
@@ -196,9 +234,9 @@ export default function AdminApplications() {
             </div>
 
             {/* Photo */}
-            {selected.photo_url && (
+            {selectedPhotoUrl && (
               <div className="text-center pt-6 px-6">
-                <img src={selected.photo_url} alt={selected.full_name} className="w-24 h-24 rounded-2xl object-cover mx-auto border-2 border-border shadow-lg" />
+                <img src={selectedPhotoUrl} alt={selected.full_name} className="w-24 h-24 rounded-2xl object-cover mx-auto border-2 border-border shadow-lg" />
               </div>
             )}
 
