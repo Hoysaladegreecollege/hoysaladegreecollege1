@@ -230,9 +230,13 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile menu — app-like slide-in */}
-      <div className={`xl:hidden border-t border-border overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${open ? "max-h-[85vh] opacity-100" : "max-h-0 opacity-0"}`}>
-        <div className="container py-3 px-5 bg-card overflow-y-auto max-h-[80vh]">
+      {/* Mobile menu — premium dark slide-in */}
+      <div className={`xl:hidden overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${open ? "max-h-[85vh] opacity-100" : "max-h-0 opacity-0"}`}>
+        <div className="py-4 px-5 overflow-y-auto max-h-[80vh]"
+          style={{ background: "linear-gradient(180deg, hsl(230,18%,8%), hsl(228,16%,11%))" }}>
+          {/* Gold accent line */}
+          <div className="h-[1px] bg-gradient-to-r from-transparent via-[hsl(var(--gold))]/30 to-transparent mb-4" />
+          
           {/* Nav links — staggered animation */}
           <div className="flex flex-col gap-0.5">
             {navLinks.map((link, i) => {
@@ -241,44 +245,52 @@ export default function Navbar() {
                 <Link
                   key={link.path}
                   to={link.path}
-                  style={{ animationDelay: open ? `${i * 40}ms` : "0ms" }}
-                  className={`px-4 py-3 text-[15px] font-body rounded-xl transition-all duration-300 flex items-center justify-between group touch-manipulation active:scale-[0.98] ${
+                  style={{ animationDelay: open ? `${i * 35}ms` : "0ms" }}
+                  className={`px-4 py-3 text-[14px] font-body rounded-xl transition-all duration-300 flex items-center justify-between group touch-manipulation active:scale-[0.98] ${
                     open ? "animate-fade-in-up" : ""
                   } ${
                     active
-                      ? "text-primary bg-primary/5 font-semibold border-l-2 border-secondary"
-                      : "text-foreground hover:bg-muted hover:translate-x-1"
+                      ? "text-[hsl(var(--gold))] bg-white/[0.06] font-semibold border-l-2 border-[hsl(var(--gold))]"
+                      : "text-white/60 hover:text-white/90 hover:bg-white/[0.04] hover:translate-x-1"
                   }`}
                 >
                   <span>{link.label}</span>
                   {active && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--gold))] animate-pulse" />
                   )}
                 </Link>
               );
             })}
           </div>
 
-          {/* Quick contact — thumb-friendly */}
-          <div className="mt-4 pt-4 border-t border-border/50">
-            <div className="flex gap-2 flex-wrap mb-3">
+          {/* Divider */}
+          <div className="h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent my-4" />
+
+          {/* Quick contact */}
+          <div>
+            <p className="font-body text-[10px] uppercase tracking-widest text-white/25 px-4 mb-2">Quick Contact</p>
+            <div className="flex gap-2 flex-wrap mb-4 px-1">
               {["7676272167", "7975344252"].map((num) => (
                 <a key={num} href={`tel:${num}`}
-                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-muted border border-border font-body text-sm text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary active:scale-[0.97] transition-all duration-300 touch-manipulation">
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] font-body text-sm text-white/60 hover:text-[hsl(var(--gold))] hover:border-[hsl(var(--gold))]/30 hover:bg-[hsl(var(--gold))]/[0.06] active:scale-[0.97] transition-all duration-300 touch-manipulation">
                   <Phone className="w-3.5 h-3.5" /> {num}
                 </a>
               ))}
             </div>
-            <Link to="/login">
-              <button className="relative w-full group overflow-hidden px-6 py-3.5 rounded-xl font-body text-sm font-bold text-primary-foreground active:scale-[0.97] transition-all duration-300 touch-manipulation"
-                style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--navy-dark)))" }}>
-                <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <Link to="/login" className="block px-1">
+              <button className="relative w-full group overflow-hidden px-6 py-3.5 rounded-xl font-body text-sm font-bold text-white active:scale-[0.97] transition-all duration-300 touch-manipulation border border-[hsl(var(--gold))]/20"
+                style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(230,18%,10%))" }}>
+                <span className="absolute inset-0 bg-gradient-to-r from-[hsl(var(--gold))]/0 via-[hsl(var(--gold))]/10 to-[hsl(var(--gold))]/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                <span className="absolute top-0 left-[20%] right-[20%] h-px bg-gradient-to-r from-transparent via-[hsl(var(--gold))]/30 to-transparent" />
                 <span className="relative flex items-center justify-center gap-2">
-                  <Sparkles className="w-4 h-4" /> Login to Portal
+                  <Sparkles className="w-4 h-4 text-[hsl(var(--gold))]" /> Login to Portal
                 </span>
               </button>
             </Link>
           </div>
+          
+          {/* Bottom gold line */}
+          <div className="h-[1px] bg-gradient-to-r from-transparent via-[hsl(var(--gold))]/15 to-transparent mt-4" />
         </div>
       </div>
     </header>

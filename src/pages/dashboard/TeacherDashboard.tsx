@@ -89,6 +89,7 @@ export default function TeacherDashboard() {
 
   const quickActions = [
     { icon: Clock, label: "Mark Attendance", desc: "Record daily attendance", path: "/dashboard/teacher/attendance", color: "bg-blue-500/10", iconColor: "text-blue-500" },
+    { icon: Users, label: "Attendance Overview", desc: "Present & absent list", path: "/dashboard/teacher/attendance-overview", color: "bg-teal-500/10", iconColor: "text-teal-500" },
     { icon: BarChart3, label: "Upload Marks", desc: "Enter student marks", path: "/dashboard/teacher/marks", color: "bg-emerald-500/10", iconColor: "text-emerald-500" },
     { icon: Upload, label: "Upload Material", desc: "Share resources", path: "/dashboard/teacher/materials", color: "bg-purple-500/10", iconColor: "text-purple-500" },
     { icon: Megaphone, label: "Post Notice", desc: "Publish updates", path: "/dashboard/teacher/notices", color: "bg-amber-500/10", iconColor: "text-amber-500" },

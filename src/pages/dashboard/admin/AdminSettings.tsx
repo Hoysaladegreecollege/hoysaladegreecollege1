@@ -1,4 +1,4 @@
-import { Settings, Globe, Calendar, Shield, TrendingUp, Activity, Download, Users, Database, Server, CheckCircle, AlertCircle, Clock, ArrowLeft, Cpu, HardDrive, Wifi, BarChart3, Zap, RefreshCw } from "lucide-react";
+import { Settings, Globe, Calendar, Shield, TrendingUp, Activity, Download, Users, Database, Server, CheckCircle, AlertCircle, Clock, ArrowLeft, Cpu, HardDrive, Wifi, BarChart3, Zap, RefreshCw, ExternalLink } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -317,6 +317,26 @@ export default function AdminSettings() {
           <Button variant="outline" onClick={exportHealthReport} className="rounded-xl font-body text-xs shrink-0">
             <Download className="w-3 h-3 mr-1" /> CSV
           </Button>
+        </div>
+      </div>
+
+      {/* System Status Link */}
+      <div className="bg-card border border-border rounded-2xl p-5 hover:shadow-lg transition-all duration-300">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+              <Activity className="w-4 h-4 text-emerald-500" />
+            </div>
+            <div>
+              <h3 className="font-body text-sm font-bold text-foreground">System Status Monitor</h3>
+              <p className="font-body text-xs text-muted-foreground">Real-time uptime & incident monitoring</p>
+            </div>
+          </div>
+          <a href="https://status.rhealth.dev/hoysala-degree-college" target="_blank" rel="noopener noreferrer">
+            <Button variant="outline" className="rounded-xl font-body text-xs gap-1.5">
+              <ExternalLink className="w-3 h-3" /> View Status
+            </Button>
+          </a>
         </div>
       </div>
 
