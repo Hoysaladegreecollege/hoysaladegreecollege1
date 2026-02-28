@@ -359,7 +359,7 @@ export default function Index() {
             <ScrollReveal key={img.title} delay={i * 60}>
                 <div
                 className="relative group cursor-pointer overflow-hidden rounded-2xl border border-border aspect-[4/3] hover:shadow-2xl transition-all duration-500"
-                onClick={() => setLightboxIdx(i)}>
+                onClick={() => { setLightboxIdx(i); document.body.style.overflow = "hidden"; }}>
 
                   <img src={img.src} alt={img.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" />
                   <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -384,24 +384,40 @@ export default function Index() {
 
       {/* Full-screen Lightbox */}
       {lightboxIdx !== null &&
-      <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center animate-fade-in" onClick={() => setLightboxIdx(null)}>
-          <button className="fixed top-4 right-4 sm:top-6 sm:right-6 w-11 h-11 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/25 transition-colors z-[110]"
-        onClick={(e) => {e.stopPropagation();setLightboxIdx(null);}}>
-            <X className="w-5 h-5" />
-          </button>
-          <button className="fixed left-3 sm:left-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/25 transition-colors z-[110]"
-        onClick={(e) => {e.stopPropagation();setLightboxIdx((lightboxIdx - 1 + galleryImages.length) % galleryImages.length);}}>
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          <button className="fixed right-3 sm:right-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/25 transition-colors z-[110]"
-        onClick={(e) => {e.stopPropagation();setLightboxIdx((lightboxIdx + 1) % galleryImages.length);}}>
-            <ChevronRight className="w-6 h-6" />
-          </button>
-          <div className="flex flex-col items-center justify-center w-full h-full px-14 sm:px-20 py-16" onClick={(e) => e.stopPropagation()}>
-            <img src={galleryImages[lightboxIdx].src} alt={galleryImages[lightboxIdx].title} className="max-w-full max-h-[70vh] object-contain rounded-xl shadow-2xl animate-scale-bounce" />
-            <div className="mt-4 text-center">
-              <p className="font-display text-lg sm:text-xl font-bold text-white">{galleryImages[lightboxIdx].title}</p>
-              <p className="font-body text-xs text-white/50 mt-1">{galleryImages[lightboxIdx].category} • {lightboxIdx + 1} / {galleryImages.length}</p>
+      <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md animate-fade-in"
+        onClick={() => { setLightboxIdx(null); document.body.style.overflow = ""; }}>
+          {/* Content container - viewport centered */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            {/* Close button - relative to image area */}
+            <button className="absolute top-4 right-4 sm:top-6 sm:right-6 w-11 h-11 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/25 transition-colors z-[110]"
+              onClick={(e) => {e.stopPropagation(); setLightboxIdx(null); document.body.style.overflow = "";}}>
+              <X className="w-5 h-5" />
+            </button>
+            {/* Nav buttons */}
+            <button className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/25 transition-colors z-[110]"
+              onClick={(e) => {e.stopPropagation();setLightboxIdx((lightboxIdx - 1 + galleryImages.length) % galleryImages.length);}}>
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <button className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/25 transition-colors z-[110]"
+              onClick={(e) => {e.stopPropagation();setLightboxIdx((lightboxIdx + 1) % galleryImages.length);}}>
+              <ChevronRight className="w-6 h-6" />
+            </button>
+            {/* Image + caption */}
+            <div className="flex flex-col items-center px-14 sm:px-20 max-w-full max-h-full" onClick={(e) => e.stopPropagation()}
+              onTouchStart={(e) => { (window as any).__touchStartX = e.touches[0].clientX; }}
+              onTouchEnd={(e) => {
+                const startX = (window as any).__touchStartX;
+                if (startX == null) return;
+                const diff = e.changedTouches[0].clientX - startX;
+                if (Math.abs(diff) > 50) {
+                  diff > 0 ? setLightboxIdx((lightboxIdx - 1 + galleryImages.length) % galleryImages.length) : setLightboxIdx((lightboxIdx + 1) % galleryImages.length);
+                }
+              }}>
+              <img src={galleryImages[lightboxIdx].src} alt={galleryImages[lightboxIdx].title} className="max-w-full max-h-[70vh] object-contain rounded-xl shadow-2xl animate-scale-bounce" key={lightboxIdx} />
+              <div className="mt-4 text-center">
+                <p className="font-display text-lg sm:text-xl font-bold text-white">{galleryImages[lightboxIdx].title}</p>
+                <p className="font-body text-xs text-white/50 mt-1">{galleryImages[lightboxIdx].category} • {lightboxIdx + 1} / {galleryImages.length}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -416,10 +432,18 @@ export default function Index() {
                 <div className="absolute -inset-6 bg-gradient-to-br from-secondary/15 to-primary/5 rounded-3xl blur-3xl opacity-70 group-hover:opacity-100 transition-opacity duration-700" />
                 <div className="absolute -top-3 -left-3 w-20 h-20 border-t-2 border-l-2 border-secondary/40 rounded-tl-3xl z-20 group-hover:border-secondary/70 transition-colors duration-500" />
                 <div className="absolute -bottom-3 -right-3 w-20 h-20 border-b-2 border-r-2 border-secondary/40 rounded-br-3xl z-20 group-hover:border-secondary/70 transition-colors duration-500" />
-                {/* Shimmer on photo */}
+                {/* Glass effect on hover */}
                 <div className="relative overflow-hidden rounded-2xl z-10">
-                  <img alt="Principal" className="w-full max-w-sm mx-auto shadow-2xl group-hover:scale-[1.02] transition-transform duration-700" src="/lovable-uploads/bacc5b2d-3f25-473a-a2ee-a0d75a0cb7e3.png" />
-                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/15 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-800" />
+                  <img alt="Principal" className="w-full max-w-sm mx-auto shadow-2xl group-hover:scale-[1.03] transition-transform duration-700" src="/lovable-uploads/bacc5b2d-3f25-473a-a2ee-a0d75a0cb7e3.png" />
+                  {/* Glassmorphism overlay on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/40 via-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute inset-0 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+                    <p className="font-display text-base font-bold text-white drop-shadow-lg">Sri Gopal H.R</p>
+                    <p className="font-body text-xs text-white/80">Principal · M.Sc, M.Ed, Ph.D</p>
+                  </div>
+                  {/* Shimmer sweep */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                 </div>
               </div>
             </ScrollReveal>
