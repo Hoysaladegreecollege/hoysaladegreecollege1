@@ -100,10 +100,10 @@ export default function About() {
       <SEOHead title="About Us" description="Learn about Hoysala Degree College, Nelamangala – our history, vision, mission, principal's message, and world-class facilities. Affiliated to Bangalore University." canonical="/about" />
       <PageHeader title="About Us" subtitle="Discover the story of Hoysala Degree College" />
 
-      <div className="relative">
+      <div className="relative lg:flex lg:gap-0">
         {/* Sticky TOC - desktop only */}
-        <aside className="hidden lg:block fixed top-32 left-4 xl:left-8 z-30 w-52">
-          <nav className="bg-card/95 backdrop-blur-sm border border-border rounded-2xl p-3 shadow-lg">
+        <aside className="hidden lg:block shrink-0 w-56 xl:w-60">
+          <nav className="sticky top-32 ml-4 xl:ml-8 bg-card/95 backdrop-blur-sm border border-border rounded-2xl p-3 shadow-lg z-30">
             <p className="font-display text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-3 mb-2">On this page</p>
             <ul className="space-y-0.5">
               {tocSections.map((s) => {
@@ -132,7 +132,7 @@ export default function About() {
         </aside>
 
         {/* Main content */}
-        <div className="scroll-smooth">
+        <div className="scroll-smooth flex-1 min-w-0">
           {/* About intro */}
           <section id="about-intro" className="py-20 sm:py-28 bg-background relative overflow-hidden scroll-mt-24">
             <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/4 rounded-full blur-3xl pointer-events-none" />
