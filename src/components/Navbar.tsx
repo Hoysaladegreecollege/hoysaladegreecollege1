@@ -167,10 +167,10 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile menu */}
-      <div className={`xl:hidden border-t border-border overflow-hidden transition-all duration-500 ease-in-out ${open ? "max-h-[700px] opacity-100" : "max-h-0 opacity-0"}`}>
-        <div className="container py-3 px-4 bg-card">
-          {/* Nav links */}
+      {/* Mobile menu — app-like slide-in */}
+      <div className={`xl:hidden border-t border-border overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${open ? "max-h-[85vh] opacity-100" : "max-h-0 opacity-0"}`}>
+        <div className="container py-3 px-5 bg-card overflow-y-auto max-h-[80vh]">
+          {/* Nav links — staggered animation */}
           <div className="flex flex-col gap-0.5">
             {navLinks.map((link, i) => {
               const active = location.pathname === link.path;
@@ -178,8 +178,10 @@ export default function Navbar() {
                 <Link
                   key={link.path}
                   to={link.path}
-                  style={{ animationDelay: `${i * 30}ms` }}
-                  className={`px-4 py-2.5 text-sm font-body rounded-xl transition-all duration-300 flex items-center justify-between group ${
+                  style={{ animationDelay: open ? `${i * 40}ms` : "0ms" }}
+                  className={`px-4 py-3 text-[15px] font-body rounded-xl transition-all duration-300 flex items-center justify-between group touch-manipulation active:scale-[0.98] ${
+                    open ? "animate-fade-in-up" : ""
+                  } ${
                     active
                       ? "text-primary bg-primary/5 font-semibold border-l-2 border-secondary"
                       : "text-foreground hover:bg-muted hover:translate-x-1"
@@ -194,18 +196,18 @@ export default function Navbar() {
             })}
           </div>
 
-          {/* Quick contact */}
-          <div className="mt-3 pt-3 border-t border-border/50">
+          {/* Quick contact — thumb-friendly */}
+          <div className="mt-4 pt-4 border-t border-border/50">
             <div className="flex gap-2 flex-wrap mb-3">
               {["7676272167", "7975344252"].map((num) => (
                 <a key={num} href={`tel:${num}`}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted border border-border font-body text-xs text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300">
-                  <Phone className="w-3 h-3" /> {num}
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-muted border border-border font-body text-sm text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary active:scale-[0.97] transition-all duration-300 touch-manipulation">
+                  <Phone className="w-3.5 h-3.5" /> {num}
                 </a>
               ))}
             </div>
             <Link to="/login">
-              <button className="relative w-full group overflow-hidden px-6 py-3 rounded-xl font-body text-sm font-bold text-primary-foreground transition-all duration-300"
+              <button className="relative w-full group overflow-hidden px-6 py-3.5 rounded-xl font-body text-sm font-bold text-primary-foreground active:scale-[0.97] transition-all duration-300 touch-manipulation"
                 style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--navy-dark)))" }}>
                 <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                 <span className="relative flex items-center justify-center gap-2">
