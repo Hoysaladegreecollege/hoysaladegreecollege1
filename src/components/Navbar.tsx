@@ -67,23 +67,27 @@ export default function Navbar() {
       <div className="absolute top-0 left-0 h-[2px] bg-gradient-to-r from-secondary via-primary to-secondary transition-all duration-100 z-50"
         style={{ width: `${progress * 100}%`, opacity: progress > 0 ? 1 : 0 }} />
 
-      {/* Top bar */}
-      <div className="relative bg-gradient-to-r from-primary via-primary to-navy-dark text-primary-foreground py-2 overflow-hidden">
-        {/* Shimmer sweep */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-100%] animate-[shimmer_4s_linear_infinite]" />
-        <div className="container px-4 relative">
-          <p className="font-display text-xs sm:text-sm font-bold tracking-wide text-center">
+      {/* Top bar — premium dark */}
+      <div className="relative bg-[hsl(230,15%,6%)] dark:bg-[hsl(230,15%,4%)] text-white/90 py-2.5 overflow-hidden border-b border-white/[0.06]">
+        {/* Subtle shimmer */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent translate-x-[-100%] animate-[shimmer_6s_linear_infinite]" />
+        {/* Accent line at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[hsl(var(--gold))]/20 to-transparent" />
+        <div className="container px-4 relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0">
+          <p className="font-display text-xs sm:text-sm font-bold tracking-wide text-center sm:text-left text-white">
             ಶ್ರೀಶಿರಡಿ ಸಾಯಿ ಎಜುಕೇಷನಲ್ ಟ್ರಸ್ಟ್ (ರಿ.)
           </p>
-          <div className="flex items-center gap-3 sm:gap-5 flex-wrap justify-center mt-0.5 text-[10px] sm:text-xs">
-            <span className="text-secondary font-semibold flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
+          <div className="flex items-center gap-3 sm:gap-5 flex-wrap justify-center sm:justify-end text-[10px] sm:text-xs">
+            <span className="text-[hsl(var(--gold))] font-semibold flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--gold))] animate-pulse" />
               Recognized by Govt. of Karnataka
             </span>
-            <a href="tel:7676272167" className="hover:text-secondary transition-colors hidden sm:inline-flex items-center gap-1 group">
+            <span className="hidden sm:block w-px h-3 bg-white/10" />
+            <a href="tel:7676272167" className="text-white/60 hover:text-white transition-colors hidden sm:inline-flex items-center gap-1 group">
               <Phone className="w-3 h-3 group-hover:scale-110 transition-transform" /> 7676272167
             </a>
-            <a href="mailto:principal.hoysaladegreecollege@gmail.com" className="hover:text-secondary transition-colors hidden sm:inline-flex items-center gap-1 group">
+            <span className="hidden sm:block w-px h-3 bg-white/10" />
+            <a href="mailto:principal.hoysaladegreecollege@gmail.com" className="text-white/60 hover:text-white transition-colors hidden sm:inline-flex items-center gap-1 group">
               <Mail className="w-3 h-3 group-hover:scale-110 transition-transform" /> Mail Us
             </a>
           </div>
