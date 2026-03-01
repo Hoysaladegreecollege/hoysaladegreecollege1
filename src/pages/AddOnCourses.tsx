@@ -2,7 +2,7 @@ import SEOHead from "@/components/SEOHead";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
 import PageHeader from "@/components/PageHeader";
-import { BookOpen, Monitor, Briefcase, CheckCircle, ArrowRight, Sparkles } from "lucide-react";
+import { BookOpen, Monitor, Briefcase, CheckCircle, ArrowRight, Sparkles, GraduationCap, Award, Wrench } from "lucide-react";
 import { Link } from "react-router-dom";
 import PremiumStatsStrip from "@/components/PremiumStatsStrip";
 
@@ -34,10 +34,10 @@ export default function AddOnCourses() {
       <PageHeader title="Add-on Courses" subtitle="Value-added certifications to boost your career" />
 
       <PremiumStatsStrip stats={[
-        { value: "15+", label: "Add-on Courses" },
-        { value: "100%", label: "Practical Based" },
-        { value: "Free", label: "For Students" },
-        { value: "Industry", label: "Certified" },
+        { icon: BookOpen, value: "15+", label: "Add-on Courses" },
+        { icon: Wrench, value: "100%", label: "Practical Based" },
+        { icon: GraduationCap, value: "Free", label: "For Students" },
+        { icon: Award, value: "Industry", label: "Certified" },
       ]} />
 
       <section className="py-14 sm:py-24 bg-background relative overflow-hidden">

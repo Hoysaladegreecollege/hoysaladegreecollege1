@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { X, Cake, PartyPopper, Star, Sparkles } from "lucide-react";
+import { X, Cake, Star, Sparkles, Heart, Gift } from "lucide-react";
 import confetti from "canvas-confetti";
 
 export default function BirthdayPopup() {
@@ -74,66 +74,131 @@ export default function BirthdayPopup() {
   const quote = birthdaySettings?.quote || "Education is the passport to the future, for tomorrow belongs to those who prepare for it today.";
 
   return (
-    <div className="fixed inset-0 bg-foreground/60 backdrop-blur-sm z-[250] flex items-end sm:items-center justify-center sm:p-4 animate-fade-in" onClick={() => setIsOpen(false)}>
+    <div
+      className="fixed inset-0 z-[250] flex items-end sm:items-center justify-center sm:p-4 animate-fade-in"
+      style={{ backgroundColor: "rgba(0,0,0,0.65)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)" }}
+      onClick={() => setIsOpen(false)}
+    >
       <div
-        className="bg-card sm:rounded-3xl rounded-t-3xl border border-border w-full max-w-md shadow-2xl overflow-hidden animate-scale-bounce"
+        className="w-full max-w-md overflow-hidden animate-scale-bounce sm:rounded-[2rem] rounded-t-[2rem]"
+        style={{
+          background: "linear-gradient(180deg, hsl(230,12%,6%) 0%, hsl(228,10%,8%) 100%)",
+          boxShadow: "0 32px 80px -12px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.05)",
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Decorative header */}
-        <div className="relative bg-gradient-to-br from-primary via-primary to-secondary/80 p-8 pb-10 text-center overflow-hidden">
-          <div className="absolute top-3 left-6 animate-sparkle"><Star className="w-4 h-4 text-secondary/60" /></div>
-          <div className="absolute top-8 right-8 animate-sparkle animation-delay-300"><Sparkles className="w-5 h-5 text-secondary/50" /></div>
-          <div className="absolute bottom-4 left-10 animate-sparkle animation-delay-600"><Star className="w-3 h-3 text-secondary/40" /></div>
-          <div className="absolute top-4 right-4 animate-float"><PartyPopper className="w-6 h-6 text-secondary/50" /></div>
+        {/* Premium header */}
+        <div className="relative pt-10 pb-14 px-6 text-center overflow-hidden">
+          {/* Radial glow */}
+          <div
+            className="absolute inset-0 opacity-[0.08]"
+            style={{ backgroundImage: "radial-gradient(circle at 50% 40%, hsl(var(--gold)), transparent 65%)" }}
+          />
+          {/* Subtle grid */}
+          <div
+            className="absolute inset-0 opacity-[0.03]"
+            style={{
+              backgroundImage: "linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)",
+              backgroundSize: "32px 32px",
+            }}
+          />
 
-          <button onClick={() => setIsOpen(false)} className="absolute top-3 right-3 p-2 rounded-xl bg-primary-foreground/10 hover:bg-primary-foreground/20 transition-colors">
-            <X className="w-4 h-4 text-primary-foreground" />
+          {/* Close */}
+          <button
+            onClick={() => setIsOpen(false)}
+            className="absolute top-4 right-4 p-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] transition-colors duration-200 border border-white/[0.06]"
+          >
+            <X className="w-4 h-4 text-white/50" />
           </button>
 
-          <div className="w-20 h-20 rounded-full bg-primary-foreground/15 flex items-center justify-center mx-auto mb-4 animate-float border-2 border-primary-foreground/20">
-            <Cake className="w-10 h-10 text-primary-foreground" />
+          {/* Floating decorations */}
+          <div className="absolute top-6 left-8 animate-sparkle"><Star className="w-3.5 h-3.5 text-yellow-400/40" /></div>
+          <div className="absolute top-12 right-12 animate-sparkle animation-delay-300"><Sparkles className="w-4 h-4 text-yellow-400/30" /></div>
+          <div className="absolute bottom-10 left-12 animate-float"><Gift className="w-4 h-4 text-purple-400/30" /></div>
+          <div className="absolute bottom-8 right-10 animate-sparkle animation-delay-600"><Star className="w-3 h-3 text-pink-400/30" /></div>
+
+          {/* Cake icon */}
+          <div className="relative mx-auto mb-5 w-[88px] h-[88px]">
+            {/* Outer ring glow */}
+            <div
+              className="absolute inset-0 rounded-full animate-pulse"
+              style={{ background: "radial-gradient(circle, hsl(var(--gold) / 0.15), transparent 70%)" }}
+            />
+            <div
+              className="w-full h-full rounded-full flex items-center justify-center border border-white/[0.08]"
+              style={{ background: "linear-gradient(135deg, rgba(251,191,36,0.12), rgba(168,85,247,0.08))" }}
+            >
+              <Cake className="w-10 h-10 text-yellow-400/90" />
+            </div>
           </div>
 
-          <h2 className="font-display text-2xl sm:text-3xl font-bold text-primary-foreground leading-tight">
-            Happy Birthday! 🎂
-          </h2>
-          <p className="font-display text-lg text-primary-foreground/80 mt-1 italic">
-            Dear {firstName}
+          <p className="font-body text-[11px] uppercase tracking-[0.25em] text-white/30 mb-2 font-medium">
+            🎂 Celebrating You 🎂
           </p>
 
+          <h2 className="font-display text-3xl sm:text-4xl font-bold text-white leading-tight">
+            Happy Birthday!
+          </h2>
+          <p className="font-display text-lg text-white/50 mt-2 font-medium">
+            Dear <span className="text-yellow-400/80">{firstName}</span>
+          </p>
+
+          {/* Wave separator */}
           <div className="absolute -bottom-1 left-0 right-0">
-            <svg viewBox="0 0 400 30" className="w-full" preserveAspectRatio="none">
-              <path d="M0,30 Q100,0 200,15 T400,30 L400,30 L0,30 Z" fill="hsl(var(--card))" />
+            <svg viewBox="0 0 400 24" className="w-full" preserveAspectRatio="none">
+              <path d="M0,24 Q100,0 200,12 T400,24 L400,24 L0,24 Z" fill="hsl(228,10%,8%)" />
             </svg>
           </div>
         </div>
 
         {/* Message body */}
-        <div className="px-6 pt-2 pb-4 text-center">
-          <p className="font-body text-sm text-muted-foreground leading-relaxed">
-            {wishesMessage.includes("{principal}") 
+        <div className="px-7 sm:px-8 pt-1 pb-3 text-center">
+          <p className="font-body text-[13px] text-white/45 leading-[1.8]">
+            {wishesMessage.includes("{principal}")
               ? wishesMessage.replace("{principal}", principalName)
-              : <>On behalf of the entire <span className="font-semibold text-foreground">Hoysala Degree College</span> family and our <span className="font-semibold text-foreground">Principal {principalName}</span>, {wishesMessage.replace(/On behalf of the entire Hoysala Degree College family and our Principal, /i, "").replace(/on behalf of.*?principal,?\s*/i, "")}</>
+              : <>On behalf of the entire <span className="font-semibold text-white/70">Hoysala Degree College</span> family and our <span className="font-semibold text-white/70">Principal {principalName}</span>, {wishesMessage.replace(/On behalf of the entire Hoysala Degree College family and our Principal, /i, "").replace(/on behalf of.*?principal,?\s*/i, "")}</>
             }
           </p>
 
-          <div className="flex items-center justify-center gap-2 my-5">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent to-border" />
-            <Sparkles className="w-4 h-4 text-secondary" />
-            <div className="h-px flex-1 bg-gradient-to-l from-transparent to-border" />
+          {/* Divider */}
+          <div className="flex items-center justify-center gap-3 my-6">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent to-white/[0.06]" />
+            <div className="w-7 h-7 rounded-full bg-white/[0.04] border border-white/[0.06] flex items-center justify-center">
+              <Sparkles className="w-3.5 h-3.5 text-yellow-400/50" />
+            </div>
+            <div className="h-px flex-1 bg-gradient-to-l from-transparent to-white/[0.06]" />
           </div>
 
-          <p className="font-display text-xs text-muted-foreground italic">
+          {/* Quote */}
+          <p className="font-display text-xs text-white/30 italic leading-relaxed max-w-xs mx-auto">
             "{quote}"
           </p>
         </div>
 
-        <div className="px-6 pb-6">
+        {/* Footer */}
+        <div className="px-7 sm:px-8 pt-3 pb-7">
+          {/* Love note */}
+          <div className="flex items-center justify-center gap-1.5 mb-5">
+            <Heart className="w-3 h-3 text-red-400/60 fill-red-400/60" />
+            <span className="font-body text-[10px] text-white/25 uppercase tracking-widest">With love from HDC family</span>
+            <Heart className="w-3 h-3 text-red-400/60 fill-red-400/60" />
+          </div>
+
           <button
             onClick={() => setIsOpen(false)}
-            className="w-full py-3.5 rounded-2xl bg-primary text-primary-foreground font-body text-sm font-semibold hover:bg-primary/90 transition-all duration-200 btn-magnetic"
+            className="group relative w-full py-4 rounded-2xl font-body text-sm font-bold text-white overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+            style={{
+              background: "linear-gradient(135deg, hsl(var(--gold) / 0.9), hsl(42, 70%, 42%))",
+              boxShadow: "0 8px 30px hsl(var(--gold) / 0.2), inset 0 1px 0 rgba(255,255,255,0.15)",
+            }}
           >
-            Thank You! 🎉
+            {/* Shimmer */}
+            <span className="absolute inset-0 overflow-hidden rounded-2xl">
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+            </span>
+            <span className="relative flex items-center justify-center gap-2">
+              Thank You! <span className="text-base">🎉</span>
+            </span>
           </button>
         </div>
       </div>
