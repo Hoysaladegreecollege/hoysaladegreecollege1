@@ -3,13 +3,44 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { UserCheck, UserX, Filter, ArrowLeft, Users } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { UserCheck, UserX, Filter, ArrowLeft, Users, Phone, Eye, User, BookOpen, Hash, MapPin, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function AdminAttendanceOverview() {
   const [courseFilter, setCourseFilter] = useState("all");
   const [semesterFilter, setSemesterFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState(new Date().toISOString().split("T")[0]);
+  const [selectedStudent, setSelectedStudent] = useState<any>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const handleViewStudent = async (student: any) => {
+    // Fetch full student details including parent phone
+    const { data: fullStudent } = await supabase
+      .from("students")
+      .select("*, courses(name, code)")
+      .eq("id", student.id)
+      .single();
+    
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("full_name, email, phone")
+      .eq("user_id", student.user_id)
+      .single();
+
+    setSelectedStudent({
+      ...student,
+      phone: fullStudent?.phone || "",
+      parent_phone: fullStudent?.parent_phone || "",
+      address: fullStudent?.address || "",
+      father_name: fullStudent?.father_name || "",
+      mother_name: fullStudent?.mother_name || "",
+      date_of_birth: fullStudent?.date_of_birth || "",
+      email: profile?.email || "",
+      profilePhone: profile?.phone || "",
+    });
+    setDialogOpen(true);
+  };
 
   const { data: courses = [] } = useQuery({
     queryKey: ["att-overview-courses"],
@@ -172,13 +203,105 @@ export default function AdminAttendanceOverview() {
                     <p className="font-body text-sm font-semibold text-foreground">{s.name}</p>
                     <p className="font-body text-xs text-muted-foreground">{s.roll_number} • {s.courseName} • Sem {s.semester}</p>
                   </div>
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-destructive/10 text-destructive font-body font-semibold">Absent</span>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 px-2 text-xs gap-1"
+                      onClick={() => handleViewStudent(s)}
+                    >
+                      <Eye className="w-3 h-3" /> View
+                    </Button>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-destructive/10 text-destructive font-body font-semibold">Absent</span>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </div>
       )}
+
+      {/* Student Details Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 font-display">
+              <User className="w-5 h-5 text-primary" /> Student Details
+            </DialogTitle>
+          </DialogHeader>
+          {selectedStudent && (
+            <div className="space-y-4">
+              <div className="bg-muted/50 rounded-xl p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <User className="w-4 h-4 text-muted-foreground" />
+                  <span className="font-body text-sm font-semibold text-foreground">{selectedStudent.name}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Hash className="w-4 h-4 text-muted-foreground" />
+                  <span className="font-body text-sm text-muted-foreground">Roll: {selectedStudent.roll_number}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-muted-foreground" />
+                  <span className="font-body text-sm text-muted-foreground">{selectedStudent.courseName} • Semester {selectedStudent.semester}</span>
+                </div>
+                {selectedStudent.father_name && (
+                  <div className="flex items-center gap-2">
+                    <User className="w-4 h-4 text-muted-foreground" />
+                    <span className="font-body text-sm text-muted-foreground">Father: {selectedStudent.father_name}</span>
+                  </div>
+                )}
+                {selectedStudent.mother_name && (
+                  <div className="flex items-center gap-2">
+                    <User className="w-4 h-4 text-muted-foreground" />
+                    <span className="font-body text-sm text-muted-foreground">Mother: {selectedStudent.mother_name}</span>
+                  </div>
+                )}
+                {selectedStudent.address && (
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-muted-foreground" />
+                    <span className="font-body text-sm text-muted-foreground">{selectedStudent.address}</span>
+                  </div>
+                )}
+                {selectedStudent.date_of_birth && (
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-muted-foreground" />
+                    <span className="font-body text-sm text-muted-foreground">DOB: {selectedStudent.date_of_birth}</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  className="gap-2"
+                  onClick={() => {
+                    const phone = selectedStudent.phone || selectedStudent.profilePhone;
+                    if (phone) window.open(`tel:${phone}`, "_self");
+                  }}
+                  disabled={!selectedStudent.phone && !selectedStudent.profilePhone}
+                >
+                  <Phone className="w-4 h-4" />
+                  Call Student
+                </Button>
+                <Button
+                  variant="secondary"
+                  className="gap-2"
+                  onClick={() => {
+                    if (selectedStudent.parent_phone) window.open(`tel:${selectedStudent.parent_phone}`, "_self");
+                  }}
+                  disabled={!selectedStudent.parent_phone}
+                >
+                  <Phone className="w-4 h-4" />
+                  Call Parent
+                </Button>
+              </div>
+
+              {!selectedStudent.phone && !selectedStudent.profilePhone && !selectedStudent.parent_phone && (
+                <p className="font-body text-xs text-muted-foreground text-center">No phone numbers available for this student.</p>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
