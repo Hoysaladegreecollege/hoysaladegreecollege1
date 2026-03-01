@@ -80,10 +80,10 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
       <SEOHead title="Login" description="Sign in to Hoysala Degree College portal." canonical="/login" noIndex />
 
-      {/* Immersive deep blue-black background */}
-      <div className="absolute inset-0" style={{ background: "linear-gradient(160deg, #030712 0%, #0a1628 35%, #0c1a30 55%, #060e1a 100%)" }} />
+      {/* Deep graphite background */}
+      <div className="absolute inset-0" style={{ background: "linear-gradient(160deg, #050507 0%, #0E1016 35%, #141824 55%, #0a0c12 100%)" }} />
 
-      {/* Animated aurora mesh */}
+      {/* Animated aurora mesh — warm gold tones */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="login-aurora login-aurora-1" />
         <div className="login-aurora login-aurora-2" />
@@ -93,15 +93,15 @@ export default function Login() {
       {/* Noise texture overlay */}
       <div className="absolute inset-0 opacity-[0.035]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")" }} />
 
-      {/* Radial spotlight */}
-      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-[0.07]"
-        style={{ background: "radial-gradient(circle, #3b82f6, transparent 70%)" }} />
+      {/* Radial spotlight — muted gold */}
+      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-[0.05]"
+        style={{ background: "radial-gradient(circle, hsl(42 87% 55%), transparent 70%)" }} />
 
-      {/* Floating orbs */}
-      <div className="absolute top-[15%] left-[10%] w-[300px] h-[300px] rounded-full opacity-[0.04] animate-float"
-        style={{ background: "radial-gradient(circle, #60a5fa, transparent 60%)", animationDuration: "8s" }} />
-      <div className="absolute bottom-[10%] right-[8%] w-[250px] h-[250px] rounded-full opacity-[0.03] animate-float"
-        style={{ background: "radial-gradient(circle, #818cf8, transparent 60%)", animationDuration: "10s", animationDelay: "2s" }} />
+      {/* Floating orbs — warm amber */}
+      <div className="absolute top-[15%] left-[10%] w-[300px] h-[300px] rounded-full opacity-[0.03] animate-float"
+        style={{ background: "radial-gradient(circle, hsl(42 80% 60%), transparent 60%)", animationDuration: "8s" }} />
+      <div className="absolute bottom-[10%] right-[8%] w-[250px] h-[250px] rounded-full opacity-[0.025] animate-float"
+        style={{ background: "radial-gradient(circle, hsl(42 70% 50%), transparent 60%)", animationDuration: "10s", animationDelay: "2s" }} />
 
       <div className="relative z-10 w-full max-w-[440px] mx-4 login-card-enter">
 
@@ -111,20 +111,20 @@ export default function Login() {
           onMouseMove={handleMouseMove}
           className="relative rounded-[28px] overflow-hidden"
           style={{
-            background: "linear-gradient(165deg, rgba(15, 23, 42, 0.88), rgba(10, 18, 34, 0.95))",
-            boxShadow: "0 40px 80px -20px rgba(0,0,0,0.6), 0 0 0 1px rgba(59, 130, 246, 0.08), 0 0 80px -20px rgba(59, 130, 246, 0.06), inset 0 1px 0 rgba(255,255,255,0.04)",
+            background: "linear-gradient(165deg, rgba(14, 16, 22, 0.92), rgba(20, 24, 36, 0.96))",
+            boxShadow: "0 40px 80px -20px rgba(0,0,0,0.7), 0 0 0 1px hsla(42, 87%, 55%, 0.06), 0 0 80px -20px hsla(42, 87%, 55%, 0.04), inset 0 1px 0 rgba(255,255,255,0.04)",
             backdropFilter: "blur(60px)",
           }}
         >
           {/* Interactive spotlight follow */}
           <div
             className="absolute inset-0 pointer-events-none opacity-[0.06] transition-opacity duration-500 rounded-[28px]"
-            style={{ background: `radial-gradient(500px circle at ${mousePos.x}% ${mousePos.y}%, rgba(59, 130, 246, 0.4), transparent 50%)` }}
+            style={{ background: `radial-gradient(500px circle at ${mousePos.x}% ${mousePos.y}%, hsla(42, 87%, 55%, 0.08), transparent 50%)` }}
           />
 
-          {/* Top accent bar — electric blue gradient */}
+          {/* Top accent bar — muted gold gradient */}
           <div className="h-[2px] relative overflow-hidden">
-            <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, transparent 5%, #3b82f6 30%, #60a5fa 50%, #3b82f6 70%, transparent 95%)" }} />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, transparent 5%, hsl(42 87% 55% / 0.5) 30%, hsl(42 80% 65% / 0.6) 50%, hsl(42 87% 55% / 0.5) 70%, transparent 95%)" }} />
             <div className="absolute inset-0 login-shimmer-bar" />
           </div>
 
@@ -136,7 +136,7 @@ export default function Login() {
                 {/* Pulsing glow ring */}
                 <div className="absolute -inset-4 rounded-[22px] login-logo-glow" />
                 <div className="relative w-[76px] h-[76px] rounded-[20px] overflow-hidden border border-white/[0.08]"
-                  style={{ boxShadow: "0 12px 40px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255,255,255,0.06)" }}>
+                  style={{ boxShadow: "0 12px 40px hsla(42, 87%, 55%, 0.1), inset 0 1px 0 rgba(255,255,255,0.06)" }}>
                   <img src={collegeLogo} alt="Hoysala Degree College Logo" className="w-full h-full object-contain" />
                 </div>
               </div>
@@ -144,7 +144,7 @@ export default function Login() {
               <h1 className="font-display text-[24px] font-bold text-white tracking-tight leading-tight">
                 {canSignup ? "Create Account" : "Welcome Back"}
               </h1>
-              <p className="font-body text-[13px] text-blue-200/40 mt-2.5 tracking-wide font-light">
+              <p className="font-body text-[13px] text-white/35 mt-2.5 tracking-wide font-light">
                 {canSignup ? "Register a new user on the portal" : "Sign in to your college portal"}
               </p>
             </div>
@@ -152,14 +152,14 @@ export default function Login() {
             {/* Role selection for signup */}
             {canSignup && (
               <div className="mb-8">
-                <label className="font-body text-[10px] font-semibold text-blue-300/40 block mb-3 uppercase tracking-[0.18em]">Account Type</label>
+                <label className="font-body text-[10px] font-semibold text-white/40 block mb-3 uppercase tracking-[0.18em]">Account Type</label>
                 <div className="grid grid-cols-4 gap-2">
                   {roles.map((r) => (
                     <button key={r.value} type="button" onClick={() => setRole(r.value)}
                       className={`group p-3.5 rounded-2xl border text-center transition-all duration-400 font-body text-[11px] ${
                         role === r.value
-                          ? "border-blue-500/30 bg-blue-500/10 text-blue-300 font-bold shadow-[0_0_20px_-4px_rgba(59,130,246,0.2)]"
-                          : "border-white/[0.04] text-white/30 hover:border-blue-500/10 hover:bg-blue-500/[0.03] hover:text-white/50"
+                          ? "border-secondary/30 bg-secondary/10 text-secondary font-bold shadow-[0_0_20px_-4px_hsla(42,87%,55%,0.15)]"
+                          : "border-white/[0.04] text-white/30 hover:border-secondary/10 hover:bg-secondary/[0.03] hover:text-white/50"
                       }`}>
                       <div className="text-lg mb-1.5 transition-transform duration-300 group-hover:scale-110">{r.icon}</div>
                       <div>{r.label}</div>
@@ -172,9 +172,9 @@ export default function Login() {
             <form className="space-y-5" onSubmit={handleSubmit}>
               {canSignup && (
                 <div className="login-field-enter" style={{ animationDelay: "0.1s" }}>
-                  <label className="font-body text-[10px] font-semibold text-blue-200/35 block mb-2.5 uppercase tracking-[0.18em]">Full Name</label>
+                  <label className="font-body text-[10px] font-semibold text-white/35 block mb-2.5 uppercase tracking-[0.18em]">Full Name</label>
                   <div className="relative group">
-                    <User className={`absolute left-4 top-1/2 -translate-y-1/2 w-[15px] h-[15px] transition-all duration-400 ${focused === "fullName" ? "text-blue-400" : "text-white/15"}`} />
+                    <User className={`absolute left-4 top-1/2 -translate-y-1/2 w-[15px] h-[15px] transition-all duration-400 ${focused === "fullName" ? "text-secondary" : "text-white/15"}`} />
                     <input
                       value={fullName} onChange={(e) => setFullName(e.target.value)}
                       className={`login-input pl-11 ${focused === "fullName" ? "login-input-focused" : ""}`}
@@ -186,9 +186,9 @@ export default function Login() {
               )}
 
               <div className="login-field-enter" style={{ animationDelay: "0.15s" }}>
-                <label className="font-body text-[10px] font-semibold text-blue-200/35 block mb-2.5 uppercase tracking-[0.18em]">Email Address</label>
+                <label className="font-body text-[10px] font-semibold text-white/35 block mb-2.5 uppercase tracking-[0.18em]">Email Address</label>
                 <div className="relative group">
-                  <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 w-[15px] h-[15px] transition-all duration-400 ${focused === "email" ? "text-blue-400" : "text-white/15"}`} />
+                  <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 w-[15px] h-[15px] transition-all duration-400 ${focused === "email" ? "text-secondary" : "text-white/15"}`} />
                   <input
                     type="email" value={email} onChange={(e) => setEmail(e.target.value)}
                     className={`login-input pl-11 ${focused === "email" ? "login-input-focused" : ""}`}
@@ -199,9 +199,9 @@ export default function Login() {
               </div>
 
               <div className="login-field-enter" style={{ animationDelay: "0.2s" }}>
-                <label className="font-body text-[10px] font-semibold text-blue-200/35 block mb-2.5 uppercase tracking-[0.18em]">Password</label>
+                <label className="font-body text-[10px] font-semibold text-white/35 block mb-2.5 uppercase tracking-[0.18em]">Password</label>
                 <div className="relative group">
-                  <Lock className={`absolute left-4 top-1/2 -translate-y-1/2 w-[15px] h-[15px] transition-all duration-400 ${focused === "password" ? "text-blue-400" : "text-white/15"}`} />
+                  <Lock className={`absolute left-4 top-1/2 -translate-y-1/2 w-[15px] h-[15px] transition-all duration-400 ${focused === "password" ? "text-secondary" : "text-white/15"}`} />
                   <input
                     type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)}
                     className={`login-input pl-11 pr-12 ${focused === "password" ? "login-input-focused" : ""}`}
@@ -209,7 +209,7 @@ export default function Login() {
                     onFocus={() => setFocused("password")} onBlur={() => setFocused(null)}
                   />
                   <button type="button" onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/15 hover:text-blue-400/60 transition-colors duration-300 p-1 rounded-lg">
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/15 hover:text-secondary/60 transition-colors duration-300 p-1 rounded-lg">
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
@@ -246,16 +246,16 @@ export default function Login() {
                 { icon: Fingerprint, label: "Secure Auth" },
                 { icon: Lock, label: "Encrypted" },
               ].map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-1.5 text-blue-300/20 group cursor-default">
-                  <Icon className="w-3 h-3 group-hover:text-blue-400/40 transition-colors duration-300" />
-                  <span className="font-body text-[10px] group-hover:text-blue-200/30 transition-colors duration-300">{label}</span>
+              <div key={label} className="flex items-center gap-1.5 text-white/20 group cursor-default">
+                  <Icon className="w-3 h-3 group-hover:text-secondary/40 transition-colors duration-300" />
+                  <span className="font-body text-[10px] group-hover:text-white/30 transition-colors duration-300">{label}</span>
                 </div>
               ))}
             </div>
 
             {/* Back link */}
             <div className="text-center mt-5">
-              <Link to="/" className="font-body text-[11px] text-blue-300/20 hover:text-blue-400/50 transition-all duration-300 inline-flex items-center gap-1.5 group">
+              <Link to="/" className="font-body text-[11px] text-white/20 hover:text-secondary/50 transition-all duration-300 inline-flex items-center gap-1.5 group">
                 <ArrowLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform duration-300" />
                 Back to Website
               </Link>
@@ -264,7 +264,7 @@ export default function Login() {
         </div>
 
         {/* Footer */}
-        <p className="text-center font-body text-[10px] text-blue-200/12 mt-7 tracking-wider">
+        <p className="text-center font-body text-[10px] text-white/10 mt-7 tracking-wider">
           Hoysala Degree College · Affiliated to Bangalore University
         </p>
       </div>
@@ -288,14 +288,14 @@ export default function Login() {
           color: rgba(148, 163, 184, 0.25);
         }
         .login-input:hover {
-          border-color: rgba(59, 130, 246, 0.12);
+          border-color: hsla(42, 87%, 55%, 0.1);
           background: rgba(255, 255, 255, 0.04);
         }
         .login-input-focused,
         .login-input:focus {
-          border-color: rgba(59, 130, 246, 0.35) !important;
-          background: rgba(59, 130, 246, 0.05) !important;
-          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.06), 0 0 20px -4px rgba(59, 130, 246, 0.08);
+          border-color: hsla(42, 87%, 55%, 0.3) !important;
+          background: hsla(42, 87%, 55%, 0.04) !important;
+          box-shadow: 0 0 0 4px hsla(42, 87%, 55%, 0.05), 0 0 20px -4px hsla(42, 87%, 55%, 0.06);
         }
 
         .login-submit-btn {
@@ -305,14 +305,14 @@ export default function Login() {
           border: none;
           cursor: pointer;
           overflow: hidden;
-          background: linear-gradient(135deg, #2563eb, #3b82f6 50%, #1d4ed8);
-          color: white;
-          box-shadow: 0 12px 32px -8px rgba(37, 99, 235, 0.35), 0 0 0 1px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255,255,255,0.1);
+          background: linear-gradient(135deg, hsl(42 87% 45%), hsl(42 87% 55%) 50%, hsl(42 70% 40%));
+          color: #0E1016;
+          box-shadow: 0 12px 32px -8px hsla(42, 87%, 55%, 0.25), 0 0 0 1px hsla(42, 87%, 55%, 0.12), inset 0 1px 0 rgba(255,255,255,0.15);
           transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .login-submit-btn:hover:not(:disabled) {
           transform: translateY(-2px);
-          box-shadow: 0 20px 48px -12px rgba(37, 99, 235, 0.45), 0 0 0 1px rgba(59, 130, 246, 0.2), inset 0 1px 0 rgba(255,255,255,0.15);
+          box-shadow: 0 20px 48px -12px hsla(42, 87%, 55%, 0.35), 0 0 0 1px hsla(42, 87%, 55%, 0.18), inset 0 1px 0 rgba(255,255,255,0.2);
         }
         .login-submit-btn:active:not(:disabled) {
           transform: translateY(0) scale(0.98);
@@ -340,7 +340,7 @@ export default function Login() {
         }
 
         .login-shimmer-bar {
-          background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.5), transparent);
+          background: linear-gradient(90deg, transparent, hsla(42, 87%, 55%, 0.5), transparent);
           transform: translateX(-100%);
           animation: loginBarShimmer 4s ease-in-out infinite;
         }
@@ -350,7 +350,7 @@ export default function Login() {
         }
 
         .login-logo-glow {
-          background: conic-gradient(from 220deg, rgba(59, 130, 246, 0.15), rgba(99, 102, 241, 0.1), rgba(59, 130, 246, 0.15));
+          background: conic-gradient(from 220deg, hsla(42, 87%, 55%, 0.15), hsla(42, 60%, 40%, 0.08), hsla(42, 87%, 55%, 0.15));
           animation: loginLogoGlow 5s linear infinite;
         }
         @keyframes loginLogoGlow {
@@ -385,19 +385,19 @@ export default function Login() {
         .login-aurora-1 {
           width: 500px; height: 500px;
           top: -15%; left: -10%;
-          background: radial-gradient(circle, rgba(37, 99, 235, 0.12), transparent 60%);
+          background: radial-gradient(circle, hsla(42, 87%, 55%, 0.06), transparent 60%);
           animation: auroraFloat1 12s ease-in-out infinite;
         }
         .login-aurora-2 {
           width: 400px; height: 400px;
           bottom: -10%; right: -10%;
-          background: radial-gradient(circle, rgba(99, 102, 241, 0.08), transparent 60%);
+          background: radial-gradient(circle, hsla(42, 60%, 45%, 0.04), transparent 60%);
           animation: auroraFloat2 15s ease-in-out infinite;
         }
         .login-aurora-3 {
           width: 350px; height: 350px;
           top: 40%; left: 50%;
-          background: radial-gradient(circle, rgba(59, 130, 246, 0.06), transparent 60%);
+          background: radial-gradient(circle, hsla(42, 87%, 55%, 0.035), transparent 60%);
           animation: auroraFloat3 10s ease-in-out infinite;
         }
         @keyframes auroraFloat1 {
