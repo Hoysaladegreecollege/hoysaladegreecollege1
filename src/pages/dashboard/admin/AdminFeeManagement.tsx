@@ -21,13 +21,13 @@ export default function AdminFeeManagement() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
-  const [paymentForm, setPaymentForm] = useState({ amount: "", payment_method: "Cash", remarks: "", is_installment: false });
+  const [paymentForm, setPaymentForm] = useState({ amount: "", payment_method: "Cash", remarks: "", upi_number: "" });
   const [courseFilter, setCourseFilter] = useState("all");
   const [feeFilter, setFeeFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [semesterFilter, setSemesterFilter] = useState("all");
   const [feeEditStudent, setFeeEditStudent] = useState<any>(null);
-  const [feeEditForm, setFeeEditForm] = useState({ total_fee: "", fee_due_date: "", fee_remarks: "" });
+  const [feeEditForm, setFeeEditForm] = useState({ total_fee: "", fee_due_date: "", fee_remarks: "", payment_method: "Cash", upi_number: "" });
   const [receiptStudent, setReceiptStudent] = useState<any>(null);
   const [receiptPayment, setReceiptPayment] = useState<any>(null);
 
@@ -77,9 +77,10 @@ export default function AdminFeeManagement() {
       const amount = parseFloat(paymentForm.amount);
       const newPaid = (selectedStudent.fee_paid || 0) + amount;
       const receipt_number = `RCP-${Date.now().toString().slice(-6)}`;
-      const remarks = paymentForm.is_installment
-        ? `[Installment] ${paymentForm.remarks || ""}`
-        : paymentForm.remarks;
+      const upiInfo = (paymentForm.payment_method === "Online" || paymentForm.payment_method === "UPI") && paymentForm.upi_number
+        ? `[UPI: ${paymentForm.upi_number}] `
+        : "";
+      const remarks = `${upiInfo}${paymentForm.remarks || ""}`.trim();
       await supabase.from("fee_payments").insert({
         student_id: selectedStudent.id, amount,
         payment_method: paymentForm.payment_method,
@@ -97,7 +98,7 @@ export default function AdminFeeManagement() {
       qc.invalidateQueries({ queryKey: ["all-fee-payments"] });
       setReceiptStudent(selectedStudent);
       setReceiptPayment({ ...data, created_at: new Date().toISOString(), student_name: selectedStudent.profile?.full_name, roll_number: selectedStudent.roll_number, course: selectedStudent.courses?.name });
-      setPaymentForm({ amount: "", payment_method: "Cash", remarks: "", is_installment: false });
+      setPaymentForm({ amount: "", payment_method: "Cash", remarks: "", upi_number: "" });
       setSelectedStudent((prev: any) => prev ? { ...prev, fee_paid: (prev.fee_paid || 0) + parseFloat(paymentForm.amount) } : null);
     },
     onError: (e: any) => toast.error(e.message),
@@ -140,7 +141,7 @@ export default function AdminFeeManagement() {
     return due > 0 && s.fee_due_date && new Date(s.fee_due_date) < new Date();
   }).length;
   const collectionRate = totalFees > 0 ? Math.round((totalPaid / totalFees) * 100) : 0;
-  const installmentCount = allPayments.filter((p: any) => p.remarks?.startsWith("[Installment]")).length;
+  const onlinePaymentCount = allPayments.filter((p: any) => p.payment_method === "Online" || p.payment_method === "UPI").length;
 
   // Payment method breakdown
   const methodBreakdown = allPayments.reduce((acc: Record<string, number>, p: any) => {
@@ -243,7 +244,7 @@ export default function AdminFeeManagement() {
               <span className="font-body text-[11px] text-secondary-foreground font-semibold uppercase tracking-wider">Financial Hub</span>
             </div>
             <h2 className="font-display text-xl font-bold text-foreground">Fee Management Console</h2>
-            <p className="font-body text-sm text-muted-foreground mt-1">Track payments, manage dues, installments & generate reports</p>
+            <p className="font-body text-sm text-muted-foreground mt-1">Track payments, manage dues & generate reports</p>
           </div>
         </div>
       </div>
@@ -257,7 +258,7 @@ export default function AdminFeeManagement() {
           { label: "Collection Rate", value: `${collectionRate}%`, icon: TrendingUp, gradient: "from-secondary/10 to-secondary/3", iconColor: "text-secondary-foreground" },
           { label: "Fee Due", value: dueCount, icon: Users, gradient: "from-orange-500/10 to-orange-500/3", iconColor: "text-orange-600" },
           { label: "Overdue", value: overdueCount, icon: Clock, gradient: "from-red-600/10 to-red-600/3", iconColor: "text-red-600" },
-          { label: "Installments", value: installmentCount, icon: Layers, gradient: "from-purple-500/10 to-purple-500/3", iconColor: "text-purple-600" },
+          { label: "Online Payments", value: onlinePaymentCount, icon: CreditCard, gradient: "from-purple-500/10 to-purple-500/3", iconColor: "text-purple-600" },
         ].map(({ label, value, icon: Icon, gradient, iconColor }) => (
           <div key={label} className={`relative overflow-hidden bg-gradient-to-br ${gradient} border border-border rounded-2xl p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group`}>
             <Icon className={`w-5 h-5 ${iconColor} mb-2 group-hover:scale-110 transition-transform duration-300`} />
@@ -473,7 +474,7 @@ export default function AdminFeeManagement() {
                           className="px-2.5 py-1.5 rounded-lg bg-primary/10 text-primary font-body text-xs font-semibold hover:bg-primary/20 transition-all duration-200 hover:scale-105">
                           <Receipt className="w-3 h-3 inline mr-1" /> Pay
                         </button>
-                        <button onClick={() => { setFeeEditStudent(s); setFeeEditForm({ total_fee: String(s.total_fee || ""), fee_due_date: s.fee_due_date || "", fee_remarks: s.fee_remarks || "" }); }}
+                        <button onClick={() => { setFeeEditStudent(s); setFeeEditForm({ total_fee: String(s.total_fee || ""), fee_due_date: s.fee_due_date || "", fee_remarks: s.fee_remarks || "", payment_method: "Cash", upi_number: "" }); }}
                           className="px-2.5 py-1.5 rounded-lg bg-secondary/10 text-secondary-foreground font-body text-xs font-semibold hover:bg-secondary/20 transition-all duration-200 hover:scale-105">
                           <FileText className="w-3 h-3 inline mr-1" /> Edit
                         </button>
@@ -506,7 +507,7 @@ export default function AdminFeeManagement() {
               <div key={p.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-all duration-200 group">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    {p.remarks?.startsWith("[Installment]") ? <Layers className="w-4 h-4 text-purple-600" /> : <ArrowDownRight className="w-4 h-4 text-emerald-600" />}
+                    <ArrowDownRight className="w-4 h-4 text-emerald-600" />
                   </div>
                   <div>
                     <p className="font-body text-xs font-semibold text-foreground">{p.receipt_number || "—"}</p>
@@ -557,7 +558,6 @@ export default function AdminFeeManagement() {
                           <span className="font-semibold text-emerald-600">₹{p.amount}</span>
                           <span className="text-muted-foreground ml-2">{p.payment_method}</span>
                           {p.receipt_number && <span className="text-muted-foreground ml-1">· {p.receipt_number}</span>}
-                          {p.remarks?.startsWith("[Installment]") && <span className="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-600">Installment</span>}
                         </div>
                         <span className="text-muted-foreground">{format(new Date(p.created_at), "MMM d, yyyy")}</span>
                       </div>
@@ -573,17 +573,17 @@ export default function AdminFeeManagement() {
                 </div>
                 <div>
                   <label className="font-body text-xs font-semibold block mb-1.5">Payment Method</label>
-                  <select value={paymentForm.payment_method} onChange={e => setPaymentForm({ ...paymentForm, payment_method: e.target.value })} className={inputClass}>
-                    {["Cash", "Online Transfer", "DD", "Cheque", "UPI"].map(m => <option key={m}>{m}</option>)}
+                  <select value={paymentForm.payment_method} onChange={e => setPaymentForm({ ...paymentForm, payment_method: e.target.value, upi_number: "" })} className={inputClass}>
+                    {["Cash", "Online", "Cheque", "UPI", "DD"].map(m => <option key={m}>{m}</option>)}
                   </select>
                 </div>
-                <div className="flex items-center gap-3">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" checked={paymentForm.is_installment} onChange={e => setPaymentForm({ ...paymentForm, is_installment: e.target.checked })}
-                      className="w-4 h-4 rounded border-border text-primary focus:ring-primary/30" />
-                    <span className="font-body text-xs font-semibold text-foreground flex items-center gap-1"><Layers className="w-3 h-3 text-purple-500" /> Mark as Installment</span>
-                  </label>
-                </div>
+                {(paymentForm.payment_method === "Online" || paymentForm.payment_method === "UPI") && (
+                  <div>
+                    <label className="font-body text-xs font-semibold block mb-1.5">UPI / Transaction Number</label>
+                    <input value={paymentForm.upi_number} onChange={e => setPaymentForm({ ...paymentForm, upi_number: e.target.value })}
+                      className={inputClass} placeholder="Enter UPI ID or transaction number" />
+                  </div>
+                )}
                 <div>
                   <label className="font-body text-xs font-semibold block mb-1.5">Remarks</label>
                   <input value={paymentForm.remarks} onChange={e => setPaymentForm({ ...paymentForm, remarks: e.target.value })}
@@ -623,6 +623,19 @@ export default function AdminFeeManagement() {
                 <input type="date" value={feeEditForm.fee_due_date} onChange={e => setFeeEditForm({ ...feeEditForm, fee_due_date: e.target.value })}
                   className={inputClass} />
               </div>
+              <div>
+                <label className="font-body text-xs font-semibold block mb-1.5">Payment Mode</label>
+                <select value={feeEditForm.payment_method} onChange={e => setFeeEditForm({ ...feeEditForm, payment_method: e.target.value, upi_number: "" })} className={inputClass}>
+                  {["Cash", "Online", "Cheque", "UPI", "DD"].map(m => <option key={m}>{m}</option>)}
+                </select>
+              </div>
+              {(feeEditForm.payment_method === "Online" || feeEditForm.payment_method === "UPI") && (
+                <div>
+                  <label className="font-body text-xs font-semibold block mb-1.5">UPI / Transaction Number</label>
+                  <input value={feeEditForm.upi_number} onChange={e => setFeeEditForm({ ...feeEditForm, upi_number: e.target.value })}
+                    className={inputClass} placeholder="Enter UPI ID or transaction number" />
+                </div>
+              )}
               <div>
                 <label className="font-body text-xs font-semibold block mb-1.5">Remarks</label>
                 <input value={feeEditForm.fee_remarks} onChange={e => setFeeEditForm({ ...feeEditForm, fee_remarks: e.target.value })}
