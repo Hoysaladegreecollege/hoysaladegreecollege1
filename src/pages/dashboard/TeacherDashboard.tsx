@@ -1,8 +1,8 @@
 import { useAuth } from "@/contexts/AuthContext";
 import {
   Users, Clock, BarChart3, Upload, Bell, Megaphone, Calendar, BookOpen, CheckCircle,
-  TrendingUp, Activity, IndianRupee, Wallet, FileText, ListTodo, Plus, Trash2, Award,
-  ArrowRight, PieChart
+  TrendingUp, Activity, ListTodo, Plus, Trash2, Award,
+  ArrowRight
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -82,7 +82,7 @@ export default function TeacherDashboard() {
   const { profile } = useAuth();
   const [newNote, setNewNote] = useState("");
   const { notes, add, toggle, remove } = useTeacherNotes();
-  const [feeSemFilter, setFeeSemFilter] = useState("all");
+  
 
   // Main stats
   const { data: counts, isLoading } = useQuery({
@@ -127,23 +127,12 @@ export default function TeacherDashboard() {
     },
   });
 
-  // Performance analytics: marks distribution
+  // Performance analytics: top performers
   const { data: perfData } = useQuery({
     queryKey: ["teacher-performance-analytics"],
     queryFn: async () => {
-      const { data: marks } = await supabase.from("marks").select("student_id, obtained_marks, max_marks, subject, exam_type, course_id");
+      const { data: marks } = await supabase.from("marks").select("student_id, obtained_marks, max_marks");
       if (!marks?.length) return null;
-
-      // Grade distribution
-      const grades = { A: 0, B: 0, C: 0, D: 0, F: 0 };
-      marks.forEach(m => {
-        const pct = (m.obtained_marks / m.max_marks) * 100;
-        if (pct >= 90) grades.A++;
-        else if (pct >= 75) grades.B++;
-        else if (pct >= 60) grades.C++;
-        else if (pct >= 40) grades.D++;
-        else grades.F++;
-      });
 
       // Top 5 performers
       const studentScores: Record<string, { total: number; count: number }> = {};
@@ -166,25 +155,7 @@ export default function TeacherDashboard() {
         return { name: name?.full_name || "Unknown", roll: stu?.roll_number || "", avg: t.avg };
       });
 
-      // Pass/fail rate
-      const passCount = marks.filter(m => (m.obtained_marks / m.max_marks) * 100 >= 40).length;
-      const failCount = marks.length - passCount;
-
-      return { grades, topPerformers, passRate: marks.length > 0 ? Math.round((passCount / marks.length) * 100) : 0, passCount, failCount, totalExams: marks.length };
-    },
-  });
-
-  // Fee collection view
-  const { data: feeData } = useQuery({
-    queryKey: ["teacher-fee-view"],
-    queryFn: async () => {
-      const { data: students } = await supabase.from("students").select("id, total_fee, fee_paid, fee_due_date, semester, course_id, roll_number, user_id, courses(name, code)").eq("is_active", true);
-      const { data: profiles } = await supabase.from("profiles").select("user_id, full_name");
-      const { data: payments } = await supabase.from("fee_payments").select("*").order("created_at", { ascending: false }).limit(100);
-      return {
-        students: (students || []).map((s: any) => ({ ...s, name: profiles?.find(p => p.user_id === s.user_id)?.full_name || "—" })),
-        payments: payments || [],
-      };
+      return { topPerformers };
     },
   });
 
@@ -207,13 +178,6 @@ export default function TeacherDashboard() {
     { icon: Megaphone, label: "Announcements", desc: "Post messages", path: "/dashboard/teacher/announcements", color: "bg-indigo-500/10", iconColor: "text-indigo-500" },
   ];
 
-  // Fee computations
-  const feeStudents = feeData?.students || [];
-  const filteredFeeStudents = feeSemFilter === "all" ? feeStudents : feeStudents.filter((s: any) => String(s.semester) === feeSemFilter);
-  const totalFeeAmt = filteredFeeStudents.reduce((s: number, st: any) => s + (st.total_fee || 0), 0);
-  const totalPaidAmt = filteredFeeStudents.reduce((s: number, st: any) => s + (st.fee_paid || 0), 0);
-  const totalDueAmt = totalFeeAmt - totalPaidAmt;
-  const feeDefaulters = filteredFeeStudents.filter((s: any) => (s.total_fee || 0) - (s.fee_paid || 0) > 0);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -349,136 +313,40 @@ export default function TeacherDashboard() {
         </div>
       )}
 
-      {/* ═══ STUDENT PERFORMANCE ANALYTICS ═══ */}
+      {/* ═══ TOP PERFORMERS ═══ */}
       {perfData && (
-        <div className="grid md:grid-cols-2 gap-4">
-          {/* Grade Distribution + Pass Rate */}
-          <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                <PieChart className="w-4 h-4 text-purple-500" />
-              </div>
-              <h3 className="font-body text-[14px] font-semibold text-foreground">Grade Distribution</h3>
-            </div>
-            <div className="space-y-2 mb-4">
-              {Object.entries(perfData.grades).map(([grade, count]) => {
-                const pct = perfData.totalExams > 0 ? Math.round(((count as number) / perfData.totalExams) * 100) : 0;
-                const colors: Record<string, string> = { A: "bg-emerald-500", B: "bg-blue-500", C: "bg-amber-500", D: "bg-orange-500", F: "bg-destructive" };
-                return (
-                  <div key={grade} className="flex items-center gap-3">
-                    <span className="font-body text-xs font-bold text-foreground w-6">{ grade}</span>
-                    <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
-                      <div className={`h-full rounded-full ${colors[grade]} transition-all duration-700`} style={{ width: `${pct}%` }} />
-                    </div>
-                    <span className="font-body text-[11px] text-muted-foreground tabular-nums w-14 text-right">{count as number} ({pct}%)</span>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="flex gap-3">
-              <div className="flex-1 bg-emerald-500/5 rounded-xl p-3 text-center">
-                <p className="font-body text-xl font-bold text-emerald-600 tabular-nums">{perfData.passRate}%</p>
-                <p className="font-body text-[9px] text-muted-foreground">Pass Rate</p>
-              </div>
-              <div className="flex-1 bg-destructive/5 rounded-xl p-3 text-center">
-                <p className="font-body text-xl font-bold text-destructive tabular-nums">{perfData.failCount}</p>
-                <p className="font-body text-[9px] text-muted-foreground">Below 40%</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Top Performers */}
-          <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                <Award className="w-4 h-4 text-amber-500" />
-              </div>
-              <h3 className="font-body text-[14px] font-semibold text-foreground">Top Performers</h3>
-            </div>
-            {perfData.topPerformers.length > 0 ? (
-              <div className="space-y-2">
-                {perfData.topPerformers.map((s: any, i: number) => (
-                  <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors duration-200">
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-body text-xs font-bold ${
-                      i === 0 ? "bg-amber-500/20 text-amber-600" : i === 1 ? "bg-gray-300/20 text-gray-600" : i === 2 ? "bg-orange-400/20 text-orange-600" : "bg-muted text-muted-foreground"
-                    }`}>
-                      #{i + 1}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-body text-[12px] font-semibold text-foreground truncate">{s.name}</p>
-                      <p className="font-body text-[10px] text-muted-foreground">{s.roll}</p>
-                    </div>
-                    <div className="bg-emerald-500/10 rounded-lg px-2.5 py-1">
-                      <span className="font-body text-[12px] font-bold text-emerald-600 tabular-nums">{s.avg}%</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="font-body text-sm text-muted-foreground text-center py-8">No marks data yet</p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ═══ FEE COLLECTION VIEW ═══ */}
-      {feeData && (
         <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                <IndianRupee className="w-4 h-4 text-emerald-500" />
-              </div>
-              <h3 className="font-body text-[14px] font-semibold text-foreground">Fee Collection Overview</h3>
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
+              <Award className="w-4 h-4 text-amber-500" />
             </div>
-            <select value={feeSemFilter} onChange={e => setFeeSemFilter(e.target.value)}
-              className="font-body text-xs border border-border rounded-lg px-2.5 py-1.5 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
-              <option value="all">All Semesters</option>
-              {[1,2,3,4,5,6].map(s => <option key={s} value={String(s)}>Semester {s}</option>)}
-            </select>
+            <h3 className="font-body text-[14px] font-semibold text-foreground">Top Performers</h3>
           </div>
-
-          <div className="grid grid-cols-3 gap-3 mb-4">
-            <div className="bg-muted/30 rounded-xl p-3 text-center">
-              <p className="font-body text-lg font-bold text-foreground tabular-nums">₹{totalFeeAmt.toLocaleString()}</p>
-              <p className="font-body text-[10px] text-muted-foreground">Total Fees</p>
+          {perfData.topPerformers.length > 0 ? (
+            <div className="space-y-2">
+              {perfData.topPerformers.map((s: any, i: number) => (
+                <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors duration-200">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-body text-xs font-bold ${
+                    i === 0 ? "bg-amber-500/20 text-amber-600" : i === 1 ? "bg-gray-300/20 text-gray-600" : i === 2 ? "bg-orange-400/20 text-orange-600" : "bg-muted text-muted-foreground"
+                  }`}>
+                    #{i + 1}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-body text-[12px] font-semibold text-foreground truncate">{s.name}</p>
+                    <p className="font-body text-[10px] text-muted-foreground">{s.roll}</p>
+                  </div>
+                  <div className="bg-emerald-500/10 rounded-lg px-2.5 py-1">
+                    <span className="font-body text-[12px] font-bold text-emerald-600 tabular-nums">{s.avg}%</span>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="bg-emerald-500/5 rounded-xl p-3 text-center">
-              <p className="font-body text-lg font-bold text-emerald-600 tabular-nums">₹{totalPaidAmt.toLocaleString()}</p>
-              <p className="font-body text-[10px] text-muted-foreground">Collected</p>
-            </div>
-            <div className={`rounded-xl p-3 text-center ${totalDueAmt > 0 ? "bg-destructive/5" : "bg-emerald-500/5"}`}>
-              <p className={`font-body text-lg font-bold tabular-nums ${totalDueAmt > 0 ? "text-destructive" : "text-emerald-600"}`}>
-                ₹{totalDueAmt.toLocaleString()}
-              </p>
-              <p className="font-body text-[10px] text-muted-foreground">Pending</p>
-            </div>
-          </div>
-
-          {/* Fee Defaulters */}
-          {feeDefaulters.length > 0 && (
-            <div>
-              <h4 className="font-body text-[11px] font-bold text-foreground mb-2 uppercase tracking-wider flex items-center gap-1">
-                <Wallet className="w-3 h-3 text-destructive" /> Fee Defaulters ({feeDefaulters.length})
-              </h4>
-              <div className="space-y-1.5 max-h-48 overflow-y-auto">
-                {feeDefaulters.slice(0, 10).map((s: any) => {
-                  const due = (s.total_fee || 0) - (s.fee_paid || 0);
-                  return (
-                    <div key={s.id} className="flex items-center justify-between p-2.5 rounded-lg bg-destructive/5 font-body text-xs">
-                      <div>
-                        <span className="font-semibold text-foreground">{s.name}</span>
-                        <span className="text-muted-foreground ml-2">{s.roll_number} · {(s as any).courses?.code || "—"} · Sem {s.semester}</span>
-                      </div>
-                      <span className="font-bold text-destructive tabular-nums">₹{due.toLocaleString()}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+          ) : (
+            <p className="font-body text-sm text-muted-foreground text-center py-8">No marks data yet</p>
           )}
         </div>
       )}
+
 
       {/* ═══ QUICK NOTES / TO-DO ═══ */}
       <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
