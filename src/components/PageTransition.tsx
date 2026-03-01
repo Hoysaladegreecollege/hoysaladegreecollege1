@@ -14,27 +14,44 @@ export default function PageTransition({ children }: { children: React.ReactNode
     }
     prevPath.current = location.pathname;
 
-    // Exit phase
     setPhase("exit");
     const exitTimer = setTimeout(() => {
       setDisplayChildren(children);
       setPhase("enter");
-      const enterTimer = setTimeout(() => setPhase("idle"), 500);
+      const enterTimer = setTimeout(() => setPhase("idle"), 600);
       return () => clearTimeout(enterTimer);
-    }, 200);
+    }, 250);
 
     return () => clearTimeout(exitTimer);
   }, [location.pathname, children]);
 
+  const getStyles = (): React.CSSProperties => {
+    if (phase === "exit") {
+      return {
+        opacity: 0,
+        transform: "translateY(-12px) scale(0.995)",
+        filter: "blur(2px)",
+        transition: "opacity 0.25s cubic-bezier(0.4,0,1,1), transform 0.25s cubic-bezier(0.4,0,1,1), filter 0.25s ease",
+      };
+    }
+    if (phase === "enter") {
+      return {
+        opacity: 1,
+        transform: "translateY(0) scale(1)",
+        filter: "blur(0px)",
+        transition: "opacity 0.5s cubic-bezier(0.16,1,0.3,1), transform 0.5s cubic-bezier(0.16,1,0.3,1), filter 0.4s ease-out",
+      };
+    }
+    return {
+      opacity: 1,
+      transform: "none",
+      filter: "none",
+      transition: "none",
+    };
+  };
+
   return (
-    <div
-      className="will-change-[opacity,transform]"
-      style={{
-        transition: "opacity 0.4s cubic-bezier(0.16,1,0.3,1), transform 0.4s cubic-bezier(0.16,1,0.3,1)",
-        opacity: phase === "exit" ? 0 : 1,
-        transform: phase === "exit" ? "translateY(-8px)" : phase === "enter" ? "translateY(0)" : "none",
-      }}
-    >
+    <div className="will-change-[opacity,transform,filter]" style={getStyles()}>
       {displayChildren}
     </div>
   );
