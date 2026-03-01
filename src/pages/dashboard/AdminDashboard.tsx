@@ -1,5 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { Users, GraduationCap, BookOpen, Calendar, FileText, Settings, Mail, TrendingUp, Trophy, Shield, Image, BarChart3, PieChart, Megaphone, ArrowUpCircle, Download, UserX, CalendarDays, AlertTriangle, IndianRupee, UserPlus, Activity, Clock, Target } from "lucide-react";
+import { Users, GraduationCap, BookOpen, Calendar, FileText, Settings, Mail, TrendingUp, Trophy, Shield, Image, BarChart3, PieChart, Megaphone, ArrowUpCircle, Download, UserX, CalendarDays, AlertTriangle, IndianRupee, UserPlus, Activity, Clock, Target, Bell, Cake, CreditCard, CheckCircle2, XCircle, UserCheck, FileCheck } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
@@ -9,6 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import ActionCenter from "@/components/ActionCenter";
+import DashboardSkeleton from "@/components/DashboardSkeleton";
+import { format, formatDistanceToNow } from "date-fns";
 
 const CHART_COLORS = [
   "hsl(215, 90%, 55%)", "hsl(145, 65%, 42%)", "hsl(42, 70%, 52%)", "hsl(280, 60%, 55%)",
@@ -161,6 +163,89 @@ export default function AdminDashboard() {
     },
   });
 
+  // Recent Activity Feed
+  const { data: recentActivity = [] } = useQuery({
+    queryKey: ["admin-recent-activity"],
+    refetchInterval: 30000,
+    queryFn: async () => {
+      const activities: any[] = [];
+      
+      const [recentApps, recentNotices, recentEvents, recentAttendance] = await Promise.all([
+        supabase.from("admission_applications").select("id, full_name, course, status, created_at").order("created_at", { ascending: false }).limit(5),
+        supabase.from("notices").select("id, title, type, created_at").order("created_at", { ascending: false }).limit(5),
+        supabase.from("events").select("id, title, category, created_at").order("created_at", { ascending: false }).limit(3),
+        supabase.from("attendance").select("id, date, status, created_at").order("created_at", { ascending: false }).limit(3),
+      ]);
+
+      (recentApps.data || []).forEach((a: any) => activities.push({
+        id: a.id, type: "application", icon: FileCheck,
+        title: `New Application: ${a.full_name}`,
+        desc: `Applied for ${a.course} · ${a.status}`,
+        time: a.created_at, color: "text-orange-500", bg: "bg-orange-500/10",
+      }));
+      (recentNotices.data || []).forEach((n: any) => activities.push({
+        id: n.id, type: "notice", icon: Megaphone,
+        title: `Notice: ${n.title}`,
+        desc: n.type,
+        time: n.created_at, color: "text-blue-500", bg: "bg-blue-500/10",
+      }));
+      (recentEvents.data || []).forEach((e: any) => activities.push({
+        id: e.id, type: "event", icon: Calendar,
+        title: `Event: ${e.title}`,
+        desc: e.category,
+        time: e.created_at, color: "text-purple-500", bg: "bg-purple-500/10",
+      }));
+      (recentAttendance.data || []).forEach((a: any) => activities.push({
+        id: a.id, type: "attendance", icon: UserCheck,
+        title: `Attendance marked`,
+        desc: `${a.status} · ${a.date}`,
+        time: a.created_at, color: "text-emerald-500", bg: "bg-emerald-500/10",
+      }));
+
+      return activities.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 8);
+    },
+  });
+
+  // System Notifications
+  const { data: notifications = [] } = useQuery({
+    queryKey: ["admin-notifications"],
+    refetchInterval: 30000,
+    queryFn: async () => {
+      const alerts: any[] = [];
+      const today = new Date().toISOString().split("T")[0];
+      
+      // Pending applications
+      const { count: pendingCount } = await supabase.from("admission_applications").select("id", { count: "exact", head: true }).eq("status", "pending");
+      if ((pendingCount || 0) > 0) alerts.push({ id: "pending-apps", type: "warning", icon: FileText, title: `${pendingCount} pending applications`, desc: "Review and process new admissions", path: "/dashboard/admin/applications", color: "text-orange-500", bg: "bg-orange-500/10" });
+
+      // New contact messages
+      const { count: msgCount } = await supabase.from("contact_submissions").select("id", { count: "exact", head: true }).eq("status", "new");
+      if ((msgCount || 0) > 0) alerts.push({ id: "new-msgs", type: "info", icon: Mail, title: `${msgCount} unread messages`, desc: "Check new contact submissions", path: "/dashboard/admin/contacts", color: "text-blue-500", bg: "bg-blue-500/10" });
+
+      // Fee defaulters
+      const { data: feeStudents } = await supabase.from("students").select("total_fee, fee_paid").eq("is_active", true).gt("total_fee", 0);
+      const defaulterCount = (feeStudents || []).filter((s: any) => ((s.total_fee || 0) - (s.fee_paid || 0)) > 0).length;
+      if (defaulterCount > 0) alerts.push({ id: "fee-due", type: "warning", icon: CreditCard, title: `${defaulterCount} students with fee dues`, desc: "Track and follow up on payments", path: "/dashboard/admin/fee-management", color: "text-red-500", bg: "bg-red-500/10" });
+
+      // Upcoming events
+      const { data: upcomingEvents } = await supabase.from("events").select("id, title, event_date").eq("is_active", true).gte("event_date", today).order("event_date").limit(3);
+      if ((upcomingEvents || []).length > 0) alerts.push({ id: "upcoming-events", type: "info", icon: Calendar, title: `${upcomingEvents!.length} upcoming events`, desc: upcomingEvents![0].title, path: "/dashboard/admin/events", color: "text-purple-500", bg: "bg-purple-500/10" });
+
+      // Today's birthdays
+      const todayMonth = new Date().getMonth() + 1;
+      const todayDay = new Date().getDate();
+      const { data: birthdayStudents } = await supabase.from("students").select("id, user_id, date_of_birth").eq("is_active", true).not("date_of_birth", "is", null);
+      const todayBdays = (birthdayStudents || []).filter((s: any) => {
+        if (!s.date_of_birth) return false;
+        const d = new Date(s.date_of_birth);
+        return d.getMonth() + 1 === todayMonth && d.getDate() === todayDay;
+      });
+      if (todayBdays.length > 0) alerts.push({ id: "birthdays", type: "info", icon: Cake, title: `${todayBdays.length} student birthday(s) today`, desc: "Send birthday wishes", color: "text-pink-500", bg: "bg-pink-500/10" });
+
+      return alerts;
+    },
+  });
+
   const exportStudentsCSV = async () => {
     toast.info("Generating CSV...");
     const { data: students } = await supabase.from("students").select("roll_number, semester, year_level, admission_year, parent_phone, phone, total_fee, fee_paid, fee_due_date, user_id, courses(name, code)").eq("is_active", true).order("roll_number");
@@ -217,6 +302,8 @@ export default function AdminDashboard() {
     { name: "Attendance", value: attendanceStats?.percentage || 0, fill: "hsl(145, 65%, 42%)" },
   ];
 
+  if (countsLoading) return <DashboardSkeleton />;
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Welcome */}
@@ -236,15 +323,9 @@ export default function AdminDashboard() {
       <ActionCenter role="admin" />
 
       {/* Stats Grid */}
-      {countsLoading ? (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {[1,2,3,4].map(i => <Skeleton key={i} className="h-32 rounded-2xl" />)}
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {stats.map((s) => <StatCard key={s.label} {...s} />)}
-        </div>
-      )}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {stats.map((s) => <StatCard key={s.label} {...s} />)}
+      </div>
 
       {/* KPI Strip */}
       <div className="grid grid-cols-3 gap-3">
@@ -274,6 +355,76 @@ export default function AdminDashboard() {
           </div>
           <p className="font-body text-2xl font-bold text-foreground tabular-nums">{attendanceStats?.percentage || 0}%</p>
           <p className="font-body text-[11px] text-muted-foreground mt-0.5">Attendance Rate</p>
+        </div>
+      </div>
+
+      {/* System Notifications + Activity Feed */}
+      <div className="grid md:grid-cols-2 gap-4">
+        {/* Notifications */}
+        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
+              <Bell className="w-4 h-4 text-amber-500" />
+            </div>
+            <h3 className="font-body text-[14px] font-semibold text-foreground">System Alerts</h3>
+            {notifications.length > 0 && (
+              <span className="font-body text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 font-semibold">{notifications.length}</span>
+            )}
+          </div>
+          {notifications.length === 0 ? (
+            <div className="text-center py-8">
+              <CheckCircle2 className="w-10 h-10 text-emerald-500/30 mx-auto mb-2" />
+              <p className="font-body text-[13px] text-muted-foreground">All clear — no pending alerts</p>
+            </div>
+          ) : (
+            <div className="space-y-2 max-h-[280px] overflow-y-auto">
+              {notifications.map((n: any) => (
+                <Link
+                  key={n.id}
+                  to={n.path || "#"}
+                  className="flex items-start gap-3 p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-all duration-200 group"
+                >
+                  <div className={`w-8 h-8 rounded-lg ${n.bg} flex items-center justify-center shrink-0`}>
+                    <n.icon className={`w-4 h-4 ${n.color}`} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-body text-[12px] font-medium text-foreground truncate group-hover:text-primary transition-colors">{n.title}</p>
+                    <p className="font-body text-[10px] text-muted-foreground truncate">{n.desc}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Activity Feed */}
+        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+              <Activity className="w-4 h-4 text-cyan-500" />
+            </div>
+            <h3 className="font-body text-[14px] font-semibold text-foreground">Recent Activity</h3>
+          </div>
+          {recentActivity.length === 0 ? (
+            <p className="font-body text-[13px] text-muted-foreground text-center py-8">No recent activity</p>
+          ) : (
+            <div className="space-y-1 max-h-[280px] overflow-y-auto">
+              {recentActivity.map((a: any) => (
+                <div key={a.id} className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-muted/30 transition-colors duration-200">
+                  <div className={`w-7 h-7 rounded-lg ${a.bg} flex items-center justify-center shrink-0 mt-0.5`}>
+                    <a.icon className={`w-3.5 h-3.5 ${a.color}`} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-body text-[11px] font-medium text-foreground truncate">{a.title}</p>
+                    <p className="font-body text-[10px] text-muted-foreground">{a.desc}</p>
+                  </div>
+                  <span className="font-body text-[9px] text-muted-foreground shrink-0 mt-1">
+                    {formatDistanceToNow(new Date(a.time), { addSuffix: true })}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
