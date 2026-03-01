@@ -266,12 +266,23 @@ export default function Navbar() {
               ))}
             </div>
             <Link to="/login" className="block px-1">
-              <button className="relative w-full group overflow-hidden px-6 py-3.5 rounded-xl font-body text-sm font-bold text-white active:scale-[0.97] transition-all duration-300 touch-manipulation border border-[hsl(var(--gold))]/20"
-                style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(230,18%,10%))" }}>
-                <span className="absolute inset-0 bg-gradient-to-r from-[hsl(var(--gold))]/0 via-[hsl(var(--gold))]/10 to-[hsl(var(--gold))]/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                <span className="absolute top-0 left-[20%] right-[20%] h-px bg-gradient-to-r from-transparent via-[hsl(var(--gold))]/30 to-transparent" />
-                <span className="relative flex items-center justify-center gap-2">
-                  <Sparkles className="w-4 h-4 text-[hsl(var(--gold))]" /> Login to Portal
+              <button className="relative w-full group overflow-hidden px-6 py-4 rounded-2xl font-body text-sm font-bold tracking-wider uppercase text-white active:scale-[0.97] transition-all duration-500 touch-manipulation border border-[hsl(var(--gold))]/25 hover:border-[hsl(var(--gold))]/40 shadow-[0_4px_24px_hsl(var(--primary)/0.3),inset_0_1px_0_rgba(255,255,255,0.08)] hover:shadow-[0_8px_32px_hsl(var(--primary)/0.4),0_0_0_1px_hsl(var(--gold)/0.1)]"
+                style={{ background: "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(230,20%,14%) 50%, hsl(var(--primary) / 0.8) 100%)" }}>
+                {/* Animated shimmer sweep */}
+                <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/[0.12] to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out" />
+                {/* Top highlight edge */}
+                <span className="absolute top-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+                {/* Bottom gold accent */}
+                <span className="absolute bottom-0 left-[15%] right-[15%] h-px bg-gradient-to-r from-transparent via-[hsl(var(--gold))]/40 to-transparent" />
+                {/* Corner accents */}
+                <span className="absolute top-0 left-0 w-4 h-4 border-t border-l border-[hsl(var(--gold))]/20 rounded-tl-2xl" />
+                <span className="absolute top-0 right-0 w-4 h-4 border-t border-r border-[hsl(var(--gold))]/20 rounded-tr-2xl" />
+                <span className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-[hsl(var(--gold))]/20 rounded-bl-2xl" />
+                <span className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-[hsl(var(--gold))]/20 rounded-br-2xl" />
+                {/* Button content */}
+                <span className="relative flex items-center justify-center gap-2.5">
+                  <Sparkles className="w-4 h-4 text-[hsl(var(--gold))] group-hover:rotate-12 group-hover:scale-110 transition-all duration-400" />
+                  <span className="bg-gradient-to-r from-white via-white to-[hsl(var(--gold))] bg-clip-text">Login to Portal</span>
                 </span>
               </button>
             </Link>
