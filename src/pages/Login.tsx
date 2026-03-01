@@ -214,7 +214,11 @@ export default function Login() {
               </div>
 
               {!canSignup && (
-                <div className="flex justify-end login-field-enter" style={{ animationDelay: "0.22s" }}>
+                <div className="flex items-center justify-between login-field-enter" style={{ animationDelay: "0.22s" }}>
+                  <label className="flex items-center gap-2 cursor-pointer group">
+                    <input type="checkbox" className="w-3.5 h-3.5 rounded border-white/10 bg-white/[0.03] text-secondary focus:ring-secondary/30 focus:ring-offset-0 accent-[hsl(42,87%,55%)] cursor-pointer" />
+                    <span className="font-body text-[11px] text-white/30 group-hover:text-white/45 transition-colors duration-300 select-none">Remember me</span>
+                  </label>
                   <Link to="/forgot-password" className="font-body text-[11px] text-white/30 hover:text-secondary/60 transition-colors duration-300">
                     Forgot password?
                   </Link>
