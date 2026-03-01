@@ -64,9 +64,10 @@ function StatCard({ label, value, icon: Icon, color }: { label: string; value: s
 
 export default function PrincipalDashboard() {
   const { profile } = useAuth();
+  const [attDate, setAttDate] = useState(new Date().toISOString().split("T")[0]);
 
   const { data: counts, isLoading } = useQuery({
-    queryKey: ["principal-stats"],
+    queryKey: ["principal-stats", attDate],
     refetchInterval: 30000,
     queryFn: async () => {
       const [students, teachers, courses, notices, attendance] = await Promise.all([
@@ -74,14 +75,14 @@ export default function PrincipalDashboard() {
         supabase.from("teachers").select("id", { count: "exact", head: true }).eq("is_active", true),
         supabase.from("courses").select("id", { count: "exact", head: true }).eq("is_active", true),
         supabase.from("notices").select("id", { count: "exact", head: true }).eq("is_active", true),
-        supabase.from("attendance").select("status"),
+        supabase.from("attendance").select("status").eq("date", attDate),
       ]);
       const semCounts: Record<number, number> = {};
       (students.data || []).forEach((s: any) => { semCounts[s.semester] = (semCounts[s.semester] || 0) + 1; });
       const att = attendance.data || [];
       const present = att.filter(a => a.status === "present").length;
       const pct = att.length > 0 ? Math.round((present / att.length) * 100) : 0;
-      return { students: students.count || 0, teachers: teachers.count || 0, courses: courses.count || 0, notices: notices.count || 0, semesterBreakdown: semCounts, attendancePct: pct };
+      return { students: students.count || 0, teachers: teachers.count || 0, courses: courses.count || 0, notices: notices.count || 0, semesterBreakdown: semCounts, attendancePct: pct, totalAtt: att.length, presentAtt: present };
     },
   });
 
@@ -157,6 +158,37 @@ export default function PrincipalDashboard() {
           <p className="font-body text-2xl font-bold text-foreground tabular-nums">{counts?.courses || 0}</p>
           <p className="font-body text-[11px] text-muted-foreground mt-0.5">Active Courses</p>
         </div>
+      </div>
+
+      {/* Attendance Detail with Date Picker */}
+      <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+              <Clock className="w-4 h-4 text-emerald-500" />
+            </div>
+            <h3 className="font-body text-[14px] font-semibold text-foreground">Attendance Overview</h3>
+          </div>
+          <input type="date" value={attDate} onChange={e => setAttDate(e.target.value)}
+            className="font-body text-xs border border-border rounded-lg px-2.5 py-1.5 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="bg-emerald-500/5 rounded-xl p-3 text-center">
+            <p className="font-body text-2xl font-bold text-emerald-600 tabular-nums">{counts?.presentAtt || 0}</p>
+            <p className="font-body text-[10px] text-muted-foreground">Present</p>
+          </div>
+          <div className="bg-red-500/5 rounded-xl p-3 text-center">
+            <p className="font-body text-2xl font-bold text-red-500 tabular-nums">{(counts?.totalAtt || 0) - (counts?.presentAtt || 0)}</p>
+            <p className="font-body text-[10px] text-muted-foreground">Absent</p>
+          </div>
+          <div className="bg-muted/40 rounded-xl p-3 text-center">
+            <p className="font-body text-2xl font-bold text-foreground tabular-nums">{counts?.attendancePct || 0}%</p>
+            <p className="font-body text-[10px] text-muted-foreground">Rate</p>
+          </div>
+        </div>
+        {(counts?.totalAtt || 0) === 0 && (
+          <p className="font-body text-xs text-muted-foreground text-center mt-3">No attendance records for this date</p>
+        )}
       </div>
 
       {/* Chart + Management */}
