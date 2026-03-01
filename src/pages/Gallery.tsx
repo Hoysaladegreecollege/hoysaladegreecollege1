@@ -43,24 +43,10 @@ export default function Gallery() {
 
   const openLightbox = useCallback((index: number) => {
     setLightboxIdx(index);
-    document.body.style.overflow = "hidden";
-    document.documentElement.style.overflow = "hidden";
   }, []);
 
   const closeLightbox = useCallback(() => {
     setLightboxIdx(null);
-    document.body.style.overflow = "";
-    document.documentElement.style.overflow = "";
-    document.body.style.removeProperty("overflow");
-    document.documentElement.style.removeProperty("overflow");
-  }, []);
-
-  // Cleanup on unmount to ensure scroll is always restored
-  useEffect(() => {
-    return () => {
-      document.body.style.removeProperty("overflow");
-      document.documentElement.style.removeProperty("overflow");
-    };
   }, []);
 
   const goNext = useCallback(() => {
@@ -144,15 +130,15 @@ export default function Gallery() {
       {/* Full-screen Lightbox - viewport centered */}
       {lightboxIdx !== null && (
         <div
-          className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center animate-fade-in"
+          className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center animate-fade-in pointer-events-auto"
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
           onClick={closeLightbox}
           role="dialog"
           aria-modal="true"
           aria-label="Image lightbox"
         >
-          {/* Image container with relative close button */}
           <div
-            className="relative flex flex-col items-center max-w-[90vw] sm:max-w-[80vw] max-h-[90vh]"
+            className="relative flex flex-col items-center w-[92vw] sm:max-w-[80vw]"
             onClick={(e) => e.stopPropagation()}
             onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
             onTouchEnd={(e) => {
@@ -164,9 +150,9 @@ export default function Gallery() {
               setTouchStartX(null);
             }}
           >
-            {/* Close button - positioned at top-right of image */}
+            {/* Close button */}
             <button
-              className="absolute -top-2 -right-2 sm:top-0 sm:right-0 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 z-20 shadow-lg border border-white/10"
+              className="absolute -top-12 right-0 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 z-20 shadow-lg border border-white/10"
               onClick={(e) => { e.stopPropagation(); closeLightbox(); }}
               aria-label="Close lightbox"
             >
@@ -175,14 +161,14 @@ export default function Gallery() {
 
             {/* Nav buttons */}
             <button
-              className="absolute left-0 sm:-left-14 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/25 transition-colors z-20"
+              className="absolute left-2 sm:-left-14 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/25 transition-colors z-20"
               onClick={(e) => { e.stopPropagation(); goPrev(); }}
               aria-label="Previous image"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
-              className="absolute right-0 sm:-right-14 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/25 transition-colors z-20"
+              className="absolute right-2 sm:-right-14 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/25 transition-colors z-20"
               onClick={(e) => { e.stopPropagation(); goNext(); }}
               aria-label="Next image"
             >
@@ -193,11 +179,11 @@ export default function Gallery() {
             <img
               src={(filtered[lightboxIdx] as any).image_url}
               alt={(filtered[lightboxIdx] as any).title}
-              className="max-w-full max-h-[72vh] object-contain rounded-2xl shadow-2xl animate-scale-bounce"
+              className="w-full max-h-[70vh] object-contain rounded-2xl shadow-2xl animate-scale-bounce"
               key={lightboxIdx}
             />
             {/* Caption */}
-            <div className="mt-4 text-center bg-black/40 backdrop-blur-sm px-6 py-3 rounded-xl border border-white/10">
+            <div className="mt-3 text-center bg-black/40 backdrop-blur-sm px-6 py-3 rounded-xl border border-white/10">
               <p className="font-display text-base sm:text-lg font-bold text-white">{(filtered[lightboxIdx] as any).title}</p>
               <p className="font-body text-xs text-white/60 mt-1">{(filtered[lightboxIdx] as any).category} • {lightboxIdx + 1} / {filtered.length}</p>
             </div>
