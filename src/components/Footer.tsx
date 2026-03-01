@@ -18,9 +18,14 @@ const MAPS_LINK = "https://maps.app.goo.gl/nqvvEX7kgB7wQVKb7";
 
 export default function Footer() {
   const [showTop, setShowTop] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
-    const onScroll = () => setShowTop(window.scrollY > 400);
+    const onScroll = () => {
+      setShowTop(window.scrollY > 400);
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      setScrollProgress(docHeight > 0 ? Math.min(window.scrollY / docHeight, 1) : 0);
+    };
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -176,10 +181,21 @@ export default function Footer() {
       {/* Back to top */}
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className={`fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-40 w-10 h-10 rounded-xl bg-primary border border-primary-foreground/15 flex items-center justify-center text-primary-foreground shadow-lg hover:bg-secondary hover:text-primary hover:scale-110 transition-all duration-300 ${showTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"}`}
+        className={`fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-40 w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group/top ${showTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6 pointer-events-none"}`}
         aria-label="Back to top"
       >
-        <ArrowUp className="w-4 h-4" />
+        {/* Scroll progress ring */}
+        <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 48 48">
+          <circle cx="24" cy="24" r="21" fill="none" stroke="hsl(var(--border))" strokeWidth="2" className="opacity-30" />
+          <circle cx="24" cy="24" r="21" fill="none" stroke="hsl(var(--gold))" strokeWidth="2"
+            strokeDasharray={`${2 * Math.PI * 21}`}
+            strokeDashoffset={`${2 * Math.PI * 21 * (1 - scrollProgress)}`}
+            strokeLinecap="round"
+            className="transition-all duration-200" />
+        </svg>
+        {/* Button bg */}
+        <span className="absolute inset-[3px] rounded-[13px] bg-card border border-border/50 group-hover/top:border-[hsl(var(--gold))]/30 group-hover/top:shadow-[0_0_16px_hsl(var(--gold)/0.15)] transition-all duration-300" />
+        <ArrowUp className="w-4 h-4 relative text-foreground group-hover/top:text-[hsl(var(--gold))] group-hover/top:-translate-y-0.5 transition-all duration-300" />
       </button>
     </footer>
   );
