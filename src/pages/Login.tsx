@@ -133,8 +133,6 @@ export default function Login() {
             {/* Logo */}
             <div className="text-center mb-10">
               <div className="relative inline-flex items-center justify-center mb-6">
-                {/* Pulsing glow ring */}
-                <div className="absolute -inset-4 rounded-[22px] login-logo-glow" />
                 <div className="relative w-[76px] h-[76px] rounded-[20px] overflow-hidden border border-white/[0.08]"
                   style={{ boxShadow: "0 12px 40px hsla(42, 87%, 55%, 0.1), inset 0 1px 0 rgba(255,255,255,0.06)" }}>
                   <img src={collegeLogo} alt="Hoysala Degree College Logo" className="w-full h-full object-contain" />
@@ -215,7 +213,15 @@ export default function Login() {
                 </div>
               </div>
 
-              <div className="pt-2 login-field-enter" style={{ animationDelay: "0.25s" }}>
+              {!canSignup && (
+                <div className="flex justify-end login-field-enter" style={{ animationDelay: "0.22s" }}>
+                  <Link to="/forgot-password" className="font-body text-[11px] text-white/30 hover:text-secondary/60 transition-colors duration-300">
+                    Forgot password?
+                  </Link>
+                </div>
+              )}
+
+              <div className="pt-1 login-field-enter" style={{ animationDelay: "0.25s" }}>
                 <button
                   type="submit"
                   disabled={loading}
@@ -349,15 +355,7 @@ export default function Login() {
           40% { transform: translateX(100%); }
         }
 
-        .login-logo-glow {
-          background: conic-gradient(from 220deg, hsla(42, 87%, 55%, 0.15), hsla(42, 60%, 40%, 0.08), hsla(42, 87%, 55%, 0.15));
-          animation: loginLogoGlow 5s linear infinite;
-        }
-        @keyframes loginLogoGlow {
-          0% { opacity: 0.3; transform: rotate(0deg) scale(1); }
-          50% { opacity: 0.6; transform: rotate(180deg) scale(1.05); }
-          100% { opacity: 0.3; transform: rotate(360deg) scale(1); }
-        }
+        /* logo glow removed */
 
         .login-card-enter {
           animation: loginCardIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
