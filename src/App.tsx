@@ -31,6 +31,7 @@ const AddOnCourses = lazy(() => import("./pages/AddOnCourses"));
 const ApplicationStatus = lazy(() => import("./pages/ApplicationStatus"));
 const Gallery = lazy(() => import("./pages/Gallery"));
 const PreviousYearPapers = lazy(() => import("./pages/PreviousYearPapers"));
+const DownloadApp = lazy(() => import("./pages/Download"));
 
 // Lazy load student dashboard
 const StudentDashboard = lazy(() => import("./pages/dashboard/StudentDashboard"));
@@ -136,6 +137,7 @@ const App = () => (
               <Route path="/application-status" element={<SuspenseWrap><ApplicationStatus /></SuspenseWrap>} />
               <Route path="/previous-year-papers" element={<SuspenseWrap><PreviousYearPapers /></SuspenseWrap>} />
               <Route path="/gallery" element={<SuspenseWrap><Gallery /></SuspenseWrap>} />
+              <Route path="/download" element={<SuspenseWrap><DownloadApp /></SuspenseWrap>} />
             </Route>
 
             <Route path="/login" element={<SuspenseWrap><Login /></SuspenseWrap>} />
