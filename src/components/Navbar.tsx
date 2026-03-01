@@ -59,9 +59,9 @@ export default function Navbar() {
   const progress = Math.min(scrollY / 300, 1);
 
   return (
-    <header className={`sticky top-0 z-50 transition-all duration-500 ${scrolled
-      ? "bg-card shadow-sm border-b border-border"
-      : "bg-card border-b border-border/40"
+    <header className={`sticky top-0 z-50 transition-all duration-500 border-b ${scrolled
+      ? "bg-card/80 backdrop-blur-xl backdrop-saturate-150 shadow-[0_1px_3px_rgba(0,0,0,0.08)] border-border/50"
+      : "bg-card/60 backdrop-blur-lg backdrop-saturate-125 border-border/20"
     }`}>
 
       {/* Scroll progress bar */}
