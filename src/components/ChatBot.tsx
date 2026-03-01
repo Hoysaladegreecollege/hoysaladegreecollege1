@@ -123,18 +123,8 @@ export default function ChatBot() {
         >
           {/* Premium Header */}
           <div
-            className="relative px-5 py-4 flex items-center justify-between shrink-0 overflow-hidden"
-            style={{
-              background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.85), hsl(var(--gold) / 0.9))",
-            }}
+            className="relative px-5 py-4 flex items-center justify-between shrink-0 bg-primary"
           >
-            {/* Subtle shimmer overlay */}
-            <div className="absolute inset-0 opacity-10"
-              style={{
-                background: "linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.15) 45%, transparent 60%)",
-                animation: "shimmer 4s ease-in-out infinite",
-              }}
-            />
             <div className="flex items-center gap-3 relative z-10">
               <div
                 className="w-10 h-10 rounded-2xl flex items-center justify-center"
