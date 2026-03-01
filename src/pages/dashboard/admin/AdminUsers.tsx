@@ -72,6 +72,7 @@ export default function AdminUsers() {
       if (roll_number) studentUpdate.roll_number = roll_number;
       if (semester) studentUpdate.semester = parseInt(semester);
       if (parent_phone !== undefined) studentUpdate.parent_phone = parent_phone;
+      if (phone !== undefined) studentUpdate.phone = phone;
       if (address !== undefined) studentUpdate.address = address;
       if (date_of_birth) studentUpdate.date_of_birth = date_of_birth;
       if (course_id) studentUpdate.course_id = course_id;
@@ -136,9 +137,9 @@ export default function AdminUsers() {
 
       // Update student record
       const yearLevel = parseInt(newStudent.year_level) || 1;
-      const semFromYear: Record<number, number> = { 1: 1, 2: 3, 3: 5 };
+      const semesterVal = parseInt(newStudent.semester) || 1;
       const updateData: any = {
-        semester: semFromYear[yearLevel] || 1,
+        semester: semesterVal,
         year_level: yearLevel,
         admission_year: parseInt(newStudent.admission_year),
         parent_phone: newStudent.parent_phone,
@@ -275,6 +276,17 @@ export default function AdminUsers() {
                 <option value="1">1st Year</option>
                 <option value="2">2nd Year</option>
                 <option value="3">3rd Year</option>
+              </select>
+            </div>
+            <div>
+              <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Semester *</label>
+              <select value={newStudent.semester} onChange={(e) => setNewStudent({ ...newStudent, semester: e.target.value })} required className={inputClass}>
+                <option value="1">Semester 1</option>
+                <option value="2">Semester 2</option>
+                <option value="3">Semester 3</option>
+                <option value="4">Semester 4</option>
+                <option value="5">Semester 5</option>
+                <option value="6">Semester 6</option>
               </select>
             </div>
             <div>
