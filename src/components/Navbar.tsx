@@ -69,36 +69,42 @@ export default function Navbar() {
         style={{ width: `${progress * 100}%`, opacity: progress > 0 ? 1 : 0 }} />
 
       {/* Top bar — premium */}
-      <div className="relative bg-gradient-to-r from-[hsl(230,18%,8%)] via-[hsl(228,16%,10%)] to-[hsl(230,18%,8%)] text-white py-2.5 overflow-hidden">
+      <div className="relative text-white py-3 overflow-hidden" style={{ background: "linear-gradient(100deg, hsl(230,20%,6%) 0%, hsl(228,18%,9%) 40%, hsl(230,16%,7%) 100%)" }}>
+        {/* Noise texture overlay */}
+        <div className="absolute inset-0 opacity-[0.015]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }} />
         {/* Animated shimmer sweep */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent animate-[shimmer_5s_linear_infinite]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent animate-[shimmer_8s_linear_infinite]" />
         {/* Floating ambient orbs */}
-        <div className="absolute -top-6 left-[10%] w-24 h-24 rounded-full bg-[hsl(var(--gold))]/[0.06] blur-2xl animate-float" />
-        <div className="absolute -bottom-4 right-[15%] w-20 h-20 rounded-full bg-[hsl(var(--gold))]/[0.04] blur-2xl animate-float animation-delay-300" />
-        {/* Top gold accent line */}
-        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[hsl(var(--gold))]/25 to-transparent" />
-        {/* Bottom gold accent line */}
-        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[hsl(var(--gold))]/15 to-transparent" />
+        <div className="absolute -top-8 left-[8%] w-32 h-32 rounded-full blur-3xl animate-float" style={{ background: "radial-gradient(circle, hsla(42,87%,55%,0.05), transparent 70%)" }} />
+        <div className="absolute -bottom-6 right-[12%] w-28 h-28 rounded-full blur-3xl animate-float" style={{ background: "radial-gradient(circle, hsla(42,60%,45%,0.03), transparent 70%)", animationDelay: "2s" }} />
+        {/* Top accent line */}
+        <div className="absolute top-0 left-0 right-0 h-[0.5px]" style={{ background: "linear-gradient(90deg, transparent 5%, hsla(42,87%,55%,0.2) 30%, hsla(42,87%,55%,0.35) 50%, hsla(42,87%,55%,0.2) 70%, transparent 95%)" }} />
+        {/* Bottom separator */}
+        <div className="absolute bottom-0 left-0 right-0 h-[0.5px]" style={{ background: "linear-gradient(90deg, transparent 10%, hsla(0,0%,100%,0.06) 50%, transparent 90%)" }} />
 
-        <div className="container px-4 relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0">
-          <p className="font-display text-xs sm:text-sm font-bold tracking-wide text-center sm:text-left text-white animate-fade-in">
-            ಶ್ರೀಶಿರಡಿ ಸಾಯಿ ಎಜುಕೇಷನಲ್ ಟ್ರಸ್ಟ್ (ರಿ.)
-          </p>
-          <div className="flex items-center gap-3 sm:gap-4 flex-wrap justify-center sm:justify-end text-[10px] sm:text-xs animate-fade-in animation-delay-200">
-            <span className="text-[hsl(var(--gold))] font-semibold flex items-center gap-1.5 group">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[hsl(var(--gold))]/60" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[hsl(var(--gold))]" />
+        <div className="container px-4 relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-0">
+          <div className="text-center sm:text-left animate-fade-in">
+            <p className="font-display text-[11px] sm:text-[13px] font-bold tracking-[0.04em] text-white/90" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>
+              ಶ್ರೀಶಿರಡಿ ಸಾಯಿ ಎಜುಕೇಷನಲ್ ಟ್ರಸ್ಟ್ (ರಿ.)
+            </p>
+          </div>
+          <div className="flex items-center gap-3 sm:gap-5 flex-wrap justify-center sm:justify-end text-[10px] sm:text-[11px] animate-fade-in" style={{ animationDelay: "0.15s" }}>
+            <span className="flex items-center gap-2 font-medium tracking-wide" style={{ color: "hsl(42,87%,60%)" }}>
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-50" style={{ background: "hsl(42,87%,55%)" }} />
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5" style={{ background: "hsl(42,87%,55%)" }} />
               </span>
               Recognized by Govt. of Karnataka
             </span>
-            <span className="hidden sm:block w-px h-3.5 bg-white/10" />
-            <a href="tel:7676272167" className="text-white/50 hover:text-[hsl(var(--gold))] transition-all duration-300 hidden sm:inline-flex items-center gap-1.5 group hover:translate-y-[-1px]">
-              <Phone className="w-3 h-3 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300" /> 7676272167
+            <span className="hidden sm:block w-[0.5px] h-3 bg-white/[0.08]" />
+            <a href="tel:7676272167" className="text-white/40 hover:text-white/80 transition-all duration-400 hidden sm:inline-flex items-center gap-1.5 group hover:-translate-y-[0.5px]">
+              <Phone className="w-3 h-3 opacity-50 group-hover:opacity-100 transition-all duration-400" /> 
+              <span className="tracking-wide">7676272167</span>
             </a>
-            <span className="hidden sm:block w-px h-3.5 bg-white/10" />
-            <a href="mailto:principal.hoysaladegreecollege@gmail.com" className="text-white/50 hover:text-[hsl(var(--gold))] transition-all duration-300 hidden sm:inline-flex items-center gap-1.5 group hover:translate-y-[-1px]">
-              <Mail className="w-3 h-3 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300" /> Mail Us
+            <span className="hidden sm:block w-[0.5px] h-3 bg-white/[0.08]" />
+            <a href="mailto:principal.hoysaladegreecollege@gmail.com" className="text-white/40 hover:text-white/80 transition-all duration-400 hidden sm:inline-flex items-center gap-1.5 group hover:-translate-y-[0.5px]">
+              <Mail className="w-3 h-3 opacity-50 group-hover:opacity-100 transition-all duration-400" /> 
+              <span className="tracking-wide">Mail Us</span>
             </a>
           </div>
         </div>
