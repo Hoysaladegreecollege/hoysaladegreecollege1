@@ -174,55 +174,43 @@ export default function Navbar() {
           {/* Hamburger — premium toggle */}
           <button
             onClick={() => setOpen(!open)}
-            className="xl:hidden relative w-[40px] h-[40px] rounded-xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group/burger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-90"
+            className="xl:hidden relative w-11 h-11 rounded-xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group/burger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-90 bg-primary/10 dark:bg-white/[0.06] border border-primary/20 dark:border-white/10 hover:bg-primary/15 dark:hover:bg-white/10 hover:border-primary/30 dark:hover:border-white/15 hover:shadow-[0_0_16px_hsl(var(--primary)/0.15)] dark:hover:shadow-[0_0_16px_hsl(var(--gold)/0.1)]"
             aria-label="Toggle menu"
             style={{
-              background: open
-                ? "linear-gradient(135deg, hsl(var(--primary)), hsl(230,18%,14%))"
-                : "linear-gradient(135deg, hsl(230,18%,14%), hsl(230,16%,18%))",
-              boxShadow: open
-                ? "0 2px 12px hsl(var(--primary) / 0.3), inset 0 1px 0 rgba(255,255,255,0.06)"
-                : "0 1px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04), 0 0 8px rgba(198,167,94,0.04)",
-              border: open ? "1px solid hsl(var(--primary) / 0.3)" : "1px solid rgba(255,255,255,0.06)",
+              ...(open ? {
+                background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.7))",
+                borderColor: "hsl(var(--primary) / 0.4)",
+                boxShadow: "0 0 20px hsl(var(--primary) / 0.25), inset 0 1px 0 rgba(255,255,255,0.1)",
+              } : {}),
             }}
           >
-            {/* Ambient glow */}
-            <span
-              className="absolute inset-0 rounded-xl transition-opacity duration-500"
-              style={{
-                background: open
-                  ? "radial-gradient(circle at center, hsl(var(--primary) / 0.15), transparent 70%)"
-                  : "radial-gradient(circle at center, hsl(var(--gold) / 0.06), transparent 70%)",
-                opacity: open ? 1 : 0,
-              }}
-            />
             {/* Animated bars → X */}
             <div className="relative w-[18px] h-[14px] mx-auto">
               <span
-                className="absolute left-0 h-[1.5px] rounded-full transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                className="absolute left-0 h-[2px] rounded-full transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
                 style={{
                   width: open ? 18 : 18,
                   top: open ? 6 : 0,
                   transform: open ? "rotate(45deg)" : "rotate(0)",
-                  background: open ? "hsl(var(--gold))" : "hsl(var(--foreground) / 0.7)",
+                  background: open ? "white" : "hsl(var(--foreground))",
                 }}
               />
               <span
-                className="absolute left-0 top-[6px] h-[1.5px] rounded-full transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                className="absolute left-0 top-[6px] h-[2px] rounded-full transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
                 style={{
                   width: open ? 0 : 12,
-                  opacity: open ? 0 : 1,
+                  opacity: open ? 0 : 0.7,
                   transform: open ? "translateX(8px)" : "translateX(0)",
-                  background: "hsl(var(--gold) / 0.5)",
+                  background: "hsl(var(--foreground))",
                 }}
               />
               <span
-                className="absolute left-0 h-[1.5px] rounded-full transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                className="absolute left-0 h-[2px] rounded-full transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
                 style={{
                   width: open ? 18 : 15,
                   top: open ? 6 : 12,
                   transform: open ? "rotate(-45deg)" : "rotate(0)",
-                  background: open ? "hsl(var(--gold))" : "hsl(var(--foreground) / 0.5)",
+                  background: open ? "white" : "hsl(var(--foreground) / 0.6)",
                 }}
               />
             </div>
