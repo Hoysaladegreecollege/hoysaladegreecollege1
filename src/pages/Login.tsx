@@ -94,22 +94,22 @@ export default function Login() {
       <div className="absolute inset-0 opacity-[0.035]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")" }} />
 
       {/* Radial spotlight — muted gold */}
-      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-[0.05]"
+      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] rounded-full opacity-[0.05]"
         style={{ background: "radial-gradient(circle, hsl(42 87% 55%), transparent 70%)" }} />
 
-      {/* Floating orbs — warm amber */}
-      <div className="absolute top-[15%] left-[10%] w-[300px] h-[300px] rounded-full opacity-[0.03] animate-float"
+      {/* Floating orbs — warm amber (hidden on small screens) */}
+      <div className="absolute top-[15%] left-[10%] w-[300px] h-[300px] rounded-full opacity-[0.03] animate-float hidden sm:block"
         style={{ background: "radial-gradient(circle, hsl(42 80% 60%), transparent 60%)", animationDuration: "8s" }} />
-      <div className="absolute bottom-[10%] right-[8%] w-[250px] h-[250px] rounded-full opacity-[0.025] animate-float"
+      <div className="absolute bottom-[10%] right-[8%] w-[250px] h-[250px] rounded-full opacity-[0.025] animate-float hidden sm:block"
         style={{ background: "radial-gradient(circle, hsl(42 70% 50%), transparent 60%)", animationDuration: "10s", animationDelay: "2s" }} />
 
-      <div className="relative z-10 w-full max-w-[440px] mx-4 login-card-enter">
+      <div className="relative z-10 w-full max-w-[440px] px-4 sm:mx-4 login-card-enter">
 
         {/* Main glassmorphism card */}
         <div
           ref={cardRef}
           onMouseMove={handleMouseMove}
-          className="relative rounded-[28px] overflow-hidden"
+          className="relative rounded-[20px] sm:rounded-[28px] overflow-hidden"
           style={{
             background: "linear-gradient(165deg, rgba(14, 16, 22, 0.92), rgba(20, 24, 36, 0.96))",
             boxShadow: "0 40px 80px -20px rgba(0,0,0,0.7), 0 0 0 1px hsla(42, 87%, 55%, 0.06), 0 0 80px -20px hsla(42, 87%, 55%, 0.04), inset 0 1px 0 rgba(255,255,255,0.04)",
@@ -128,38 +128,38 @@ export default function Login() {
             <div className="absolute inset-0 login-shimmer-bar" />
           </div>
 
-          <div className="px-9 pt-11 pb-9 sm:px-11 relative z-10">
+          <div className="px-6 pt-8 pb-7 sm:px-9 sm:pt-11 sm:pb-9 relative z-10">
 
             {/* Logo */}
-            <div className="text-center mb-10">
-              <div className="relative inline-flex items-center justify-center mb-6">
-                <div className="relative w-[76px] h-[76px] rounded-[20px] overflow-hidden border border-white/[0.08]"
+            <div className="text-center mb-7 sm:mb-10">
+              <div className="relative inline-flex items-center justify-center mb-4 sm:mb-6">
+                <div className="relative w-[60px] h-[60px] sm:w-[76px] sm:h-[76px] rounded-[16px] sm:rounded-[20px] overflow-hidden border border-white/[0.08]"
                   style={{ boxShadow: "0 12px 40px hsla(42, 87%, 55%, 0.1), inset 0 1px 0 rgba(255,255,255,0.06)" }}>
                   <img src={collegeLogo} alt="Hoysala Degree College Logo" className="w-full h-full object-contain" />
                 </div>
               </div>
 
-              <h1 className="font-display text-[24px] font-bold text-white tracking-tight leading-tight">
+              <h1 className="font-display text-[20px] sm:text-[24px] font-bold text-white tracking-tight leading-tight">
                 {canSignup ? "Create Account" : "Welcome Back"}
               </h1>
-              <p className="font-body text-[13px] text-white/35 mt-2.5 tracking-wide font-light">
+              <p className="font-body text-[12px] sm:text-[13px] text-white/35 mt-2 sm:mt-2.5 tracking-wide font-light">
                 {canSignup ? "Register a new user on the portal" : "Sign in to your college portal"}
               </p>
             </div>
 
             {/* Role selection for signup */}
             {canSignup && (
-              <div className="mb-8">
-                <label className="font-body text-[10px] font-semibold text-white/40 block mb-3 uppercase tracking-[0.18em]">Account Type</label>
-                <div className="grid grid-cols-4 gap-2">
+              <div className="mb-6 sm:mb-8">
+                <label className="font-body text-[10px] font-semibold text-white/40 block mb-2.5 sm:mb-3 uppercase tracking-[0.18em]">Account Type</label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {roles.map((r) => (
                     <button key={r.value} type="button" onClick={() => setRole(r.value)}
-                      className={`group p-3.5 rounded-2xl border text-center transition-all duration-400 font-body text-[11px] ${
+                      className={`group p-3 sm:p-3.5 rounded-2xl border text-center transition-all duration-400 font-body text-[11px] ${
                         role === r.value
                           ? "border-secondary/30 bg-secondary/10 text-secondary font-bold shadow-[0_0_20px_-4px_hsla(42,87%,55%,0.15)]"
                           : "border-white/[0.04] text-white/30 hover:border-secondary/10 hover:bg-secondary/[0.03] hover:text-white/50"
                       }`}>
-                      <div className="text-lg mb-1.5 transition-transform duration-300 group-hover:scale-110">{r.icon}</div>
+                      <div className="text-lg mb-1 sm:mb-1.5 transition-transform duration-300 group-hover:scale-110">{r.icon}</div>
                       <div>{r.label}</div>
                     </button>
                   ))}
@@ -167,7 +167,7 @@ export default function Login() {
               </div>
             )}
 
-            <form className="space-y-5" onSubmit={handleSubmit}>
+            <form className="space-y-4 sm:space-y-5" onSubmit={handleSubmit}>
               {canSignup && (
                 <div className="login-field-enter" style={{ animationDelay: "0.1s" }}>
                   <label className="font-body text-[10px] font-semibold text-white/35 block mb-2.5 uppercase tracking-[0.18em]">Full Name</label>
@@ -246,21 +246,21 @@ export default function Login() {
             </form>
 
             {/* Trust bar */}
-            <div className="flex items-center justify-center gap-5 mt-8 pt-7 border-t border-white/[0.04]">
+            <div className="flex items-center justify-center gap-4 sm:gap-5 mt-6 sm:mt-8 pt-5 sm:pt-7 border-t border-white/[0.04]">
               {[
                 { icon: Shield, label: "256-bit SSL" },
                 { icon: Fingerprint, label: "Secure Auth" },
                 { icon: Lock, label: "Encrypted" },
               ].map(({ icon: Icon, label }) => (
-              <div key={label} className="flex items-center gap-1.5 text-white/20 group cursor-default">
+              <div key={label} className="flex items-center gap-1 sm:gap-1.5 text-white/20 group cursor-default">
                   <Icon className="w-3 h-3 group-hover:text-secondary/40 transition-colors duration-300" />
-                  <span className="font-body text-[10px] group-hover:text-white/30 transition-colors duration-300">{label}</span>
+                  <span className="font-body text-[9px] sm:text-[10px] group-hover:text-white/30 transition-colors duration-300">{label}</span>
                 </div>
               ))}
             </div>
 
             {/* Back link */}
-            <div className="text-center mt-5">
+            <div className="text-center mt-4 sm:mt-5">
               <Link to="/" className="font-body text-[11px] text-white/20 hover:text-secondary/50 transition-all duration-300 inline-flex items-center gap-1.5 group">
                 <ArrowLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform duration-300" />
                 Back to Website
@@ -270,7 +270,7 @@ export default function Login() {
         </div>
 
         {/* Footer */}
-        <p className="text-center font-body text-[10px] text-white/10 mt-7 tracking-wider">
+        <p className="text-center font-body text-[10px] text-white/10 mt-5 sm:mt-7 tracking-wider px-4">
           Hoysala Degree College · Affiliated to Bangalore University
         </p>
       </div>
@@ -281,7 +281,7 @@ export default function Login() {
         .login-input {
           width: 100%;
           border-radius: 16px;
-          padding: 14px 16px;
+          padding: 12px 14px;
           font-family: 'Inter', system-ui, sans-serif;
           font-size: 13px;
           line-height: 1.2;
@@ -309,8 +309,8 @@ export default function Login() {
 
         .login-submit-btn {
           position: relative;
-          padding: 16px 24px;
-          border-radius: 16px;
+          padding: 14px 20px;
+          border-radius: 14px;
           border: none;
           cursor: pointer;
           overflow: hidden;
