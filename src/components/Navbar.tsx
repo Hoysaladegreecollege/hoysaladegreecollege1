@@ -153,17 +153,25 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           <DarkModeToggle />
           <Link to="/login" className="hidden xl:block">
-            <button className="relative group overflow-hidden px-6 py-2.5 rounded-full font-body text-xs font-bold tracking-wider uppercase text-white shadow-[0_0_20px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_30px_hsl(var(--primary)/0.5)] hover:scale-105 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-400 border border-white/10 hover:border-white/20"
-              style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(230,20%,12%))" }}>
-              {/* Animated shimmer sweep */}
-              <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-              {/* Inner glow top edge */}
-              <span className="absolute top-0 left-[20%] right-[20%] h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-              {/* Gold accent bottom */}
-              <span className="absolute bottom-0 left-[30%] right-[30%] h-px bg-gradient-to-r from-transparent via-[hsl(var(--gold))]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <button className="relative group overflow-hidden px-7 py-2.5 rounded-[14px] font-body text-[11px] font-semibold tracking-[0.08em] uppercase transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.03] hover:-translate-y-[1px] active:scale-[0.97]"
+              style={{
+                background: "linear-gradient(160deg, hsla(0,0%,100%,0.12) 0%, hsla(0,0%,100%,0.04) 100%)",
+                backdropFilter: "blur(20px) saturate(1.8)",
+                WebkitBackdropFilter: "blur(20px) saturate(1.8)",
+                border: "1px solid hsla(0,0%,100%,0.12)",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.2), inset 0 1px 0 hsla(0,0%,100%,0.08), 0 0 0 0.5px hsla(0,0%,0%,0.15)",
+                color: "hsla(0,0%,100%,0.92)",
+              }}>
+              {/* Shimmer sweep */}
+              <span className="absolute inset-0 rounded-[14px] bg-gradient-to-r from-white/0 via-white/[0.07] to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-[800ms] ease-out" />
+              {/* Top highlight */}
+              <span className="absolute top-0 left-[15%] right-[15%] h-[0.5px] bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+              {/* Hover glow */}
+              <span className="absolute inset-0 rounded-[14px] opacity-0 group-hover:opacity-100 transition-opacity duration-500" 
+                style={{ boxShadow: "inset 0 0 20px hsla(0,0%,100%,0.04), 0 4px 16px rgba(0,0,0,0.2)" }} />
               <span className="relative flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5 group-hover:rotate-12 group-hover:scale-110 transition-all duration-400 text-[hsl(var(--gold))]" />
-                Login
+                <Sparkles className="w-3 h-3 opacity-60 group-hover:opacity-100 group-hover:rotate-12 transition-all duration-500 text-[hsl(var(--gold))]" />
+                Sign In
               </span>
             </button>
           </Link>
