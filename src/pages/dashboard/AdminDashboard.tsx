@@ -165,6 +165,35 @@ export default function AdminDashboard() {
     },
   });
 
+  // Semester-wise fee collection breakdown
+  const { data: semFeeData = [] } = useQuery({
+    queryKey: ["admin-semester-fee-breakdown"],
+    queryFn: async () => {
+      const { data: payments } = await supabase.from("fee_payments").select("semester, amount");
+      const { data: students } = await supabase.from("students").select("semester, total_fee, fee_paid").eq("is_active", true);
+      if (!payments && !students) return [];
+      const semData: Record<number, { collected: number; pending: number; total: number }> = {};
+      [1,2,3,4,5,6].forEach(s => { semData[s] = { collected: 0, pending: 0, total: 0 }; });
+      (payments || []).forEach((p: any) => {
+        const sem = p.semester || 1;
+        if (semData[sem]) semData[sem].collected += Number(p.amount) || 0;
+      });
+      (students || []).forEach((s: any) => {
+        const sem = s.semester || 1;
+        if (semData[sem]) {
+          semData[sem].total += Number(s.total_fee) || 0;
+          semData[sem].pending += Math.max(0, (Number(s.total_fee) || 0) - (Number(s.fee_paid) || 0));
+        }
+      });
+      return [1,2,3,4,5,6].map(s => ({
+        name: `Sem ${s}`,
+        collected: semData[s].collected,
+        pending: semData[s].pending,
+        total: semData[s].total,
+      }));
+    },
+  });
+
   // Recent Activity Feed
   const { data: recentActivity = [] } = useQuery({
     queryKey: ["admin-recent-activity"],
@@ -647,6 +676,45 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Semester-wise Fee Collection Chart */}
+      {semFeeData.some((s: any) => s.collected > 0 || s.pending > 0 || s.total > 0) && (
+        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+          <div className="flex items-center gap-2 mb-5">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+              <IndianRupee className="w-4 h-4 text-emerald-500" />
+            </div>
+            <h3 className="font-body text-[14px] font-semibold text-foreground">Semester-wise Fee Collection</h3>
+          </div>
+          <div className="h-56">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={semFeeData} barGap={4}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `₹${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} />
+                <Tooltip contentStyle={{ borderRadius: 16, fontFamily: "Inter", fontSize: 12, border: "1px solid hsl(var(--border))", background: "hsl(var(--card))", color: "hsl(var(--foreground))", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }} formatter={(value: number) => [`₹${value.toLocaleString()}`, undefined]} />
+                <Legend wrapperStyle={{ fontSize: 11, fontFamily: "Inter" }} />
+                <Bar dataKey="collected" name="Collected" fill="hsl(145, 65%, 42%)" radius={[6, 6, 0, 0]} barSize={28} />
+                <Bar dataKey="pending" name="Pending" fill="hsl(0, 70%, 58%)" radius={[6, 6, 0, 0]} barSize={28} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="grid grid-cols-3 gap-3 mt-4">
+            <div className="bg-muted/30 rounded-xl p-3 text-center">
+              <p className="font-body text-lg font-bold text-foreground tabular-nums">₹{semFeeData.reduce((s: number, d: any) => s + d.total, 0).toLocaleString()}</p>
+              <p className="font-body text-[10px] text-muted-foreground">Total Fees</p>
+            </div>
+            <div className="bg-emerald-500/5 rounded-xl p-3 text-center">
+              <p className="font-body text-lg font-bold text-emerald-600 tabular-nums">₹{semFeeData.reduce((s: number, d: any) => s + d.collected, 0).toLocaleString()}</p>
+              <p className="font-body text-[10px] text-muted-foreground">Total Collected</p>
+            </div>
+            <div className="bg-red-500/5 rounded-xl p-3 text-center">
+              <p className="font-body text-lg font-bold text-red-500 tabular-nums">₹{semFeeData.reduce((s: number, d: any) => s + d.pending, 0).toLocaleString()}</p>
+              <p className="font-body text-[10px] text-muted-foreground">Total Pending</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Quick Actions */}
       <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
