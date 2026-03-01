@@ -100,8 +100,8 @@ export default function ChatBot() {
           <span
             className="relative w-14 h-14 sm:w-[60px] sm:h-[60px] rounded-full flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-500 group-hover:scale-110 group-active:scale-95"
             style={{
-              background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--gold)))",
-              boxShadow: "0 8px 32px hsla(var(--primary), 0.3), 0 2px 8px hsla(var(--gold), 0.2)",
+              background: "hsl(var(--primary))",
+              boxShadow: "0 8px 32px hsla(var(--primary), 0.3)",
               animation: "chatbot-float 4.5s ease-in-out infinite",
             }}
           >
