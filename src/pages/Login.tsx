@@ -185,7 +185,7 @@ export default function Login() {
                     <User className={`absolute left-4 top-1/2 -translate-y-1/2 w-[15px] h-[15px] transition-all duration-400 ${focused === "fullName" ? "text-secondary" : "text-white/15"}`} />
                     <input
                       value={fullName} onChange={(e) => setFullName(e.target.value)}
-                      className={`login-input pl-11 ${focused === "fullName" ? "login-input-focused" : ""}`}
+                      className={`login-input pl-12 ${focused === "fullName" ? "login-input-focused" : ""}`}
                       placeholder="Enter full name"
                       onFocus={() => setFocused("fullName")} onBlur={() => setFocused(null)}
                     />
@@ -199,7 +199,7 @@ export default function Login() {
                   <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 w-[15px] h-[15px] transition-all duration-400 ${focused === "email" ? "text-secondary" : "text-white/15"}`} />
                   <input
                     type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                    className={`login-input pl-11 ${focused === "email" ? "login-input-focused" : ""}`}
+                    className={`login-input pl-12 ${focused === "email" ? "login-input-focused" : ""}`}
                     placeholder="you@example.com"
                     onFocus={() => setFocused("email")} onBlur={() => setFocused(null)}
                   />
@@ -212,7 +212,7 @@ export default function Login() {
                   <Lock className={`absolute left-4 top-1/2 -translate-y-1/2 w-[15px] h-[15px] transition-all duration-400 ${focused === "password" ? "text-secondary" : "text-white/15"}`} />
                   <input
                     type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)}
-                    className={`login-input pl-11 pr-12 ${focused === "password" ? "login-input-focused" : ""}`}
+                    className={`login-input pl-12 pr-12 ${focused === "password" ? "login-input-focused" : ""}`}
                     placeholder="Enter your password"
                     onFocus={() => setFocused("password")} onBlur={() => setFocused(null)}
                   />
@@ -295,17 +295,16 @@ export default function Login() {
         .login-input {
           width: 100%;
           border-radius: 16px;
-          padding: 12px 14px;
+          height: 48px;
+          padding: 0 14px;
           font-family: 'Inter', system-ui, sans-serif;
           font-size: 13px;
-          line-height: 1.2;
+          line-height: 48px;
           color: white;
           background: rgba(255, 255, 255, 0.03);
           border: 1px solid rgba(255, 255, 255, 0.05);
           outline: none;
           transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-          display: flex;
-          align-items: center;
         }
         .login-input::placeholder {
           color: rgba(148, 163, 184, 0.25);
