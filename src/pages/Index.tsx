@@ -291,33 +291,44 @@ export default function Index() {
 
       {/* Courses */}
       <section className="py-14 sm:py-28 bg-background relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/3 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/4 rounded-full blur-3xl pointer-events-none" />
+        {/* Ambient glow orbs */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[100px] pointer-events-none" style={{ background: "radial-gradient(circle, hsla(42,87%,55%,0.03), transparent 70%)" }} />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full blur-[80px] pointer-events-none" style={{ background: "radial-gradient(circle, hsla(var(--primary),0.04), transparent 70%)" }} />
         <div className="container px-5 sm:px-4 relative">
           <ScrollReveal>
             <SectionHeading title="Courses We Offer" subtitle="Choose from our carefully designed undergraduate programs & professional coaching" />
           </ScrollReveal>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5">
             {courses.map((c, i) =>
             <ScrollReveal key={c.name} delay={i * 80}>
-                <Link to="/courses">
+                <Link to="/courses" className="block h-full">
                   <div
-                  className="relative premium-card p-5 sm:p-7 cursor-pointer h-full group overflow-hidden border-glow active:scale-[0.98] transition-transform touch-manipulation"
+                  className="relative p-5 sm:p-7 cursor-pointer h-full group overflow-hidden rounded-2xl border border-border/40 bg-card active:scale-[0.97] touch-manipulation"
+                  style={{ transition: "all 0.6s cubic-bezier(0.16,1,0.3,1)", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
                   onMouseEnter={() => setHoveredCard(i)}
                   onMouseLeave={() => setHoveredCard(null)}>
 
-                    <div className={`absolute inset-0 bg-gradient-to-br ${c.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl`} />
-                    <div className="absolute top-0 left-4 right-4 h-0.5 bg-gradient-to-r from-transparent via-secondary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    {/* Hover background gradient */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${c.color} opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-2xl`} />
+                    
+                    {/* Top gold accent line */}
+                    <div className="absolute top-0 left-6 right-6 h-[0.5px] opacity-0 group-hover:opacity-100 transition-all duration-500" style={{ background: "linear-gradient(90deg, transparent, hsl(42 87% 55% / 0.4), transparent)" }} />
+                    
+                    {/* Shimmer sweep */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent translate-x-[-100%] group-hover:translate-x-[100%] rounded-2xl pointer-events-none" style={{ transition: "transform 0.9s ease" }} />
+                    
+                    {/* Hover border glow */}
+                    <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ boxShadow: "inset 0 0 0 1px hsla(42,87%,55%,0.12), 0 8px 32px rgba(0,0,0,0.08)" }} />
 
                     <div className="relative z-10">
-                      <div className="text-3xl sm:text-5xl mb-3 sm:mb-4 group-hover:scale-125 group-hover:-rotate-6 transition-all duration-400 inline-block filter group-hover:drop-shadow-lg">{c.icon}</div>
-                      <h3 className="font-display text-lg sm:text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">{c.name}</h3>
-                      <p className="font-body text-xs text-muted-foreground mt-1 sm:mt-1.5 font-medium">{c.full}</p>
+                      <div className="text-3xl sm:text-4xl mb-3 sm:mb-4 inline-block group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] filter group-hover:drop-shadow-lg">{c.icon}</div>
+                      <h3 className="font-display text-lg sm:text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-400">{c.name}</h3>
+                      <p className="font-body text-[11px] text-muted-foreground mt-1 sm:mt-1.5 font-medium tracking-wide uppercase opacity-60">{c.full}</p>
                       <p className="font-body text-sm text-muted-foreground mt-2 sm:mt-3 leading-relaxed line-clamp-2">{c.desc}</p>
                       <div className="mt-4 sm:mt-5 flex items-center justify-between">
-                        <span className="text-[10px] font-body text-secondary font-bold bg-secondary/10 px-3 py-1.5 rounded-full border border-secondary/20">{c.duration}</span>
-                        <span className="text-primary text-xs font-body font-semibold flex items-center gap-1 group-hover:gap-2 transition-all duration-300">
-                          Details <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                        <span className="text-[10px] font-body font-semibold px-3 py-1.5 rounded-full border transition-colors duration-300" style={{ color: "hsl(42,87%,55%)", background: "hsla(42,87%,55%,0.08)", borderColor: "hsla(42,87%,55%,0.15)" }}>{c.duration}</span>
+                        <span className="text-primary text-xs font-body font-semibold flex items-center gap-1 group-hover:gap-2 transition-all duration-400 opacity-60 group-hover:opacity-100">
+                          Details <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-400" />
                         </span>
                       </div>
                     </div>
