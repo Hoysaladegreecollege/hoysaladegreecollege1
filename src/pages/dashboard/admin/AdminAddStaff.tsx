@@ -171,7 +171,7 @@ export default function AdminAddStaff() {
               <div>
                 <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Password *</label>
                 <div className="relative">
-                  <input type={showPassword ? "text" : "password"} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required minLength={8} className={inputClass} placeholder={PASSWORD_REQUIREMENTS} />
+                  <input type={showPassword ? "text" : "password"} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required className={inputClass} placeholder={PASSWORD_REQUIREMENTS} />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
