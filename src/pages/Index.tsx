@@ -84,19 +84,26 @@ function useAnimatedCounter(target: number, duration = 2000) {
   return { count, ref };
 }
 
-function AnimatedStat({ value, label, icon: Icon, suffix = "" }: {value: number;label: string;icon: any;suffix?: string;}) {
+const statColors = [
+  { bg: "from-blue-500/20 to-cyan-500/10", border: "border-blue-400/20", text: "text-blue-400", glow: "group-hover:shadow-blue-500/20" },
+  { bg: "from-emerald-500/20 to-green-500/10", border: "border-emerald-400/20", text: "text-emerald-400", glow: "group-hover:shadow-emerald-500/20" },
+  { bg: "from-amber-500/20 to-yellow-500/10", border: "border-amber-400/20", text: "text-amber-400", glow: "group-hover:shadow-amber-500/20" },
+  { bg: "from-purple-500/20 to-violet-500/10", border: "border-purple-400/20", text: "text-purple-400", glow: "group-hover:shadow-purple-500/20" },
+];
+
+function AnimatedStat({ value, label, icon: Icon, suffix = "", index = 0 }: {value: number;label: string;icon: any;suffix?: string;index?: number;}) {
   const { count, ref } = useAnimatedCounter(value);
+  const color = statColors[index % statColors.length];
   return (
-    <div ref={ref} className="text-center text-primary-foreground group cursor-default">
-      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-primary-foreground/8 border border-primary-foreground/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-secondary/20 group-hover:border-secondary/40 group-hover:scale-110 transition-all duration-500 shadow-lg">
-        <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-secondary group-hover:rotate-12 transition-transform duration-500" />
+    <div ref={ref} className="text-center text-white group cursor-default">
+      <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br ${color.bg} border ${color.border} flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-all duration-500 shadow-lg ${color.glow} group-hover:shadow-xl`}>
+        <Icon className={`w-6 h-6 sm:w-7 sm:h-7 ${color.text} group-hover:rotate-12 transition-transform duration-500`} />
       </div>
       <div className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight group-hover:scale-105 transition-transform duration-300">
         {count}{suffix}
       </div>
-      <div className="font-body text-[10px] sm:text-xs opacity-50 mt-2 tracking-widest uppercase group-hover:opacity-80 transition-opacity duration-300">{label}</div>
+      <div className="font-body text-[10px] sm:text-xs text-white/40 mt-2 tracking-widest uppercase group-hover:text-white/70 transition-all duration-300">{label}</div>
     </div>);
-
 }
 
 export default function Index() {
@@ -259,12 +266,26 @@ export default function Index() {
       <InfoSlider />
 
       {/* Stats */}
-      <section className="bg-primary py-10 sm:py-16 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary to-navy-dark opacity-70" />
-        <div className="absolute inset-0 opacity-[0.04]"
-        style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
-        <div className="relative container grid grid-cols-2 md:grid-cols-4 gap-5 sm:gap-8 px-5 sm:px-4">
-          {stats.map((s, i) => <AnimatedStat key={i} value={s.value} label={s.label} icon={s.icon} suffix={s.suffix} />)}
+      <section className="py-10 sm:py-16 relative">
+        <div className="container px-5 sm:px-4">
+          <div className="relative rounded-3xl overflow-hidden py-12 sm:py-16 px-6 sm:px-10">
+            {/* Ultra-premium dark background */}
+            <div className="absolute inset-0" style={{ background: "linear-gradient(145deg, hsl(230,12%,7%), hsl(228,10%,4%), hsl(230,14%,8%))" }} />
+            {/* Subtle grid pattern */}
+            <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
+            {/* Top-left gold ambient */}
+            <div className="absolute -top-20 -left-20 w-[300px] h-[300px] bg-[hsl(var(--gold))]/[0.04] rounded-full blur-[80px] pointer-events-none" />
+            {/* Bottom-right subtle glow */}
+            <div className="absolute -bottom-20 -right-20 w-[250px] h-[250px] bg-[hsl(var(--gold))]/[0.03] rounded-full blur-[90px] pointer-events-none" />
+            {/* Top accent line */}
+            <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-[hsl(var(--gold))]/15 to-transparent" />
+            {/* Inner border glow */}
+            <div className="absolute inset-0 rounded-3xl border border-white/[0.06]" />
+
+            <div className="relative grid grid-cols-2 md:grid-cols-4 gap-5 sm:gap-8">
+              {stats.map((s, i) => <AnimatedStat key={i} value={s.value} label={s.label} icon={s.icon} suffix={s.suffix} index={i} />)}
+            </div>
+          </div>
         </div>
       </section>
 
