@@ -267,31 +267,41 @@ export default function Navbar() {
 
           {/* Quick contact */}
           <div>
-            <p className="font-body text-[10px] uppercase tracking-widest text-white/25 px-4 mb-2">Quick Contact</p>
-            <div className="flex gap-2 flex-wrap mb-4 px-1">
+            <p className="font-body text-[10px] uppercase tracking-widest text-muted-foreground/40 px-4 mb-3">Quick Contact</p>
+            <div className="flex gap-2.5 flex-wrap mb-5 px-1">
               {["7676272167", "7975344252"].map((num) => (
                 <a key={num} href={`tel:${num}`}
-                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] font-body text-sm text-white/60 hover:text-[hsl(var(--gold))] hover:border-[hsl(var(--gold))]/30 hover:bg-[hsl(var(--gold))]/[0.06] active:scale-[0.97] transition-all duration-300 touch-manipulation">
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl font-body text-sm text-foreground/70 hover:text-foreground active:scale-[0.97] transition-all duration-300 touch-manipulation"
+                  style={{
+                    background: "hsl(var(--muted) / 0.15)",
+                    border: "2px solid hsl(var(--border) / 0.25)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = "hsl(var(--primary) / 0.4)";
+                    e.currentTarget.style.background = "hsl(var(--primary) / 0.06)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "hsl(var(--border) / 0.25)";
+                    e.currentTarget.style.background = "hsl(var(--muted) / 0.15)";
+                  }}
+                >
                   <Phone className="w-3.5 h-3.5" /> {num}
                 </a>
               ))}
             </div>
             <Link to="/login" className="block px-1">
-              <button className="relative w-full group overflow-hidden px-6 py-4 rounded-2xl font-body text-sm font-semibold tracking-[0.12em] uppercase text-white active:scale-[0.97] transition-all duration-500 touch-manipulation border border-[hsl(var(--gold))]/30 hover:border-[hsl(var(--gold))]/50"
+              <button className="relative w-full group overflow-hidden px-6 py-4 rounded-2xl font-body text-sm font-semibold tracking-[0.1em] uppercase text-foreground active:scale-[0.97] transition-all duration-500 touch-manipulation"
                 style={{
-                  background: "linear-gradient(160deg, hsla(var(--gold), 0.12) 0%, hsl(var(--card)) 40%, hsl(var(--card)) 60%, hsla(var(--gold), 0.06) 100%)",
-                  boxShadow: "0 6px 28px rgba(0,0,0,0.3), 0 0 0 0.5px hsla(var(--gold), 0.1), inset 0 1px 0 rgba(255,255,255,0.04)",
+                  background: "hsl(var(--card))",
+                  border: "2px solid hsl(var(--primary) / 0.35)",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
                 }}>
                 {/* Shimmer sweep */}
-                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
-                {/* Top edge highlight */}
-                <span className="absolute top-0 left-[8%] right-[8%] h-px bg-gradient-to-r from-transparent via-[hsl(var(--gold))]/30 to-transparent" />
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
                 {/* Button content */}
                 <span className="relative flex items-center justify-center gap-3">
-                  <span className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "hsla(var(--gold), 0.1)", border: "1px solid hsla(var(--gold), 0.15)" }}>
-                    <Sparkles className="w-4 h-4 text-[hsl(var(--gold))] group-hover:rotate-12 transition-transform duration-500" />
-                  </span>
-                  <span className="text-white/90 group-hover:text-white transition-colors duration-300">Login to Portal</span>
+                  <Sparkles className="w-4 h-4 text-primary group-hover:rotate-12 transition-transform duration-500" />
+                  <span className="text-foreground/90 group-hover:text-foreground transition-colors duration-300">Login to Portal</span>
                 </span>
               </button>
             </Link>
