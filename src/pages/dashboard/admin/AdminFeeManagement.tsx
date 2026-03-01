@@ -7,26 +7,29 @@ import { Button } from "@/components/ui/button";
 import {
   DollarSign, Plus, ArrowLeft, Users, TrendingUp, AlertCircle, Phone, CheckCircle,
   Receipt, Download, PieChart, BarChart3, Calendar, Search, Filter, IndianRupee,
-  CreditCard, Wallet, ArrowUpRight, ArrowDownRight, Clock, FileText
+  CreditCard, Wallet, ArrowUpRight, ArrowDownRight, Clock, FileText, Layers, Printer
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
-import { PieChart as RePieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
+import { PieChart as RePieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line, Area, AreaChart } from "recharts";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-const CHART_COLORS = ["hsl(142, 70%, 40%)", "hsl(0, 84%, 60%)", "hsl(42, 87%, 55%)", "hsl(217, 72%, 18%)"];
+const CHART_COLORS = ["hsl(142, 70%, 40%)", "hsl(0, 84%, 60%)", "hsl(42, 87%, 55%)", "hsl(217, 72%, 18%)", "hsl(280, 60%, 55%)"];
 
 export default function AdminFeeManagement() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
-  const [paymentForm, setPaymentForm] = useState({ amount: "", payment_method: "Cash", remarks: "" });
+  const [paymentForm, setPaymentForm] = useState({ amount: "", payment_method: "Cash", remarks: "", is_installment: false });
   const [courseFilter, setCourseFilter] = useState("all");
   const [feeFilter, setFeeFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [semesterFilter, setSemesterFilter] = useState("all");
   const [feeEditStudent, setFeeEditStudent] = useState<any>(null);
   const [feeEditForm, setFeeEditForm] = useState({ total_fee: "", fee_due_date: "", fee_remarks: "" });
+  const [receiptStudent, setReceiptStudent] = useState<any>(null);
+  const [receiptPayment, setReceiptPayment] = useState<any>(null);
 
   const { data: courses = [] } = useQuery({
     queryKey: ["fee-courses"],
@@ -63,7 +66,7 @@ export default function AdminFeeManagement() {
   const { data: allPayments = [] } = useQuery({
     queryKey: ["all-fee-payments"],
     queryFn: async () => {
-      const { data } = await supabase.from("fee_payments").select("*").order("created_at", { ascending: false }).limit(50);
+      const { data } = await supabase.from("fee_payments").select("*").order("created_at", { ascending: false }).limit(200);
       return data || [];
     },
   });
@@ -74,21 +77,27 @@ export default function AdminFeeManagement() {
       const amount = parseFloat(paymentForm.amount);
       const newPaid = (selectedStudent.fee_paid || 0) + amount;
       const receipt_number = `RCP-${Date.now().toString().slice(-6)}`;
+      const remarks = paymentForm.is_installment
+        ? `[Installment] ${paymentForm.remarks || ""}`
+        : paymentForm.remarks;
       await supabase.from("fee_payments").insert({
         student_id: selectedStudent.id, amount,
         payment_method: paymentForm.payment_method,
-        remarks: paymentForm.remarks,
+        remarks,
         receipt_number,
         recorded_by: user?.id,
       });
       await supabase.from("students").update({ fee_paid: newPaid }).eq("id", selectedStudent.id);
+      return { receipt_number, amount, payment_method: paymentForm.payment_method, remarks };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success("Payment recorded successfully!");
       qc.invalidateQueries({ queryKey: ["fee-students"] });
       qc.invalidateQueries({ queryKey: ["fee-payments"] });
       qc.invalidateQueries({ queryKey: ["all-fee-payments"] });
-      setPaymentForm({ amount: "", payment_method: "Cash", remarks: "" });
+      setReceiptStudent(selectedStudent);
+      setReceiptPayment({ ...data, created_at: new Date().toISOString(), student_name: selectedStudent.profile?.full_name, roll_number: selectedStudent.roll_number, course: selectedStudent.courses?.name });
+      setPaymentForm({ amount: "", payment_method: "Cash", remarks: "", is_installment: false });
       setSelectedStudent((prev: any) => prev ? { ...prev, fee_paid: (prev.fee_paid || 0) + parseFloat(paymentForm.amount) } : null);
     },
     onError: (e: any) => toast.error(e.message),
@@ -131,6 +140,7 @@ export default function AdminFeeManagement() {
     return due > 0 && s.fee_due_date && new Date(s.fee_due_date) < new Date();
   }).length;
   const collectionRate = totalFees > 0 ? Math.round((totalPaid / totalFees) * 100) : 0;
+  const installmentCount = allPayments.filter((p: any) => p.remarks?.startsWith("[Installment]")).length;
 
   // Payment method breakdown
   const methodBreakdown = allPayments.reduce((acc: Record<string, number>, p: any) => {
@@ -146,6 +156,16 @@ export default function AdminFeeManagement() {
     const paid = courseStudents.reduce((s: number, st: any) => s + (st.fee_paid || 0), 0);
     return { name: c.code, total, paid, due: total - paid };
   }).filter(c => c.total > 0);
+
+  // Monthly collection trends
+  const monthlyTrends = (() => {
+    const months: Record<string, number> = {};
+    allPayments.forEach((p: any) => {
+      const m = format(new Date(p.created_at), "MMM yyyy");
+      months[m] = (months[m] || 0) + Number(p.amount);
+    });
+    return Object.entries(months).reverse().slice(0, 12).reverse().map(([month, amount]) => ({ month, amount }));
+  })();
 
   const inputClass = "w-full border border-border rounded-xl px-3 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all duration-200";
 
@@ -174,6 +194,41 @@ export default function AdminFeeManagement() {
     toast.success("Defaulters report exported!");
   };
 
+  const printReceipt = () => {
+    if (!receiptPayment) return;
+    const w = window.open("", "_blank", "width=400,height=600");
+    if (!w) return;
+    w.document.write(`
+      <html><head><title>Payment Receipt</title>
+      <style>body{font-family:sans-serif;padding:20px;max-width:380px;margin:0 auto}
+      h1{text-align:center;font-size:18px;margin-bottom:4px}
+      .sub{text-align:center;font-size:12px;color:#666;margin-bottom:20px}
+      .divider{border-top:1px dashed #ccc;margin:12px 0}
+      .row{display:flex;justify-content:space-between;padding:4px 0;font-size:13px}
+      .label{color:#666}.value{font-weight:bold}
+      .total{font-size:16px;margin-top:8px;padding-top:8px;border-top:2px solid #333}
+      .footer{text-align:center;font-size:10px;color:#999;margin-top:24px}
+      @media print{button{display:none}}</style></head><body>
+      <h1>Hoysala Degree College</h1>
+      <p class="sub">Payment Receipt</p>
+      <div class="divider"></div>
+      <div class="row"><span class="label">Receipt No:</span><span class="value">${receiptPayment.receipt_number}</span></div>
+      <div class="row"><span class="label">Date:</span><span class="value">${format(new Date(receiptPayment.created_at), "dd MMM yyyy, hh:mm a")}</span></div>
+      <div class="divider"></div>
+      <div class="row"><span class="label">Student:</span><span class="value">${receiptPayment.student_name || "—"}</span></div>
+      <div class="row"><span class="label">Roll No:</span><span class="value">${receiptPayment.roll_number || "—"}</span></div>
+      <div class="row"><span class="label">Course:</span><span class="value">${receiptPayment.course || "—"}</span></div>
+      <div class="divider"></div>
+      <div class="row"><span class="label">Payment Method:</span><span class="value">${receiptPayment.payment_method}</span></div>
+      ${receiptPayment.remarks ? `<div class="row"><span class="label">Remarks:</span><span class="value">${receiptPayment.remarks}</span></div>` : ""}
+      <div class="row total"><span>Amount Paid:</span><span>₹${Number(receiptPayment.amount).toLocaleString()}</span></div>
+      <div class="footer"><p>Thank you for your payment!</p><p>This is a computer-generated receipt.</p></div>
+      <br/><button onclick="window.print()" style="width:100%;padding:8px;cursor:pointer;border:1px solid #ccc;border-radius:8px;background:#f5f5f5">🖨️ Print Receipt</button>
+      </body></html>
+    `);
+    w.document.close();
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
@@ -188,13 +243,13 @@ export default function AdminFeeManagement() {
               <span className="font-body text-[11px] text-secondary-foreground font-semibold uppercase tracking-wider">Financial Hub</span>
             </div>
             <h2 className="font-display text-xl font-bold text-foreground">Fee Management Console</h2>
-            <p className="font-body text-sm text-muted-foreground mt-1">Track payments, manage dues, generate reports & analytics</p>
+            <p className="font-body text-sm text-muted-foreground mt-1">Track payments, manage dues, installments & generate reports</p>
           </div>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-7 gap-3">
         {[
           { label: "Total Fees", value: `₹${totalFees.toLocaleString()}`, icon: IndianRupee, gradient: "from-primary/10 to-primary/3", iconColor: "text-primary" },
           { label: "Collected", value: `₹${totalPaid.toLocaleString()}`, icon: CheckCircle, gradient: "from-emerald-500/10 to-emerald-500/3", iconColor: "text-emerald-600" },
@@ -202,9 +257,9 @@ export default function AdminFeeManagement() {
           { label: "Collection Rate", value: `${collectionRate}%`, icon: TrendingUp, gradient: "from-secondary/10 to-secondary/3", iconColor: "text-secondary-foreground" },
           { label: "Fee Due", value: dueCount, icon: Users, gradient: "from-orange-500/10 to-orange-500/3", iconColor: "text-orange-600" },
           { label: "Overdue", value: overdueCount, icon: Clock, gradient: "from-red-600/10 to-red-600/3", iconColor: "text-red-600" },
+          { label: "Installments", value: installmentCount, icon: Layers, gradient: "from-purple-500/10 to-purple-500/3", iconColor: "text-purple-600" },
         ].map(({ label, value, icon: Icon, gradient, iconColor }) => (
           <div key={label} className={`relative overflow-hidden bg-gradient-to-br ${gradient} border border-border rounded-2xl p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group`}>
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none spotlight" />
             <Icon className={`w-5 h-5 ${iconColor} mb-2 group-hover:scale-110 transition-transform duration-300`} />
             <p className="font-display text-xl font-bold text-foreground">{value}</p>
             <p className="font-body text-[10px] text-muted-foreground mt-0.5 uppercase tracking-wider">{label}</p>
@@ -237,24 +292,15 @@ export default function AdminFeeManagement() {
             </div>
             <div className="flex-1 space-y-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                  <span className="font-body text-xs text-muted-foreground">Fully Paid</span>
-                </div>
+                <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-emerald-500" /><span className="font-body text-xs text-muted-foreground">Fully Paid</span></div>
                 <span className="font-body text-sm font-bold text-foreground">{paidCount}</span>
               </div>
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-orange-500" />
-                  <span className="font-body text-xs text-muted-foreground">Partially Paid</span>
-                </div>
+                <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-orange-500" /><span className="font-body text-xs text-muted-foreground">Partially Paid</span></div>
                 <span className="font-body text-sm font-bold text-foreground">{dueCount - overdueCount}</span>
               </div>
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500" />
-                  <span className="font-body text-xs text-muted-foreground">Overdue</span>
-                </div>
+                <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-red-500" /><span className="font-body text-xs text-muted-foreground">Overdue</span></div>
                 <span className="font-body text-sm font-bold text-foreground">{overdueCount}</span>
               </div>
             </div>
@@ -284,6 +330,32 @@ export default function AdminFeeManagement() {
           )}
         </div>
       </div>
+
+      {/* Monthly Collection Trends */}
+      {monthlyTrends.length > 1 && (
+        <div className="bg-card border border-border rounded-2xl p-5 hover:shadow-lg transition-all duration-300">
+          <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-emerald-500" /> Monthly Collection Trends
+          </h3>
+          <div className="h-52">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={monthlyTrends}>
+                <defs>
+                  <linearGradient id="feeGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(142, 70%, 40%)" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(142, 70%, 40%)" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `₹${(v / 1000).toFixed(0)}k`} />
+                <Tooltip contentStyle={{ borderRadius: 12, fontFamily: "Inter", fontSize: 12, border: "1px solid hsl(var(--border))", background: "hsl(var(--card))" }} formatter={(v: any) => `₹${Number(v).toLocaleString()}`} />
+                <Area type="monotone" dataKey="amount" stroke="hsl(142, 70%, 40%)" fill="url(#feeGrad)" strokeWidth={2.5} dot={{ r: 4, fill: "hsl(142, 70%, 40%)", strokeWidth: 2, stroke: "hsl(var(--card))" }} activeDot={{ r: 6 }} name="Collected" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
 
       {/* Course-wise Fee Collection Chart */}
       {courseWiseFees.length > 0 && (
@@ -434,7 +506,7 @@ export default function AdminFeeManagement() {
               <div key={p.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-all duration-200 group">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <ArrowDownRight className="w-4 h-4 text-emerald-600" />
+                    {p.remarks?.startsWith("[Installment]") ? <Layers className="w-4 h-4 text-purple-600" /> : <ArrowDownRight className="w-4 h-4 text-emerald-600" />}
                   </div>
                   <div>
                     <p className="font-body text-xs font-semibold text-foreground">{p.receipt_number || "—"}</p>
@@ -485,6 +557,7 @@ export default function AdminFeeManagement() {
                           <span className="font-semibold text-emerald-600">₹{p.amount}</span>
                           <span className="text-muted-foreground ml-2">{p.payment_method}</span>
                           {p.receipt_number && <span className="text-muted-foreground ml-1">· {p.receipt_number}</span>}
+                          {p.remarks?.startsWith("[Installment]") && <span className="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-600">Installment</span>}
                         </div>
                         <span className="text-muted-foreground">{format(new Date(p.created_at), "MMM d, yyyy")}</span>
                       </div>
@@ -503,6 +576,13 @@ export default function AdminFeeManagement() {
                   <select value={paymentForm.payment_method} onChange={e => setPaymentForm({ ...paymentForm, payment_method: e.target.value })} className={inputClass}>
                     {["Cash", "Online Transfer", "DD", "Cheque", "UPI"].map(m => <option key={m}>{m}</option>)}
                   </select>
+                </div>
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" checked={paymentForm.is_installment} onChange={e => setPaymentForm({ ...paymentForm, is_installment: e.target.checked })}
+                      className="w-4 h-4 rounded border-border text-primary focus:ring-primary/30" />
+                    <span className="font-body text-xs font-semibold text-foreground flex items-center gap-1"><Layers className="w-3 h-3 text-purple-500" /> Mark as Installment</span>
+                  </label>
                 </div>
                 <div>
                   <label className="font-body text-xs font-semibold block mb-1.5">Remarks</label>
@@ -558,6 +638,38 @@ export default function AdminFeeManagement() {
           </div>
         </div>
       )}
+
+      {/* Receipt Dialog */}
+      <Dialog open={!!receiptPayment} onOpenChange={() => setReceiptPayment(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="font-display text-lg flex items-center gap-2">
+              <Receipt className="w-5 h-5 text-emerald-500" /> Payment Receipt
+            </DialogTitle>
+          </DialogHeader>
+          {receiptPayment && (
+            <div className="space-y-4 mt-2">
+              <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4 text-center">
+                <CheckCircle className="w-10 h-10 text-emerald-500 mx-auto mb-2" />
+                <p className="font-display text-2xl font-bold text-emerald-600">₹{Number(receiptPayment.amount).toLocaleString()}</p>
+                <p className="font-body text-xs text-muted-foreground mt-1">Payment Recorded Successfully</p>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between font-body text-xs"><span className="text-muted-foreground">Receipt No</span><span className="font-semibold">{receiptPayment.receipt_number}</span></div>
+                <div className="flex justify-between font-body text-xs"><span className="text-muted-foreground">Student</span><span className="font-semibold">{receiptPayment.student_name}</span></div>
+                <div className="flex justify-between font-body text-xs"><span className="text-muted-foreground">Roll No</span><span className="font-semibold">{receiptPayment.roll_number}</span></div>
+                <div className="flex justify-between font-body text-xs"><span className="text-muted-foreground">Course</span><span className="font-semibold">{receiptPayment.course}</span></div>
+                <div className="flex justify-between font-body text-xs"><span className="text-muted-foreground">Method</span><span className="font-semibold">{receiptPayment.payment_method}</span></div>
+                <div className="flex justify-between font-body text-xs"><span className="text-muted-foreground">Date</span><span className="font-semibold">{format(new Date(receiptPayment.created_at), "dd MMM yyyy, hh:mm a")}</span></div>
+                {receiptPayment.remarks && <div className="flex justify-between font-body text-xs"><span className="text-muted-foreground">Remarks</span><span className="font-semibold">{receiptPayment.remarks}</span></div>}
+              </div>
+              <Button onClick={printReceipt} className="w-full rounded-xl font-body">
+                <Printer className="w-4 h-4 mr-2" /> Print / Download Receipt
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

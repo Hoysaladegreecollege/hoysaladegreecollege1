@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { Search, Trash2, Edit3, X, Save, Users, Phone, UserPlus, Eye, ArrowLeft, KeyRound } from "lucide-react";
+import { Search, Trash2, Edit3, X, Save, Users, Phone, UserPlus, Eye, ArrowLeft, KeyRound, GraduationCap, BookOpen, Shield } from "lucide-react";
 import { validatePassword, PASSWORD_REQUIREMENTS } from "@/lib/password-validation";
 import { useAuth } from "@/contexts/AuthContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -15,12 +15,13 @@ export default function AdminUsers() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("All");
   const [courseFilter, setCourseFilter] = useState("All");
   const [semesterFilter, setSemesterFilter] = useState("All");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ full_name: "", phone: "", roll_number: "", semester: "", parent_phone: "", address: "", date_of_birth: "", course_id: "", total_fee: "", fee_paid: "", fee_due_date: "", fee_remarks: "" });
   const [showAddStudent, setShowAddStudent] = useState(false);
-  const [viewStudent, setViewStudent] = useState<any>(null);
+  const [viewUser, setViewUser] = useState<any>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<any>(null);
   const [resetPwUser, setResetPwUser] = useState<any>(null);
   const [newPassword, setNewPassword] = useState("");
@@ -38,11 +39,13 @@ export default function AdminUsers() {
       const { data: roles } = await supabase.from("user_roles").select("*");
       const { data: profiles } = await supabase.from("profiles").select("*");
       const { data: students } = await supabase.from("students").select("*, courses(name, code)");
+      const { data: teachers } = await supabase.from("teachers").select("*, departments:department_id(name, code)");
       if (!roles || !profiles) return [];
       return profiles.map((p) => {
         const roleEntry = roles.find((r) => r.user_id === p.user_id);
         const studentEntry = students?.find((s) => s.user_id === p.user_id);
-        return { ...p, role: roleEntry?.role || "student", role_id: roleEntry?.id, student: studentEntry, avatarUrl: (studentEntry as any)?.avatar_url };
+        const teacherEntry = teachers?.find((t) => t.user_id === p.user_id);
+        return { ...p, role: roleEntry?.role || "student", role_id: roleEntry?.id, student: studentEntry, teacher: teacherEntry, avatarUrl: (studentEntry as any)?.avatar_url };
       });
     },
   });
@@ -126,31 +129,21 @@ export default function AdminUsers() {
       });
       if (authError) throw authError;
       if (!authData.user) throw new Error("Failed to create user");
-
-      // Wait for trigger to create profile & student records
       await new Promise(r => setTimeout(r, 2000));
-
-      // Update profile with phone
       if (newStudent.phone) {
         await supabase.from("profiles").update({ phone: newStudent.phone }).eq("user_id", authData.user.id);
       }
-
-      // Update student record
       const yearLevel = parseInt(newStudent.year_level) || 1;
       const semesterVal = parseInt(newStudent.semester) || 1;
       const updateData: any = {
-        semester: semesterVal,
-        year_level: yearLevel,
+        semester: semesterVal, year_level: yearLevel,
         admission_year: parseInt(newStudent.admission_year),
-        parent_phone: newStudent.parent_phone,
-        father_name: newStudent.father_name,
-        mother_name: newStudent.mother_name,
-        address: newStudent.address,
+        parent_phone: newStudent.parent_phone, father_name: newStudent.father_name,
+        mother_name: newStudent.mother_name, address: newStudent.address,
         date_of_birth: newStudent.date_of_birth || null,
       };
       if (newStudent.roll_number) updateData.roll_number = newStudent.roll_number;
       if (newStudent.course_id) updateData.course_id = newStudent.course_id;
-      // Also update profile phone
       if (newStudent.phone) {
         await supabase.from("profiles").update({ phone: newStudent.phone }).eq("user_id", authData.user.id);
       }
@@ -181,13 +174,19 @@ export default function AdminUsers() {
     const name = (u.full_name || "").toLowerCase();
     const email = (u.email || "").toLowerCase();
     const matchSearch = name.includes(search.toLowerCase()) || email.includes(search.toLowerCase());
+    const matchRole = roleFilter === "All" || u.role === roleFilter;
     let matchCourse = true;
     if (courseFilter === "no-course") matchCourse = u.role === "student" && !u.student?.course_id;
     else if (courseFilter !== "All") matchCourse = u.student?.course_id === courseFilter;
     let matchSemester = true;
     if (semesterFilter !== "All") matchSemester = u.student?.semester === parseInt(semesterFilter);
-    return matchSearch && matchCourse && matchSemester;
+    return matchSearch && matchRole && matchCourse && matchSemester;
   });
+
+  const roleCounts = users.reduce((acc: Record<string, number>, u: any) => {
+    acc[u.role] = (acc[u.role] || 0) + 1;
+    return acc;
+  }, {});
 
   const inputClass = "w-full border border-border rounded-xl px-3 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all";
 
@@ -213,11 +212,45 @@ export default function AdminUsers() {
               <p className="font-body text-xs text-muted-foreground">{users.length} registered users</p>
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <div className="relative flex-1 sm:w-48">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 rounded-xl text-sm" />
-            </div>
+          <Button size="sm" onClick={() => setShowAddStudent(true)} className="rounded-xl font-body">
+            <UserPlus className="w-4 h-4 mr-1" /> Add Student
+          </Button>
+        </div>
+      </div>
+
+      {/* Role Filter Tabs */}
+      <div className="flex flex-wrap gap-2">
+        {[
+          { key: "All", label: "All Users", icon: Users, count: users.length },
+          { key: "student", label: "Students", icon: GraduationCap, count: roleCounts["student"] || 0 },
+          { key: "teacher", label: "Teachers", icon: BookOpen, count: roleCounts["teacher"] || 0 },
+          { key: "principal", label: "Principals", icon: Shield, count: roleCounts["principal"] || 0 },
+          { key: "admin", label: "Admins", icon: Shield, count: roleCounts["admin"] || 0 },
+        ].map(({ key, label, icon: Icon, count }) => (
+          <button
+            key={key}
+            onClick={() => setRoleFilter(key)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-body text-xs font-semibold transition-all duration-200 border ${
+              roleFilter === key
+                ? "bg-primary text-primary-foreground border-primary shadow-md"
+                : "bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground"
+            }`}
+          >
+            <Icon className="w-3.5 h-3.5" />
+            {label}
+            <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${roleFilter === key ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{count}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Search & Filters */}
+      <div className="flex flex-col sm:flex-row gap-2">
+        <div className="relative flex-1 sm:w-48">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input placeholder="Search by name or email..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 rounded-xl text-sm" />
+        </div>
+        {(roleFilter === "All" || roleFilter === "student") && (
+          <>
             <select value={courseFilter} onChange={(e) => setCourseFilter(e.target.value)} className="border border-border rounded-xl px-3 py-2 font-body text-xs bg-background focus:outline-none focus:ring-2 focus:ring-primary/30">
               <option value="All">All Courses</option>
               {courses.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -227,11 +260,8 @@ export default function AdminUsers() {
               <option value="All">All Semesters</option>
               {[1,2,3,4,5,6].map(s => <option key={s} value={s}>Semester {s}</option>)}
             </select>
-            <Button size="sm" onClick={() => setShowAddStudent(true)} className="rounded-xl font-body">
-              <UserPlus className="w-4 h-4 mr-1" /> Add Student
-            </Button>
-          </div>
-        </div>
+          </>
+        )}
       </div>
 
       {/* Add Student Dialog */}
@@ -242,7 +272,6 @@ export default function AdminUsers() {
             <DialogDescription className="font-body text-sm">Create a student account — email confirmation will be sent automatically</DialogDescription>
           </DialogHeader>
           <form onSubmit={(e) => { e.preventDefault(); addStudentMutation.mutate(); }} className="grid sm:grid-cols-2 gap-4 mt-4">
-            {/* Section: Personal */}
             <div className="sm:col-span-2">
               <div className="flex items-center gap-2 py-2 border-b border-border mb-1">
                 <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-[10px]">1</span>
@@ -256,7 +285,6 @@ export default function AdminUsers() {
             <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Date of Birth</label><input type="date" value={newStudent.date_of_birth} onChange={(e) => setNewStudent({ ...newStudent, date_of_birth: e.target.value })} className={inputClass} /></div>
             <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Roll Number</label><input value={newStudent.roll_number} onChange={(e) => setNewStudent({ ...newStudent, roll_number: e.target.value })} placeholder="Auto-generated if empty" className={inputClass} /></div>
 
-            {/* Section: Academic */}
             <div className="sm:col-span-2 mt-1">
               <div className="flex items-center gap-2 py-2 border-b border-border mb-1">
                 <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-[10px]">2</span>
@@ -273,32 +301,20 @@ export default function AdminUsers() {
             <div>
               <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Year *</label>
               <select value={newStudent.year_level} onChange={(e) => setNewStudent({ ...newStudent, year_level: e.target.value })} required className={inputClass}>
-                <option value="1">1st Year</option>
-                <option value="2">2nd Year</option>
-                <option value="3">3rd Year</option>
+                <option value="1">1st Year</option><option value="2">2nd Year</option><option value="3">3rd Year</option>
               </select>
             </div>
             <div>
               <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Semester *</label>
               <select value={newStudent.semester} onChange={(e) => setNewStudent({ ...newStudent, semester: e.target.value })} required className={inputClass}>
-                <option value="1">Semester 1</option>
-                <option value="2">Semester 2</option>
-                <option value="3">Semester 3</option>
-                <option value="4">Semester 4</option>
-                <option value="5">Semester 5</option>
-                <option value="6">Semester 6</option>
+                {[1,2,3,4,5,6].map(s => <option key={s} value={s}>Semester {s}</option>)}
               </select>
-            </div>
-            <div>
-              <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Academic Year</label>
-              <input value={newStudent.academic_year} onChange={(e) => setNewStudent({ ...newStudent, academic_year: e.target.value })} placeholder="e.g. 2025-2026" className={inputClass} />
             </div>
             <div>
               <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Admission Year</label>
               <input value={newStudent.admission_year} onChange={(e) => setNewStudent({ ...newStudent, admission_year: e.target.value })} className={inputClass} />
             </div>
 
-            {/* Section: Parent */}
             <div className="sm:col-span-2 mt-1">
               <div className="flex items-center gap-2 py-2 border-b border-border mb-1">
                 <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-[10px]">3</span>
@@ -336,46 +352,104 @@ export default function AdminUsers() {
         </DialogContent>
       </Dialog>
 
-      {/* View Student Detail Dialog */}
-      <Dialog open={!!viewStudent} onOpenChange={() => setViewStudent(null)}>
+      {/* View User Detail Dialog — Role-Specific */}
+      <Dialog open={!!viewUser} onOpenChange={() => setViewUser(null)}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle className="font-display text-xl">Student Details</DialogTitle>
+            <DialogTitle className="font-display text-xl">
+              {viewUser?.role === "teacher" ? "Teacher Details" : viewUser?.role === "principal" ? "Principal Details" : viewUser?.role === "admin" ? "Admin Details" : "Student Details"}
+            </DialogTitle>
           </DialogHeader>
-          {viewStudent && (
+          {viewUser && (
             <div className="space-y-4 mt-2">
               <div className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl p-4 text-center">
-                {viewStudent.avatarUrl ? (
-                  <img src={viewStudent.avatarUrl} alt={viewStudent.full_name} className="w-20 h-20 rounded-2xl object-cover border-4 border-secondary/30 shadow-lg mx-auto mb-2" />
+                {viewUser.avatarUrl ? (
+                  <img src={viewUser.avatarUrl} alt={viewUser.full_name} className="w-20 h-20 rounded-2xl object-cover border-4 border-secondary/30 shadow-lg mx-auto mb-2" />
                 ) : (
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
-                    <span className="text-2xl">{viewStudent.role === "teacher" ? "📚" : viewStudent.role === "admin" ? "⚙️" : "🎓"}</span>
+                    <span className="text-2xl">{viewUser.role === "teacher" ? "📚" : viewUser.role === "admin" ? "⚙️" : viewUser.role === "principal" ? "🏛️" : "🎓"}</span>
                   </div>
                 )}
-                <p className="font-display text-lg font-bold text-foreground">{viewStudent.full_name || "—"}</p>
-                <p className="font-body text-xs text-muted-foreground">{viewStudent.email}</p>
+                <p className="font-display text-lg font-bold text-foreground">{viewUser.full_name || "—"}</p>
+                <p className="font-body text-xs text-muted-foreground">{viewUser.email}</p>
+                <span className={`inline-block mt-1 text-[10px] px-3 py-0.5 rounded-full font-body font-bold capitalize ${
+                  viewUser.role === "admin" ? "bg-destructive/10 text-destructive" :
+                  viewUser.role === "principal" ? "bg-secondary/20 text-secondary-foreground" :
+                  viewUser.role === "teacher" ? "bg-primary/10 text-primary" :
+                  "bg-muted text-muted-foreground"
+                }`}>{viewUser.role}</span>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Role</p><p className="font-body text-sm font-semibold capitalize">{viewStudent.role}</p></div>
-                <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Course</p><p className="font-body text-sm font-semibold">{viewStudent.student?.courses?.name || "—"}</p></div>
-                <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Roll Number</p><p className="font-body text-sm font-semibold">{viewStudent.student?.roll_number || "—"}</p></div>
-                <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Semester</p><p className="font-body text-sm font-semibold">{viewStudent.student?.semester || "—"}</p></div>
-                <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Admission Year</p><p className="font-body text-sm font-semibold">{viewStudent.student?.admission_year || "—"}</p></div>
-                <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Phone</p><p className="font-body text-sm font-semibold">{viewStudent.phone || "—"}</p></div>
-                <div className="bg-muted/30 rounded-xl p-3 col-span-2"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Address</p><p className="font-body text-sm font-semibold">{viewStudent.student?.address || "—"}</p></div>
-              </div>
+
+              {/* Student-specific details */}
+              {viewUser.role === "student" && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Full Name</p><p className="font-body text-sm font-semibold">{viewUser.full_name || "—"}</p></div>
+                  <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Course</p><p className="font-body text-sm font-semibold">{viewUser.student?.courses?.name || "—"}</p></div>
+                  <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Roll Number</p><p className="font-body text-sm font-semibold">{viewUser.student?.roll_number || "—"}</p></div>
+                  <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Semester</p><p className="font-body text-sm font-semibold">{viewUser.student?.semester || "—"}</p></div>
+                  <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Year Level</p><p className="font-body text-sm font-semibold">{viewUser.student?.year_level || "—"}</p></div>
+                  <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Admission Year</p><p className="font-body text-sm font-semibold">{viewUser.student?.admission_year || "—"}</p></div>
+                  <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Phone</p><p className="font-body text-sm font-semibold">{viewUser.phone || viewUser.student?.phone || "—"}</p></div>
+                  <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Parent Phone</p><p className="font-body text-sm font-semibold">{viewUser.student?.parent_phone || "—"}</p></div>
+                  <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Father's Name</p><p className="font-body text-sm font-semibold">{viewUser.student?.father_name || "—"}</p></div>
+                  <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Mother's Name</p><p className="font-body text-sm font-semibold">{viewUser.student?.mother_name || "—"}</p></div>
+                  <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Date of Birth</p><p className="font-body text-sm font-semibold">{viewUser.student?.date_of_birth || "—"}</p></div>
+                  <div className="bg-muted/30 rounded-xl p-3 col-span-2"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Address</p><p className="font-body text-sm font-semibold">{viewUser.student?.address || "—"}</p></div>
+                  {/* Fee Info */}
+                  <div className="col-span-2 border-t border-border pt-3 mt-1">
+                    <p className="font-body text-xs font-bold text-primary uppercase tracking-wider mb-2">💰 Fee Information</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="bg-primary/5 rounded-xl p-3 text-center"><p className="font-body text-[10px] text-muted-foreground">Total Fee</p><p className="font-display text-base font-bold text-foreground">₹{(viewUser.student?.total_fee || 0).toLocaleString()}</p></div>
+                      <div className="bg-emerald-500/5 rounded-xl p-3 text-center"><p className="font-body text-[10px] text-muted-foreground">Paid</p><p className="font-display text-base font-bold text-emerald-600">₹{(viewUser.student?.fee_paid || 0).toLocaleString()}</p></div>
+                      <div className="bg-destructive/5 rounded-xl p-3 text-center"><p className="font-body text-[10px] text-muted-foreground">Due</p><p className="font-display text-base font-bold text-destructive">₹{((viewUser.student?.total_fee || 0) - (viewUser.student?.fee_paid || 0)).toLocaleString()}</p></div>
+                    </div>
+                    {viewUser.student?.fee_due_date && (
+                      <p className="font-body text-xs text-muted-foreground mt-2">Due Date: <span className="font-semibold text-foreground">{viewUser.student.fee_due_date}</span></p>
+                    )}
+                    {viewUser.student?.fee_remarks && (
+                      <p className="font-body text-xs text-muted-foreground mt-1">Remarks: {viewUser.student.fee_remarks}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Teacher-specific details */}
+              {viewUser.role === "teacher" && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Full Name</p><p className="font-body text-sm font-semibold">{viewUser.full_name || "—"}</p></div>
+                  <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Employee ID</p><p className="font-body text-sm font-semibold">{viewUser.teacher?.employee_id || "—"}</p></div>
+                  <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Phone</p><p className="font-body text-sm font-semibold">{viewUser.phone || "—"}</p></div>
+                  <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Department</p><p className="font-body text-sm font-semibold">{(viewUser.teacher?.departments as any)?.name || "—"}</p></div>
+                  <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Qualification</p><p className="font-body text-sm font-semibold">{viewUser.teacher?.qualification || "—"}</p></div>
+                  <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Experience</p><p className="font-body text-sm font-semibold">{viewUser.teacher?.experience || "—"}</p></div>
+                  <div className="bg-muted/30 rounded-xl p-3 col-span-2"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Subjects</p><p className="font-body text-sm font-semibold">{viewUser.teacher?.subjects?.length > 0 ? viewUser.teacher.subjects.join(", ") : "—"}</p></div>
+                  <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Status</p><p className="font-body text-sm font-semibold">{viewUser.teacher?.is_active ? "Active" : "Inactive"}</p></div>
+                  <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Email</p><p className="font-body text-sm font-semibold">{viewUser.email || "—"}</p></div>
+                </div>
+              )}
+
+              {/* Principal/Admin details */}
+              {(viewUser.role === "principal" || viewUser.role === "admin") && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Full Name</p><p className="font-body text-sm font-semibold">{viewUser.full_name || "—"}</p></div>
+                  <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Email</p><p className="font-body text-sm font-semibold">{viewUser.email || "—"}</p></div>
+                  <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Phone</p><p className="font-body text-sm font-semibold">{viewUser.phone || "—"}</p></div>
+                  <div className="bg-muted/30 rounded-xl p-3"><p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Role</p><p className="font-body text-sm font-semibold capitalize">{viewUser.role}</p></div>
+                </div>
+              )}
+
               <div className="flex flex-wrap gap-2 pt-2">
-                {viewStudent.phone && (
-                  <a href={`tel:${viewStudent.phone}`}>
-                    <Button size="sm" variant="outline" className="rounded-xl font-body text-xs"><Phone className="w-3 h-3 mr-1" /> Call Student</Button>
+                {viewUser.phone && (
+                  <a href={`tel:${viewUser.phone}`}>
+                    <Button size="sm" variant="outline" className="rounded-xl font-body text-xs"><Phone className="w-3 h-3 mr-1" /> Call</Button>
                   </a>
                 )}
-                {viewStudent.student?.parent_phone && (
-                  <a href={`tel:${viewStudent.student.parent_phone}`}>
+                {viewUser.role === "student" && viewUser.student?.parent_phone && (
+                  <a href={`tel:${viewUser.student.parent_phone}`}>
                     <Button size="sm" variant="outline" className="rounded-xl font-body text-xs"><Phone className="w-3 h-3 mr-1" /> Call Parent</Button>
                   </a>
                 )}
-                <Button size="sm" variant="outline" onClick={() => { setViewStudent(null); startEdit(viewStudent); }} className="rounded-xl font-body text-xs">
+                <Button size="sm" variant="outline" onClick={() => { setViewUser(null); startEdit(viewUser); }} className="rounded-xl font-body text-xs">
                   <Edit3 className="w-3 h-3 mr-1" /> Edit Details
                 </Button>
               </div>
@@ -451,6 +525,7 @@ export default function AdminUsers() {
                         "bg-muted text-muted-foreground"
                       }`}>{u.role}</span>
                       {u.student?.courses?.code && <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-body">{u.student.courses.code}</span>}
+                      {u.role === "teacher" && u.teacher?.employee_id && <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary/10 text-secondary-foreground font-body">{u.teacher.employee_id}</span>}
                     </div>
                     <p className="font-body text-xs text-muted-foreground mt-0.5">{u.email}</p>
                     <div className="flex items-center gap-3 mt-1">
@@ -467,7 +542,7 @@ export default function AdminUsers() {
                     <option value="principal">Principal</option>
                     <option value="admin">Admin</option>
                   </select>
-                  <button onClick={() => setViewStudent(u)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:scale-110 transition-all duration-200" title="View"><Eye className="w-4 h-4" /></button>
+                  <button onClick={() => setViewUser(u)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:scale-110 transition-all duration-200" title="View"><Eye className="w-4 h-4" /></button>
                   <button onClick={() => startEdit(u)} className="p-1.5 rounded-lg hover:bg-primary/10 text-primary hover:scale-110 transition-all duration-200" title="Edit"><Edit3 className="w-4 h-4" /></button>
                   <button onClick={() => { setResetPwUser(u); setNewPassword(""); }}
                     className="p-1.5 rounded-lg hover:bg-secondary/10 text-secondary-foreground hover:scale-110 transition-all duration-200" title="Reset Password"><KeyRound className="w-4 h-4" /></button>
