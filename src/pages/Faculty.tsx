@@ -25,6 +25,7 @@ const deptConfig: Record<string, { grad: string; badge: string; iconColor: strin
 
 export default function Faculty() {
   const [selectedFaculty, setSelectedFaculty] = useState<any>(null);
+  const [clickY, setClickY] = useState(0);
 
   const { data: dbFaculty = [], isLoading } = useQuery({
     queryKey: ["public-faculty"],
@@ -75,7 +76,7 @@ export default function Faculty() {
                 return (
                   <ScrollReveal key={f.id} delay={i * 60}>
                     <div
-                      onClick={() => setSelectedFaculty(f)}
+                      onClick={(e) => { setClickY(e.clientY); setSelectedFaculty(f); }}
                       className="premium-card p-6 text-center group h-full flex flex-col cursor-pointer relative overflow-hidden card-stack"
                     >
                       {/* Hover gradient */}
@@ -137,7 +138,8 @@ export default function Faculty() {
 
       {/* Faculty Detail Modal */}
       {selectedFaculty && (
-        <div className="fixed inset-0 bg-black/70 dark:bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in" onClick={() => setSelectedFaculty(null)}>
+        <div className="fixed inset-0 bg-black/70 dark:bg-black/80 backdrop-blur-md z-50 overflow-y-auto animate-fade-in" onClick={() => setSelectedFaculty(null)}>
+          <div className="min-h-full flex items-start justify-center p-4" style={{ paddingTop: `${Math.max(24, Math.min(clickY - 200, window.innerHeight - 400))}px`, paddingBottom: 24 }}>
           <div className="bg-card rounded-3xl border border-border w-full max-w-md shadow-2xl animate-scale-bounce overflow-hidden" onClick={e => e.stopPropagation()}>
             {/* Header gradient */}
             <div className={`p-6 bg-gradient-to-br ${deptConfig[selectedFaculty.department]?.grad || "from-primary/10 to-secondary/5"} relative overflow-hidden`}>
@@ -203,6 +205,7 @@ export default function Faculty() {
                 </div>
               )}
             </div>
+          </div>
           </div>
         </div>
       )}
