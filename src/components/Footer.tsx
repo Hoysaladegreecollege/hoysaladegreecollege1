@@ -181,21 +181,21 @@ export default function Footer() {
       {/* Back to top */}
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className={`fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-40 w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group/top ${showTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6 pointer-events-none"}`}
+        className={`fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-40 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group/top ${showTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6 pointer-events-none"}`}
         aria-label="Back to top"
       >
         {/* Scroll progress ring */}
-        <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 48 48">
-          <circle cx="24" cy="24" r="21" fill="none" stroke="hsl(var(--border))" strokeWidth="2" className="opacity-30" />
-          <circle cx="24" cy="24" r="21" fill="none" stroke="hsl(var(--gold))" strokeWidth="2"
-            strokeDasharray={`${2 * Math.PI * 21}`}
-            strokeDashoffset={`${2 * Math.PI * 21 * (1 - scrollProgress)}`}
+        <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 56 56">
+          <circle cx="28" cy="28" r="26" fill="none" stroke="hsl(var(--border))" strokeWidth="2.5" className="opacity-25" />
+          <circle cx="28" cy="28" r="26" fill="none" stroke="hsl(var(--gold))" strokeWidth="2.5"
+            strokeDasharray={`${2 * Math.PI * 26}`}
+            strokeDashoffset={`${2 * Math.PI * 26 * (1 - scrollProgress)}`}
             strokeLinecap="round"
-            className="transition-all duration-200" />
+            className="transition-all duration-150 drop-shadow-[0_0_4px_hsl(var(--gold)/0.4)]" />
         </svg>
         {/* Button bg */}
-        <span className="absolute inset-[3px] rounded-[13px] bg-card border border-border/50 group-hover/top:border-[hsl(var(--gold))]/30 group-hover/top:shadow-[0_0_16px_hsl(var(--gold)/0.15)] transition-all duration-300" />
-        <ArrowUp className="w-4 h-4 relative text-foreground group-hover/top:text-[hsl(var(--gold))] group-hover/top:-translate-y-0.5 transition-all duration-300" />
+        <span className="absolute inset-[4px] rounded-full bg-card border border-border/40 group-hover/top:border-[hsl(var(--gold))]/40 group-hover/top:shadow-[0_0_20px_hsl(var(--gold)/0.2)] transition-all duration-300" />
+        <ArrowUp className="w-4.5 h-4.5 relative text-foreground group-hover/top:text-[hsl(var(--gold))] group-hover/top:-translate-y-0.5 transition-all duration-300" />
       </button>
     </footer>
   );
