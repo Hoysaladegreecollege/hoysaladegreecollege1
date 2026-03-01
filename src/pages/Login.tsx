@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import SEOHead from "@/components/SEOHead";
-import { GraduationCap, Eye, EyeOff, Sparkles, Lock, Mail, User } from "lucide-react";
+import { Eye, EyeOff, Sparkles, Lock, Mail, User } from "lucide-react";
+import collegeLogo from "@/assets/college-logo.png";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -91,8 +92,8 @@ export default function Login() {
             {/* Logo */}
             <div className="text-center mb-8">
               <div className="relative inline-flex items-center justify-center mb-5">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-navy-dark flex items-center justify-center shadow-2xl shadow-primary/30 border border-secondary/20">
-                  <GraduationCap className="w-10 h-10 text-secondary" />
+                <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-2xl shadow-primary/30 border border-secondary/20">
+                  <img src={collegeLogo} alt="Hoysala Degree College Logo" className="w-full h-full object-contain" />
                 </div>
                 <div className="absolute -top-1 -right-1 w-6 h-6 bg-secondary rounded-full flex items-center justify-center shadow-lg">
                   <Sparkles className="w-3 h-3 text-primary" />

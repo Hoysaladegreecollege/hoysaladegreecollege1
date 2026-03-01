@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import {
-  GraduationCap,
   MapPin,
   Phone,
   Mail,
@@ -12,6 +11,7 @@ import {
   Heart,
   ArrowUp,
 } from "lucide-react";
+import collegeLogo from "@/assets/college-logo.png";
 import { useState, useEffect } from "react";
 
 const MAPS_LINK = "https://maps.app.goo.gl/nqvvEX7kgB7wQVKb7";
@@ -42,8 +42,8 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2.5 mb-4 sm:mb-5">
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-secondary to-secondary/80 flex items-center justify-center shadow-lg">
-                <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl overflow-hidden shrink-0">
+                <img src={collegeLogo} alt="Hoysala Degree College Logo" className="w-full h-full object-contain" />
               </div>
               <div>
                 <span className="font-display text-base sm:text-lg font-bold block">Hoysala Degree College</span>
