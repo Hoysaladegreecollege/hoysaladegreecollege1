@@ -183,7 +183,7 @@ export default function Courses() {
                     ))}
                   </div>
                 </div>
-                <Link to="/admissions">
+                <Link to="/apply">
                   <button className="relative w-full group overflow-hidden px-6 py-3 rounded-xl font-body text-sm font-bold text-primary-foreground transition-all duration-300 hover:scale-[1.02] shadow-lg mt-2"
                     style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--navy-dark)))", boxShadow: "0 4px 20px hsl(var(--primary) / 0.25)" }}>
                     <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl" />

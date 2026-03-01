@@ -236,7 +236,7 @@ export default function Index() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center animate-slide-up animation-delay-500 px-4 sm:px-2">
-            <Link to="/admissions" className="w-full sm:w-[220px]">
+            <Link to="/apply" className="w-full sm:w-[220px]">
               <button className="relative group w-full h-14 overflow-hidden rounded-2xl font-body text-sm font-bold text-foreground shadow-2xl btn-magnetic active:scale-[0.97] touch-manipulation"
               style={{ background: "linear-gradient(135deg, hsl(42,87%,58%), hsl(38,92%,48%), hsl(42,87%,65%))", boxShadow: "0 8px 40px hsla(42,87%,52%,0.5), 0 2px 0 rgba(255,255,255,0.2) inset" }}>
                 <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/0 via-white/25 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
@@ -652,7 +652,7 @@ export default function Index() {
               Join 250+ students building their future. Admissions open for 2026–27 academic year.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-              <Link to="/admissions" className="w-full sm:w-auto">
+              <Link to="/apply" className="w-full sm:w-auto">
                 <button className="relative group overflow-hidden w-full sm:w-auto px-8 sm:px-10 py-4 rounded-2xl font-body font-bold text-foreground shadow-2xl btn-magnetic active:scale-[0.97] touch-manipulation"
                 style={{ background: "linear-gradient(135deg, hsl(42,87%,58%), hsl(38,92%,48%))", boxShadow: "0 8px 32px hsla(42,87%,52%,0.4)" }}>
                   <span className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
