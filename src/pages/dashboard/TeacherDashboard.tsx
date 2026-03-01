@@ -82,18 +82,18 @@ export default function TeacherDashboard() {
   const { profile } = useAuth();
   const [newNote, setNewNote] = useState("");
   const { notes, add, toggle, remove } = useTeacherNotes();
-  
+  const [attDate, setAttDate] = useState(new Date().toISOString().split("T")[0]);
 
   // Main stats
   const { data: counts, isLoading } = useQuery({
-    queryKey: ["teacher-stats"],
+    queryKey: ["teacher-stats", attDate],
     refetchInterval: 30000,
     queryFn: async () => {
       const [students, materials, notices, attendance, announcements] = await Promise.all([
         supabase.from("students").select("id", { count: "exact", head: true }).eq("is_active", true),
         supabase.from("study_materials").select("id", { count: "exact", head: true }),
         supabase.from("notices").select("id", { count: "exact", head: true }).eq("is_active", true),
-        supabase.from("attendance").select("status"),
+        supabase.from("attendance").select("status").eq("date", attDate),
         supabase.from("announcements").select("id", { count: "exact", head: true }).eq("is_active", true),
       ]);
       const att = attendance.data || [];
@@ -245,11 +245,15 @@ export default function TeacherDashboard() {
         {/* Attendance Ring */}
         {counts && (
           <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
-            <div className="flex items-center gap-2 mb-5">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                <Activity className="w-4 h-4 text-emerald-500" />
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                  <Activity className="w-4 h-4 text-emerald-500" />
+                </div>
+                <h3 className="font-body text-[14px] font-semibold text-foreground">Attendance Overview</h3>
               </div>
-              <h3 className="font-body text-[14px] font-semibold text-foreground">Attendance Overview</h3>
+              <input type="date" value={attDate} onChange={e => setAttDate(e.target.value)}
+                className="font-body text-xs border border-border rounded-lg px-2.5 py-1.5 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
             </div>
             <div className="flex items-center gap-5">
               <div className="relative w-24 h-24 shrink-0">

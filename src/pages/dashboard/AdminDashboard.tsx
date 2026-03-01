@@ -88,6 +88,7 @@ function StatCard({ label, value, icon: Icon, color, trend }: { label: string; v
 export default function AdminDashboard() {
   const { profile } = useAuth();
   const [birthdayDialogOpen, setBirthdayDialogOpen] = useState(false);
+  const [attDate, setAttDate] = useState(new Date().toISOString().split("T")[0]);
 
   const { data: counts, isLoading: countsLoading } = useQuery({
     queryKey: ["admin-stats"],
@@ -138,9 +139,9 @@ export default function AdminDashboard() {
   });
 
   const { data: attendanceStats } = useQuery({
-    queryKey: ["admin-attendance-stats"],
+    queryKey: ["admin-attendance-stats", attDate],
     queryFn: async () => {
-      const { data } = await supabase.from("attendance").select("status");
+      const { data } = await supabase.from("attendance").select("status").eq("date", attDate);
       if (!data) return { total: 0, present: 0, percentage: 0 };
       const total = data.length;
       const present = data.filter(a => a.status === "present").length;
@@ -582,11 +583,15 @@ export default function AdminDashboard() {
 
         {/* Attendance Circular Progress */}
         <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
-          <div className="flex items-center gap-2 mb-5">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-              <Clock className="w-4 h-4 text-emerald-500" />
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                <Clock className="w-4 h-4 text-emerald-500" />
+              </div>
+              <h3 className="font-body text-[14px] font-semibold text-foreground">Attendance Overview</h3>
             </div>
-            <h3 className="font-body text-[14px] font-semibold text-foreground">Attendance Overview</h3>
+            <input type="date" value={attDate} onChange={e => setAttDate(e.target.value)}
+              className="font-body text-xs border border-border rounded-lg px-2.5 py-1.5 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
           </div>
           <div className="flex items-center gap-6">
             <CircularProgress pct={attendanceStats?.percentage || 0} size={110} stroke={10} color="hsl(145, 65%, 42%)" label="Rate" />
