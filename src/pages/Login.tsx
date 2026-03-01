@@ -28,6 +28,7 @@ export default function Login() {
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
   const [focused, setFocused] = useState<string | null>(null);
+  const [rememberMe, setRememberMe] = useState(true);
   const { signIn, signUp, role: currentUserRole, user } = useAuth();
   const navigate = useNavigate();
   const cardRef = useRef<HTMLDivElement>(null);
@@ -65,7 +66,16 @@ export default function Login() {
     if (mode === "login") {
       const { error } = await signIn(email, password);
       if (error) { toast.error(error.message); setLoading(false); }
-      else toast.success("Signed in successfully!");
+      else {
+        if (rememberMe) {
+          sessionStorage.setItem("hdc_remember", "1");
+          localStorage.setItem("hdc_remember", "1");
+        } else {
+          sessionStorage.setItem("hdc_remember", "1");
+          localStorage.removeItem("hdc_remember");
+        }
+        toast.success("Signed in successfully!");
+      }
     } else {
       if (!canSignup) { toast.error("Only admins can create new accounts"); setLoading(false); return; }
       if (!fullName) { toast.error("Please enter the full name"); setLoading(false); return; }
@@ -216,7 +226,7 @@ export default function Login() {
               {!canSignup && (
                 <div className="flex items-center justify-between login-field-enter" style={{ animationDelay: "0.22s" }}>
                   <label className="flex items-center gap-2 cursor-pointer group">
-                    <input type="checkbox" className="w-3.5 h-3.5 rounded border-white/10 bg-white/[0.03] text-secondary focus:ring-secondary/30 focus:ring-offset-0 accent-[hsl(42,87%,55%)] cursor-pointer" />
+                    <input type="checkbox" checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} className="w-3.5 h-3.5 rounded border-white/10 bg-white/[0.03] text-secondary focus:ring-secondary/30 focus:ring-offset-0 accent-[hsl(42,87%,55%)] cursor-pointer" />
                     <span className="font-body text-[11px] text-white/30 group-hover:text-white/45 transition-colors duration-300 select-none">Remember me</span>
                   </label>
                   <Link to="/forgot-password" className="font-body text-[11px] text-white/30 hover:text-secondary/60 transition-colors duration-300">

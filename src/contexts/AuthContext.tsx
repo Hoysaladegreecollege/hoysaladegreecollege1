@@ -62,7 +62,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) setLoading(false);
+      if (!session) {
+        setLoading(false);
+      } else {
+        // If "Remember me" was not checked, the localStorage flag won't exist.
+        // sessionStorage is cleared on browser close, so if it's missing but
+        // localStorage is also missing, the user didn't want to persist.
+        const rememberFlag = localStorage.getItem("hdc_remember");
+        const sessionFlag = sessionStorage.getItem("hdc_remember");
+        if (!rememberFlag && !sessionFlag) {
+          // Browser was restarted without "Remember me" — sign out
+          supabase.auth.signOut().then(() => {
+            setUser(null); setSession(null); setRole(null); setProfile(null);
+            setLoading(false);
+          });
+        } else {
+          // Ensure sessionStorage flag is set for this tab
+          sessionStorage.setItem("hdc_remember", "1");
+        }
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -86,6 +104,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
+    localStorage.removeItem("hdc_remember");
+    sessionStorage.removeItem("hdc_remember");
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
