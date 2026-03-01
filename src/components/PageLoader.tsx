@@ -13,7 +13,7 @@ export default function PageLoader() {
     if (isInitial) {
       sessionStorage.setItem("hdc-loaded", "1");
       setShowLogo(true);
-      setTimeout(() => setShowLogo(false), 3200);
+      setTimeout(() => setShowLogo(false), 4000);
     }
   }, []);
 
