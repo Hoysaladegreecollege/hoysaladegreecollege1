@@ -1,11 +1,12 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { BookOpen, Clock, BarChart3, Bell, Calendar, TrendingUp, CheckCircle, XCircle, Megaphone, ArrowRight, Sparkles, Upload, User, GraduationCap, FileText, Award } from "lucide-react";
+import { BookOpen, Clock, BarChart3, Bell, Calendar, TrendingUp, CheckCircle, XCircle, Megaphone, ArrowRight, Sparkles, Upload, User, GraduationCap, FileText, Award, IndianRupee, Wallet } from "lucide-react";
 import BirthdayPopup from "@/components/BirthdayPopup";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect, useRef } from "react";
+import { format } from "date-fns";
 import ActionCenter from "@/components/ActionCenter";
 
 const NOTICE_TYPE_COLORS: Record<string, string> = {
@@ -126,6 +127,20 @@ export default function StudentDashboard() {
       if (!user) return [];
       const { data } = await supabase.from("announcements").select("id, title, content, created_at").eq("is_active", true).order("created_at", { ascending: false }).limit(4);
       return data || [];
+    },
+    enabled: !!user,
+  });
+
+  const [feeSemFilter, setFeeSemFilter] = useState("all");
+
+  const { data: feeData } = useQuery({
+    queryKey: ["student-fee-data", user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const { data: student } = await supabase.from("students").select("id, total_fee, fee_paid, fee_due_date, fee_remarks, semester").eq("user_id", user.id).single();
+      if (!student) return null;
+      const { data: payments } = await supabase.from("fee_payments").select("*").eq("student_id", student.id).order("created_at", { ascending: false });
+      return { student, payments: payments || [] };
     },
     enabled: !!user,
   });
@@ -315,6 +330,105 @@ export default function StudentDashboard() {
           ))}
         </div>
       </div>
+
+      {/* Fee Overview with Semester Filter */}
+      {feeData && (
+        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                <IndianRupee className="w-4 h-4 text-emerald-500" />
+              </div>
+              <h3 className="font-body text-[14px] font-semibold text-foreground">Fee Overview</h3>
+            </div>
+            <select
+              value={feeSemFilter}
+              onChange={e => setFeeSemFilter(e.target.value)}
+              className="font-body text-xs border border-border rounded-lg px-2.5 py-1.5 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+            >
+              <option value="all">All Semesters</option>
+              {[1,2,3,4,5,6].map(s => <option key={s} value={String(s)}>Semester {s}</option>)}
+            </select>
+          </div>
+
+          {/* Fee Summary Cards */}
+          {(() => {
+            const filteredPayments = feeSemFilter === "all"
+              ? feeData.payments
+              : feeData.payments.filter((p: any) => p.semester === parseInt(feeSemFilter));
+            const totalPaid = filteredPayments.reduce((sum: number, p: any) => sum + Number(p.amount), 0);
+            const totalFee = feeSemFilter === "all" ? (feeData.student.total_fee || 0) : (feeData.student.total_fee || 0) / 6;
+            const due = Math.max(0, (feeSemFilter === "all" ? (feeData.student.total_fee || 0) : totalFee) - totalPaid);
+            const pct = totalFee > 0 ? Math.min(100, Math.round((totalPaid / totalFee) * 100)) : 0;
+
+            return (
+              <>
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  <div className="bg-muted/30 rounded-xl p-3 text-center">
+                    <p className="font-body text-lg font-bold text-foreground tabular-nums">₹{(feeSemFilter === "all" ? (feeData.student.total_fee || 0) : totalFee).toLocaleString()}</p>
+                    <p className="font-body text-[10px] text-muted-foreground">Total Fee</p>
+                  </div>
+                  <div className="bg-emerald-500/5 rounded-xl p-3 text-center">
+                    <p className="font-body text-lg font-bold text-emerald-600 tabular-nums">₹{totalPaid.toLocaleString()}</p>
+                    <p className="font-body text-[10px] text-muted-foreground">Paid</p>
+                  </div>
+                  <div className={`rounded-xl p-3 text-center ${due > 0 ? "bg-destructive/5" : "bg-emerald-500/5"}`}>
+                    <p className={`font-body text-lg font-bold tabular-nums ${due > 0 ? "text-destructive" : "text-emerald-600"}`}>
+                      {due > 0 ? `₹${due.toLocaleString()}` : "✓ Cleared"}
+                    </p>
+                    <p className="font-body text-[10px] text-muted-foreground">Remaining</p>
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="mb-4">
+                  <div className="flex justify-between mb-1">
+                    <span className="font-body text-[10px] text-muted-foreground">Payment Progress</span>
+                    <span className="font-body text-[10px] font-bold text-foreground">{pct}%</span>
+                  </div>
+                  <div className="h-2.5 bg-muted rounded-full overflow-hidden">
+                    <div className="h-full rounded-full transition-all duration-700" style={{
+                      width: `${pct}%`,
+                      background: pct === 100 ? "hsl(142, 70%, 40%)" : pct > 50 ? "hsl(42, 87%, 55%)" : "hsl(0, 84%, 60%)"
+                    }} />
+                  </div>
+                  {feeData.student.fee_due_date && (
+                    <p className="font-body text-[10px] text-muted-foreground mt-1.5">
+                      Due by: <span className="font-semibold">{format(new Date(feeData.student.fee_due_date), "MMM d, yyyy")}</span>
+                    </p>
+                  )}
+                </div>
+
+                {/* Recent Payments */}
+                {filteredPayments.length > 0 ? (
+                  <div>
+                    <h4 className="font-body text-[11px] font-bold text-foreground mb-2 uppercase tracking-wider">Payment History</h4>
+                    <div className="space-y-1.5 max-h-40 overflow-y-auto">
+                      {filteredPayments.slice(0, 10).map((p: any) => (
+                        <div key={p.id} className="flex justify-between items-center p-2.5 rounded-lg bg-muted/30 font-body text-xs">
+                          <div className="flex items-center gap-2">
+                            <Wallet className="w-3.5 h-3.5 text-emerald-500" />
+                            <div>
+                              <span className="font-semibold text-emerald-600">₹{Number(p.amount).toLocaleString()}</span>
+                              <span className="text-muted-foreground ml-1.5">{p.payment_method}</span>
+                              {p.semester && <span className="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary">Sem {p.semester}</span>}
+                            </div>
+                          </div>
+                          <span className="text-muted-foreground text-[10px]">{format(new Date(p.created_at), "MMM d")}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <p className="font-body text-xs text-muted-foreground text-center py-4">
+                    {feeSemFilter === "all" ? "No payments recorded yet" : `No payments for Semester ${feeSemFilter}`}
+                  </p>
+                )}
+              </>
+            );
+          })()}
+        </div>
+      )}
 
       {/* Notices + Announcements */}
       <div className="grid md:grid-cols-2 gap-4">
