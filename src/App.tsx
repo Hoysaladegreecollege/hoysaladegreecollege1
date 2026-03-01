@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 const About = lazy(() => import("./pages/About"));
 const Courses = lazy(() => import("./pages/Courses"));
 const Admissions = lazy(() => import("./pages/Admissions"));
+const Apply = lazy(() => import("./pages/Apply"));
 const Departments = lazy(() => import("./pages/Departments"));
 const Faculty = lazy(() => import("./pages/Faculty"));
 const Events = lazy(() => import("./pages/Events"));
@@ -123,6 +124,7 @@ const App = () => (
               <Route path="/about" element={<SuspenseWrap><About /></SuspenseWrap>} />
               <Route path="/courses" element={<SuspenseWrap><Courses /></SuspenseWrap>} />
               <Route path="/admissions" element={<SuspenseWrap><Admissions /></SuspenseWrap>} />
+              <Route path="/apply" element={<SuspenseWrap><Apply /></SuspenseWrap>} />
               <Route path="/departments" element={<SuspenseWrap><Departments /></SuspenseWrap>} />
               <Route path="/faculty" element={<SuspenseWrap><Faculty /></SuspenseWrap>} />
               <Route path="/events" element={<SuspenseWrap><Events /></SuspenseWrap>} />
