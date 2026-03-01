@@ -465,6 +465,7 @@ export type Database = {
           receipt_number: string | null
           recorded_by: string | null
           remarks: string | null
+          semester: number | null
           student_id: string | null
         }
         Insert: {
@@ -476,6 +477,7 @@ export type Database = {
           receipt_number?: string | null
           recorded_by?: string | null
           remarks?: string | null
+          semester?: number | null
           student_id?: string | null
         }
         Update: {
@@ -487,6 +489,7 @@ export type Database = {
           receipt_number?: string | null
           recorded_by?: string | null
           remarks?: string | null
+          semester?: number | null
           student_id?: string | null
         }
         Relationships: [

@@ -21,7 +21,7 @@ export default function AdminFeeManagement() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
-  const [paymentForm, setPaymentForm] = useState({ amount: "", payment_method: "Cash", remarks: "", upi_number: "" });
+  const [paymentForm, setPaymentForm] = useState({ amount: "", payment_method: "Cash", remarks: "", upi_number: "", semester: "" });
   const [courseFilter, setCourseFilter] = useState("all");
   const [feeFilter, setFeeFilter] = useState("all");
   const [search, setSearch] = useState("");
@@ -87,6 +87,7 @@ export default function AdminFeeManagement() {
         remarks,
         receipt_number,
         recorded_by: user?.id,
+        semester: paymentForm.semester ? parseInt(paymentForm.semester) : (selectedStudent.semester || null),
       });
       await supabase.from("students").update({ fee_paid: newPaid }).eq("id", selectedStudent.id);
       return { receipt_number, amount, payment_method: paymentForm.payment_method, remarks };
@@ -98,7 +99,7 @@ export default function AdminFeeManagement() {
       qc.invalidateQueries({ queryKey: ["all-fee-payments"] });
       setReceiptStudent(selectedStudent);
       setReceiptPayment({ ...data, created_at: new Date().toISOString(), student_name: selectedStudent.profile?.full_name, roll_number: selectedStudent.roll_number, course: selectedStudent.courses?.name });
-      setPaymentForm({ amount: "", payment_method: "Cash", remarks: "", upi_number: "" });
+      setPaymentForm({ amount: "", payment_method: "Cash", remarks: "", upi_number: "", semester: "" });
       setSelectedStudent((prev: any) => prev ? { ...prev, fee_paid: (prev.fee_paid || 0) + parseFloat(paymentForm.amount) } : null);
     },
     onError: (e: any) => toast.error(e.message),
@@ -511,7 +512,7 @@ export default function AdminFeeManagement() {
                   </div>
                   <div>
                     <p className="font-body text-xs font-semibold text-foreground">{p.receipt_number || "—"}</p>
-                    <p className="font-body text-[10px] text-muted-foreground">{p.payment_method} · {p.remarks || "No remarks"}</p>
+                    <p className="font-body text-[10px] text-muted-foreground">{p.payment_method} · {p.semester ? `Sem ${p.semester} · ` : ""}{p.remarks || "No remarks"}</p>
                   </div>
                 </div>
                 <div className="text-right">
@@ -557,6 +558,7 @@ export default function AdminFeeManagement() {
                         <div>
                           <span className="font-semibold text-emerald-600">₹{p.amount}</span>
                           <span className="text-muted-foreground ml-2">{p.payment_method}</span>
+                          {p.semester && <span className="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary">Sem {p.semester}</span>}
                           {p.receipt_number && <span className="text-muted-foreground ml-1">· {p.receipt_number}</span>}
                         </div>
                         <span className="text-muted-foreground">{format(new Date(p.created_at), "MMM d, yyyy")}</span>
@@ -570,6 +572,13 @@ export default function AdminFeeManagement() {
                   <label className="font-body text-xs font-semibold block mb-1.5">Amount (₹) *</label>
                   <input type="number" value={paymentForm.amount} onChange={e => setPaymentForm({ ...paymentForm, amount: e.target.value })}
                     className={inputClass} placeholder="Enter amount" min="1" />
+                </div>
+                <div>
+                  <label className="font-body text-xs font-semibold block mb-1.5">Semester</label>
+                  <select value={paymentForm.semester} onChange={e => setPaymentForm({ ...paymentForm, semester: e.target.value })} className={inputClass}>
+                    <option value="">Current ({selectedStudent?.semester || "—"})</option>
+                    {[1,2,3,4,5,6].map(s => <option key={s} value={String(s)}>Semester {s}</option>)}
+                  </select>
                 </div>
                 <div>
                   <label className="font-body text-xs font-semibold block mb-1.5">Payment Method</label>
