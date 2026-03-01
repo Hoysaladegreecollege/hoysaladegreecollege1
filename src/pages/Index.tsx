@@ -571,10 +571,16 @@ export default function Index() {
 
       {/* CTA Banner */}
       <section className="py-14 sm:py-20 relative overflow-hidden">
-        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--navy-dark)))" }} />
-        <div className="absolute inset-0 opacity-[0.06]"
-        style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] sm:w-[600px] h-[200px] sm:h-[300px] bg-secondary/10 rounded-full blur-3xl pointer-events-none" />
+        {/* Deep graphite-to-black gradient — no blue */}
+        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, hsl(230,12%,6%), hsl(228,10%,3%), hsl(230,12%,6%))" }} />
+        {/* Subtle dot pattern */}
+        <div className="absolute inset-0 opacity-[0.03]"
+        style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.6) 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
+        {/* Gold ambient glow top */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] sm:w-[700px] h-[200px] sm:h-[300px] bg-[hsl(var(--gold))]/[0.06] rounded-full blur-[100px] pointer-events-none" />
+        {/* Subtle gold accent lines */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[hsl(var(--gold))]/20 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[hsl(var(--gold))]/10 to-transparent" />
 
         <div className="relative container px-5 sm:px-4 text-center text-primary-foreground">
           <ScrollReveal>
