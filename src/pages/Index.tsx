@@ -342,7 +342,9 @@ export default function Index() {
 
       {/* Key Highlights */}
       <section className="py-14 sm:py-28 bg-cream relative overflow-hidden">
-        <div className="absolute inset-0 section-pattern opacity-60" />
+        <div className="absolute inset-0 section-pattern opacity-40" />
+        <div className="absolute top-0 left-[10%] w-[400px] h-[400px] rounded-full blur-[100px] pointer-events-none" style={{ background: "radial-gradient(circle, hsla(42,87%,55%,0.03), transparent 70%)" }} />
+        <div className="absolute bottom-0 right-[5%] w-[350px] h-[350px] rounded-full blur-[80px] pointer-events-none" style={{ background: "radial-gradient(circle, hsla(var(--primary),0.03), transparent 70%)" }} />
         <div className="container px-5 sm:px-4 relative">
           <ScrollReveal>
             <SectionHeading title="Why Hoysala?" subtitle="Key highlights that set us apart from the rest" />
@@ -350,21 +352,25 @@ export default function Index() {
        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5">
             {highlights.map((h, i) =>
             <ScrollReveal key={h.label} delay={i * 40}>
-                <div className="relative premium-card p-4 sm:p-6 cursor-default group overflow-hidden h-full border border-border/40 rounded-2xl active:scale-[0.97] touch-manipulation"
-                  style={{ transition: "all 0.5s cubic-bezier(0.4,0,0.2,1)" }}>
-                  {/* Glass overlay on hover */}
-                  <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500"
-                    style={{ background: "linear-gradient(135deg, hsla(var(--primary), 0.06), hsla(var(--secondary), 0.08), hsla(var(--primary), 0.04))", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }} />
-                  <div className="absolute inset-0 border border-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-secondary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 rounded-2xl pointer-events-none" />
+                <div className="relative p-4 sm:p-6 cursor-default group overflow-hidden h-full border border-border/40 rounded-2xl bg-card active:scale-[0.97] touch-manipulation"
+                  style={{ transition: "all 0.6s cubic-bezier(0.16,1,0.3,1)", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+                  
+                  {/* Top gold accent line */}
+                  <div className="absolute top-0 left-6 right-6 h-[0.5px] opacity-0 group-hover:opacity-100 transition-all duration-500" style={{ background: "linear-gradient(90deg, transparent, hsl(42 87% 55% / 0.35), transparent)" }} />
+                  
+                  {/* Shimmer sweep */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent translate-x-[-100%] group-hover:translate-x-[100%] rounded-2xl pointer-events-none" style={{ transition: "transform 0.9s ease" }} />
+                  
+                  {/* Hover border glow */}
+                  <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ boxShadow: "inset 0 0 0 1px hsla(42,87%,55%,0.1), 0 8px 32px rgba(0,0,0,0.06)" }} />
+
                   <div className="relative flex flex-col items-center text-center gap-2.5 sm:gap-3 z-10">
-                    <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-sm border border-border/30 group-hover:border-secondary/40 group-hover:shadow-xl group-hover:shadow-secondary/15">
-                      <h.icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary group-hover:text-secondary transition-colors duration-300" />
+                    <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110 group-hover:-rotate-3 border border-border/30 group-hover:border-secondary/30"
+                      style={{ background: "linear-gradient(135deg, hsla(var(--primary),0.08), hsla(var(--secondary),0.08))" }}>
+                      <h.icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary group-hover:text-secondary transition-colors duration-400" />
                     </div>
                     <div>
-                      <span className="font-body text-[13px] sm:text-sm font-bold text-foreground block group-hover:text-primary transition-colors duration-300 leading-snug">{h.label}</span>
+                      <span className="font-body text-[13px] sm:text-sm font-bold text-foreground block group-hover:text-primary transition-colors duration-400 leading-snug">{h.label}</span>
                       <span className="font-body text-[11px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1 block leading-relaxed">{h.desc}</span>
                     </div>
                   </div>
