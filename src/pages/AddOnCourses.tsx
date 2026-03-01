@@ -4,6 +4,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 import PageHeader from "@/components/PageHeader";
 import { BookOpen, Monitor, Briefcase, CheckCircle, ArrowRight, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
+import PremiumStatsStrip from "@/components/PremiumStatsStrip";
 
 const bcomBba = [
   { name: "CA (Chartered Accountancy)", desc: "Foundation & Intermediate coaching integrated with B.Com" },
@@ -32,25 +33,12 @@ export default function AddOnCourses() {
       <SEOHead title="Add-on Courses" description="Value-added courses at Hoysala Degree College: AI, ML, Python, CA/CS/CMA coaching, Tally ERP, soft skills, aptitude training for BCA, BCom and BBA students." canonical="/addon-courses" />
       <PageHeader title="Add-on Courses" subtitle="Value-added certifications to boost your career" />
 
-      {/* Stats strip */}
-      <section className="py-8 sm:py-10 bg-primary relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-navy-dark/80 to-primary" />
-        <div className="relative container px-5 sm:px-4">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-primary-foreground text-center">
-            {[
-              { value: "15+", label: "Add-on Courses" },
-              { value: "100%", label: "Practical Based" },
-              { value: "Free", label: "For Students" },
-              { value: "Industry", label: "Certified" },
-            ].map((s, i) => (
-              <div key={s.label} className="group cursor-default">
-                <div className="font-display text-2xl sm:text-3xl font-bold">{s.value}</div>
-                <div className="font-body text-[10px] opacity-50 mt-1 uppercase tracking-wider">{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <PremiumStatsStrip stats={[
+        { value: "15+", label: "Add-on Courses" },
+        { value: "100%", label: "Practical Based" },
+        { value: "Free", label: "For Students" },
+        { value: "Industry", label: "Certified" },
+      ]} />
 
       <section className="py-14 sm:py-24 bg-background relative overflow-hidden">
         <div className="absolute top-0 right-0 w-80 h-80 bg-secondary/4 rounded-full blur-3xl pointer-events-none" />

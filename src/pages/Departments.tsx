@@ -3,6 +3,7 @@ import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
 import PageHeader from "@/components/PageHeader";
 import { Monitor, TrendingUp, Briefcase, Award, ChevronRight, Users, GraduationCap, BookOpen } from "lucide-react";
+import PremiumStatsStrip from "@/components/PremiumStatsStrip";
 
 const departments = [
   {
@@ -58,30 +59,12 @@ export default function Departments() {
       <SEOHead title="Departments" description="Explore departments at Hoysala Degree College – Computer Applications, Commerce, and Business Administration. Specialized faculty and modern facilities." canonical="/departments" />
       <PageHeader title="Departments" subtitle="Specialized education and skill development" />
 
-      {/* Stats strip */}
-      <section className="py-10 bg-primary relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-navy-dark/80 to-primary" />
-        <div className="absolute inset-0 opacity-[0.04]"
-          style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
-        <div className="relative container px-4">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-primary-foreground text-center">
-            {[
-              { icon: BookOpen, value: "3", label: "Departments" },
-              { icon: Users, value: "400+", label: "Students" },
-              { icon: GraduationCap, value: "24+", label: "Faculty Members" },
-              { icon: Award, value: "90%", label: "Placement Rate" },
-            ].map((s, i) => (
-              <div key={s.label} className="group cursor-default" style={{ animationDelay: `${i * 100}ms` }}>
-                <div className="w-12 h-12 mx-auto mb-2 rounded-xl bg-primary-foreground/8 border border-primary-foreground/12 flex items-center justify-center group-hover:bg-secondary/20 group-hover:scale-110 transition-all duration-400">
-                  <s.icon className="w-6 h-6 text-secondary group-hover:rotate-12 transition-transform duration-400" />
-                </div>
-                <div className="font-display text-2xl sm:text-3xl font-bold">{s.value}</div>
-                <div className="font-body text-[10px] opacity-50 mt-1 uppercase tracking-wider">{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <PremiumStatsStrip stats={[
+        { icon: BookOpen, value: "3", label: "Departments" },
+        { icon: Users, value: "400+", label: "Students" },
+        { icon: GraduationCap, value: "24+", label: "Faculty Members" },
+        { icon: Award, value: "90%", label: "Placement Rate" },
+      ]} />
 
       <section className="py-16 sm:py-24 bg-background relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/4 rounded-full blur-3xl pointer-events-none" />

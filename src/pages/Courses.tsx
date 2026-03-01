@@ -6,6 +6,7 @@ import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Clock, CheckCircle, IndianRupee, ArrowRight, GraduationCap, Sparkles, Users, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
+import PremiumStatsStrip from "@/components/PremiumStatsStrip";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 const courses = [
@@ -74,37 +75,12 @@ export default function Courses() {
       <PageHeader title="Our Courses" subtitle="Choose from our carefully designed programs" />
 
       {/* Stats strip */}
-      <section className="py-12 relative overflow-hidden">
-        {/* Ultra-premium dark graphite background */}
-        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, hsl(230,12%,6%) 0%, hsl(228,14%,9%) 50%, hsl(230,10%,5%) 100%)" }} />
-        {/* Subtle radial glow */}
-        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "radial-gradient(circle at 50% 50%, hsl(var(--gold)), transparent 70%)" }} />
-        {/* Top gold accent */}
-        <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent 10%, hsl(var(--gold) / 0.2) 50%, transparent 90%)" }} />
-        {/* Bottom gold accent */}
-        <div className="absolute bottom-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent 10%, hsl(var(--gold) / 0.15) 50%, transparent 90%)" }} />
-
-        <div className="relative container px-4">
-          <div className="bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] rounded-3xl p-8 sm:p-10 shadow-2xl">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
-              {[
-                { icon: BookOpen, value: "6", label: "Programs", gradient: "from-blue-400 to-cyan-400", bg: "bg-blue-500/15", shadow: "shadow-blue-500/20" },
-                { icon: Users, value: "300+", label: "Students", gradient: "from-emerald-400 to-green-400", bg: "bg-emerald-500/15", shadow: "shadow-emerald-500/20" },
-                { icon: GraduationCap, value: "3", label: "Years Duration", gradient: "from-amber-400 to-yellow-400", bg: "bg-amber-500/15", shadow: "shadow-amber-500/20" },
-                { icon: Sparkles, value: "90%", label: "Placement Rate", gradient: "from-purple-400 to-violet-400", bg: "bg-purple-500/15", shadow: "shadow-purple-500/20" },
-              ].map((s, i) => (
-                <div key={s.label} className="group" style={{ animationDelay: `${i * 100}ms` }}>
-                  <div className={`w-12 h-12 rounded-2xl ${s.bg} flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300 shadow-lg ${s.shadow} border border-white/[0.06]`}>
-                    <s.icon className="w-6 h-6" style={{ color: s.gradient.includes("blue") ? "#60a5fa" : s.gradient.includes("emerald") ? "#34d399" : s.gradient.includes("amber") ? "#fbbf24" : "#a78bfa" }} />
-                  </div>
-                  <div className="font-display text-2xl sm:text-3xl font-bold text-white/90">{s.value}</div>
-                  <div className="font-body text-[10px] text-white/40 mt-1.5 uppercase tracking-widest">{s.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      <PremiumStatsStrip stats={[
+        { icon: BookOpen, value: "6", label: "Programs" },
+        { icon: Users, value: "300+", label: "Students" },
+        { icon: GraduationCap, value: "3", label: "Years Duration" },
+        { icon: Sparkles, value: "90%", label: "Placement Rate" },
+      ]} />
 
       <section className="py-20 sm:py-28 bg-background relative overflow-hidden">
         <div className="absolute top-0 right-0 w-80 h-80 bg-secondary/4 rounded-full blur-3xl pointer-events-none" />
