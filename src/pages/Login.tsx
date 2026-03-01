@@ -284,11 +284,14 @@ export default function Login() {
           padding: 14px 16px;
           font-family: 'Inter', system-ui, sans-serif;
           font-size: 13px;
+          line-height: 1.2;
           color: white;
           background: rgba(255, 255, 255, 0.03);
           border: 1px solid rgba(255, 255, 255, 0.05);
           outline: none;
           transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          display: flex;
+          align-items: center;
         }
         .login-input::placeholder {
           color: rgba(148, 163, 184, 0.25);
