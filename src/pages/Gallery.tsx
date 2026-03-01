@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import SEOHead from "@/components/SEOHead";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -127,18 +128,17 @@ export default function Gallery() {
         </div>
       </section>
 
-      {/* Full-screen Lightbox - viewport centered */}
-      {lightboxIdx !== null && (
+      {/* Full-screen Lightbox - viewport centered via portal */}
+      {lightboxIdx !== null && createPortal(
         <div
-          className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center animate-fade-in pointer-events-auto"
-          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+          className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-md flex items-center justify-center animate-fade-in"
           onClick={closeLightbox}
           role="dialog"
           aria-modal="true"
           aria-label="Image lightbox"
         >
           <div
-            className="relative flex flex-col items-center w-[92vw] sm:max-w-[80vw]"
+            className="relative flex flex-col items-center justify-center w-[92vw] sm:max-w-[80vw] max-h-[100dvh] px-2 py-14 sm:py-8"
             onClick={(e) => e.stopPropagation()}
             onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
             onTouchEnd={(e) => {
@@ -150,9 +150,9 @@ export default function Gallery() {
               setTouchStartX(null);
             }}
           >
-            {/* Close button */}
+            {/* Close button - fixed to viewport top-right */}
             <button
-              className="absolute -top-12 right-0 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 z-20 shadow-lg border border-white/10"
+              className="fixed top-4 right-4 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 z-[10000] shadow-lg border border-white/10"
               onClick={(e) => { e.stopPropagation(); closeLightbox(); }}
               aria-label="Close lightbox"
             >
@@ -161,14 +161,14 @@ export default function Gallery() {
 
             {/* Nav buttons */}
             <button
-              className="absolute left-2 sm:-left-14 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/25 transition-colors z-20"
+              className="absolute left-0 sm:-left-14 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/25 transition-colors z-20"
               onClick={(e) => { e.stopPropagation(); goPrev(); }}
               aria-label="Previous image"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
-              className="absolute right-2 sm:-right-14 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/25 transition-colors z-20"
+              className="absolute right-0 sm:-right-14 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/25 transition-colors z-20"
               onClick={(e) => { e.stopPropagation(); goNext(); }}
               aria-label="Next image"
             >
@@ -179,7 +179,7 @@ export default function Gallery() {
             <img
               src={(filtered[lightboxIdx] as any).image_url}
               alt={(filtered[lightboxIdx] as any).title}
-              className="w-full max-h-[70vh] object-contain rounded-2xl shadow-2xl animate-scale-bounce"
+              className="w-full max-h-[65dvh] sm:max-h-[75vh] object-contain rounded-2xl shadow-2xl animate-scale-bounce"
               key={lightboxIdx}
             />
             {/* Caption */}
@@ -188,7 +188,8 @@ export default function Gallery() {
               <p className="font-body text-xs text-white/60 mt-1">{(filtered[lightboxIdx] as any).category} • {lightboxIdx + 1} / {filtered.length}</p>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
