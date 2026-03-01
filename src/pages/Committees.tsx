@@ -3,6 +3,7 @@ import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
 import PageHeader from "@/components/PageHeader";
 import { Globe, Briefcase, Monitor, Award, Users, Heart, Shield, BookOpen, Leaf, Scale, Sparkles, MessageSquare, AlertTriangle, ArrowRight } from "lucide-react";
+import PremiumStatsStrip from "@/components/PremiumStatsStrip";
 
 const committees = [
   { name: "Language Club", icon: Globe, desc: "Promoting linguistic skills and cultural appreciation through literary events.", color: "from-blue-500/15 to-blue-500/5", iconBg: "bg-blue-500/10", iconColor: "text-blue-600", badge: "bg-blue-50 text-blue-700 border-blue-100" },
@@ -26,28 +27,12 @@ export default function Committees() {
       <SEOHead title="Committees & Clubs" description="Explore 13+ committees and clubs at Hoysala Degree College – NSS, Tech Club, Placement Cell, Eco Club, and more for holistic student development." canonical="/committees" />
       <PageHeader title="Committees & Clubs" subtitle="Driving holistic student development" />
 
-      {/* Stats strip */}
-      <section className="py-10 bg-primary relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-navy-dark/80 to-primary" />
-        <div className="absolute inset-0 opacity-[0.04]"
-          style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
-        <div className="relative container px-4">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-primary-foreground text-center">
-            {[
-              { emoji: "🎭", value: "13+", label: "Active Committees" },
-              { emoji: "🤝", value: "500+", label: "Student Members" },
-              { emoji: "📅", value: "50+", label: "Annual Events" },
-              { emoji: "🏆", value: "10+", label: "Awards Won" },
-            ].map((s, i) => (
-              <div key={s.label} className="group cursor-default" style={{ animationDelay: `${i * 100}ms` }}>
-                <div className="text-3xl mb-1.5 group-hover:scale-125 transition-transform duration-400">{s.emoji}</div>
-                <div className="font-display text-2xl sm:text-3xl font-bold">{s.value}</div>
-                <div className="font-body text-[10px] opacity-50 mt-1 uppercase tracking-wider">{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <PremiumStatsStrip stats={[
+        { emoji: "🎭", value: "13+", label: "Active Committees" },
+        { emoji: "🤝", value: "500+", label: "Student Members" },
+        { emoji: "📅", value: "50+", label: "Annual Events" },
+        { emoji: "🏆", value: "10+", label: "Awards Won" },
+      ]} />
 
       <section className="py-16 sm:py-24 bg-background relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/4 rounded-full blur-3xl pointer-events-none" />
