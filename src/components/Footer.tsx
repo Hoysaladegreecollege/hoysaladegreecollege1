@@ -86,6 +86,7 @@ export default function Footer() {
                 { label: "Committees", path: "/committees" },
                 { label: "Management", path: "/management" },
                 { label: "Contact", path: "/contact" },
+                { label: "Download App", path: "/download" },
               ].map((l) => (
                 <Link
                   key={l.label}
