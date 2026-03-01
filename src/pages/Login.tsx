@@ -1,26 +1,26 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import SEOHead from "@/components/SEOHead";
-import { Eye, EyeOff, Sparkles, Lock, Mail, User, ArrowLeft, Shield, GraduationCap } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, User, ArrowLeft, Shield, Fingerprint, Sparkles } from "lucide-react";
 import collegeLogo from "@/assets/college-logo.png";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { validatePassword, PASSWORD_REQUIREMENTS } from "@/lib/password-validation";
+import { validatePassword } from "@/lib/password-validation";
 
 type Role = "student" | "teacher" | "principal" | "admin";
 
-const roles: { value: Role; label: string; icon: string }[] = [
-  { value: "student", label: "Student", icon: "🎓" },
-  { value: "teacher", label: "Teacher", icon: "📚" },
-  { value: "principal", label: "Principal", icon: "🏛️" },
-  { value: "admin", label: "Admin", icon: "⚙️" },
+const roles: { value: Role; label: string; icon: string; desc: string }[] = [
+  { value: "student", label: "Student", icon: "🎓", desc: "Academic portal" },
+  { value: "teacher", label: "Teacher", icon: "📚", desc: "Class management" },
+  { value: "principal", label: "Principal", icon: "🏛️", desc: "Institution head" },
+  { value: "admin", label: "Admin", icon: "⚙️", desc: "System control" },
 ];
 
 export default function Login() {
   const [searchParams] = useSearchParams();
   const isSignupMode = searchParams.get("mode") === "signup";
-  const [mode, setMode] = useState<"login" | "signup">(isSignupMode ? "signup" : "login");
+  const [mode] = useState<"login" | "signup">(isSignupMode ? "signup" : "login");
   const [role, setRole] = useState<Role>("student");
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -28,9 +28,10 @@ export default function Login() {
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
   const [focused, setFocused] = useState<string | null>(null);
-  const [passwordStrength, setPasswordStrength] = useState(0);
   const { signIn, signUp, role: currentUserRole, user } = useAuth();
   const navigate = useNavigate();
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
 
   const canSignup = isSignupMode && currentUserRole === "admin";
 
@@ -44,16 +45,14 @@ export default function Login() {
     }
   }, [user, currentUserRole, isSignupMode, navigate]);
 
-  // Password strength meter
-  useEffect(() => {
-    if (!password) { setPasswordStrength(0); return; }
-    let strength = 0;
-    if (password.length >= 8) strength += 25;
-    if (/[A-Z]/.test(password)) strength += 25;
-    if (/[0-9]/.test(password)) strength += 25;
-    if (/[^A-Za-z0-9]/.test(password)) strength += 25;
-    setPasswordStrength(strength);
-  }, [password]);
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    setMousePos({
+      x: ((e.clientX - rect.left) / rect.width) * 100,
+      y: ((e.clientY - rect.top) / rect.height) * 100,
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,92 +76,93 @@ export default function Login() {
     }
   };
 
-  const getStrengthColor = () => {
-    if (passwordStrength <= 25) return "bg-destructive";
-    if (passwordStrength <= 50) return "bg-orange-500";
-    if (passwordStrength <= 75) return "bg-amber-500";
-    return "bg-emerald-500";
-  };
-
-  const getStrengthLabel = () => {
-    if (passwordStrength <= 25) return "Weak";
-    if (passwordStrength <= 50) return "Fair";
-    if (passwordStrength <= 75) return "Good";
-    return "Strong";
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
-      <SEOHead title="Login" description="Sign in to Hoysala Degree College portal. Access student, teacher, principal, and admin dashboards." canonical="/login" noIndex />
+      <SEOHead title="Login" description="Sign in to Hoysala Degree College portal." canonical="/login" noIndex />
 
-      {/* Deep graphite background */}
-      <div className="absolute inset-0 bg-[#0E1016]" />
+      {/* Immersive deep blue-black background */}
+      <div className="absolute inset-0" style={{ background: "linear-gradient(160deg, #030712 0%, #0a1628 35%, #0c1a30 55%, #060e1a 100%)" }} />
 
-      {/* Subtle radial glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full opacity-[0.04]"
-        style={{ background: "radial-gradient(circle, hsl(42 87% 55%), transparent 70%)" }} />
+      {/* Animated aurora mesh */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="login-aurora login-aurora-1" />
+        <div className="login-aurora login-aurora-2" />
+        <div className="login-aurora login-aurora-3" />
+      </div>
 
-      {/* Micro grid pattern */}
-      <div className="absolute inset-0 opacity-[0.025]"
-        style={{ backgroundImage: "linear-gradient(hsla(42,87%,55%,0.15) 1px, transparent 1px), linear-gradient(90deg, hsla(42,87%,55%,0.15) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+      {/* Noise texture overlay */}
+      <div className="absolute inset-0 opacity-[0.035]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")" }} />
 
-      {/* Floating ambient dots */}
-      {[...Array(4)].map((_, i) => (
-        <div key={i} className="absolute rounded-full animate-float"
+      {/* Radial spotlight */}
+      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-[0.07]"
+        style={{ background: "radial-gradient(circle, #3b82f6, transparent 70%)" }} />
+
+      {/* Floating orbs */}
+      <div className="absolute top-[15%] left-[10%] w-[300px] h-[300px] rounded-full opacity-[0.04] animate-float"
+        style={{ background: "radial-gradient(circle, #60a5fa, transparent 60%)", animationDuration: "8s" }} />
+      <div className="absolute bottom-[10%] right-[8%] w-[250px] h-[250px] rounded-full opacity-[0.03] animate-float"
+        style={{ background: "radial-gradient(circle, #818cf8, transparent 60%)", animationDuration: "10s", animationDelay: "2s" }} />
+
+      <div className="relative z-10 w-full max-w-[440px] mx-4 login-card-enter">
+
+        {/* Main glassmorphism card */}
+        <div
+          ref={cardRef}
+          onMouseMove={handleMouseMove}
+          className="relative rounded-[28px] overflow-hidden"
           style={{
-            width: `${6 + i * 3}px`, height: `${6 + i * 3}px`,
-            left: `${20 + i * 20}%`, top: `${25 + (i % 2) * 40}%`,
-            background: `hsla(42, 87%, 55%, ${0.08 + i * 0.02})`,
-            animationDelay: `${i * 1.2}s`,
-            filter: "blur(1px)",
-          }} />
-      ))}
+            background: "linear-gradient(165deg, rgba(15, 23, 42, 0.88), rgba(10, 18, 34, 0.95))",
+            boxShadow: "0 40px 80px -20px rgba(0,0,0,0.6), 0 0 0 1px rgba(59, 130, 246, 0.08), 0 0 80px -20px rgba(59, 130, 246, 0.06), inset 0 1px 0 rgba(255,255,255,0.04)",
+            backdropFilter: "blur(60px)",
+          }}
+        >
+          {/* Interactive spotlight follow */}
+          <div
+            className="absolute inset-0 pointer-events-none opacity-[0.06] transition-opacity duration-500 rounded-[28px]"
+            style={{ background: `radial-gradient(500px circle at ${mousePos.x}% ${mousePos.y}%, rgba(59, 130, 246, 0.4), transparent 50%)` }}
+          />
 
-      <div className="relative z-10 w-full max-w-[420px] mx-4 login-card-enter">
-        {/* Main card */}
-        <div className="relative rounded-3xl overflow-hidden"
-          style={{
-            background: "linear-gradient(145deg, hsla(228, 10%, 10%, 0.95), hsla(228, 10%, 7%, 0.98))",
-            boxShadow: "0 32px 64px rgba(0,0,0,0.5), 0 0 0 1px hsla(42, 87%, 55%, 0.08), inset 0 1px 0 hsla(0,0%,100%,0.04)",
-            backdropFilter: "blur(40px)",
-          }}>
+          {/* Top accent bar — electric blue gradient */}
+          <div className="h-[2px] relative overflow-hidden">
+            <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, transparent 5%, #3b82f6 30%, #60a5fa 50%, #3b82f6 70%, transparent 95%)" }} />
+            <div className="absolute inset-0 login-shimmer-bar" />
+          </div>
 
-          {/* Top gold accent line */}
-          <div className="h-[2px]" style={{ background: "linear-gradient(90deg, transparent 10%, hsl(42 87% 55% / 0.5) 50%, transparent 90%)" }} />
+          <div className="px-9 pt-11 pb-9 sm:px-11 relative z-10">
 
-          <div className="px-8 pt-10 pb-8 sm:px-10">
-            {/* Logo section */}
-            <div className="text-center mb-9">
-              <div className="relative inline-flex items-center justify-center mb-5">
-                {/* Glow ring */}
-                <div className="absolute -inset-3 rounded-[1.25rem] opacity-20"
-                  style={{ background: "conic-gradient(from 180deg, hsl(42 87% 55%), hsl(42 60% 35%), hsl(42 87% 55%))" }} />
-                <div className="relative w-[72px] h-[72px] rounded-2xl overflow-hidden border border-white/[0.08]"
-                  style={{ boxShadow: "0 8px 32px rgba(198, 167, 94, 0.15)" }}>
+            {/* Logo */}
+            <div className="text-center mb-10">
+              <div className="relative inline-flex items-center justify-center mb-6">
+                {/* Pulsing glow ring */}
+                <div className="absolute -inset-4 rounded-[22px] login-logo-glow" />
+                <div className="relative w-[76px] h-[76px] rounded-[20px] overflow-hidden border border-white/[0.08]"
+                  style={{ boxShadow: "0 12px 40px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255,255,255,0.06)" }}>
                   <img src={collegeLogo} alt="Hoysala Degree College Logo" className="w-full h-full object-contain" />
                 </div>
               </div>
-              <h1 className="font-display text-[22px] font-bold text-white tracking-tight">
+
+              <h1 className="font-display text-[24px] font-bold text-white tracking-tight leading-tight">
                 {canSignup ? "Create Account" : "Welcome Back"}
               </h1>
-              <p className="font-body text-[13px] text-white/40 mt-2 tracking-wide">
-                {canSignup ? "Register a new user account" : "Sign in to your college portal"}
+              <p className="font-body text-[13px] text-blue-200/40 mt-2.5 tracking-wide font-light">
+                {canSignup ? "Register a new user on the portal" : "Sign in to your college portal"}
               </p>
             </div>
 
-            {/* Role Selection (signup mode) */}
+            {/* Role selection for signup */}
             {canSignup && (
-              <div className="mb-7">
-                <label className="font-body text-[10px] font-semibold text-white/50 block mb-3 uppercase tracking-[0.15em]">Select Role</label>
+              <div className="mb-8">
+                <label className="font-body text-[10px] font-semibold text-blue-300/40 block mb-3 uppercase tracking-[0.18em]">Account Type</label>
                 <div className="grid grid-cols-4 gap-2">
                   {roles.map((r) => (
                     <button key={r.value} type="button" onClick={() => setRole(r.value)}
-                      className={`p-3 rounded-2xl border text-center transition-all duration-300 font-body text-[11px] hover:scale-[1.03] ${
+                      className={`group p-3.5 rounded-2xl border text-center transition-all duration-400 font-body text-[11px] ${
                         role === r.value
-                          ? "border-secondary/40 bg-secondary/10 text-secondary font-bold"
-                          : "border-white/[0.06] text-white/40 hover:border-white/10 hover:text-white/60"
+                          ? "border-blue-500/30 bg-blue-500/10 text-blue-300 font-bold shadow-[0_0_20px_-4px_rgba(59,130,246,0.2)]"
+                          : "border-white/[0.04] text-white/30 hover:border-blue-500/10 hover:bg-blue-500/[0.03] hover:text-white/50"
                       }`}>
-                      <div className="text-lg mb-1">{r.icon}</div>{r.label}
+                      <div className="text-lg mb-1.5 transition-transform duration-300 group-hover:scale-110">{r.icon}</div>
+                      <div>{r.label}</div>
                     </button>
                   ))}
                 </div>
@@ -171,15 +171,13 @@ export default function Login() {
 
             <form className="space-y-5" onSubmit={handleSubmit}>
               {canSignup && (
-                <div>
-                  <label className="font-body text-[10px] font-semibold text-white/50 block mb-2.5 uppercase tracking-[0.15em]">Full Name</label>
-                  <div className="relative">
-                    <User className={`absolute left-4 top-1/2 -translate-y-1/2 w-[15px] h-[15px] transition-colors duration-300 ${focused === "fullName" ? "text-secondary" : "text-white/20"}`} />
+                <div className="login-field-enter" style={{ animationDelay: "0.1s" }}>
+                  <label className="font-body text-[10px] font-semibold text-blue-200/35 block mb-2.5 uppercase tracking-[0.18em]">Full Name</label>
+                  <div className="relative group">
+                    <User className={`absolute left-4 top-1/2 -translate-y-1/2 w-[15px] h-[15px] transition-all duration-400 ${focused === "fullName" ? "text-blue-400" : "text-white/15"}`} />
                     <input
                       value={fullName} onChange={(e) => setFullName(e.target.value)}
-                      className={`w-full rounded-xl px-4 py-3.5 pl-11 font-body text-[13px] text-white bg-white/[0.04] border transition-all duration-300 placeholder:text-white/15 focus:outline-none ${
-                        focused === "fullName" ? "border-secondary/40 ring-2 ring-secondary/10 bg-white/[0.06]" : "border-white/[0.06] hover:border-white/10"
-                      }`}
+                      className={`login-input pl-11 ${focused === "fullName" ? "login-input-focused" : ""}`}
                       placeholder="Enter full name"
                       onFocus={() => setFocused("fullName")} onBlur={() => setFocused(null)}
                     />
@@ -187,106 +185,78 @@ export default function Login() {
                 </div>
               )}
 
-              <div>
-                <label className="font-body text-[10px] font-semibold text-white/50 block mb-2.5 uppercase tracking-[0.15em]">Email Address</label>
-                <div className="relative">
-                  <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 w-[15px] h-[15px] transition-colors duration-300 ${focused === "email" ? "text-secondary" : "text-white/20"}`} />
+              <div className="login-field-enter" style={{ animationDelay: "0.15s" }}>
+                <label className="font-body text-[10px] font-semibold text-blue-200/35 block mb-2.5 uppercase tracking-[0.18em]">Email Address</label>
+                <div className="relative group">
+                  <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 w-[15px] h-[15px] transition-all duration-400 ${focused === "email" ? "text-blue-400" : "text-white/15"}`} />
                   <input
                     type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                    className={`w-full rounded-xl px-4 py-3.5 pl-11 font-body text-[13px] text-white bg-white/[0.04] border transition-all duration-300 placeholder:text-white/15 focus:outline-none ${
-                      focused === "email" ? "border-secondary/40 ring-2 ring-secondary/10 bg-white/[0.06]" : "border-white/[0.06] hover:border-white/10"
-                    }`}
+                    className={`login-input pl-11 ${focused === "email" ? "login-input-focused" : ""}`}
                     placeholder="you@example.com"
                     onFocus={() => setFocused("email")} onBlur={() => setFocused(null)}
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="font-body text-[10px] font-semibold text-white/50 block mb-2.5 uppercase tracking-[0.15em]">Password</label>
-                <div className="relative">
-                  <Lock className={`absolute left-4 top-1/2 -translate-y-1/2 w-[15px] h-[15px] transition-colors duration-300 ${focused === "password" ? "text-secondary" : "text-white/20"}`} />
+              <div className="login-field-enter" style={{ animationDelay: "0.2s" }}>
+                <label className="font-body text-[10px] font-semibold text-blue-200/35 block mb-2.5 uppercase tracking-[0.18em]">Password</label>
+                <div className="relative group">
+                  <Lock className={`absolute left-4 top-1/2 -translate-y-1/2 w-[15px] h-[15px] transition-all duration-400 ${focused === "password" ? "text-blue-400" : "text-white/15"}`} />
                   <input
                     type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)}
-                    className={`w-full rounded-xl px-4 py-3.5 pl-11 pr-12 font-body text-[13px] text-white bg-white/[0.04] border transition-all duration-300 placeholder:text-white/15 focus:outline-none ${
-                      focused === "password" ? "border-secondary/40 ring-2 ring-secondary/10 bg-white/[0.06]" : "border-white/[0.06] hover:border-white/10"
-                    }`}
-                    placeholder="••••••••" minLength={8}
+                    className={`login-input pl-11 pr-12 ${focused === "password" ? "login-input-focused" : ""}`}
+                    placeholder="Enter your password"
                     onFocus={() => setFocused("password")} onBlur={() => setFocused(null)}
                   />
                   <button type="button" onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/50 transition-colors p-1 rounded-lg">
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/15 hover:text-blue-400/60 transition-colors duration-300 p-1 rounded-lg">
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-
-                {/* Password strength meter */}
-                {password.length > 0 && (
-                  <div className="mt-2.5 flex items-center gap-2">
-                    <div className="flex-1 h-[3px] bg-white/[0.06] rounded-full overflow-hidden">
-                      <div className={`h-full rounded-full transition-all duration-500 ${getStrengthColor()}`}
-                        style={{ width: `${passwordStrength}%` }} />
-                    </div>
-                    <span className={`font-body text-[10px] font-medium ${
-                      passwordStrength <= 25 ? "text-destructive" :
-                      passwordStrength <= 50 ? "text-orange-400" :
-                      passwordStrength <= 75 ? "text-amber-400" : "text-emerald-400"
-                    }`}>{getStrengthLabel()}</span>
-                  </div>
-                )}
               </div>
 
-              <div className="pt-1">
-                <Button
-                  className="w-full rounded-xl font-body font-semibold py-6 text-[14px] relative overflow-hidden transition-all duration-300 group border-0"
-                  style={{
-                    background: "linear-gradient(135deg, hsl(42 87% 50%), hsl(42 70% 42%))",
-                    boxShadow: loading ? "none" : "0 8px 24px hsla(42, 87%, 55%, 0.2), inset 0 1px 0 hsla(0,0%,100%,0.15)",
-                    color: "#0E1016",
-                  }}
+              <div className="pt-2 login-field-enter" style={{ animationDelay: "0.25s" }}>
+                <button
                   type="submit"
                   disabled={loading}
+                  className="login-submit-btn w-full"
                 >
-                  <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-x-[-100%] group-hover:translate-x-[100%]"
-                    style={{ transition: "transform 0.7s ease, opacity 0.3s ease" }} />
-                  <span className="relative z-10 flex items-center justify-center gap-2">
+                  <span className="absolute inset-0 rounded-2xl login-btn-shimmer" />
+                  <span className="relative z-10 flex items-center justify-center gap-2.5 font-body font-semibold text-[14px]">
                     {loading ? (
                       <>
-                        <div className="w-4 h-4 border-2 border-[#0E1016]/20 border-t-[#0E1016] rounded-full animate-spin" />
-                        Signing in...
+                        <div className="w-[18px] h-[18px] border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                        <span className="text-white/80">Authenticating...</span>
                       </>
                     ) : (
                       <>
+                        <Sparkles className="w-4 h-4" />
                         {canSignup ? "Create Account" : "Sign In"}
                       </>
                     )}
                   </span>
-                </Button>
+                </button>
               </div>
             </form>
 
-            {/* Trust indicators */}
-            <div className="flex items-center justify-center gap-4 mt-7 pt-6 border-t border-white/[0.04]">
-              <div className="flex items-center gap-1.5 text-white/20">
-                <Shield className="w-3 h-3" />
-                <span className="font-body text-[10px]">Encrypted</span>
-              </div>
-              <div className="w-px h-3 bg-white/[0.06]" />
-              <div className="flex items-center gap-1.5 text-white/20">
-                <Lock className="w-3 h-3" />
-                <span className="font-body text-[10px]">Secure Login</span>
-              </div>
-              <div className="w-px h-3 bg-white/[0.06]" />
-              <div className="flex items-center gap-1.5 text-white/20">
-                <GraduationCap className="w-3 h-3" />
-                <span className="font-body text-[10px]">BU Affiliated</span>
-              </div>
+            {/* Trust bar */}
+            <div className="flex items-center justify-center gap-5 mt-8 pt-7 border-t border-white/[0.04]">
+              {[
+                { icon: Shield, label: "256-bit SSL" },
+                { icon: Fingerprint, label: "Secure Auth" },
+                { icon: Lock, label: "Encrypted" },
+              ].map(({ icon: Icon, label }) => (
+                <div key={label} className="flex items-center gap-1.5 text-blue-300/20 group cursor-default">
+                  <Icon className="w-3 h-3 group-hover:text-blue-400/40 transition-colors duration-300" />
+                  <span className="font-body text-[10px] group-hover:text-blue-200/30 transition-colors duration-300">{label}</span>
+                </div>
+              ))}
             </div>
 
             {/* Back link */}
             <div className="text-center mt-5">
-              <Link to="/" className="font-body text-[11px] text-white/25 hover:text-secondary/70 transition-colors inline-flex items-center gap-1.5 group">
-                <ArrowLeft className="w-3 h-3 group-hover:-translate-x-0.5 transition-transform" />
+              <Link to="/" className="font-body text-[11px] text-blue-300/20 hover:text-blue-400/50 transition-all duration-300 inline-flex items-center gap-1.5 group">
+                <ArrowLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform duration-300" />
                 Back to Website
               </Link>
             </div>
@@ -294,22 +264,159 @@ export default function Login() {
         </div>
 
         {/* Footer */}
-        <p className="text-center font-body text-[10px] text-white/15 mt-6 tracking-wide">
+        <p className="text-center font-body text-[10px] text-blue-200/12 mt-7 tracking-wider">
           Hoysala Degree College · Affiliated to Bangalore University
         </p>
       </div>
 
       <style>{`
+        /* === LOGIN PAGE PREMIUM STYLES === */
+
+        .login-input {
+          width: 100%;
+          border-radius: 16px;
+          padding: 14px 16px;
+          font-family: 'Inter', system-ui, sans-serif;
+          font-size: 13px;
+          color: white;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          outline: none;
+          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .login-input::placeholder {
+          color: rgba(148, 163, 184, 0.25);
+        }
+        .login-input:hover {
+          border-color: rgba(59, 130, 246, 0.12);
+          background: rgba(255, 255, 255, 0.04);
+        }
+        .login-input-focused,
+        .login-input:focus {
+          border-color: rgba(59, 130, 246, 0.35) !important;
+          background: rgba(59, 130, 246, 0.05) !important;
+          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.06), 0 0 20px -4px rgba(59, 130, 246, 0.08);
+        }
+
+        .login-submit-btn {
+          position: relative;
+          padding: 16px 24px;
+          border-radius: 16px;
+          border: none;
+          cursor: pointer;
+          overflow: hidden;
+          background: linear-gradient(135deg, #2563eb, #3b82f6 50%, #1d4ed8);
+          color: white;
+          box-shadow: 0 12px 32px -8px rgba(37, 99, 235, 0.35), 0 0 0 1px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255,255,255,0.1);
+          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .login-submit-btn:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 20px 48px -12px rgba(37, 99, 235, 0.45), 0 0 0 1px rgba(59, 130, 246, 0.2), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        .login-submit-btn:active:not(:disabled) {
+          transform: translateY(0) scale(0.98);
+        }
+        .login-submit-btn:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+
+        .login-btn-shimmer {
+          overflow: hidden;
+        }
+        .login-btn-shimmer::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.08) 45%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.08) 55%, transparent 60%);
+          transform: translateX(-110%);
+          animation: loginShimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes loginShimmer {
+          0%, 70%, 100% { transform: translateX(-110%); }
+          50% { transform: translateX(110%); }
+        }
+
+        .login-shimmer-bar {
+          background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.5), transparent);
+          transform: translateX(-100%);
+          animation: loginBarShimmer 4s ease-in-out infinite;
+        }
+        @keyframes loginBarShimmer {
+          0%, 60%, 100% { transform: translateX(-100%); }
+          40% { transform: translateX(100%); }
+        }
+
+        .login-logo-glow {
+          background: conic-gradient(from 220deg, rgba(59, 130, 246, 0.15), rgba(99, 102, 241, 0.1), rgba(59, 130, 246, 0.15));
+          animation: loginLogoGlow 5s linear infinite;
+        }
+        @keyframes loginLogoGlow {
+          0% { opacity: 0.3; transform: rotate(0deg) scale(1); }
+          50% { opacity: 0.6; transform: rotate(180deg) scale(1.05); }
+          100% { opacity: 0.3; transform: rotate(360deg) scale(1); }
+        }
+
         .login-card-enter {
-          animation: loginCardIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+          animation: loginCardIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
         @keyframes loginCardIn {
-          from { opacity: 0; transform: translateY(20px) scale(0.97); filter: blur(4px); }
+          from { opacity: 0; transform: translateY(30px) scale(0.96); filter: blur(8px); }
           to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
         }
+
+        .login-field-enter {
+          animation: loginFieldIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        @keyframes loginFieldIn {
+          from { opacity: 0; transform: translateY(12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Aurora background orbs */
+        .login-aurora {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(80px);
+          will-change: transform;
+        }
+        .login-aurora-1 {
+          width: 500px; height: 500px;
+          top: -15%; left: -10%;
+          background: radial-gradient(circle, rgba(37, 99, 235, 0.12), transparent 60%);
+          animation: auroraFloat1 12s ease-in-out infinite;
+        }
+        .login-aurora-2 {
+          width: 400px; height: 400px;
+          bottom: -10%; right: -10%;
+          background: radial-gradient(circle, rgba(99, 102, 241, 0.08), transparent 60%);
+          animation: auroraFloat2 15s ease-in-out infinite;
+        }
+        .login-aurora-3 {
+          width: 350px; height: 350px;
+          top: 40%; left: 50%;
+          background: radial-gradient(circle, rgba(59, 130, 246, 0.06), transparent 60%);
+          animation: auroraFloat3 10s ease-in-out infinite;
+        }
+        @keyframes auroraFloat1 {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33% { transform: translate(40px, 30px) scale(1.1); }
+          66% { transform: translate(-20px, -20px) scale(0.95); }
+        }
+        @keyframes auroraFloat2 {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(-50px, -30px) scale(1.15); }
+        }
+        @keyframes auroraFloat3 {
+          0%, 100% { transform: translate(-50%, 0) scale(1); }
+          50% { transform: translate(-50%, -40px) scale(1.1); }
+        }
+
         @keyframes float {
           0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-12px); }
+          50% { transform: translateY(-14px); }
         }
         .animate-float { animation: float 6s ease-in-out infinite; }
       `}</style>
