@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { GraduationCap } from "lucide-react";
+import collegeLogo from "@/assets/college-logo.png";
 
 export default function PageLoader() {
   const location = useLocation();
@@ -37,9 +37,9 @@ export default function PageLoader() {
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-background"
           style={{ animation: "logo-splash-out 0.5s cubic-bezier(0.16,1,0.3,1) 2s forwards" }}>
           <div className="flex flex-col items-center gap-4" style={{ animation: "logo-splash-in 0.6s cubic-bezier(0.16,1,0.3,1) forwards" }}>
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-navy-dark flex items-center justify-center shadow-2xl"
+            <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-2xl"
               style={{ animation: "logo-spin-in 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards" }}>
-              <GraduationCap className="w-8 h-8 text-secondary" />
+              <img src={collegeLogo} alt="Logo" className="w-full h-full object-contain" />
             </div>
             <div className="text-center">
               <p className="font-display text-lg font-bold text-foreground animate-fade-in animation-delay-300">Hoysala Degree College</p>

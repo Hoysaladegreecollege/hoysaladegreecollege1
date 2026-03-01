@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { GraduationCap, ChevronDown, Phone, Mail, Sparkles } from "lucide-react";
+import { ChevronDown, Phone, Mail, Sparkles } from "lucide-react";
+import collegeLogo from "@/assets/college-logo.png";
 import { Button } from "@/components/ui/button";
 import DarkModeToggle from "./DarkModeToggle";
 
@@ -108,11 +109,7 @@ export default function Navbar() {
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
           <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl overflow-hidden shrink-0">
-            {/* Gradient bg with rotation animation on hover */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-navy-dark group-hover:from-navy-dark group-hover:to-primary transition-all duration-500" />
-            {/* Inner glow */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <GraduationCap className="absolute inset-0 m-auto w-5 h-5 sm:w-6 sm:h-6 text-secondary group-hover:scale-110 group-hover:rotate-6 transition-all duration-400" />
+            <img src={collegeLogo} alt="Hoysala Degree College Logo" className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-400" />
           </div>
           <div className="leading-tight">
             <span className="font-display text-sm sm:text-[17px] font-bold block group-hover:text-primary transition-colors duration-300 text-foreground">

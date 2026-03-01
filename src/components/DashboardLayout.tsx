@@ -7,6 +7,7 @@ import {
   UserCog, Menu, X, Mail, Trophy, UserCheck,
   DollarSign, Book, ArrowUpCircle, Cake, ImagePlus, ChevronLeft, ExternalLink
 } from "lucide-react";
+import collegeLogo from "@/assets/college-logo.png";
 import { useState } from "react";
 import PageLoader from "./PageLoader";
 import DarkModeToggle from "./DarkModeToggle";
@@ -109,8 +110,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="px-5 pt-5 pb-4 shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
-                <GraduationCap className="w-4 h-4 text-white/80" />
+              <div className="w-8 h-8 rounded-lg overflow-hidden">
+                <img src={collegeLogo} alt="Logo" className="w-full h-full object-contain" />
               </div>
               <div>
                 <p className="font-body text-[13px] font-semibold text-white/90 leading-tight">Hoysala College</p>
