@@ -33,6 +33,8 @@ const ApplicationStatus = lazy(() => import("./pages/ApplicationStatus"));
 const Gallery = lazy(() => import("./pages/Gallery"));
 const PreviousYearPapers = lazy(() => import("./pages/PreviousYearPapers"));
 const DownloadApp = lazy(() => import("./pages/Download"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
 // Lazy load student dashboard
 const StudentDashboard = lazy(() => import("./pages/dashboard/StudentDashboard"));
@@ -143,6 +145,8 @@ const App = () => (
             </Route>
 
             <Route path="/login" element={<SuspenseWrap><Login /></SuspenseWrap>} />
+            <Route path="/forgot-password" element={<SuspenseWrap><ForgotPassword /></SuspenseWrap>} />
+            <Route path="/reset-password" element={<SuspenseWrap><ResetPassword /></SuspenseWrap>} />
 
             <Route path="/dashboard" element={
               <ProtectedRoute allowedRoles={["student", "teacher", "principal", "admin"]}>

@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import ActionCenter from "@/components/ActionCenter";
 import DashboardSkeleton from "@/components/DashboardSkeleton";
 import { format, formatDistanceToNow } from "date-fns";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const CHART_COLORS = [
   "hsl(215, 90%, 55%)", "hsl(145, 65%, 42%)", "hsl(42, 70%, 52%)", "hsl(280, 60%, 55%)",
@@ -86,6 +87,7 @@ function StatCard({ label, value, icon: Icon, color, trend }: { label: string; v
 
 export default function AdminDashboard() {
   const { profile } = useAuth();
+  const [birthdayDialogOpen, setBirthdayDialogOpen] = useState(false);
 
   const { data: counts, isLoading: countsLoading } = useQuery({
     queryKey: ["admin-stats"],
@@ -225,7 +227,7 @@ export default function AdminDashboard() {
       // Fee defaulters
       const { data: feeStudents } = await supabase.from("students").select("total_fee, fee_paid").eq("is_active", true).gt("total_fee", 0);
       const defaulterCount = (feeStudents || []).filter((s: any) => ((s.total_fee || 0) - (s.fee_paid || 0)) > 0).length;
-      if (defaulterCount > 0) alerts.push({ id: "fee-due", type: "warning", icon: CreditCard, title: `${defaulterCount} students with fee dues`, desc: "Track and follow up on payments", path: "/dashboard/admin/fee-management", color: "text-red-500", bg: "bg-red-500/10" });
+      if (defaulterCount > 0) alerts.push({ id: "fee-due", type: "warning", icon: CreditCard, title: `${defaulterCount} students with fee dues`, desc: "Track and follow up on payments", path: "/dashboard/admin/fees", color: "text-red-500", bg: "bg-red-500/10" });
 
       // Upcoming events
       const { data: upcomingEvents } = await supabase.from("events").select("id, title, event_date").eq("is_active", true).gte("event_date", today).order("event_date").limit(3);
@@ -240,9 +242,32 @@ export default function AdminDashboard() {
         const d = new Date(s.date_of_birth);
         return d.getMonth() + 1 === todayMonth && d.getDate() === todayDay;
       });
-      if (todayBdays.length > 0) alerts.push({ id: "birthdays", type: "info", icon: Cake, title: `${todayBdays.length} student birthday(s) today`, desc: "Send birthday wishes", color: "text-pink-500", bg: "bg-pink-500/10" });
+      if (todayBdays.length > 0) alerts.push({ id: "birthdays", type: "info", icon: Cake, title: `${todayBdays.length} student birthday(s) today`, desc: "Send birthday wishes", color: "text-pink-500", bg: "bg-pink-500/10", isBirthday: true });
 
       return alerts;
+    },
+  });
+
+  // Birthday students query for dialog
+  const { data: birthdayStudentsList = [] } = useQuery({
+    queryKey: ["admin-birthday-students"],
+    queryFn: async () => {
+      const todayMonth = new Date().getMonth() + 1;
+      const todayDay = new Date().getDate();
+      const { data: students } = await supabase.from("students").select("id, user_id, date_of_birth, roll_number").eq("is_active", true).not("date_of_birth", "is", null);
+      if (!students) return [];
+      const todayBdays = students.filter((s: any) => {
+        const d = new Date(s.date_of_birth);
+        return d.getMonth() + 1 === todayMonth && d.getDate() === todayDay;
+      });
+      if (todayBdays.length === 0) return [];
+      const userIds = todayBdays.map((s: any) => s.user_id);
+      const { data: profiles } = await supabase.from("profiles").select("user_id, full_name, email").in("user_id", userIds);
+      return todayBdays.map((s: any) => ({
+        ...s,
+        name: profiles?.find((p: any) => p.user_id === s.user_id)?.full_name || s.roll_number,
+        email: profiles?.find((p: any) => p.user_id === s.user_id)?.email || "",
+      }));
     },
   });
 
@@ -378,21 +403,40 @@ export default function AdminDashboard() {
             </div>
           ) : (
             <div className="space-y-2 max-h-[280px] overflow-y-auto">
-              {notifications.map((n: any) => (
-                <Link
-                  key={n.id}
-                  to={n.path || "#"}
-                  className="flex items-start gap-3 p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-all duration-200 group"
-                >
-                  <div className={`w-8 h-8 rounded-lg ${n.bg} flex items-center justify-center shrink-0`}>
-                    <n.icon className={`w-4 h-4 ${n.color}`} />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-body text-[12px] font-medium text-foreground truncate group-hover:text-primary transition-colors">{n.title}</p>
-                    <p className="font-body text-[10px] text-muted-foreground truncate">{n.desc}</p>
-                  </div>
-                </Link>
-              ))}
+              {notifications.map((n: any) => {
+                if (n.isBirthday) {
+                  return (
+                    <button
+                      key={n.id}
+                      onClick={() => setBirthdayDialogOpen(true)}
+                      className="flex items-start gap-3 p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-all duration-200 group w-full text-left"
+                    >
+                      <div className={`w-8 h-8 rounded-lg ${n.bg} flex items-center justify-center shrink-0`}>
+                        <n.icon className={`w-4 h-4 ${n.color}`} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-body text-[12px] font-medium text-foreground truncate group-hover:text-primary transition-colors">{n.title}</p>
+                        <p className="font-body text-[10px] text-muted-foreground truncate">{n.desc}</p>
+                      </div>
+                    </button>
+                  );
+                }
+                return (
+                  <Link
+                    key={n.id}
+                    to={n.path || "#"}
+                    className="flex items-start gap-3 p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-all duration-200 group"
+                  >
+                    <div className={`w-8 h-8 rounded-lg ${n.bg} flex items-center justify-center shrink-0`}>
+                      <n.icon className={`w-4 h-4 ${n.color}`} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-body text-[12px] font-medium text-foreground truncate group-hover:text-primary transition-colors">{n.title}</p>
+                      <p className="font-body text-[10px] text-muted-foreground truncate">{n.desc}</p>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           )}
         </div>
@@ -628,6 +672,37 @@ export default function AdminDashboard() {
           ))}
         </div>
       </div>
+
+      {/* Birthday Dialog */}
+      <Dialog open={birthdayDialogOpen} onOpenChange={setBirthdayDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Cake className="w-5 h-5 text-pink-500" />
+              🎂 Today's Birthdays
+            </DialogTitle>
+          </DialogHeader>
+          {birthdayStudentsList.length === 0 ? (
+            <p className="font-body text-sm text-muted-foreground text-center py-6">No student birthdays today</p>
+          ) : (
+            <div className="space-y-3 max-h-[400px] overflow-y-auto">
+              {birthdayStudentsList.map((s: any) => (
+                <div key={s.id} className="flex items-center gap-3 p-3 rounded-xl bg-muted/40 border border-border/40">
+                  <div className="w-10 h-10 rounded-full bg-pink-500/10 flex items-center justify-center shrink-0">
+                    <Cake className="w-5 h-5 text-pink-500" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-body text-sm font-medium text-foreground truncate">{s.name}</p>
+                    <p className="font-body text-[11px] text-muted-foreground">{s.roll_number} · {s.date_of_birth ? format(new Date(s.date_of_birth), "dd MMM yyyy") : ""}</p>
+                    {s.email && <p className="font-body text-[10px] text-muted-foreground truncate">{s.email}</p>}
+                  </div>
+                  <span className="text-2xl">🎉</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
