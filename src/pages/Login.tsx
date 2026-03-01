@@ -182,7 +182,7 @@ export default function Login() {
                 <div className="login-field-enter" style={{ animationDelay: "0.1s" }}>
                   <label className="font-body text-[10px] font-semibold text-white/35 block mb-2.5 uppercase tracking-[0.18em]">Full Name</label>
                   <div className="relative group">
-                    <User className={`absolute left-4 top-1/2 -translate-y-1/2 w-[15px] h-[15px] transition-all duration-400 ${focused === "fullName" ? "text-secondary" : "text-white/15"}`} />
+                    <User className={`absolute left-4 top-1/2 -translate-y-1/2 w-[15px] h-[15px] transition-all duration-400 ${focused === "fullName" ? "text-secondary scale-110 drop-shadow-[0_0_6px_hsla(42,87%,55%,0.4)]" : "text-white/15"}`} />
                     <input
                       value={fullName} onChange={(e) => setFullName(e.target.value)}
                       className={`login-input pl-12 ${focused === "fullName" ? "login-input-focused" : ""}`}
@@ -196,7 +196,7 @@ export default function Login() {
               <div className="login-field-enter" style={{ animationDelay: "0.15s" }}>
                 <label className="font-body text-[10px] font-semibold text-white/35 block mb-2.5 uppercase tracking-[0.18em]">Email Address</label>
                 <div className="relative group">
-                  <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 w-[15px] h-[15px] transition-all duration-400 ${focused === "email" ? "text-secondary" : "text-white/15"}`} />
+                  <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 w-[15px] h-[15px] transition-all duration-400 ${focused === "email" ? "text-secondary scale-110 drop-shadow-[0_0_6px_hsla(42,87%,55%,0.4)]" : "text-white/15"}`} />
                   <input
                     type="email" value={email} onChange={(e) => setEmail(e.target.value)}
                     className={`login-input pl-12 ${focused === "email" ? "login-input-focused" : ""}`}
@@ -209,7 +209,7 @@ export default function Login() {
               <div className="login-field-enter" style={{ animationDelay: "0.2s" }}>
                 <label className="font-body text-[10px] font-semibold text-white/35 block mb-2.5 uppercase tracking-[0.18em]">Password</label>
                 <div className="relative group">
-                  <Lock className={`absolute left-4 top-1/2 -translate-y-1/2 w-[15px] h-[15px] transition-all duration-400 ${focused === "password" ? "text-secondary" : "text-white/15"}`} />
+                  <Lock className={`absolute left-4 top-1/2 -translate-y-1/2 w-[15px] h-[15px] transition-all duration-400 ${focused === "password" ? "text-secondary scale-110 drop-shadow-[0_0_6px_hsla(42,87%,55%,0.4)]" : "text-white/15"}`} />
                   <input
                     type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)}
                     className={`login-input pl-12 pr-12 ${focused === "password" ? "login-input-focused" : ""}`}
