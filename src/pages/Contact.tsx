@@ -282,6 +282,17 @@ export default function Contact() {
           {/* Map overlay gradient */}
           <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-background to-transparent pointer-events-none" />
         </div>
+        <div className="flex justify-center py-4 bg-background">
+          <a
+            href={MAPS_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-body font-semibold text-sm hover:opacity-90 transition-opacity shadow-lg"
+          >
+            <MapPin className="w-4 h-4" />
+            Get Directions
+          </a>
+        </div>
       </section>
     </div>
   );
