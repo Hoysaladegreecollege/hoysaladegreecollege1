@@ -185,7 +185,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {role === "admin" && <RefreshButton />}
+            <RefreshButton />
             <DarkModeToggle />
             <Link
               to="/"
