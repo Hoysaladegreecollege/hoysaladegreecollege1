@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { createPortal } from "react-dom";
 import SEOHead from "@/components/SEOHead";
 import { GraduationCap, BookOpen, Users, Award, Calendar, ArrowRight, Star, Sparkles, Brain, ClipboardCheck, Library, MessageSquare, FlaskConical, BarChart3, ChevronRight, ChevronLeft, Quote, Zap, TrendingUp, Play, X, Camera } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
@@ -417,8 +418,8 @@ export default function Index() {
       </section>
 
       {/* Full-screen Lightbox */}
-      {lightboxIdx !== null &&
-      <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md animate-fade-in flex items-center justify-center"
+      {lightboxIdx !== null && createPortal(
+      <div className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-md animate-fade-in flex items-center justify-center"
         onClick={() => { setLightboxIdx(null); document.body.style.removeProperty("overflow"); document.documentElement.style.removeProperty("overflow"); }}
         role="dialog" aria-modal="true" aria-label="Image lightbox"
         onKeyDown={(e) => {
@@ -427,43 +428,40 @@ export default function Index() {
           if (e.key === "ArrowLeft") setLightboxIdx((lightboxIdx - 1 + galleryImages.length) % galleryImages.length);
         }}
         tabIndex={0}
-        ref={(el) => el?.focus()}>
-          {/* Image container with relative close button */}
-          <div className="relative flex flex-col items-center max-w-[90vw] sm:max-w-[80vw] max-h-[90vh]"
-            onClick={(e) => e.stopPropagation()}
-            onTouchStart={(e) => { (window as any).__touchStartX = e.touches[0].clientX; }}
-            onTouchEnd={(e) => {
-              const startX = (window as any).__touchStartX;
+        ref={el => el?.focus()}>
+          <div className="relative w-[90vw] max-w-3xl" onClick={e => e.stopPropagation()}
+            onTouchStart={e => { (e.currentTarget as any)._touchX = e.touches[0].clientX; }}
+            onTouchEnd={e => {
+              const startX = (e.currentTarget as any)._touchX;
               if (startX == null) return;
               const diff = e.changedTouches[0].clientX - startX;
               if (Math.abs(diff) > 50) {
                 diff > 0 ? setLightboxIdx((lightboxIdx - 1 + galleryImages.length) % galleryImages.length) : setLightboxIdx((lightboxIdx + 1) % galleryImages.length);
               }
             }}>
-            {/* Close button - positioned at top-right of image container */}
+            {/* Close button */}
             <button className="absolute -top-2 -right-2 sm:top-0 sm:right-0 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 z-20 shadow-lg border border-white/10"
-              onClick={() => { setLightboxIdx(null); document.body.style.removeProperty("overflow"); document.documentElement.style.removeProperty("overflow"); }}>
-              <X className="w-5 h-5" />
-            </button>
-            {/* Nav buttons */}
-            <button className="absolute left-0 sm:-left-14 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/25 transition-colors z-20"
-              onClick={() => setLightboxIdx((lightboxIdx - 1 + galleryImages.length) % galleryImages.length)}>
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button className="absolute right-0 sm:-right-14 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/25 transition-colors z-20"
-              onClick={() => setLightboxIdx((lightboxIdx + 1) % galleryImages.length)}>
-              <ChevronRight className="w-5 h-5" />
-            </button>
+              onClick={(e) => { e.stopPropagation(); setLightboxIdx(null); document.body.style.removeProperty("overflow"); document.documentElement.style.removeProperty("overflow"); }}
+              aria-label="Close lightbox"><X className="w-5 h-5" /></button>
+            {/* Nav arrows */}
+            <button className="absolute left-0 sm:-left-14 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 z-10 shadow-lg border border-white/10"
+              onClick={(e) => { e.stopPropagation(); setLightboxIdx((lightboxIdx - 1 + galleryImages.length) % galleryImages.length); }}
+              aria-label="Previous image"><ChevronLeft className="w-5 h-5" /></button>
+            <button className="absolute right-0 sm:-right-14 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 z-10 shadow-lg border border-white/10"
+              onClick={(e) => { e.stopPropagation(); setLightboxIdx((lightboxIdx + 1) % galleryImages.length); }}
+              aria-label="Next image"><ChevronRight className="w-5 h-5" /></button>
             {/* Image */}
-            <img src={galleryImages[lightboxIdx].src} alt={galleryImages[lightboxIdx].title} className="max-w-full max-h-[72vh] object-contain rounded-2xl shadow-2xl animate-scale-bounce" key={lightboxIdx} />
-            {/* Caption below image */}
+            <img src={galleryImages[lightboxIdx].src} alt={galleryImages[lightboxIdx].title}
+              className="w-full max-h-[65dvh] sm:max-h-[75vh] object-contain rounded-2xl shadow-2xl animate-scale-bounce" key={lightboxIdx} />
+            {/* Caption */}
             <div className="mt-4 text-center bg-black/40 backdrop-blur-sm px-6 py-3 rounded-xl border border-white/10">
               <p className="font-display text-base sm:text-lg font-bold text-white">{galleryImages[lightboxIdx].title}</p>
               <p className="font-body text-xs text-white/60 mt-1">{galleryImages[lightboxIdx].category} • {lightboxIdx + 1} / {galleryImages.length}</p>
             </div>
           </div>
-        </div>
-      }
+        </div>,
+        document.body
+      )}
 
       {/* Principal's Message */}
       <section className="py-14 sm:py-24 bg-background">
