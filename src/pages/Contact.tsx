@@ -7,7 +7,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const MAPS_LINK = "https://maps.app.goo.gl/nqvvEX7kgB7wQVKb7";
+const MAPS_LINK = "https://maps.app.goo.gl/vf43fz7ZhJ8PZAUD9";
 
 const contactInfo = [
   {
@@ -271,7 +271,7 @@ export default function Contact() {
         <div className="h-1 bg-gradient-to-r from-transparent via-secondary/30 to-transparent" />
         <div className="relative overflow-hidden">
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3885.8!2d77.38!3d13.1!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sNelamangala!5e0!3m2!1sen!2sin!4v1"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3885.5!2d77.3892!3d13.0965!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae23a3a58ed6f1%3A0x8b0e1e6e2b3e1a0!2sHoysala%20Degree%20College!5e0!3m2!1sen!2sin!4v1"
             width="100%"
             height="340"
             style={{ border: 0, display: "block" }}
