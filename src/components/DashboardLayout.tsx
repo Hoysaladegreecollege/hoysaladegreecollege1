@@ -13,6 +13,7 @@ import PageLoader from "./PageLoader";
 import DarkModeToggle from "./DarkModeToggle";
 import ScrollToTop from "./ScrollToTop";
 import RefreshButton from "./RefreshButton";
+import NotificationBadge from "./NotificationBadge";
 
 interface NavItem { label: string; path: string; icon: React.ElementType; }
 
@@ -186,6 +187,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
           <div className="flex items-center gap-2">
             <RefreshButton />
+            <NotificationBadge />
             <DarkModeToggle />
             <Link
               to="/"

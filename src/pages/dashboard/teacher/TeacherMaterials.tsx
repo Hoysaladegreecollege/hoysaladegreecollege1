@@ -21,6 +21,7 @@ export default function TeacherMaterials() {
   const [title, setTitle] = useState("");
   const [subject, setSubject] = useState("");
   const [materialFiles, setMaterialFiles] = useState<File[]>([]);
+  const [semester, setSemester] = useState<string>("");
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [semesterFilter, setSemesterFilter] = useState<string>("");
@@ -69,6 +70,7 @@ export default function TeacherMaterials() {
         file_url: fileUrl,
         course_id: courseId || null,
         uploaded_by: user!.id,
+        semester: semester ? parseInt(semester) : null,
       }));
 
       const { error } = await supabase.from("study_materials").insert(inserts);
@@ -77,7 +79,7 @@ export default function TeacherMaterials() {
     },
     onSuccess: () => {
       toast.success(`${materialFiles.length} file(s) uploaded!`);
-      setTitle(""); setSubject(""); setMaterialFiles([]); setCourseId("");
+      setTitle(""); setSubject(""); setMaterialFiles([]); setCourseId(""); setSemester("");
       setUploading(false); setUploadProgress(0);
       queryClient.invalidateQueries({ queryKey: ["teacher-materials"] });
     },
@@ -111,7 +113,11 @@ export default function TeacherMaterials() {
 
   const inputClass = "w-full border border-border rounded-xl px-3 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all";
 
-  const grouped = materials.reduce((acc: any, m: any) => {
+  const filtered = semesterFilter
+    ? materials.filter((m: any) => m.semester === parseInt(semesterFilter))
+    : materials;
+
+  const grouped = filtered.reduce((acc: any, m: any) => {
     const key = m.courses?.name || "General";
     if (!acc[key]) acc[key] = [];
     acc[key].push(m);
@@ -144,6 +150,13 @@ export default function TeacherMaterials() {
               <select value={courseId} onChange={(e) => setCourseId(e.target.value)} className={inputClass}>
                 <option value="">All Courses (General)</option>
                 {courses.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Semester</label>
+              <select value={semester} onChange={(e) => setSemester(e.target.value)} className={inputClass}>
+                <option value="">No Semester</option>
+                {[1,2,3,4,5,6].map(s => <option key={s} value={s}>Semester {s}</option>)}
               </select>
             </div>
             <div>
@@ -199,7 +212,7 @@ export default function TeacherMaterials() {
       <div className="space-y-4">
         {isLoading ? (
           <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-14 bg-muted/50 rounded-xl animate-pulse" />)}</div>
-        ) : materials.length === 0 ? (
+        ) : filtered.length === 0 ? (
           <div className="bg-card border border-border rounded-2xl p-10 text-center">
             <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
             <p className="font-body text-sm text-muted-foreground">No materials uploaded yet.</p>
@@ -219,7 +232,9 @@ export default function TeacherMaterials() {
                     <div className="shrink-0">{fileIcon(m.file_url || "")}</div>
                     <div className="min-w-0 flex-1">
                       <p className="font-body text-sm font-semibold text-foreground truncate">{m.title}</p>
-                      <p className="font-body text-xs text-muted-foreground">{m.subject} • {new Date(m.created_at).toLocaleDateString()}</p>
+                      <p className="font-body text-xs text-muted-foreground">
+                        {m.subject}{m.semester ? ` • Sem ${m.semester}` : ""} • {new Date(m.created_at).toLocaleDateString()}
+                      </p>
                     </div>
                     <div className="flex gap-1 shrink-0">
                       {m.file_url && (
