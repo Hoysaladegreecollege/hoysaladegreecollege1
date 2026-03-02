@@ -2,7 +2,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   Users, Clock, BarChart3, Upload, Bell, Megaphone, Calendar, BookOpen, CheckCircle,
   TrendingUp, Activity, ListTodo, Plus, Trash2, Award,
-  ArrowRight
+  ArrowRight, Eye, Phone, User, IndianRupee
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,6 +13,7 @@ import ActionCenter from "@/components/ActionCenter";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 function useAnimatedCounter(target: number, duration = 1200) {
   const [count, setCount] = useState(0);
@@ -83,6 +84,7 @@ export default function TeacherDashboard() {
   const [newNote, setNewNote] = useState("");
   const { notes, add, toggle, remove } = useTeacherNotes();
   const [attDate, setAttDate] = useState(new Date().toISOString().split("T")[0]);
+  const [selectedPerformer, setSelectedPerformer] = useState<any>(null);
 
   // Main stats
   const { data: counts, isLoading } = useQuery({
@@ -146,13 +148,26 @@ export default function TeacherDashboard() {
         .sort((a, b) => b.avg - a.avg)
         .slice(0, 5);
 
-      const { data: profiles } = await supabase.from("students").select("id, roll_number, user_id").in("id", topStudentIds.map(s => s.id));
-      const { data: names } = await supabase.from("profiles").select("user_id, full_name").in("user_id", (profiles || []).map(p => p.user_id));
+      const { data: profiles } = await supabase.from("students").select("id, roll_number, user_id, phone, parent_phone, father_name, mother_name, semester, date_of_birth, address, course_id, courses(name)").in("id", topStudentIds.map(s => s.id));
+      const { data: names } = await supabase.from("profiles").select("user_id, full_name, email").in("user_id", (profiles || []).map(p => p.user_id));
 
       const topPerformers = topStudentIds.map(t => {
         const stu = profiles?.find(p => p.id === t.id);
         const name = names?.find(n => n.user_id === stu?.user_id);
-        return { name: name?.full_name || "Unknown", roll: stu?.roll_number || "", avg: t.avg };
+        return {
+          name: name?.full_name || "Unknown",
+          email: name?.email || "",
+          roll: stu?.roll_number || "",
+          avg: t.avg,
+          phone: stu?.phone || "",
+          parent_phone: stu?.parent_phone || "",
+          father_name: stu?.father_name || "",
+          mother_name: stu?.mother_name || "",
+          semester: stu?.semester,
+          date_of_birth: stu?.date_of_birth || "",
+          address: stu?.address || "",
+          course: (stu as any)?.courses?.name || "",
+        };
       });
 
       return { topPerformers };
@@ -329,7 +344,7 @@ export default function TeacherDashboard() {
           {perfData.topPerformers.length > 0 ? (
             <div className="space-y-2">
               {perfData.topPerformers.map((s: any, i: number) => (
-                <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors duration-200">
+                <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors duration-200 group">
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-body text-xs font-bold ${
                     i === 0 ? "bg-amber-500/20 text-amber-600" : i === 1 ? "bg-gray-300/20 text-gray-600" : i === 2 ? "bg-orange-400/20 text-orange-600" : "bg-muted text-muted-foreground"
                   }`}>
@@ -339,9 +354,15 @@ export default function TeacherDashboard() {
                     <p className="font-body text-[12px] font-semibold text-foreground truncate">{s.name}</p>
                     <p className="font-body text-[10px] text-muted-foreground">{s.roll}</p>
                   </div>
-                  <div className="bg-emerald-500/10 rounded-lg px-2.5 py-1">
+                  <div className="bg-emerald-500/10 rounded-lg px-2.5 py-1 mr-1">
                     <span className="font-body text-[12px] font-bold text-emerald-600 tabular-nums">{s.avg}%</span>
                   </div>
+                  <button
+                    onClick={() => setSelectedPerformer(s)}
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-primary/10 text-primary font-body text-[11px] font-semibold hover:bg-primary/20 transition-colors opacity-0 group-hover:opacity-100 sm:opacity-100"
+                  >
+                    <Eye className="w-3 h-3" /> View
+                  </button>
                 </div>
               ))}
             </div>
@@ -350,6 +371,73 @@ export default function TeacherDashboard() {
           )}
         </div>
       )}
+
+      {/* Top Performer Detail Dialog */}
+      <Dialog open={!!selectedPerformer} onOpenChange={(o) => !o && setSelectedPerformer(null)}>
+        <DialogContent className="rounded-2xl max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display text-lg flex items-center gap-2">
+              <User className="w-5 h-5 text-primary" /> Student Details
+            </DialogTitle>
+          </DialogHeader>
+          {selectedPerformer && (
+            <div className="space-y-4">
+              <div className="text-center p-4 bg-muted/30 rounded-xl">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
+                  <Award className="w-6 h-6 text-primary" />
+                </div>
+                <p className="font-display text-base font-bold text-foreground">{selectedPerformer.name}</p>
+                <p className="font-body text-xs text-muted-foreground">{selectedPerformer.roll}</p>
+                <div className="inline-flex items-center gap-1 mt-2 bg-emerald-500/10 rounded-lg px-3 py-1">
+                  <span className="font-body text-sm font-bold text-emerald-600">{selectedPerformer.avg}% Avg</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: "Course", value: selectedPerformer.course },
+                  { label: "Semester", value: selectedPerformer.semester ? `Sem ${selectedPerformer.semester}` : "—" },
+                  { label: "Father", value: selectedPerformer.father_name || "—" },
+                  { label: "Mother", value: selectedPerformer.mother_name || "—" },
+                  { label: "DOB", value: selectedPerformer.date_of_birth || "—" },
+                  { label: "Email", value: selectedPerformer.email || "—" },
+                ].map(({ label, value }) => (
+                  <div key={label} className="p-2.5 rounded-xl bg-muted/20">
+                    <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">{label}</p>
+                    <p className="font-body text-xs font-semibold text-foreground mt-0.5 truncate">{value}</p>
+                  </div>
+                ))}
+              </div>
+
+              {selectedPerformer.address && (
+                <div className="p-2.5 rounded-xl bg-muted/20">
+                  <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Address</p>
+                  <p className="font-body text-xs font-semibold text-foreground mt-0.5">{selectedPerformer.address}</p>
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                <a
+                  href={selectedPerformer.phone ? `tel:${selectedPerformer.phone}` : "#"}
+                  className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl font-body text-xs font-semibold transition-colors ${
+                    selectedPerformer.phone ? "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20" : "bg-muted/30 text-muted-foreground cursor-not-allowed"
+                  }`}
+                >
+                  <Phone className="w-3.5 h-3.5" /> Call Student
+                </a>
+                <a
+                  href={selectedPerformer.parent_phone ? `tel:${selectedPerformer.parent_phone}` : "#"}
+                  className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl font-body text-xs font-semibold transition-colors ${
+                    selectedPerformer.parent_phone ? "bg-blue-500/10 text-blue-600 hover:bg-blue-500/20" : "bg-muted/30 text-muted-foreground cursor-not-allowed"
+                  }`}
+                >
+                  <Phone className="w-3.5 h-3.5" /> Call Parent
+                </a>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
 
       {/* ═══ QUICK NOTES / TO-DO ═══ */}
