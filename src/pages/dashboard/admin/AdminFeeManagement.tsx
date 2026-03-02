@@ -92,13 +92,35 @@ export default function AdminFeeManagement() {
       await supabase.from("students").update({ fee_paid: newPaid }).eq("id", selectedStudent.id);
       return { receipt_number, amount, payment_method: paymentForm.payment_method, remarks };
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast.success("Payment recorded successfully!");
       qc.invalidateQueries({ queryKey: ["fee-students"] });
       qc.invalidateQueries({ queryKey: ["fee-payments"] });
       qc.invalidateQueries({ queryKey: ["all-fee-payments"] });
       setReceiptStudent(selectedStudent);
       setReceiptPayment({ ...data, created_at: new Date().toISOString(), student_name: selectedStudent.profile?.full_name, roll_number: selectedStudent.roll_number, course: selectedStudent.courses?.name });
+      // Send receipt email to student
+      const studentEmail = selectedStudent.profile?.email;
+      if (studentEmail) {
+        try {
+          await supabase.functions.invoke("send-fee-receipt", {
+            body: {
+              studentEmail,
+              studentName: selectedStudent.profile?.full_name || "",
+              receiptNumber: data.receipt_number,
+              amount: data.amount,
+              paymentMethod: data.payment_method,
+              courseName: selectedStudent.courses?.name || "",
+              rollNumber: selectedStudent.roll_number || "",
+              remarks: data.remarks || "",
+              date: new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }),
+            },
+          });
+          toast.success("Receipt emailed to student!");
+        } catch (e) {
+          console.error("Email send failed:", e);
+        }
+      }
       setPaymentForm({ amount: "", payment_method: "Cash", remarks: "", upi_number: "", semester: "" });
       setSelectedStudent((prev: any) => prev ? { ...prev, fee_paid: (prev.fee_paid || 0) + parseFloat(paymentForm.amount) } : null);
     },
