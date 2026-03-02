@@ -273,8 +273,12 @@ export default function Login() {
               ))}
             </div>
 
-            {/* Back link */}
-            <div className="text-center mt-4 sm:mt-5">
+            {/* Links */}
+            <div className="text-center mt-4 sm:mt-5 space-y-2">
+              <p className="font-body text-[11px] text-white/25">
+                New student?{" "}
+                <Link to="/register" className="text-secondary/60 hover:text-secondary transition-colors font-semibold">Register here</Link>
+              </p>
               <Link to="/" className="font-body text-[11px] text-white/20 hover:text-secondary/50 transition-all duration-300 inline-flex items-center gap-1.5 group">
                 <ArrowLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform duration-300" />
                 Back to Website
