@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +20,7 @@ const roleConfig: Record<StaffRole, { label: string; icon: any; color: string; b
 
 export default function AdminAddStaff() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [selectedRole, setSelectedRole] = useState<StaffRole>("teacher");
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
@@ -52,12 +54,22 @@ export default function AdminAddStaff() {
 
   const addStaffMutation = useMutation({
     mutationFn: async () => {
+      // For admin role, create a pending request instead of direct signup
+      if (selectedRole === "admin") {
+        if (!form.full_name || !form.email) throw new Error("Name and email are required");
+        const { error } = await supabase.from("pending_admin_requests").insert({
+          requester_id: user?.id,
+          full_name: form.full_name,
+          email: form.email,
+          phone: form.phone || "",
+          status: "pending",
+        });
+        if (error) throw error;
+        return "admin_pending";
+      }
+
       const pwCheck = validatePassword(form.password);
       if (!pwCheck.valid) throw new Error(pwCheck.message);
-      // Only pavanaofficial05@gmail.com can be assigned admin role
-      if (selectedRole === "admin" && form.email.toLowerCase() !== "pavanaofficial05@gmail.com") {
-        throw new Error("Admin role can only be assigned to the authorized administrator email (pavanaofficial05@gmail.com)");
-      }
       // Create auth user with role metadata
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: form.email,
@@ -90,12 +102,18 @@ export default function AdminAddStaff() {
           await supabase.from("teachers").update(updateData).eq("user_id", authData.user.id);
         }
       }
+      return "created";
     },
-    onSuccess: () => {
-      toast.success(`${roleConfig[selectedRole].label} account created! Email confirmation sent.`);
+    onSuccess: (result) => {
+      if (result === "admin_pending") {
+        toast.success("Admin request submitted! Go to Admin Approval Queue to send OTP and complete approval.");
+      } else {
+        toast.success(`${roleConfig[selectedRole].label} account created! Email confirmation sent.`);
+      }
       setForm({ full_name: "", email: "", password: "", phone: "", department_id: "", employee_id: "", qualification: "", experience: "", subjects: "" });
       queryClient.invalidateQueries({ queryKey: ["existing-staff"] });
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      queryClient.invalidateQueries({ queryKey: ["pending-admin-requests"] });
     },
     onError: (e: any) => toast.error(e.message),
   });
@@ -154,6 +172,23 @@ export default function AdminAddStaff() {
             </div>
           </div>
 
+          {/* Admin security notice */}
+          {selectedRole === "admin" && (
+            <div className="bg-red-500/5 border-2 border-red-500/20 rounded-2xl p-5 space-y-3">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-red-600" />
+                <h4 className="font-display text-sm font-bold text-red-700">Enhanced Security — Admin Creation</h4>
+              </div>
+              <p className="font-body text-xs text-muted-foreground leading-relaxed">
+                Creating an admin account requires <strong>two-factor verification</strong>. After submitting, an OTP will be sent to all existing admins. 
+                You must obtain the OTP from an approving admin and verify it before the account can be created.
+              </p>
+              <Link to="/dashboard/admin/approve-admins" className="inline-flex items-center gap-2 font-body text-xs text-primary hover:underline font-semibold">
+                <ShieldCheck className="w-3.5 h-3.5" /> Go to Admin Approval Queue →
+              </Link>
+            </div>
+          )}
+
           {/* Form */}
           <form
             onSubmit={(e) => { e.preventDefault(); addStaffMutation.mutate(); }}
@@ -161,7 +196,9 @@ export default function AdminAddStaff() {
           >
             <div className="flex items-center gap-2 pb-3 border-b border-border">
               <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-[10px]">1</span>
-              <h4 className="font-body text-xs font-bold text-primary uppercase tracking-wider">Account Information</h4>
+              <h4 className="font-body text-xs font-bold text-primary uppercase tracking-wider">
+                {selectedRole === "admin" ? "Admin Request Information" : "Account Information"}
+              </h4>
             </div>
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
@@ -172,15 +209,17 @@ export default function AdminAddStaff() {
                 <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Email *</label>
                 <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required className={inputClass} placeholder="name@example.com" />
               </div>
-              <div>
-                <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Password *</label>
-                <div className="relative">
-                  <input type={showPassword ? "text" : "password"} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required className={inputClass} placeholder={PASSWORD_REQUIREMENTS} />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
+              {selectedRole !== "admin" && (
+                <div>
+                  <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Password *</label>
+                  <div className="relative">
+                    <input type={showPassword ? "text" : "password"} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required className={inputClass} placeholder={PASSWORD_REQUIREMENTS} />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
               <div>
                 <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Phone</label>
                 <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className={inputClass} placeholder="Phone number" />
@@ -225,9 +264,12 @@ export default function AdminAddStaff() {
             <div className="pt-3">
               <Button type="submit" disabled={addStaffMutation.isPending} className="w-full rounded-xl font-body py-3">
                 {addStaffMutation.isPending ? (
-                  <span className="flex items-center gap-2"><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Creating Account...</span>
+                  <span className="flex items-center gap-2"><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> {selectedRole === "admin" ? "Submitting Request..." : "Creating Account..."}</span>
                 ) : (
-                  <span className="flex items-center gap-2"><UserPlus className="w-4 h-4" /> Create {roleConfig[selectedRole].label} Account</span>
+                  <span className="flex items-center gap-2">
+                    {selectedRole === "admin" ? <ShieldCheck className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+                    {selectedRole === "admin" ? "Submit Admin Request for Approval" : `Create ${roleConfig[selectedRole].label} Account`}
+                  </span>
                 )}
               </Button>
             </div>

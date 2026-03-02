@@ -628,6 +628,57 @@ export type Database = {
         }
         Relationships: []
       }
+      pending_admin_requests: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          otp_code: string | null
+          otp_expires_at: string | null
+          phone: string | null
+          rejected_at: string | null
+          rejected_by: string | null
+          rejection_reason: string | null
+          requester_id: string
+          status: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          otp_code?: string | null
+          otp_expires_at?: string | null
+          phone?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
+          requester_id: string
+          status?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          otp_code?: string | null
+          otp_expires_at?: string | null
+          phone?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
+          requester_id?: string
+          status?: string
+        }
+        Relationships: []
+      }
       popup_banners: {
         Row: {
           created_at: string
