@@ -393,7 +393,7 @@ export default function Index() {
             <ScrollReveal key={img.title} delay={i * 60}>
                 <div
                 className="relative group cursor-pointer overflow-hidden rounded-xl sm:rounded-2xl border border-border aspect-[4/3] hover:shadow-2xl active:scale-[0.97] transition-all duration-500 touch-manipulation"
-                onClick={() => { setLightboxIdx(i); document.body.style.overflow = "hidden"; document.documentElement.style.overflow = "hidden"; }}>
+                onClick={() => { setLightboxIdx(i); window.scrollTo({ top: 0, behavior: "smooth" }); document.body.style.overflow = "hidden"; document.documentElement.style.overflow = "hidden"; }}>
 
                   <img src={img.src} alt={img.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" />
                   <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
