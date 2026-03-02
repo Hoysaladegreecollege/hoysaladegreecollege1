@@ -823,6 +823,7 @@ export type Database = {
           created_at: string
           file_url: string | null
           id: string
+          semester: number | null
           subject: string
           title: string
           uploaded_by: string | null
@@ -832,6 +833,7 @@ export type Database = {
           created_at?: string
           file_url?: string | null
           id?: string
+          semester?: number | null
           subject: string
           title: string
           uploaded_by?: string | null
@@ -841,6 +843,7 @@ export type Database = {
           created_at?: string
           file_url?: string | null
           id?: string
+          semester?: number | null
           subject?: string
           title?: string
           uploaded_by?: string | null

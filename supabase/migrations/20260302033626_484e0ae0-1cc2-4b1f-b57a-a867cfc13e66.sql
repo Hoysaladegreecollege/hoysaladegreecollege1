@@ -1,0 +1,1 @@
+ALTER TABLE public.study_materials ADD COLUMN semester integer DEFAULT NULL;
