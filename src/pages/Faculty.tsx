@@ -25,7 +25,11 @@ const deptConfig: Record<string, { grad: string; badge: string; iconColor: strin
 
 export default function Faculty() {
   const [selectedFaculty, setSelectedFaculty] = useState<any>(null);
-  const [clickY, setClickY] = useState(0);
+
+  const handleFacultyClick = (f: any) => {
+    setSelectedFaculty(f);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const { data: dbFaculty = [], isLoading } = useQuery({
     queryKey: ["public-faculty"],
@@ -76,7 +80,7 @@ export default function Faculty() {
                 return (
                   <ScrollReveal key={f.id} delay={i * 60}>
                     <div
-                      onClick={(e) => { setClickY(e.clientY); setSelectedFaculty(f); }}
+                      onClick={() => handleFacultyClick(f)}
                       className="premium-card p-6 text-center group h-full flex flex-col cursor-pointer relative overflow-hidden card-stack"
                     >
                       {/* Hover gradient */}
