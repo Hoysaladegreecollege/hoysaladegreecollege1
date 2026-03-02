@@ -54,6 +54,10 @@ export default function AdminAddStaff() {
     mutationFn: async () => {
       const pwCheck = validatePassword(form.password);
       if (!pwCheck.valid) throw new Error(pwCheck.message);
+      // Only pavanaofficial05@gmail.com can be assigned admin role
+      if (selectedRole === "admin" && form.email.toLowerCase() !== "pavanaofficial05@gmail.com") {
+        throw new Error("Admin role can only be assigned to the authorized administrator email (pavanaofficial05@gmail.com)");
+      }
       // Create auth user with role metadata
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: form.email,
