@@ -12,6 +12,7 @@ import { useState } from "react";
 import PageLoader from "./PageLoader";
 import DarkModeToggle from "./DarkModeToggle";
 import ScrollToTop from "./ScrollToTop";
+import RefreshButton from "./RefreshButton";
 
 interface NavItem { label: string; path: string; icon: React.ElementType; }
 
@@ -20,6 +21,7 @@ const studentNav: NavItem[] = [
   { label: "My Profile", path: "/dashboard/student/profile", icon: User },
   { label: "Attendance", path: "/dashboard/student/attendance", icon: Clock },
   { label: "Marks", path: "/dashboard/student/marks", icon: BarChart3 },
+  { label: "Fee Details", path: "/dashboard/student/fees", icon: DollarSign },
   { label: "Timetable", path: "/dashboard/student/timetable", icon: Calendar },
   { label: "Notices", path: "/dashboard/student/notices", icon: Bell },
   { label: "Announcements", path: "/dashboard/student/announcements", icon: Megaphone },
@@ -183,6 +185,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {role === "admin" && <RefreshButton />}
             <DarkModeToggle />
             <Link
               to="/"

@@ -160,6 +160,7 @@ export default function StudentDashboard() {
     { icon: Clock, label: "Attendance", desc: "View records", path: "/dashboard/student/attendance", color: "bg-blue-500/10", iconColor: "text-blue-500" },
     { icon: BarChart3, label: "My Marks", desc: "Exam results", path: "/dashboard/student/marks", color: "bg-emerald-500/10", iconColor: "text-emerald-500" },
     { icon: Calendar, label: "Timetable", desc: "Class schedule", path: "/dashboard/student/timetable", color: "bg-purple-500/10", iconColor: "text-purple-500" },
+    { icon: IndianRupee, label: "Fee Details", desc: "Payments & dues", path: "/dashboard/student/fees", color: "bg-emerald-500/10", iconColor: "text-emerald-500" },
     { icon: BookOpen, label: "Materials", desc: "Study resources", path: "/dashboard/student/materials", color: "bg-amber-500/10", iconColor: "text-amber-500" },
     { icon: Bell, label: "Notices", desc: "Updates", path: "/dashboard/student/notices", color: "bg-cyan-500/10", iconColor: "text-cyan-500" },
     { icon: Megaphone, label: "Announcements", desc: "Messages", path: "/dashboard/student/announcements", color: "bg-rose-500/10", iconColor: "text-rose-500" },
