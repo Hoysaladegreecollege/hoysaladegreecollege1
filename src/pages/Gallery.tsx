@@ -44,6 +44,7 @@ export default function Gallery() {
 
   const openLightbox = useCallback((index: number) => {
     setLightboxIdx(index);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
   const closeLightbox = useCallback(() => {
