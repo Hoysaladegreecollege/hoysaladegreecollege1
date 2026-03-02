@@ -7,7 +7,7 @@ import PremiumStatsStrip from "@/components/PremiumStatsStrip";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 const staticFaculty = [
   { id: "s1", name: "Sri Gopal H.R", role: "Principal", department: "Administration", qualification: "M.Sc, M.Ed, TET, KSET, Ph.D", experience: "20+ years", photo_url: "", email: "", phone: "", subjects: [] },
@@ -25,6 +25,7 @@ const deptConfig: Record<string, { grad: string; badge: string; iconColor: strin
 
 export default function Faculty() {
   const [selectedFaculty, setSelectedFaculty] = useState<any>(null);
+  const [selectedDept, setSelectedDept] = useState("All");
 
   const handleFacultyClick = (f: any) => {
     setSelectedFaculty(f);
@@ -40,6 +41,13 @@ export default function Faculty() {
   });
 
   const faculty = dbFaculty.length > 0 ? dbFaculty : staticFaculty;
+
+  const departments = useMemo(() => {
+    const depts = Array.from(new Set(faculty.map((f: any) => f.department)));
+    return ["All", ...depts];
+  }, [faculty]);
+
+  const filteredFaculty = selectedDept === "All" ? faculty : faculty.filter((f: any) => f.department === selectedDept);
 
   return (
     <div className="page-enter">
@@ -61,6 +69,22 @@ export default function Faculty() {
             <SectionHeading title="Meet Our Educators" subtitle="Experienced professors and industry experts shaping the future" />
           </ScrollReveal>
 
+          {/* Department Filter Tabs */}
+          <div className="flex flex-wrap justify-center gap-2 mb-8">
+            {departments.map((dept) => (
+              <button
+                key={dept}
+                onClick={() => setSelectedDept(dept)}
+                className={`px-4 py-2 rounded-full text-xs font-semibold border transition-all duration-300 ${
+                  selectedDept === dept
+                    ? "bg-primary text-primary-foreground border-primary shadow-md"
+                    : "bg-muted/50 text-muted-foreground border-border hover:bg-muted hover:text-foreground"
+                }`}
+              >
+                {dept}
+              </button>
+            ))}
+          </div>
           {isLoading ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6 max-w-6xl mx-auto">
               {Array.from({ length: 8 }).map((_, i) => (
@@ -75,7 +99,7 @@ export default function Faculty() {
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6 max-w-6xl mx-auto">
-              {faculty.map((f: any, i: number) => {
+              {filteredFaculty.map((f: any, i: number) => {
                 const cfg = deptConfig[f.department] || { grad: "from-primary/10 to-secondary/5", badge: "bg-muted text-muted-foreground border-border", iconColor: "text-primary" };
                 return (
                   <ScrollReveal key={f.id} delay={i * 60}>
