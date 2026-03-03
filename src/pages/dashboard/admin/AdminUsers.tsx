@@ -392,7 +392,7 @@ export default function AdminUsers() {
 
       {/* View User Detail Dialog — Role-Specific */}
       <Dialog open={!!viewUser} onOpenChange={() => setViewUser(null)}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="font-display text-xl">
               {viewUser?.role === "teacher" ? "Teacher Details" : viewUser?.role === "principal" ? "Principal Details" : viewUser?.role === "admin" ? "Admin Details" : "Student Details"}
