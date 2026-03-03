@@ -62,9 +62,9 @@ export default function ApplicationStatus() {
   };
 
   const statusConfig: Record<string, { icon: any; color: string; bg: string; border: string; label: string; ringColor: string }> = {
-    pending: { icon: Clock, color: "text-amber-600", bg: "bg-amber-50", border: "border-amber-200", label: "Under Review", ringColor: "ring-amber-200" },
-    approved: { icon: CheckCircle, color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-200", label: "Approved! 🎉", ringColor: "ring-emerald-200" },
-    rejected: { icon: XCircle, color: "text-destructive", bg: "bg-destructive/5", border: "border-destructive/20", label: "Not Approved", ringColor: "ring-destructive/20" },
+    pending: { icon: Clock, color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20", label: "Under Review", ringColor: "ring-amber-500/20" },
+    approved: { icon: CheckCircle, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20", label: "Approved! 🎉", ringColor: "ring-emerald-500/20" },
+    rejected: { icon: XCircle, color: "text-red-400", bg: "bg-red-500/10", border: "border-red-500/20", label: "Not Approved", ringColor: "ring-red-500/20" },
   };
 
   const handleDownloadPDF = () => {
@@ -167,7 +167,7 @@ export default function ApplicationStatus() {
   const sc = statusConfig[application?.status || "pending"];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/3 via-background to-secondary/3">
+    <div className="min-h-screen bg-background">
       <SEOHead title="Track Application Status" description="Track your admission application status at Hoysala Degree College. Enter your application number and email to check." canonical="/application-status" />
       {/* Hero Header */}
       <section className="relative overflow-hidden py-16 sm:py-24 text-center">
@@ -317,13 +317,13 @@ export default function ApplicationStatus() {
 
           {/* Result Card */}
           {application && !isLoading && (
-            <div className="rounded-3xl overflow-hidden shadow-2xl border border-border">
+            <div className="rounded-2xl overflow-hidden shadow-2xl border border-border/50 bg-card">
               {/* Status Header */}
-              <div className={`p-8 text-center ${sc.bg} border-b ${sc.border}`}>
+              <div className={`p-8 text-center ${sc.bg} border-b border-border/50`}>
                 {application.status === "approved" && (
-                  <div className="mb-3"><PartyPopper className="w-10 h-10 text-primary mx-auto animate-bounce" /></div>
+                  <div className="mb-3"><PartyPopper className="w-10 h-10 text-secondary mx-auto animate-bounce" /></div>
                 )}
-                <div className={`w-20 h-20 rounded-full ${sc.bg} border-2 ${sc.border} flex items-center justify-center mx-auto mb-4 shadow-lg ring-4 ${sc.ringColor}`}>
+                <div className={`w-20 h-20 rounded-2xl ${sc.bg} border-2 ${sc.border} flex items-center justify-center mx-auto mb-4 shadow-lg ring-4 ${sc.ringColor}`}>
                   <sc.icon className={`w-10 h-10 ${sc.color}`} />
                 </div>
                 <p className={`font-display text-2xl font-bold ${sc.color}`}>{sc.label}</p>
@@ -332,12 +332,12 @@ export default function ApplicationStatus() {
 
               {/* Photo */}
               {application.photo_url && (
-                <div className="flex justify-center py-6 bg-card border-b border-border">
+                <div className="flex justify-center py-6 bg-card border-b border-border/50">
                   <div className="relative">
                     <img src={application.photo_url} alt={application.full_name} className="w-28 h-28 rounded-2xl object-cover border-4 border-border shadow-xl" />
                     {application.status === "approved" && (
-                      <div className="absolute -top-2 -right-2 w-8 h-8 bg-primary rounded-full flex items-center justify-center shadow-lg">
-                        <CheckCircle className="w-5 h-5 text-primary-foreground" />
+                      <div className="absolute -top-2 -right-2 w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center shadow-lg">
+                        <CheckCircle className="w-5 h-5 text-white" />
                       </div>
                     )}
                   </div>
@@ -345,7 +345,7 @@ export default function ApplicationStatus() {
               )}
 
               {/* Details */}
-              <div className="bg-card p-6 space-y-2">
+              <div className="bg-card p-6 space-y-1">
                 {[
                   ["Full Name", application.full_name],
                   ["Course Applied", application.course],
@@ -361,7 +361,7 @@ export default function ApplicationStatus() {
                   ["Applied On", new Date(application.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })],
                   ...(application.review_notes ? [["Review Notes", application.review_notes]] : []),
                 ].filter(([, v]) => v).map(([label, val]) => (
-                  <div key={String(label)} className="flex gap-3 p-2.5 rounded-xl hover:bg-muted/30 transition-colors">
+                  <div key={String(label)} className="flex gap-3 p-3 rounded-xl hover:bg-muted/30 transition-colors">
                     <span className="font-body text-[10px] font-bold text-muted-foreground w-28 shrink-0 uppercase tracking-wider pt-0.5">{label}</span>
                     <span className="font-body text-sm text-foreground font-medium">{val}</span>
                   </div>
@@ -369,10 +369,10 @@ export default function ApplicationStatus() {
               </div>
 
               {/* Actions */}
-              <div className="bg-card border-t border-border p-5 flex flex-wrap gap-3">
+              <div className="bg-card border-t border-border/50 p-5 flex flex-wrap gap-3">
                 <Button
                   onClick={handleDownloadPDF}
-                  className="flex-1 rounded-2xl font-body gap-2 bg-primary hover:bg-primary/90 shadow-lg"
+                  className="flex-1 rounded-xl font-body gap-2 bg-primary hover:bg-primary/90 shadow-lg"
                 >
                   <Download className="w-4 h-4" /> Download PDF
                 </Button>
@@ -380,7 +380,7 @@ export default function ApplicationStatus() {
                   <Button
                     variant="outline"
                     onClick={() => { setSearched(false); setSubmitted(false); confettiFired.current = false; }}
-                    className="rounded-2xl font-body"
+                    className="rounded-xl font-body"
                   >
                     <ArrowLeft className="w-4 h-4 mr-1" /> Search Again
                   </Button>

@@ -56,9 +56,15 @@ export default function AdminApproveAdmins() {
       if (data?.error) throw new Error(data.error);
       return data;
     },
-    onSuccess: () => {
-      toast.success("Admin request approved! You can now create the account.");
+    onSuccess: (_, variables) => {
+      toast.success("Admin request approved! Redirecting to create the account...");
       queryClient.invalidateQueries({ queryKey: ["pending-admin-requests"] });
+      // Find the approved request and redirect with pre-filled data
+      const req = requests.find((r: any) => r.id === variables.requestId);
+      if (req) {
+        const params = new URLSearchParams({ name: req.full_name, email: req.email, phone: req.phone || "" });
+        window.location.href = `/dashboard/admin/add-staff?approved=true&${params.toString()}`;
+      }
     },
     onError: (e: any) => toast.error(e.message),
   });

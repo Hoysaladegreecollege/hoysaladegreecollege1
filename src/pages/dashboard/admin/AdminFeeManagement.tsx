@@ -549,7 +549,7 @@ export default function AdminFeeManagement() {
 
       {/* Payment Modal */}
       {selectedStudent && (
-        <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
           <div className="bg-card rounded-2xl border border-border w-full max-w-md shadow-2xl animate-scale-in">
             <div className="p-6 border-b border-border flex items-center justify-between">
               <div>
@@ -634,7 +634,7 @@ export default function AdminFeeManagement() {
 
       {/* Fee Edit Modal */}
       {feeEditStudent && (
-        <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
           <div className="bg-card rounded-2xl border border-border w-full max-w-md shadow-2xl animate-scale-in">
             <div className="p-6 border-b border-border flex items-center justify-between">
               <div>

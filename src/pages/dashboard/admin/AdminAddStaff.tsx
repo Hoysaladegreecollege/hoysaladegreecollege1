@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { ArrowLeft, UserPlus, ShieldCheck, GraduationCap, Crown, Users, Eye, EyeOff } from "lucide-react";
 import { validatePassword, PASSWORD_REQUIREMENTS } from "@/lib/password-validation";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type StaffRole = "teacher" | "principal" | "admin";
@@ -21,10 +21,15 @@ const roleConfig: Record<StaffRole, { label: string; icon: any; color: string; b
 export default function AdminAddStaff() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const [selectedRole, setSelectedRole] = useState<StaffRole>("teacher");
+  const [searchParams] = useSearchParams();
+  const isApproved = searchParams.get("approved") === "true";
+  const [selectedRole, setSelectedRole] = useState<StaffRole>(isApproved ? "admin" : "teacher");
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
-    full_name: "", email: "", password: "", phone: "",
+    full_name: searchParams.get("name") || "",
+    email: searchParams.get("email") || "",
+    password: "",
+    phone: searchParams.get("phone") || "",
     department_id: "", employee_id: "", qualification: "", experience: "",
     subjects: "",
   });

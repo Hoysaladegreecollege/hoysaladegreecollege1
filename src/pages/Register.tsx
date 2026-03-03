@@ -1,12 +1,13 @@
 import { useState, useRef } from "react";
 import SEOHead from "@/components/SEOHead";
-import { Eye, EyeOff, Lock, Mail, User, ArrowLeft, Phone, MapPin, Calendar, Users, GraduationCap, Sparkles, CheckCircle } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, User, ArrowLeft, Phone, MapPin, Calendar, Users, GraduationCap, Sparkles, CheckCircle, ExternalLink } from "lucide-react";
 import collegeLogo from "@/assets/college-logo.png";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 export default function Register() {
   const [step, setStep] = useState(1);
@@ -14,6 +15,7 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [focused, setFocused] = useState<string | null>(null);
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const { signUp } = useAuth();
   const navigate = useNavigate();
@@ -48,21 +50,38 @@ export default function Register() {
       const { error } = await signUp(form.email, form.password, form.fullName, "student");
       if (error) { toast.error(error.message); setLoading(false); return; }
 
-      // Update student record with additional details after a short delay
-      // The handle_new_user trigger creates the student row automatically
-      toast.success("Registration successful! Please check your email to verify your account.");
-      
-      // Store extra info in localStorage to update after email verification
-      localStorage.setItem("hdc_pending_student_info", JSON.stringify({
-        phone: form.phone,
-        dateOfBirth: form.dateOfBirth,
-        fatherName: form.fatherName,
-        motherName: form.motherName,
-        parentPhone: form.parentPhone,
-        address: form.address,
-      }));
+      // Wait for trigger to create student record, then update with extra details
+      await new Promise(r => setTimeout(r, 2500));
 
-      navigate("/login");
+      // Try to find the user and update student details directly
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        // Update profile with phone
+        await supabase.from("profiles").update({ phone: form.phone }).eq("user_id", session.user.id);
+        
+        // Update student record with family details
+        const updateData: any = {
+          phone: form.phone,
+          father_name: form.fatherName || "",
+          mother_name: form.motherName || "",
+          parent_phone: form.parentPhone || "",
+          address: form.address || "",
+          date_of_birth: form.dateOfBirth || null,
+        };
+        await supabase.from("students").update(updateData).eq("user_id", session.user.id);
+      } else {
+        // Store extra info in localStorage to update after email verification
+        localStorage.setItem("hdc_pending_student_info", JSON.stringify({
+          phone: form.phone,
+          dateOfBirth: form.dateOfBirth,
+          fatherName: form.fatherName,
+          motherName: form.motherName,
+          parentPhone: form.parentPhone,
+          address: form.address,
+        }));
+      }
+
+      setShowSuccessDialog(true);
     } catch (err: any) {
       toast.error(err.message || "Registration failed");
     } finally {
@@ -131,7 +150,6 @@ export default function Register() {
 
           {step === 1 ? (
             <div className="space-y-4 relative z-10">
-              {/* Full Name */}
               <div className="relative">
                 <User className={iconClass("fullName")} />
                 <input type="text" placeholder="Full Name *" value={form.fullName}
@@ -139,8 +157,6 @@ export default function Register() {
                   onFocus={() => setFocused("fullName")} onBlur={() => setFocused(null)}
                   className={inputClass("fullName")} />
               </div>
-
-              {/* Email */}
               <div className="relative">
                 <Mail className={iconClass("email")} />
                 <input type="email" placeholder="Email Address *" value={form.email}
@@ -148,8 +164,6 @@ export default function Register() {
                   onFocus={() => setFocused("email")} onBlur={() => setFocused(null)}
                   className={inputClass("email")} />
               </div>
-
-              {/* Password */}
               <div className="relative">
                 <Lock className={iconClass("password")} />
                 <input type={showPassword ? "text" : "password"} placeholder="Password * (min 6 chars)" value={form.password}
@@ -161,8 +175,6 @@ export default function Register() {
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-
-              {/* Confirm Password */}
               <div className="relative">
                 <Lock className={iconClass("confirmPassword")} />
                 <input type={showPassword ? "text" : "password"} placeholder="Confirm Password *" value={form.confirmPassword}
@@ -170,7 +182,6 @@ export default function Register() {
                   onFocus={() => setFocused("confirmPassword")} onBlur={() => setFocused(null)}
                   className={inputClass("confirmPassword")} />
               </div>
-
               <Button type="button" onClick={() => { if (validateStep1()) setStep(2); }}
                 className="w-full h-12 rounded-xl font-body font-semibold text-sm relative overflow-hidden group"
                 style={{ background: "linear-gradient(135deg, hsl(45 80% 45%), hsl(45 80% 55%), hsl(40 85% 50%))" }}>
@@ -182,7 +193,6 @@ export default function Register() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-3.5 relative z-10">
-              {/* Phone */}
               <div className="relative">
                 <Phone className={iconClass("phone")} />
                 <input type="tel" placeholder="Phone Number *" value={form.phone}
@@ -190,8 +200,6 @@ export default function Register() {
                   onFocus={() => setFocused("phone")} onBlur={() => setFocused(null)}
                   className={inputClass("phone")} />
               </div>
-
-              {/* Date of Birth */}
               <div className="relative">
                 <Calendar className={iconClass("dob")} />
                 <input type="date" value={form.dateOfBirth}
@@ -199,8 +207,6 @@ export default function Register() {
                   onFocus={() => setFocused("dob")} onBlur={() => setFocused(null)}
                   className={`${inputClass("dob")} ${!form.dateOfBirth ? "text-muted-foreground/50" : ""}`} />
               </div>
-
-              {/* Father & Mother names */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="relative">
                   <Users className={iconClass("father")} />
@@ -217,8 +223,6 @@ export default function Register() {
                     className={inputClass("mother")} />
                 </div>
               </div>
-
-              {/* Parent Phone */}
               <div className="relative">
                 <Phone className={iconClass("parentPhone")} />
                 <input type="tel" placeholder="Parent's Phone" value={form.parentPhone}
@@ -226,8 +230,6 @@ export default function Register() {
                   onFocus={() => setFocused("parentPhone")} onBlur={() => setFocused(null)}
                   className={inputClass("parentPhone")} />
               </div>
-
-              {/* Address */}
               <div className="relative">
                 <MapPin className={iconClass("address")} />
                 <textarea placeholder="Full Address" value={form.address} rows={2}
@@ -235,7 +237,6 @@ export default function Register() {
                   onFocus={() => setFocused("address")} onBlur={() => setFocused(null)}
                   className={`${inputClass("address")} resize-none pt-3`} />
               </div>
-
               <div className="flex gap-3 pt-1">
                 <Button type="button" variant="outline" onClick={() => setStep(1)}
                   className="flex-1 h-12 rounded-xl font-body text-sm border-border/30 bg-transparent text-muted-foreground hover:bg-muted/10">
@@ -269,6 +270,47 @@ export default function Register() {
           </div>
         </div>
       </div>
+
+      {/* Success Dialog */}
+      <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <DialogContent className="max-w-sm border-border/30 bg-card p-0 overflow-hidden" style={{ background: "linear-gradient(135deg, hsl(222 30% 12%), hsl(222 30% 9%))" }}>
+          <div className="p-8 text-center">
+            {/* Animated tick */}
+            <div className="w-20 h-20 rounded-full bg-emerald-500/10 border-2 border-emerald-500/30 flex items-center justify-center mx-auto mb-5 animate-scale-in">
+              <div className="w-14 h-14 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                <CheckCircle className="w-8 h-8 text-emerald-400" />
+              </div>
+            </div>
+            
+            <h3 className="font-display text-xl font-bold text-foreground mb-2">Account Successfully Created! 🎉</h3>
+            <p className="font-body text-sm text-muted-foreground leading-relaxed mb-6">
+              Please check your email for a confirmation link and <strong className="text-foreground">verify your email</strong> for security reasons before signing in.
+            </p>
+
+            <div className="bg-amber-500/5 border border-amber-500/15 rounded-xl p-4 mb-5">
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <Mail className="w-4 h-4 text-amber-400" />
+                <p className="font-body text-xs font-semibold text-amber-400 uppercase tracking-wider">Check Your Email</p>
+              </div>
+              <p className="font-body text-xs text-muted-foreground">{form.email}</p>
+            </div>
+
+            <div className="space-y-3">
+              <a href={`https://mail.google.com`} target="_blank" rel="noopener noreferrer">
+                <Button className="w-full rounded-xl h-11 font-body font-semibold gap-2"
+                  style={{ background: "linear-gradient(135deg, hsl(45 80% 45%), hsl(45 80% 55%))" }}>
+                  <ExternalLink className="w-4 h-4" />
+                  <span className="text-background">Open Mail App</span>
+                </Button>
+              </a>
+              <Button variant="outline" onClick={() => { setShowSuccessDialog(false); navigate("/login"); }}
+                className="w-full rounded-xl h-11 font-body text-sm border-border/30 bg-transparent text-muted-foreground hover:bg-muted/10">
+                Go to Login
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <style>{`
         @keyframes float {
