@@ -176,6 +176,7 @@ export default function Footer() {
           <span className="flex items-center gap-1">
             Made with <Heart className="w-3 h-3 text-secondary fill-secondary" /> ಶ್ರೀಶಿರಡಿ ಸಾಯಿ ಎಜುಕೇಷನಲ್ ಟ್ರಸ್ಟ್ (ರಿ.)
           </span>
+          <Link to="/credits" className="hover:text-secondary transition-colors">Website Credits</Link>
         </div>
       </div>
 
