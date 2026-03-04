@@ -86,7 +86,7 @@ export default function Apply() {
 
       <section className="py-12 sm:py-20 bg-background">
         <div className="container max-w-4xl px-4">
-          <div className="premium-card p-6 sm:p-10 border border-border/50">
+          <div className="premium-card p-6 sm:p-10 border border-border/50 hover:!transform-none hover:!scale-100">
             {/* Header */}
             <div className="flex items-center gap-4 mb-8 pb-6 border-b border-border/50">
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 bg-primary text-primary-foreground shadow-lg">
@@ -98,7 +98,7 @@ export default function Apply() {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-7">
+            <form onSubmit={handleSubmit} className="space-y-7 relative z-10">
               {/* Photo upload */}
               <div className="relative rounded-2xl border border-dashed border-primary/20 hover:border-primary/40 transition-all duration-300 overflow-hidden group">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] to-secondary/[0.03] group-hover:from-primary/[0.06] group-hover:to-secondary/[0.06] transition-all duration-500" />
