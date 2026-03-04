@@ -1,8 +1,8 @@
-import { Bell, Check, Trash2, ExternalLink } from "lucide-react";
+import { Bell, Check, Trash2, ExternalLink, Volume2 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 const TYPE_COLORS: Record<string, string> = {
@@ -10,7 +10,17 @@ const TYPE_COLORS: Record<string, string> = {
   material: "bg-emerald-500/10 text-emerald-500",
   announcement: "bg-purple-500/10 text-purple-500",
   promotion: "bg-amber-500/10 text-amber-500",
+  marks: "bg-orange-500/10 text-orange-500",
   general: "bg-primary/10 text-primary",
+};
+
+const TYPE_ICONS: Record<string, string> = {
+  attendance: "📋",
+  material: "📚",
+  announcement: "📢",
+  promotion: "🎉",
+  marks: "📝",
+  general: "🔔",
 };
 
 export default function NotificationCenter() {
@@ -18,6 +28,7 @@ export default function NotificationCenter() {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const prevCountRef = useRef(0);
 
   const { data: notifications = [] } = useQuery({
     queryKey: ["user-notifications", user?.id],
@@ -32,10 +43,21 @@ export default function NotificationCenter() {
       return (data || []) as any[];
     },
     enabled: !!user,
-    refetchInterval: 30000,
+    refetchInterval: 15000,
   });
 
   const unread = notifications.filter((n: any) => !n.is_read).length;
+
+  // Vibrate + sound on new notifications
+  useEffect(() => {
+    if (unread > prevCountRef.current && prevCountRef.current >= 0) {
+      // Vibrate on mobile
+      if ("vibrate" in navigator) {
+        navigator.vibrate([100, 50, 100]);
+      }
+    }
+    prevCountRef.current = unread;
+  }, [unread]);
 
   const markRead = useMutation({
     mutationFn: async (id: string) => {
@@ -68,6 +90,17 @@ export default function NotificationCenter() {
     }
   };
 
+  const timeAgo = (date: string) => {
+    const diff = Date.now() - new Date(date).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return "Just now";
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    const days = Math.floor(hrs / 24);
+    return `${days}d ago`;
+  };
+
   return (
     <div className="relative">
       <button
@@ -75,7 +108,7 @@ export default function NotificationCenter() {
         className="relative p-2 rounded-xl hover:bg-muted transition-colors"
         title="Notifications"
       >
-        <Bell className="w-5 h-5 text-muted-foreground" />
+        <Bell className={`w-5 h-5 transition-colors ${unread > 0 ? "text-primary" : "text-muted-foreground"}`} />
         {unread > 0 && (
           <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
             {unread > 9 ? "9+" : unread}
@@ -87,12 +120,18 @@ export default function NotificationCenter() {
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
           <div className="absolute right-0 top-12 z-50 w-80 sm:w-96 bg-card border border-border rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
-            <div className="p-4 border-b border-border flex items-center justify-between">
-              <h3 className="font-display text-sm font-bold text-foreground">Notifications</h3>
+            <div className="p-4 border-b border-border flex items-center justify-between bg-gradient-to-r from-primary/5 to-transparent">
+              <div className="flex items-center gap-2">
+                <Bell className="w-4 h-4 text-primary" />
+                <h3 className="font-display text-sm font-bold text-foreground">Notifications</h3>
+                {unread > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-full bg-destructive/10 text-destructive text-[10px] font-bold">{unread} new</span>
+                )}
+              </div>
               <div className="flex gap-1">
                 {unread > 0 && (
                   <button onClick={() => markAllRead.mutate()} className="text-[10px] font-body font-semibold px-2 py-1 rounded-lg hover:bg-muted text-primary transition-colors">
-                    <Check className="w-3 h-3 inline mr-0.5" /> Mark all read
+                    <Check className="w-3 h-3 inline mr-0.5" /> Read all
                   </button>
                 )}
                 {notifications.length > 0 && (
@@ -113,20 +152,20 @@ export default function NotificationCenter() {
                   <div
                     key={n.id}
                     onClick={() => handleClick(n)}
-                    className={`px-4 py-3 cursor-pointer hover:bg-muted/30 transition-colors ${!n.is_read ? "bg-primary/[0.03]" : ""}`}
+                    className={`px-4 py-3 cursor-pointer hover:bg-muted/30 transition-all duration-200 ${!n.is_read ? "bg-primary/[0.04] border-l-2 border-l-primary" : "border-l-2 border-l-transparent"}`}
                   >
-                    <div className="flex items-start gap-2">
-                      {!n.is_read && <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />}
+                    <div className="flex items-start gap-2.5">
+                      <span className="text-base mt-0.5 shrink-0">{TYPE_ICONS[n.type] || TYPE_ICONS.general}</span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
-                          <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${TYPE_COLORS[n.type] || TYPE_COLORS.general}`}>
+                          <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full uppercase tracking-wider ${TYPE_COLORS[n.type] || TYPE_COLORS.general}`}>
                             {n.type}
                           </span>
-                          <span className="text-[10px] text-muted-foreground font-body">
-                            {new Date(n.created_at).toLocaleDateString()}
+                          <span className="text-[10px] text-muted-foreground font-body ml-auto shrink-0">
+                            {timeAgo(n.created_at)}
                           </span>
                         </div>
-                        <p className="font-body text-sm font-semibold text-foreground truncate">{n.title}</p>
+                        <p className={`font-body text-sm truncate ${!n.is_read ? "font-bold text-foreground" : "font-medium text-foreground/80"}`}>{n.title}</p>
                         <p className="font-body text-xs text-muted-foreground truncate">{n.message}</p>
                       </div>
                       {n.link && <ExternalLink className="w-3 h-3 text-muted-foreground shrink-0 mt-1" />}

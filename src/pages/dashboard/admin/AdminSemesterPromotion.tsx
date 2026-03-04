@@ -128,6 +128,18 @@ export default function AdminSemesterPromotion() {
           type: "promotion",
           link: "/dashboard/student",
         } as any);
+        // Send promotion email
+        try {
+          await supabase.functions.invoke("send-promotion-notification", {
+            body: {
+              action: "notify_promotion",
+              studentIds: [student.id],
+              fromSemester: student.semester,
+              toSemester: student.semester + 1,
+              courseId: student.course_id || null,
+            },
+          });
+        } catch (e) { console.error("Promotion email failed:", e); }
       }
     }
   };

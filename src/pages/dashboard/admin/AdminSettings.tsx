@@ -340,6 +340,70 @@ export default function AdminSettings() {
         </div>
       </div>
 
+      {/* Import Students */}
+      <div className="bg-card border border-border rounded-2xl p-5 hover:shadow-lg transition-all duration-300">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Database className="w-4 h-4 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-body text-sm font-bold text-foreground">Import Students from CSV</h3>
+              <p className="font-body text-xs text-muted-foreground">
+                CSV format: Name, Email, Phone, Roll Number, Course Code, Semester, Father Name, Mother Name, Parent Phone, Address, DOB (YYYY-MM-DD), Total Fee
+              </p>
+            </div>
+          </div>
+          <label className="cursor-pointer">
+            <input type="file" accept=".csv" className="hidden" onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              const text = await file.text();
+              const lines = text.split("\n").filter(l => l.trim());
+              if (lines.length < 2) { toast.error("CSV must have a header row and data"); return; }
+              const rows = lines.slice(1).map(l => {
+                const cols = l.split(",").map(c => c.replace(/^"|"$/g, "").trim());
+                return { name: cols[0], email: cols[1], phone: cols[2], roll: cols[3], courseCode: cols[4], semester: cols[5], father: cols[6], mother: cols[7], parentPhone: cols[8], address: cols[9], dob: cols[10], totalFee: cols[11] };
+              });
+              let imported = 0, skipped = 0;
+              const { data: coursesData } = await supabase.from("courses").select("id, code");
+              for (const row of rows) {
+                if (!row.email) { skipped++; continue; }
+                try {
+                  const { data: authData, error: authErr } = await supabase.auth.signUp({
+                    email: row.email,
+                    password: "Welcome@" + (row.roll || "123"),
+                    options: { data: { full_name: row.name, role: "student" }, emailRedirectTo: window.location.origin },
+                  });
+                  if (authErr || !authData.user) { skipped++; continue; }
+                  await new Promise(r => setTimeout(r, 500));
+                  const courseMatch = coursesData?.find(c => c.code.toLowerCase() === (row.courseCode || "").toLowerCase());
+                  const updateData: any = {
+                    semester: parseInt(row.semester) || 1,
+                    father_name: row.father || "",
+                    mother_name: row.mother || "",
+                    parent_phone: row.parentPhone || "",
+                    address: row.address || "",
+                    date_of_birth: row.dob || null,
+                    total_fee: parseFloat(row.totalFee) || 0,
+                  };
+                  if (row.roll) updateData.roll_number = row.roll;
+                  if (courseMatch) updateData.course_id = courseMatch.id;
+                  if (row.phone) await supabase.from("profiles").update({ phone: row.phone }).eq("user_id", authData.user.id);
+                  await supabase.from("students").update(updateData).eq("user_id", authData.user.id);
+                  imported++;
+                } catch { skipped++; }
+              }
+              toast.success(`Imported ${imported} students, ${skipped} skipped`);
+              e.target.value = "";
+            }} />
+            <Button variant="outline" className="rounded-xl font-body text-xs gap-1.5" asChild>
+              <span><Download className="w-3 h-3 rotate-180" /> Import CSV</span>
+            </Button>
+          </label>
+        </div>
+      </div>
+
       {/* General Info */}
       <div className="bg-card border border-border rounded-2xl p-6 hover:shadow-lg transition-all duration-300">
         <h3 className="font-display text-base font-bold text-foreground mb-5 flex items-center gap-2">
