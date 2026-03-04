@@ -66,8 +66,20 @@ export default function AdminFeeManagement() {
   const { data: allPayments = [] } = useQuery({
     queryKey: ["all-fee-payments"],
     queryFn: async () => {
-      const { data } = await supabase.from("fee_payments").select("*").order("created_at", { ascending: false }).limit(200);
-      return data || [];
+      const { data } = await supabase.from("fee_payments").select("*, students(roll_number, user_id)").order("created_at", { ascending: false }).limit(200);
+      if (!data) return [];
+      // Fetch profiles to get student names
+      const userIds = [...new Set(data.map((p: any) => p.students?.user_id).filter(Boolean))];
+      let profilesMap: Record<string, string> = {};
+      if (userIds.length > 0) {
+        const { data: profs } = await supabase.from("profiles").select("user_id, full_name").in("user_id", userIds);
+        profs?.forEach((p: any) => { profilesMap[p.user_id] = p.full_name; });
+      }
+      return data.map((p: any) => ({
+        ...p,
+        student_name: p.students?.user_id ? profilesMap[p.students.user_id] || "" : "",
+        student_roll: p.students?.roll_number || "",
+      }));
     },
   });
 
@@ -599,8 +611,8 @@ export default function AdminFeeManagement() {
                     <ArrowDownRight className="w-4 h-4 text-emerald-600" />
                   </div>
                   <div>
-                    <p className="font-body text-xs font-semibold text-foreground">{p.receipt_number || "—"}</p>
-                    <p className="font-body text-[10px] text-muted-foreground">{p.payment_method} · {p.semester ? `Sem ${p.semester} · ` : ""}{p.remarks || "No remarks"}</p>
+                    <p className="font-body text-xs font-semibold text-foreground">{p.student_name || p.receipt_number || "—"}</p>
+                    <p className="font-body text-[10px] text-muted-foreground">{p.receipt_number}{p.student_roll ? ` · ${p.student_roll}` : ""} · {p.payment_method}{p.semester ? ` · Sem ${p.semester}` : ""}</p>
                   </div>
                 </div>
                 <div className="text-right">
