@@ -121,16 +121,33 @@ export default function AdminStudentFeeDetail() {
       if (!student) return;
       const due = (student.total_fee || 0) - (student.fee_paid || 0);
       const msg = reminderMsg || `Dear ${student.profile?.full_name}, you have a pending fee of ₹${due.toLocaleString()}. Please clear your dues at the earliest. - Hoysala Degree College`;
+      // Insert in-app notification marked as important (type: "fee_reminder")
       await supabase.from("notifications").insert({
         user_id: student.user_id,
-        title: "Fee Payment Reminder",
+        title: "⚠️ Important: Fee Payment Reminder",
         message: msg,
-        type: "fee",
+        type: "fee_reminder",
         link: "/dashboard/student/fees",
       });
+      // Send push notification
+      try {
+        await supabase.functions.invoke("send-push-notification", {
+          body: {
+            notifications: [{
+              user_id: student.user_id,
+              title: "⚠️ Fee Payment Reminder",
+              body: msg,
+              url: "/dashboard/student/fees",
+              tag: `hdc-fee-reminder-${Date.now()}`,
+            }],
+          },
+        });
+      } catch (pushErr) {
+        console.error("Push notification failed (non-critical):", pushErr);
+      }
     },
     onSuccess: () => {
-      toast.success("Reminder sent to student!");
+      toast.success("Reminder sent to student (in-app + push notification)!");
       setReminderMsg("");
       setShowReminderModal(false);
     },
