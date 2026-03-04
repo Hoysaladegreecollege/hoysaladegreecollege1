@@ -719,33 +719,43 @@ export default function AdminDashboard() {
               </select>
             </div>
           </div>
-          <div className="h-56">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={filteredSemFeeData} barGap={4} style={{ backgroundColor: "hsl(var(--card))" }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                <XAxis dataKey="name" tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `₹${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} />
-                <Tooltip contentStyle={{ borderRadius: 16, fontFamily: "Inter", fontSize: 12, border: "1px solid hsl(var(--border))", background: "hsl(var(--card))", color: "hsl(var(--foreground))", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }} formatter={(value: number) => [`₹${value.toLocaleString()}`, undefined]} />
-                <Legend wrapperStyle={{ fontSize: 11, fontFamily: "Inter" }} />
-                <Bar dataKey="collected" name="Collected" fill="hsl(145, 65%, 42%)" radius={[6, 6, 0, 0]} barSize={28} />
-                <Bar dataKey="pending" name="Pending" fill="hsl(0, 70%, 58%)" radius={[6, 6, 0, 0]} barSize={28} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="grid grid-cols-3 gap-3 mt-4">
-            <div className="bg-muted/30 rounded-xl p-3 text-center">
-              <p className="font-body text-lg font-bold text-foreground tabular-nums">₹{filteredSemFeeData.reduce((s: number, d: any) => s + d.total, 0).toLocaleString()}</p>
-              <p className="font-body text-[10px] text-muted-foreground">Total Fees</p>
+          {filteredSemFeeData.some((d: any) => d.collected > 0 || d.pending > 0 || d.total > 0) ? (
+            <>
+              <div className="h-56">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={filteredSemFeeData} barGap={4} style={{ backgroundColor: "hsl(var(--card))" }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                    <XAxis dataKey="name" tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `₹${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} />
+                    <Tooltip contentStyle={{ borderRadius: 16, fontFamily: "Inter", fontSize: 12, border: "1px solid hsl(var(--border))", background: "hsl(var(--card))", color: "hsl(var(--foreground))", boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }} formatter={(value: number) => [`₹${value.toLocaleString()}`, undefined]} />
+                    <Legend wrapperStyle={{ fontSize: 11, fontFamily: "Inter" }} />
+                    <Bar dataKey="collected" name="Collected" fill="hsl(145, 65%, 42%)" radius={[6, 6, 0, 0]} barSize={28} />
+                    <Bar dataKey="pending" name="Pending" fill="hsl(0, 70%, 58%)" radius={[6, 6, 0, 0]} barSize={28} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="grid grid-cols-3 gap-3 mt-4">
+                <div className="bg-muted/30 rounded-xl p-3 text-center">
+                  <p className="font-body text-lg font-bold text-foreground tabular-nums">₹{filteredSemFeeData.reduce((s: number, d: any) => s + d.total, 0).toLocaleString()}</p>
+                  <p className="font-body text-[10px] text-muted-foreground">Total Fees</p>
+                </div>
+                <div className="bg-emerald-500/5 rounded-xl p-3 text-center">
+                  <p className="font-body text-lg font-bold text-emerald-600 tabular-nums">₹{filteredSemFeeData.reduce((s: number, d: any) => s + d.collected, 0).toLocaleString()}</p>
+                  <p className="font-body text-[10px] text-muted-foreground">Total Collected</p>
+                </div>
+                <div className="bg-red-500/5 rounded-xl p-3 text-center">
+                  <p className="font-body text-lg font-bold text-red-500 tabular-nums">₹{filteredSemFeeData.reduce((s: number, d: any) => s + d.pending, 0).toLocaleString()}</p>
+                  <p className="font-body text-[10px] text-muted-foreground">Total Pending</p>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <IndianRupee className="w-10 h-10 text-muted-foreground/30 mb-3" />
+              <p className="font-body text-sm font-medium text-muted-foreground">No fee data available for this course</p>
+              <p className="font-body text-[11px] text-muted-foreground/60 mt-1">Try selecting a different course or semester</p>
             </div>
-            <div className="bg-emerald-500/5 rounded-xl p-3 text-center">
-              <p className="font-body text-lg font-bold text-emerald-600 tabular-nums">₹{filteredSemFeeData.reduce((s: number, d: any) => s + d.collected, 0).toLocaleString()}</p>
-              <p className="font-body text-[10px] text-muted-foreground">Total Collected</p>
-            </div>
-            <div className="bg-red-500/5 rounded-xl p-3 text-center">
-              <p className="font-body text-lg font-bold text-red-500 tabular-nums">₹{filteredSemFeeData.reduce((s: number, d: any) => s + d.pending, 0).toLocaleString()}</p>
-              <p className="font-body text-[10px] text-muted-foreground">Total Pending</p>
-            </div>
-          </div>
+          )}
         </div>
       )}
 
