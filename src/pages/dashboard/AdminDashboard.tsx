@@ -89,7 +89,8 @@ export default function AdminDashboard() {
   const { profile } = useAuth();
   const [birthdayDialogOpen, setBirthdayDialogOpen] = useState(false);
   const [attDate, setAttDate] = useState(new Date().toISOString().split("T")[0]);
-
+  const [feeChartCourse, setFeeChartCourse] = useState("all");
+  const [feeChartSem, setFeeChartSem] = useState("all");
   const { data: counts, isLoading: countsLoading } = useQuery({
     queryKey: ["admin-stats"],
     refetchInterval: 30000,
@@ -124,6 +125,14 @@ export default function AdminDashboard() {
         counts[name].count++;
       });
       return Object.values(counts);
+    },
+  });
+
+  const { data: coursesList = [] } = useQuery({
+    queryKey: ["admin-courses-list-dashboard"],
+    queryFn: async () => {
+      const { data } = await supabase.from("courses").select("id, name, code").eq("is_active", true).order("name");
+      return data || [];
     },
   });
 
@@ -168,14 +177,20 @@ export default function AdminDashboard() {
 
   // Semester-wise fee collection breakdown
   const { data: semFeeData = [] } = useQuery({
-    queryKey: ["admin-semester-fee-breakdown"],
+    queryKey: ["admin-semester-fee-breakdown", feeChartCourse],
     queryFn: async () => {
-      const { data: payments } = await supabase.from("fee_payments").select("semester, amount");
-      const { data: students } = await supabase.from("students").select("semester, total_fee, fee_paid").eq("is_active", true);
+      let paymentsQ = supabase.from("fee_payments").select("semester, amount, student_id");
+      let studentsQ = supabase.from("students").select("id, semester, total_fee, fee_paid, course_id").eq("is_active", true);
+      if (feeChartCourse !== "all") {
+        studentsQ = studentsQ.eq("course_id", feeChartCourse);
+      }
+      const [{ data: payments }, { data: students }] = await Promise.all([paymentsQ, studentsQ]);
       if (!payments && !students) return [];
+      const studentIds = new Set((students || []).map((s: any) => s.id));
       const semData: Record<number, { collected: number; pending: number; total: number }> = {};
       [1,2,3,4,5,6].forEach(s => { semData[s] = { collected: 0, pending: 0, total: 0 }; });
       (payments || []).forEach((p: any) => {
+        if (feeChartCourse !== "all" && !studentIds.has(p.student_id)) return;
         const sem = p.semester || 1;
         if (semData[sem]) semData[sem].collected += Number(p.amount) || 0;
       });
@@ -188,12 +203,15 @@ export default function AdminDashboard() {
       });
       return [1,2,3,4,5,6].map(s => ({
         name: `Sem ${s}`,
+        sem: s,
         collected: semData[s].collected,
         pending: semData[s].pending,
         total: semData[s].total,
       }));
     },
   });
+
+  const filteredSemFeeData = feeChartSem === "all" ? semFeeData : semFeeData.filter((d: any) => d.sem === Number(feeChartSem));
 
   // Recent Activity Feed
   const { data: recentActivity = [] } = useQuery({
@@ -685,15 +703,25 @@ export default function AdminDashboard() {
       {/* Semester-wise Fee Collection Chart */}
       {semFeeData.some((s: any) => s.collected > 0 || s.pending > 0 || s.total > 0) && (
         <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
-          <div className="flex items-center gap-2 mb-5">
+          <div className="flex flex-wrap items-center gap-2 mb-5">
             <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
               <IndianRupee className="w-4 h-4 text-emerald-500" />
             </div>
             <h3 className="font-body text-[14px] font-semibold text-foreground">Semester-wise Fee Collection</h3>
+            <div className="flex items-center gap-2 ml-auto">
+              <select value={feeChartCourse} onChange={e => setFeeChartCourse(e.target.value)} className="border border-border rounded-xl px-3 py-1.5 font-body text-[11px] bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
+                <option value="all">All Courses</option>
+                {coursesList.map((c: any) => <option key={c.id} value={c.id}>{c.code}</option>)}
+              </select>
+              <select value={feeChartSem} onChange={e => setFeeChartSem(e.target.value)} className="border border-border rounded-xl px-3 py-1.5 font-body text-[11px] bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
+                <option value="all">All Semesters</option>
+                {[1,2,3,4,5,6].map(s => <option key={s} value={s}>Sem {s}</option>)}
+              </select>
+            </div>
           </div>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={semFeeData} barGap={4} style={{ backgroundColor: "hsl(var(--card))" }}>
+              <BarChart data={filteredSemFeeData} barGap={4} style={{ backgroundColor: "hsl(var(--card))" }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                 <XAxis dataKey="name" tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `₹${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} />
@@ -706,15 +734,15 @@ export default function AdminDashboard() {
           </div>
           <div className="grid grid-cols-3 gap-3 mt-4">
             <div className="bg-muted/30 rounded-xl p-3 text-center">
-              <p className="font-body text-lg font-bold text-foreground tabular-nums">₹{semFeeData.reduce((s: number, d: any) => s + d.total, 0).toLocaleString()}</p>
+              <p className="font-body text-lg font-bold text-foreground tabular-nums">₹{filteredSemFeeData.reduce((s: number, d: any) => s + d.total, 0).toLocaleString()}</p>
               <p className="font-body text-[10px] text-muted-foreground">Total Fees</p>
             </div>
             <div className="bg-emerald-500/5 rounded-xl p-3 text-center">
-              <p className="font-body text-lg font-bold text-emerald-600 tabular-nums">₹{semFeeData.reduce((s: number, d: any) => s + d.collected, 0).toLocaleString()}</p>
+              <p className="font-body text-lg font-bold text-emerald-600 tabular-nums">₹{filteredSemFeeData.reduce((s: number, d: any) => s + d.collected, 0).toLocaleString()}</p>
               <p className="font-body text-[10px] text-muted-foreground">Total Collected</p>
             </div>
             <div className="bg-red-500/5 rounded-xl p-3 text-center">
-              <p className="font-body text-lg font-bold text-red-500 tabular-nums">₹{semFeeData.reduce((s: number, d: any) => s + d.pending, 0).toLocaleString()}</p>
+              <p className="font-body text-lg font-bold text-red-500 tabular-nums">₹{filteredSemFeeData.reduce((s: number, d: any) => s + d.pending, 0).toLocaleString()}</p>
               <p className="font-body text-[10px] text-muted-foreground">Total Pending</p>
             </div>
           </div>
