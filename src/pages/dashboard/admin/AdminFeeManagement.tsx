@@ -373,11 +373,11 @@ export default function AdminFeeManagement() {
             {/* Glass shimmer overlay */}
             <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/[0.03] to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
             <div className="absolute top-0 right-0 w-20 h-20 bg-white/[0.02] rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:bg-white/[0.04] transition-all duration-700" />
-            <div className={`w-9 h-9 rounded-xl ${iconBg} backdrop-blur-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-500`}>
-              <Icon className={`w-4.5 h-4.5 ${iconColor}`} fill="currentColor" strokeWidth={1} />
+            <div className={`w-10 h-10 rounded-xl ${iconBg} backdrop-blur-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-500`}>
+              <Icon className={`w-5 h-5 ${iconColor}`} strokeWidth={2} />
             </div>
-            <p className="text-xl font-bold text-foreground tabular-nums tracking-tight" style={{ fontFamily: "'Poppins', sans-serif" }}>{value}</p>
-            <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-[0.12em] font-medium" style={{ fontFamily: "'Poppins', sans-serif" }}>{label}</p>
+            <p className="font-body text-xl font-bold text-foreground tabular-nums tracking-tight">{value}</p>
+            <p className="font-body text-[10px] text-muted-foreground mt-1 uppercase tracking-[0.12em] font-medium">{label}</p>
           </div>
         ))}
       </div>
