@@ -10,6 +10,7 @@ import { format } from "date-fns";
 
 export default function StudentFees() {
   const { user } = useAuth();
+  const [summaryFilter, setSummaryFilter] = useState("all");
   const [semFilter, setSemFilter] = useState("all");
   const [methodFilter, setMethodFilter] = useState("all");
   const [dateFrom, setDateFrom] = useState("");
@@ -59,6 +60,26 @@ export default function StudentFees() {
   const feePaid = student.fee_paid || 0;
   const feeRemaining = Math.max(0, totalFee - feePaid);
   const pct = totalFee > 0 ? Math.round((feePaid / totalFee) * 100) : 0;
+  const currentSemester = student.semester || 1;
+
+  // Semester-wise payment totals
+  const semPayments: Record<number, number> = {};
+  payments.forEach((p: any) => {
+    const s = p.semester || 1;
+    semPayments[s] = (semPayments[s] || 0) + Number(p.amount);
+  });
+
+  // Per-semester fee (assume evenly split across 6 semesters)
+  const perSemFee = totalFee > 0 ? Math.round(totalFee / 6) : 0;
+  const currentSemPaid = semPayments[currentSemester] || 0;
+  const currentSemRemaining = Math.max(0, perSemFee - currentSemPaid);
+  const currentSemPct = perSemFee > 0 ? Math.round((currentSemPaid / perSemFee) * 100) : 0;
+
+  // Summary filter logic
+  const summaryTotalFee = summaryFilter === "all" ? totalFee : perSemFee;
+  const summaryPaid = summaryFilter === "all" ? feePaid : (semPayments[Number(summaryFilter)] || 0);
+  const summaryRemaining = Math.max(0, summaryTotalFee - summaryPaid);
+  const summaryPaymentsCount = summaryFilter === "all" ? payments.length : payments.filter((p: any) => String(p.semester || 1) === summaryFilter).length;
 
   // Filter payments
   const filteredPayments = payments.filter((p: any) => {
@@ -118,13 +139,30 @@ export default function StudentFees() {
         </div>
       </div>
 
+      {/* Summary Semester Filter */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="font-body text-xs font-semibold text-foreground">Fee Summary:</span>
+        <div className="flex gap-1.5 flex-wrap">
+          <button onClick={() => setSummaryFilter("all")}
+            className={`px-3 py-1.5 rounded-full font-body text-xs font-semibold border transition-all duration-200 ${summaryFilter === "all" ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border text-muted-foreground hover:bg-muted"}`}>
+            Overall
+          </button>
+          {[1,2,3,4,5,6].map(s => (
+            <button key={s} onClick={() => setSummaryFilter(String(s))}
+              className={`px-3 py-1.5 rounded-full font-body text-xs font-semibold border transition-all duration-200 ${summaryFilter === String(s) ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border text-muted-foreground hover:bg-muted"} ${s === currentSemester ? "ring-1 ring-primary/30" : ""}`}>
+              Sem {s} {s === currentSemester ? "•" : ""}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         {[
-          { label: "Total Fee", value: `₹${totalFee.toLocaleString()}`, icon: IndianRupee, color: "text-foreground", bg: "bg-primary/5" },
-          { label: "Amount Paid", value: `₹${feePaid.toLocaleString()}`, icon: CheckCircle, color: "text-emerald-600", bg: "bg-emerald-500/5" },
-          { label: "Remaining", value: feeRemaining > 0 ? `₹${feeRemaining.toLocaleString()}` : "✓ Cleared", icon: feeRemaining > 0 ? AlertCircle : CheckCircle, color: feeRemaining > 0 ? "text-destructive" : "text-emerald-600", bg: feeRemaining > 0 ? "bg-destructive/5" : "bg-emerald-500/5" },
-          { label: "Payments Made", value: String(payments.length), icon: Receipt, color: "text-primary", bg: "bg-primary/5" },
+          { label: summaryFilter === "all" ? "Total Fee" : `Sem ${summaryFilter} Fee`, value: `₹${summaryTotalFee.toLocaleString()}`, icon: IndianRupee, color: "text-foreground", bg: "bg-primary/5" },
+          { label: "Amount Paid", value: `₹${summaryPaid.toLocaleString()}`, icon: CheckCircle, color: "text-emerald-600", bg: "bg-emerald-500/5" },
+          { label: "Remaining", value: summaryRemaining > 0 ? `₹${summaryRemaining.toLocaleString()}` : "✓ Cleared", icon: summaryRemaining > 0 ? AlertCircle : CheckCircle, color: summaryRemaining > 0 ? "text-destructive" : "text-emerald-600", bg: summaryRemaining > 0 ? "bg-destructive/5" : "bg-emerald-500/5" },
+          { label: "Payments", value: String(summaryPaymentsCount), icon: Receipt, color: "text-primary", bg: "bg-primary/5" },
         ].map(({ label, value, icon: Icon, color, bg }) => (
           <div key={label} className={`${bg} border border-border/60 rounded-2xl p-4 hover:shadow-md transition-all duration-300`}>
             <Icon className={`w-5 h-5 ${color} mb-2`} />
@@ -132,6 +170,21 @@ export default function StudentFees() {
             <p className="font-body text-[10px] text-muted-foreground mt-0.5 uppercase tracking-wider">{label}</p>
           </div>
         ))}
+
+        {/* Current Semester Remaining Box */}
+        <div className={`border rounded-2xl p-4 hover:shadow-md transition-all duration-300 ${currentSemRemaining > 0 ? "bg-amber-500/5 border-amber-500/20" : "bg-emerald-500/5 border-emerald-500/20"}`}>
+          <Calendar className={`w-5 h-5 mb-2 ${currentSemRemaining > 0 ? "text-amber-600" : "text-emerald-600"}`} />
+          <p className={`font-display text-lg font-bold tabular-nums ${currentSemRemaining > 0 ? "text-amber-600" : "text-emerald-600"}`}>
+            {currentSemRemaining > 0 ? `₹${currentSemRemaining.toLocaleString()}` : "✓ Paid"}
+          </p>
+          <p className="font-body text-[10px] text-muted-foreground mt-0.5 uppercase tracking-wider">Sem {currentSemester} Due</p>
+          <div className="h-1 bg-muted rounded-full mt-2 overflow-hidden">
+            <div className="h-full rounded-full transition-all duration-700" style={{
+              width: `${Math.min(currentSemPct, 100)}%`,
+              background: currentSemPct >= 100 ? "hsl(142, 70%, 40%)" : "hsl(42, 87%, 55%)"
+            }} />
+          </div>
+        </div>
       </div>
 
       {/* Progress Bar */}
