@@ -37,6 +37,9 @@ const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Register = lazy(() => import("./pages/Register"));
 const Credits = lazy(() => import("./pages/Credits"));
+const Offers = lazy(() => import("./pages/Offers"));
+const Placements = lazy(() => import("./pages/Placements"));
+const CampusPage = lazy(() => import("./pages/Campus"));
 
 // Lazy load student dashboard
 const StudentDashboard = lazy(() => import("./pages/dashboard/StudentDashboard"));
@@ -148,6 +151,9 @@ const App = () => (
               <Route path="/gallery" element={<SuspenseWrap><Gallery /></SuspenseWrap>} />
               <Route path="/download" element={<SuspenseWrap><DownloadApp /></SuspenseWrap>} />
               <Route path="/credits" element={<SuspenseWrap><Credits /></SuspenseWrap>} />
+              <Route path="/offers" element={<SuspenseWrap><Offers /></SuspenseWrap>} />
+              <Route path="/placements" element={<SuspenseWrap><Placements /></SuspenseWrap>} />
+              <Route path="/campus" element={<SuspenseWrap><CampusPage /></SuspenseWrap>} />
             </Route>
 
             <Route path="/login" element={<SuspenseWrap><Login /></SuspenseWrap>} />
