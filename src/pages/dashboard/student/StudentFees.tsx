@@ -11,6 +11,7 @@ import { format } from "date-fns";
 export default function StudentFees() {
   const { user } = useAuth();
   const [summaryFilter, setSummaryFilter] = useState("all");
+  const [progressFilter, setProgressFilter] = useState("current");
   const [semFilter, setSemFilter] = useState("all");
   const [methodFilter, setMethodFilter] = useState("all");
   const [dateFrom, setDateFrom] = useState("");
@@ -187,20 +188,63 @@ export default function StudentFees() {
         </div>
       </div>
 
-      {/* Progress Bar */}
+      {/* Progress Bar with Semester Filter */}
       <div className="bg-card border border-border/60 rounded-2xl p-5">
-        <div className="flex items-center justify-between mb-2">
-          <span className="font-body text-xs font-semibold text-foreground">Payment Progress</span>
-          <span className="font-body text-xs font-bold text-foreground tabular-nums">{pct}%</span>
+        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+          <span className="font-body text-sm font-semibold text-foreground">Payment Progress</span>
+          <div className="flex gap-1.5 flex-wrap">
+            <button onClick={() => setProgressFilter("current")}
+              className={`px-2.5 py-1 rounded-full font-body text-[10px] font-semibold border transition-all duration-200 ${progressFilter === "current" ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border text-muted-foreground hover:bg-muted"}`}>
+              Sem {currentSemester} (Current)
+            </button>
+            <button onClick={() => setProgressFilter("all")}
+              className={`px-2.5 py-1 rounded-full font-body text-[10px] font-semibold border transition-all duration-200 ${progressFilter === "all" ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border text-muted-foreground hover:bg-muted"}`}>
+              Overall
+            </button>
+            {[1,2,3,4,5,6].filter(s => s !== currentSemester).map(s => (
+              <button key={s} onClick={() => setProgressFilter(String(s))}
+                className={`px-2.5 py-1 rounded-full font-body text-[10px] font-semibold border transition-all duration-200 ${progressFilter === String(s) ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border text-muted-foreground hover:bg-muted"}`}>
+                Sem {s}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="h-3 bg-muted rounded-full overflow-hidden">
-          <div className="h-full rounded-full transition-all duration-1000 ease-out" style={{
-            width: `${pct}%`,
-            background: pct === 100 ? "hsl(142, 70%, 40%)" : pct > 50 ? "hsl(42, 87%, 55%)" : "hsl(0, 84%, 60%)"
-          }} />
-        </div>
+
+        {(() => {
+          const progFee = progressFilter === "all" ? totalFee : perSemFee;
+          const progPaid = progressFilter === "all" ? feePaid : progressFilter === "current" ? currentSemPaid : (semPayments[Number(progressFilter)] || 0);
+          const progRemaining = Math.max(0, progFee - progPaid);
+          const progPct = progFee > 0 ? Math.round((progPaid / progFee) * 100) : 0;
+          const label = progressFilter === "all" ? "Overall" : progressFilter === "current" ? `Semester ${currentSemester}` : `Semester ${progressFilter}`;
+
+          return (
+            <>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="font-body text-xs text-muted-foreground">{label}</span>
+                <span className="font-body text-xs font-bold text-foreground tabular-nums">{progPct}%</span>
+              </div>
+              <div className="h-3 bg-muted rounded-full overflow-hidden">
+                <div className="h-full rounded-full transition-all duration-1000 ease-out" style={{
+                  width: `${progPct}%`,
+                  background: progPct === 100 ? "hsl(142, 70%, 40%)" : progPct > 50 ? "hsl(42, 87%, 55%)" : "hsl(0, 84%, 60%)"
+                }} />
+              </div>
+              <div className="flex items-center justify-between mt-2">
+                <span className="font-body text-[11px] text-muted-foreground">
+                  Paid: <span className="font-semibold text-emerald-600">₹{progPaid.toLocaleString()}</span>
+                </span>
+                <span className="font-body text-[11px] text-muted-foreground">
+                  {progRemaining > 0
+                    ? <>Due: <span className="font-semibold text-destructive">₹{progRemaining.toLocaleString()}</span></>
+                    : <span className="font-semibold text-emerald-600">✓ Fully Paid</span>}
+                </span>
+              </div>
+            </>
+          );
+        })()}
+
         {student.fee_due_date && (
-          <p className="font-body text-[11px] text-muted-foreground mt-2">
+          <p className="font-body text-[11px] text-muted-foreground mt-2 pt-2 border-t border-border/50">
             Due by: <span className="font-semibold">{format(new Date(student.fee_due_date), "dd MMM yyyy")}</span>
             {new Date(student.fee_due_date) < new Date() && feeRemaining > 0 && (
               <span className="text-destructive font-bold ml-2">⚠ Overdue</span>
