@@ -174,11 +174,11 @@ export default function Faculty() {
               <button onClick={() => setSelectedFaculty(null)} className="absolute top-3 right-3 p-1.5 rounded-xl hover:bg-background/50 transition-colors text-foreground/70 text-sm font-bold hover:scale-110 transition-all duration-200 z-20">✕</button>
               <div className="flex flex-col items-center text-center gap-3 relative z-10">
                 {selectedFaculty.photo_url ? (
-                  <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl overflow-hidden border-2 border-background shadow-lg shrink-0">
+                  <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden border-2 border-background shadow-lg shrink-0">
                     <img src={selectedFaculty.photo_url} alt={selectedFaculty.name} className="w-full h-full object-cover" />
                   </div>
                 ) : (
-                  <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl bg-background/80 flex items-center justify-center shrink-0 overflow-hidden border-2 border-background shadow-lg">
+                  <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl bg-background/80 flex items-center justify-center shrink-0 overflow-hidden border-2 border-background shadow-lg">
                     <GraduationCap className={`w-10 h-10 sm:w-14 sm:h-14 ${deptConfig[selectedFaculty.department]?.iconColor || "text-primary"}`} />
                   </div>
                 )}
