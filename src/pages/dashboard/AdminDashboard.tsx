@@ -701,7 +701,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Semester-wise Fee Collection Chart */}
-      {semFeeData.some((s: any) => s.collected > 0 || s.pending > 0 || s.total > 0) && (
+      {(semFeeData.length > 0) && (
         <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
           <div className="flex flex-wrap items-center gap-2 mb-5">
             <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
