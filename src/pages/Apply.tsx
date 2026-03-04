@@ -76,7 +76,7 @@ export default function Apply() {
     navigate(`/application-status?app=${data.application_number}&email=${encodeURIComponent(form.email)}`);
   };
 
-  const inputClass = "w-full border border-border rounded-xl px-4 py-3 font-body text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all duration-300 placeholder:text-muted-foreground/40 hover:border-primary/30 relative z-10";
+  const inputClass = "w-full border border-border rounded-xl px-4 py-3 font-body text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all duration-300 placeholder:text-muted-foreground/40 hover:border-primary/30";
   const selectClass = `${inputClass} appearance-none cursor-pointer`;
 
   return (
@@ -135,7 +135,7 @@ export default function Apply() {
                   <div>
                     <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Full Name *</label>
                     <div className="relative">
-                      <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 pointer-events-none" />
+                      <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 z-10 pointer-events-none" />
                       <input name="full_name" type="text" value={form.full_name} onChange={handleChange} required
                         placeholder="Enter your full name" className={`${inputClass} pl-10`} />
                     </div>
@@ -143,7 +143,7 @@ export default function Apply() {
                   <div>
                     <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Email *</label>
                     <div className="relative">
-                      <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 pointer-events-none" />
+                      <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 z-10 pointer-events-none" />
                       <input name="email" type="email" value={form.email} onChange={handleChange} required
                         placeholder="your@email.com" className={`${inputClass} pl-10`} />
                     </div>
@@ -151,7 +151,7 @@ export default function Apply() {
                   <div>
                     <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Phone *</label>
                     <div className="relative">
-                      <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 pointer-events-none" />
+                      <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 z-10 pointer-events-none" />
                       <input name="phone" type="tel" value={form.phone} onChange={handleChange} required
                         placeholder="10-digit number" className={`${inputClass} pl-10`} />
                     </div>
@@ -159,7 +159,7 @@ export default function Apply() {
                   <div>
                     <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Date of Birth</label>
                     <div className="relative">
-                      <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 pointer-events-none" />
+                      <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 z-10 pointer-events-none" />
                       <input name="date_of_birth" type="date" value={form.date_of_birth} onChange={handleChange}
                         className={`${inputClass} pl-10`} />
                     </div>
@@ -176,7 +176,7 @@ export default function Apply() {
                   <div>
                     <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Course *</label>
                     <div className="relative">
-                      <GraduationCap className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 pointer-events-none" />
+                      <GraduationCap className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 z-10 pointer-events-none" />
                       <select name="course" value={form.course} onChange={handleChange} required className={`${selectClass} pl-10`}>
                         <option value="">Select Course</option>
                         <option value="BCA">BCA</option>
@@ -212,7 +212,7 @@ export default function Apply() {
                   <div>
                     <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Previous PU College</label>
                     <div className="relative">
-                      <School className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 pointer-events-none" />
+                      <School className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 z-10 pointer-events-none" />
                       <input name="previous_school" type="text" value={form.previous_school} onChange={handleChange}
                         placeholder="College name" className={`${inputClass} pl-10`} />
                     </div>
@@ -220,7 +220,7 @@ export default function Apply() {
                   <div>
                     <label className="font-body text-xs font-semibold text-foreground block mb-1.5">12th Percentage</label>
                     <div className="relative">
-                      <Percent className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 pointer-events-none" />
+                      <Percent className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 z-10 pointer-events-none" />
                       <input name="percentage_12th" type="text" value={form.percentage_12th} onChange={handleChange}
                         placeholder="e.g. 78.5%" className={`${inputClass} pl-10`} />
                     </div>
