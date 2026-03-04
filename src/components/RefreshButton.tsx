@@ -7,11 +7,16 @@ export default function RefreshButton() {
   const qc = useQueryClient();
   const [spinning, setSpinning] = useState(false);
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     setSpinning(true);
-    qc.invalidateQueries();
-    toast.success("Data refreshed!");
-    setTimeout(() => setSpinning(false), 800);
+    try {
+      await qc.refetchQueries({ type: 'active' });
+      toast.success("Data refreshed!");
+    } catch {
+      toast.error("Failed to refresh some data");
+    } finally {
+      setTimeout(() => setSpinning(false), 400);
+    }
   };
 
   return (
