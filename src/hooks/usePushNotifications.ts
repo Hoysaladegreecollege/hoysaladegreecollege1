@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
 // VAPID public key (safe to expose - it's a public key)
-const VAPID_PUBLIC_KEY = 'BJKRS3jZCuPbUNjbRI71rhUmpXAlfxyE8ZI9RkqN6qcKyXqk7bCh574VYzcyegLT4-i5MlS_W681OIMS13VM3lI';
+const VAPID_PUBLIC_KEY = 'BBjtsezwDm3wYn48U8fqz1ts4hAb-HH6A46aVjxduETo9FZ6h_dPBJGU1NhC7hzBOgj2nSl1b3tiRY08PWwcLKU';
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);

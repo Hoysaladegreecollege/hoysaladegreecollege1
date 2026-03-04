@@ -53,9 +53,15 @@ export async function notifyStudents({
       }));
 
       if (pushNotifications.length > 0) {
-        await supabase.functions.invoke('send-push-notification', {
+        console.log('Sending push notifications:', pushNotifications.length);
+        const { data, error: pushError } = await supabase.functions.invoke('send-push-notification', {
           body: { notifications: pushNotifications },
         });
+        if (pushError) {
+          console.error('Push notification edge function error:', pushError);
+        } else {
+          console.log('Push notification result:', data);
+        }
       }
     } catch (pushErr) {
       console.error("Push notification failed (non-critical):", pushErr);
