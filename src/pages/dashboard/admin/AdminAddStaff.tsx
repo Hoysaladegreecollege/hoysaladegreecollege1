@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { ArrowLeft, UserPlus, ShieldCheck, GraduationCap, Crown, Users, Eye, EyeOff } from "lucide-react";
 import { validatePassword, PASSWORD_REQUIREMENTS } from "@/lib/password-validation";
@@ -59,9 +58,10 @@ export default function AdminAddStaff() {
 
   const addStaffMutation = useMutation({
     mutationFn: async () => {
-      // For admin role, create a pending request instead of direct signup
-      if (selectedRole === "admin") {
-        if (!form.full_name || !form.email) throw new Error("Name and email are required");
+      if (!form.full_name || !form.email) throw new Error("Name and email are required");
+
+      // For admin role without approval, submit a pending request
+      if (selectedRole === "admin" && !isApproved) {
         const { error } = await supabase.from("pending_admin_requests").insert({
           requester_id: user?.id,
           full_name: form.full_name,
@@ -73,9 +73,10 @@ export default function AdminAddStaff() {
         return "admin_pending";
       }
 
+      // For approved admin or teacher/principal, create the account
       const pwCheck = validatePassword(form.password);
       if (!pwCheck.valid) throw new Error(pwCheck.message);
-      // Create auth user with role metadata
+
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: form.email,
         password: form.password,
@@ -111,7 +112,7 @@ export default function AdminAddStaff() {
     },
     onSuccess: (result) => {
       if (result === "admin_pending") {
-        toast.success("Admin request submitted! Go to Admin Approval Queue to send OTP and complete approval.");
+        toast.success("Admin request submitted! Go to Admin Approval Queue to accept the request.");
       } else {
         toast.success(`${roleConfig[selectedRole].label} account created! Email confirmation sent.`);
       }
@@ -124,6 +125,9 @@ export default function AdminAddStaff() {
   });
 
   const inputClass = "w-full border border-border rounded-xl px-3 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all";
+
+  // Show password field for all roles when creating account (approved admin or teacher/principal)
+  const showPasswordField = selectedRole !== "admin" || isApproved;
 
   return (
     <div className="space-y-5 sm:space-y-6 animate-fade-in">
@@ -141,8 +145,12 @@ export default function AdminAddStaff() {
             <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-3 py-0.5 mb-1">
               <span className="font-body text-[10px] text-primary font-semibold uppercase tracking-wider">Staff Management</span>
             </div>
-            <h2 className="font-display text-xl font-bold text-foreground">Add Staff / Users</h2>
-            <p className="font-body text-xs text-muted-foreground">Create teacher, principal, or admin accounts</p>
+            <h2 className="font-display text-xl font-bold text-foreground">
+              {isApproved ? "Create Approved Admin Account" : "Add Staff / Users"}
+            </h2>
+            <p className="font-body text-xs text-muted-foreground">
+              {isApproved ? "Set a password to complete the admin account creation" : "Create teacher, principal, or admin accounts"}
+            </p>
           </div>
         </div>
       </div>
@@ -150,43 +158,58 @@ export default function AdminAddStaff() {
       <div className="grid lg:grid-cols-5 gap-5">
         {/* Left: Form */}
         <div className="lg:col-span-3 space-y-5">
-          {/* Role Selection */}
-          <div className="bg-card border border-border rounded-2xl p-5">
-            <h3 className="font-display text-sm font-bold text-foreground mb-3">Select Role</h3>
-            <div className="grid grid-cols-3 gap-3">
-              {(Object.keys(roleConfig) as StaffRole[]).map((role) => {
-                const cfg = roleConfig[role];
-                const Icon = cfg.icon;
-                const isSelected = selectedRole === role;
-                return (
-                  <button
-                    key={role}
-                    onClick={() => setSelectedRole(role)}
-                    className={`relative p-4 rounded-xl border-2 transition-all duration-300 text-center ${
-                      isSelected
-                        ? `${cfg.bgColor} ring-2 ring-offset-2 ring-primary/30 scale-[1.02]`
-                        : "border-border hover:border-primary/20 hover:bg-muted/50"
-                    }`}
-                  >
-                    <Icon className={`w-6 h-6 mx-auto mb-2 ${isSelected ? cfg.color : "text-muted-foreground"}`} />
-                    <p className={`font-display text-sm font-bold ${isSelected ? "text-foreground" : "text-muted-foreground"}`}>{cfg.label}</p>
-                    <p className="font-body text-[10px] text-muted-foreground mt-1 leading-tight">{cfg.description}</p>
-                  </button>
-                );
-              })}
+          {/* Role Selection - hide when coming from approval */}
+          {!isApproved && (
+            <div className="bg-card border border-border rounded-2xl p-5">
+              <h3 className="font-display text-sm font-bold text-foreground mb-3">Select Role</h3>
+              <div className="grid grid-cols-3 gap-3">
+                {(Object.keys(roleConfig) as StaffRole[]).map((role) => {
+                  const cfg = roleConfig[role];
+                  const Icon = cfg.icon;
+                  const isSelected = selectedRole === role;
+                  return (
+                    <button
+                      key={role}
+                      onClick={() => setSelectedRole(role)}
+                      className={`relative p-4 rounded-xl border-2 transition-all duration-300 text-center ${
+                        isSelected
+                          ? `${cfg.bgColor} ring-2 ring-offset-2 ring-primary/30 scale-[1.02]`
+                          : "border-border hover:border-primary/20 hover:bg-muted/50"
+                      }`}
+                    >
+                      <Icon className={`w-6 h-6 mx-auto mb-2 ${isSelected ? cfg.color : "text-muted-foreground"}`} />
+                      <p className={`font-display text-sm font-bold ${isSelected ? "text-foreground" : "text-muted-foreground"}`}>{cfg.label}</p>
+                      <p className="font-body text-[10px] text-muted-foreground mt-1 leading-tight">{cfg.description}</p>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Admin security notice */}
-          {selectedRole === "admin" && (
+          {/* Approved admin notice */}
+          {isApproved && (
+            <div className="bg-green-500/5 border-2 border-green-500/20 rounded-2xl p-5 space-y-2">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-green-600" />
+                <h4 className="font-display text-sm font-bold text-green-700">Admin Request Approved</h4>
+              </div>
+              <p className="font-body text-xs text-muted-foreground leading-relaxed">
+                This admin request has been approved. Please set a password below to complete the account creation.
+              </p>
+            </div>
+          )}
+
+          {/* Admin pending request notice (when not approved) */}
+          {selectedRole === "admin" && !isApproved && (
             <div className="bg-red-500/5 border-2 border-red-500/20 rounded-2xl p-5 space-y-3">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-red-600" />
-                <h4 className="font-display text-sm font-bold text-red-700">Enhanced Security — Admin Creation</h4>
+                <h4 className="font-display text-sm font-bold text-red-700">Admin Creation Requires Approval</h4>
               </div>
               <p className="font-body text-xs text-muted-foreground leading-relaxed">
-                Creating an admin account requires <strong>two-factor verification</strong>. After submitting, an OTP will be sent to all existing admins. 
-                You must obtain the OTP from an approving admin and verify it before the account can be created.
+                Submitting this form will create a <strong>pending request</strong>. Go to the Admin Approval Queue to accept or decline it. 
+                Once accepted, you'll be redirected here to set a password and complete the account.
               </p>
               <Link to="/dashboard/admin/approve-admins" className="inline-flex items-center gap-2 font-body text-xs text-primary hover:underline font-semibold">
                 <ShieldCheck className="w-3.5 h-3.5" /> Go to Admin Approval Queue →
@@ -202,7 +225,7 @@ export default function AdminAddStaff() {
             <div className="flex items-center gap-2 pb-3 border-b border-border">
               <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-[10px]">1</span>
               <h4 className="font-body text-xs font-bold text-primary uppercase tracking-wider">
-                {selectedRole === "admin" ? "Admin Request Information" : "Account Information"}
+                {selectedRole === "admin" && !isApproved ? "Admin Request Information" : "Account Information"}
               </h4>
             </div>
             <div className="grid sm:grid-cols-2 gap-4">
@@ -214,7 +237,7 @@ export default function AdminAddStaff() {
                 <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Email *</label>
                 <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required className={inputClass} placeholder="name@example.com" />
               </div>
-              {selectedRole !== "admin" && (
+              {showPasswordField && (
                 <div>
                   <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Password *</label>
                   <div className="relative">
@@ -269,11 +292,11 @@ export default function AdminAddStaff() {
             <div className="pt-3">
               <Button type="submit" disabled={addStaffMutation.isPending} className="w-full rounded-xl font-body py-3">
                 {addStaffMutation.isPending ? (
-                  <span className="flex items-center gap-2"><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> {selectedRole === "admin" ? "Submitting Request..." : "Creating Account..."}</span>
+                  <span className="flex items-center gap-2"><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> {selectedRole === "admin" && !isApproved ? "Submitting Request..." : "Creating Account..."}</span>
                 ) : (
                   <span className="flex items-center gap-2">
                     {selectedRole === "admin" ? <ShieldCheck className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
-                    {selectedRole === "admin" ? "Submit Admin Request for Approval" : `Create ${roleConfig[selectedRole].label} Account`}
+                    {selectedRole === "admin" && !isApproved ? "Submit Admin Request for Approval" : `Create ${roleConfig[selectedRole].label} Account`}
                   </span>
                 )}
               </Button>
