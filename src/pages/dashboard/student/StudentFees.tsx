@@ -32,7 +32,12 @@ export default function StudentFees() {
         .select("*")
         .eq("student_id", student.id)
         .order("created_at", { ascending: false });
-      return { student, payments: payments || [] };
+      const { data: semFees } = await supabase
+        .from("semester_fees")
+        .select("*")
+        .eq("student_id", student.id)
+        .order("semester", { ascending: true });
+      return { student, payments: payments || [], semesterFees: semFees || [] };
     },
     enabled: !!user,
   });
@@ -56,7 +61,7 @@ export default function StudentFees() {
     );
   }
 
-  const { student, payments } = data;
+  const { student, payments, semesterFees: semFeeRecords } = data;
   const totalFee = student.total_fee || 0;
   const feePaid = student.fee_paid || 0;
   const feeRemaining = Math.max(0, totalFee - feePaid);
@@ -70,14 +75,18 @@ export default function StudentFees() {
     semPayments[s] = (semPayments[s] || 0) + Number(p.amount);
   });
 
-  // Per-semester fee (assume evenly split across 6 semesters)
-  const perSemFee = totalFee > 0 ? Math.round(totalFee / 6) : 0;
+  // Per-semester fee from semester_fees table, fallback to even split
+  const semFeeMap: Record<number, number> = {};
+  semFeeRecords.forEach((sf: any) => { semFeeMap[sf.semester] = Number(sf.fee_amount); });
+  const hasSemFees = semFeeRecords.length > 0;
+  const getPerSemFee = (sem: number) => semFeeMap[sem] ?? (totalFee > 0 ? Math.round(totalFee / 6) : 0);
+  const perSemFee = getPerSemFee(currentSemester);
   const currentSemPaid = semPayments[currentSemester] || 0;
   const currentSemRemaining = Math.max(0, perSemFee - currentSemPaid);
   const currentSemPct = perSemFee > 0 ? Math.round((currentSemPaid / perSemFee) * 100) : 0;
 
   // Summary filter logic
-  const summaryTotalFee = summaryFilter === "all" ? totalFee : perSemFee;
+  const summaryTotalFee = summaryFilter === "all" ? totalFee : getPerSemFee(Number(summaryFilter));
   const summaryPaid = summaryFilter === "all" ? feePaid : (semPayments[Number(summaryFilter)] || 0);
   const summaryRemaining = Math.max(0, summaryTotalFee - summaryPaid);
   const summaryPaymentsCount = summaryFilter === "all" ? payments.length : payments.filter((p: any) => String(p.semester || 1) === summaryFilter).length;
@@ -211,7 +220,7 @@ export default function StudentFees() {
         </div>
 
         {(() => {
-          const progFee = progressFilter === "all" ? totalFee : perSemFee;
+          const progFee = progressFilter === "all" ? totalFee : progressFilter === "current" ? perSemFee : getPerSemFee(Number(progressFilter));
           const progPaid = progressFilter === "all" ? feePaid : progressFilter === "current" ? currentSemPaid : (semPayments[Number(progressFilter)] || 0);
           const progRemaining = Math.max(0, progFee - progPaid);
           const progPct = progFee > 0 ? Math.round((progPaid / progFee) * 100) : 0;
@@ -275,12 +284,36 @@ export default function StudentFees() {
           ) : <p className="font-body text-xs text-muted-foreground text-center py-4">No payments yet</p>}
         </div>
 
-        {/* Semester-wise Breakdown */}
+        {/* Semester-wise Fee Structure */}
         <div className="bg-card border border-border/60 rounded-2xl p-5">
           <h3 className="font-body text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-emerald-500" /> By Semester
+            <TrendingUp className="w-4 h-4 text-emerald-500" /> Semester-wise Fee & Payments
           </h3>
-          {Object.keys(semStats).length > 0 ? (
+          {hasSemFees ? (
+            <div className="space-y-2">
+              {[1, 2, 3, 4, 5, 6].filter(s => semFeeMap[s]).map(sem => {
+                const fee = semFeeMap[sem] || 0;
+                const paid = semPayments[sem] || 0;
+                const due = Math.max(0, fee - paid);
+                const semPct = fee > 0 ? Math.round((paid / fee) * 100) : 0;
+                return (
+                  <div key={sem} className="p-3 rounded-xl bg-muted/30 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="font-body text-xs font-semibold text-foreground">Semester {sem} {sem === currentSemester ? <span className="text-primary">(Current)</span> : ""}</span>
+                      <span className="font-body text-[11px] text-muted-foreground">Fee: ₹{fee.toLocaleString()}</span>
+                    </div>
+                    <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                      <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(semPct, 100)}%`, background: semPct >= 100 ? "hsl(142, 70%, 40%)" : "hsl(42, 87%, 55%)" }} />
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-body text-[10px] text-emerald-600 tabular-nums">Paid: ₹{paid.toLocaleString()}</span>
+                      <span className={`font-body text-[10px] tabular-nums ${due > 0 ? "text-destructive" : "text-emerald-600"}`}>{due > 0 ? `Due: ₹${due.toLocaleString()}` : "✓ Cleared"}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : Object.keys(semStats).length > 0 ? (
             <div className="space-y-2">
               {Object.entries(semStats).sort(([a], [b]) => Number(a) - Number(b)).map(([sem, amount]) => (
                 <div key={sem} className="flex items-center justify-between p-2.5 rounded-xl bg-muted/30">
@@ -289,7 +322,7 @@ export default function StudentFees() {
                 </div>
               ))}
             </div>
-          ) : <p className="font-body text-xs text-muted-foreground text-center py-4">No payments yet</p>}
+          ) : <p className="font-body text-xs text-muted-foreground text-center py-4">No fee structure set yet</p>}
         </div>
       </div>
 

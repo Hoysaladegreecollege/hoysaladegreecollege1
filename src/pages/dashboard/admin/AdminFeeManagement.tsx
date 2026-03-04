@@ -31,6 +31,8 @@ export default function AdminFeeManagement() {
   const [statsStudentSearch, setStatsStudentSearch] = useState("");
   const [feeEditStudent, setFeeEditStudent] = useState<any>(null);
   const [feeEditForm, setFeeEditForm] = useState({ total_fee: "", fee_due_date: "", fee_remarks: "", payment_method: "Cash", upi_number: "" });
+  const [feeEditMode, setFeeEditMode] = useState<"total" | "semester">("total");
+  const [feeEditSemFees, setFeeEditSemFees] = useState<Record<number, string>>({});
   const [receiptStudent, setReceiptStudent] = useState<any>(null);
   const [receiptPayment, setReceiptPayment] = useState<any>(null);
 
@@ -145,11 +147,32 @@ export default function AdminFeeManagement() {
   const updateFee = useMutation({
     mutationFn: async () => {
       if (!feeEditStudent) return;
-      await supabase.from("students").update({
-        total_fee: parseFloat(feeEditForm.total_fee) || 0,
-        fee_due_date: feeEditForm.fee_due_date || null,
-        fee_remarks: feeEditForm.fee_remarks || "",
-      }).eq("id", feeEditStudent.id);
+      if (feeEditMode === "semester") {
+        const entries = Object.entries(feeEditSemFees).filter(([_, v]) => v && parseFloat(v) > 0);
+        for (const [sem, amount] of entries) {
+          await supabase.from("semester_fees").upsert({
+            student_id: feeEditStudent.id,
+            semester: parseInt(sem),
+            fee_amount: parseFloat(amount) || 0,
+            due_date: feeEditForm.fee_due_date || null,
+            remarks: feeEditForm.fee_remarks || "",
+            updated_by: user?.id,
+          }, { onConflict: "student_id,semester" });
+        }
+        const { data: allSemFees } = await supabase.from("semester_fees").select("fee_amount").eq("student_id", feeEditStudent.id);
+        const totalFromSemesters = (allSemFees || []).reduce((sum: number, f: any) => sum + Number(f.fee_amount), 0);
+        await supabase.from("students").update({
+          total_fee: totalFromSemesters,
+          fee_due_date: feeEditForm.fee_due_date || null,
+          fee_remarks: feeEditForm.fee_remarks || "",
+        }).eq("id", feeEditStudent.id);
+      } else {
+        await supabase.from("students").update({
+          total_fee: parseFloat(feeEditForm.total_fee) || 0,
+          fee_due_date: feeEditForm.fee_due_date || null,
+          fee_remarks: feeEditForm.fee_remarks || "",
+        }).eq("id", feeEditStudent.id);
+      }
     },
     onSuccess: () => {
       toast.success("Fee details updated!");
@@ -571,7 +594,7 @@ export default function AdminFeeManagement() {
                           <Receipt className="w-3.5 h-3.5 relative z-10" />
                           <span className="relative z-10">Pay</span>
                         </button>
-                        <button onClick={() => { setFeeEditStudent(s); setFeeEditForm({ total_fee: String(s.total_fee || ""), fee_due_date: s.fee_due_date || "", fee_remarks: s.fee_remarks || "", payment_method: "Cash", upi_number: "" }); }}
+                        <button onClick={async () => { setFeeEditStudent(s); setFeeEditForm({ total_fee: String(s.total_fee || ""), fee_due_date: s.fee_due_date || "", fee_remarks: s.fee_remarks || "", payment_method: "Cash", upi_number: "" }); setFeeEditMode("total"); const { data: sf } = await supabase.from("semester_fees").select("*").eq("student_id", s.id); const semMap: Record<number, string> = {}; (sf || []).forEach((f: any) => { semMap[f.semester] = String(f.fee_amount); }); setFeeEditSemFees(semMap); }}
                           className="group relative px-3 py-1.5 rounded-xl font-body text-xs font-semibold inline-flex items-center gap-1.5 overflow-hidden border border-amber-500/20 bg-amber-500/5 text-amber-400 backdrop-blur-md transition-all duration-300 hover:scale-[1.06] hover:shadow-[0_0_20px_hsl(42_87%_55%/0.15)] hover:border-amber-500/40 hover:bg-amber-500/10 active:scale-[0.97]">
                           <span className="absolute inset-0 bg-gradient-to-r from-amber-500/0 via-amber-500/10 to-amber-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                           <FileText className="w-3.5 h-3.5 relative z-10" />
@@ -777,8 +800,8 @@ export default function AdminFeeManagement() {
       {/* Fee Edit Modal */}
       {feeEditStudent && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-card rounded-2xl border border-border w-full max-w-md shadow-2xl animate-scale-in">
-            <div className="p-6 border-b border-border flex items-center justify-between">
+          <div className="bg-card rounded-2xl border border-border w-full max-w-lg shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-border flex items-center justify-between sticky top-0 bg-card z-10 rounded-t-2xl">
               <div>
                 <h3 className="font-display text-lg font-bold text-foreground">Edit Fee Details</h3>
                 <p className="font-body text-xs text-primary font-semibold">{feeEditStudent.profile?.full_name} · {feeEditStudent.roll_number}</p>
@@ -786,29 +809,53 @@ export default function AdminFeeManagement() {
               <button onClick={() => setFeeEditStudent(null)} className="p-2 rounded-xl hover:bg-muted transition-colors">✕</button>
             </div>
             <div className="p-6 space-y-4">
-              <div>
-                <label className="font-body text-xs font-semibold block mb-1.5">Total Fee (₹)</label>
-                <input type="number" value={feeEditForm.total_fee} onChange={e => setFeeEditForm({ ...feeEditForm, total_fee: e.target.value })}
-                  className={inputClass} placeholder="Total fee amount" />
+              {/* Mode Toggle */}
+              <div className="flex gap-2 p-1 bg-muted/40 rounded-xl">
+                <button onClick={() => setFeeEditMode("total")}
+                  className={`flex-1 py-2 rounded-lg font-body text-xs font-semibold transition-all duration-200 ${feeEditMode === "total" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+                  Total Fee
+                </button>
+                <button onClick={() => setFeeEditMode("semester")}
+                  className={`flex-1 py-2 rounded-lg font-body text-xs font-semibold transition-all duration-200 ${feeEditMode === "semester" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+                  Semester-wise Fee
+                </button>
               </div>
+
+              {feeEditMode === "total" ? (
+                <div>
+                  <label className="font-body text-xs font-semibold block mb-1.5">Total Fee (₹)</label>
+                  <input type="number" value={feeEditForm.total_fee} onChange={e => setFeeEditForm({ ...feeEditForm, total_fee: e.target.value })}
+                    className={inputClass} placeholder="Total fee amount" />
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <p className="font-body text-xs text-muted-foreground">Set fee for each semester. Total fee will be auto-calculated.</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[1, 2, 3, 4, 5, 6].map(sem => (
+                      <div key={sem}>
+                        <label className="font-body text-[11px] text-muted-foreground mb-1 block">Semester {sem}</label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 font-body text-xs text-muted-foreground">₹</span>
+                          <input type="number" value={feeEditSemFees[sem] || ""} onChange={e => setFeeEditSemFees(prev => ({ ...prev, [sem]: e.target.value }))}
+                            className={`${inputClass} pl-7`} placeholder="0" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="bg-primary/5 border border-primary/15 rounded-xl p-3 flex items-center justify-between">
+                    <span className="font-body text-xs font-semibold text-foreground">Auto-calculated Total</span>
+                    <span className="font-display text-lg font-bold text-primary tabular-nums">
+                      ₹{Object.values(feeEditSemFees).reduce((sum, v) => sum + (parseFloat(v) || 0), 0).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              )}
+
               <div>
                 <label className="font-body text-xs font-semibold block mb-1.5">Due Date</label>
                 <input type="date" value={feeEditForm.fee_due_date} onChange={e => setFeeEditForm({ ...feeEditForm, fee_due_date: e.target.value })}
                   className={inputClass} />
               </div>
-              <div>
-                <label className="font-body text-xs font-semibold block mb-1.5">Payment Mode</label>
-                <select value={feeEditForm.payment_method} onChange={e => setFeeEditForm({ ...feeEditForm, payment_method: e.target.value, upi_number: "" })} className={inputClass}>
-                  {["Cash", "Online", "Cheque", "UPI", "DD"].map(m => <option key={m}>{m}</option>)}
-                </select>
-              </div>
-              {(feeEditForm.payment_method === "Online" || feeEditForm.payment_method === "UPI") && (
-                <div>
-                  <label className="font-body text-xs font-semibold block mb-1.5">UPI / Transaction Number</label>
-                  <input value={feeEditForm.upi_number} onChange={e => setFeeEditForm({ ...feeEditForm, upi_number: e.target.value })}
-                    className={inputClass} placeholder="Enter UPI ID or transaction number" />
-                </div>
-              )}
               <div>
                 <label className="font-body text-xs font-semibold block mb-1.5">Remarks</label>
                 <input value={feeEditForm.fee_remarks} onChange={e => setFeeEditForm({ ...feeEditForm, fee_remarks: e.target.value })}

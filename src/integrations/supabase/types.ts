@@ -841,6 +841,50 @@ export type Database = {
         }
         Relationships: []
       }
+      semester_fees: {
+        Row: {
+          created_at: string
+          due_date: string | null
+          fee_amount: number
+          id: string
+          remarks: string | null
+          semester: number
+          student_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          due_date?: string | null
+          fee_amount?: number
+          id?: string
+          remarks?: string | null
+          semester: number
+          student_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          due_date?: string | null
+          fee_amount?: number
+          id?: string
+          remarks?: string | null
+          semester?: number
+          student_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "semester_fees_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       students: {
         Row: {
           academic_year_id: string | null
