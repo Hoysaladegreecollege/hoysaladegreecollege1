@@ -20,6 +20,8 @@ export default function StudentAttendance() {
     enabled: !!user,
   });
 
+  const today = new Date().toISOString().split("T")[0];
+
   const { data: attendance = [], isLoading } = useQuery({
     queryKey: ["student-attendance", student?.id],
     queryFn: async () => {
@@ -32,6 +34,11 @@ export default function StudentAttendance() {
     },
     enabled: !!student?.id,
   });
+
+  // Today's attendance
+  const todayRecords = attendance.filter((a) => a.date === today);
+  const todayStatus: "present" | "absent" | "none" =
+    todayRecords.length === 0 ? "none" : todayRecords.some((r) => r.status === "absent") ? "absent" : "present";
 
   const total = attendance.length;
   const present = attendance.filter((a) => a.status === "present").length;
@@ -59,6 +66,27 @@ export default function StudentAttendance() {
             {(student as any).courses?.name || "—"} · {yearLabel}
           </p>
         )}
+      </div>
+
+      {/* Today's Attendance Status */}
+      <div className={`border rounded-2xl p-4 sm:p-5 flex items-center gap-4 transition-all duration-300 ${
+        todayStatus === "present" ? "bg-emerald-500/5 border-emerald-500/20" : todayStatus === "absent" ? "bg-red-500/5 border-red-500/20" : "bg-card border-border/60"
+      }`}>
+        <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
+          todayStatus === "present" ? "bg-emerald-500/10" : todayStatus === "absent" ? "bg-red-500/10" : "bg-muted/60"
+        }`}>
+          {todayStatus === "present" ? <CheckCircle className="w-6 h-6 text-emerald-500" />
+          : todayStatus === "absent" ? <XCircle className="w-6 h-6 text-red-500" />
+          : <Clock className="w-6 h-6 text-muted-foreground" />}
+        </div>
+        <div>
+          <p className={`font-body text-base font-semibold ${todayStatus === "present" ? "text-emerald-500" : todayStatus === "absent" ? "text-red-500" : "text-muted-foreground"}`}>
+            {todayStatus === "present" ? "You're Present Today ✅" : todayStatus === "absent" ? "You're Marked Absent Today ❌" : "No Attendance Marked Yet"}
+          </p>
+          <p className="font-body text-xs text-muted-foreground mt-0.5">
+            {todayStatus === "none" ? "Your teacher hasn't marked attendance yet today" : `${todayRecords.length} subject(s) marked today`}
+          </p>
+        </div>
       </div>
 
       {/* Summary Cards */}
