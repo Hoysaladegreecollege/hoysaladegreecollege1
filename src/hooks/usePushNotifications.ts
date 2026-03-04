@@ -3,8 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
-// This will be set after generating VAPID keys
-const VAPID_PUBLIC_KEY = localStorage.getItem('hdc_vapid_public_key') || '';
+// VAPID public key (safe to expose - it's a public key)
+const VAPID_PUBLIC_KEY = 'BJKRS3jZCuPbUNjbRI71rhUmpXAlfxyE8ZI9RkqN6qcKyXqk7bCh574VYzcyegLT4-i5MlS_W681OIMS13VM3lI';
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
@@ -42,13 +42,7 @@ export function usePushNotifications() {
   }, []);
 
   const subscribe = useCallback(async () => {
-    if (!user || !swRegistration) return;
-
-    const vapidKey = localStorage.getItem('hdc_vapid_public_key');
-    if (!vapidKey) {
-      toast.error('Push notifications not configured yet. Please try again later.');
-      return;
-    }
+    if (!user || !swRegistration || !VAPID_PUBLIC_KEY) return;
 
     setIsLoading(true);
     try {
@@ -62,10 +56,9 @@ export function usePushNotifications() {
         return;
       }
 
-      // Subscribe to push
       const subscription = await (swRegistration as any).pushManager.subscribe({
         userVisuallyIndicatesUserAction: true,
-        applicationServerKey: urlBase64ToUint8Array(vapidKey),
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
       });
 
       const subJson = subscription.toJSON();

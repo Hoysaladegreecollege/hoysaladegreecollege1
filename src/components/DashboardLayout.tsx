@@ -223,6 +223,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </header>
 
+        {/* Push notification banner for students */}
+        {isSupported && !isSubscribed && !pushBannerDismissed && role === 'student' && (
+          <div className="mx-4 sm:mx-6 lg:mx-8 mt-4 flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/20 animate-fade-in">
+            <BellRing className="w-5 h-5 text-primary shrink-0" />
+            <p className="font-body text-xs text-foreground flex-1">
+              <span className="font-semibold">Enable Push Notifications</span> — Get instant alerts for attendance, marks, and announcements even when the browser is closed.
+            </p>
+            <button onClick={subscribe} disabled={pushLoading}
+              className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground font-body text-xs font-semibold hover:bg-primary/90 transition-colors shrink-0">
+              {pushLoading ? 'Enabling...' : 'Enable'}
+            </button>
+            <button onClick={() => { setPushBannerDismissed(true); localStorage.setItem('hdc_push_banner_dismissed', '1'); }}
+              className="p-1 rounded hover:bg-muted transition-colors shrink-0">
+              <X className="w-3.5 h-3.5 text-muted-foreground" />
+            </button>
+          </div>
+        )}
+
         {/* Page content */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
           <div className="max-w-7xl mx-auto animate-fade-in">{children}</div>
