@@ -162,7 +162,10 @@ export default function AdminFeeManagement() {
   const filteredStudents = students.filter((s: any) => {
     const name = s.profile?.full_name || "";
     const roll = s.roll_number || "";
-    const matchSearch = !search || name.toLowerCase().includes(search.toLowerCase()) || roll.toLowerCase().includes(search.toLowerCase());
+    const email = s.profile?.email || "";
+    const phone = s.profile?.phone || s.phone || "";
+    const searchLower = search.toLowerCase();
+    const matchSearch = !search || name.toLowerCase().includes(searchLower) || roll.toLowerCase().includes(searchLower) || email.toLowerCase().includes(searchLower) || phone.includes(search);
     const due = (s.total_fee || 0) - (s.fee_paid || 0);
     const matchFee = feeFilter === "all" || (feeFilter === "due" && due > 0) || (feeFilter === "paid" && due <= 0) || (feeFilter === "overdue" && due > 0 && s.fee_due_date && new Date(s.fee_due_date) < new Date());
     const matchSem = semesterFilter === "all" || String(s.semester) === semesterFilter;
@@ -465,10 +468,13 @@ export default function AdminFeeManagement() {
       {/* Filters */}
       <div className="bg-card border border-border rounded-2xl p-4">
         <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
+          <div className="relative flex-1 min-w-[250px] sm:min-w-[320px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name or roll number..."
-              className={`${inputClass} pl-9`} />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, roll number or email..."
+              className={`${inputClass} pl-10 pr-9`} />
+            {search && (
+              <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors text-sm">✕</button>
+            )}
           </div>
           <select value={courseFilter} onChange={e => setCourseFilter(e.target.value)} className={`${inputClass} w-auto`}>
             <option value="all">All Courses</option>
