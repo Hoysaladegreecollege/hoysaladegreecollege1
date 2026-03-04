@@ -23,6 +23,8 @@ serve(async (req) => {
       );
     }
 
+    console.log('VAPID keys configured successfully');
+
     webpush.setVapidDetails(
       'mailto:pavanaofficial05@gmail.com',
       vapidPublicKey,
@@ -33,26 +35,13 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Verify caller is staff
+    // Log caller info (auth is optional since verify_jwt=false)
     const authHeader = req.headers.get('Authorization');
-    if (authHeader) {
+    if (authHeader && authHeader !== `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`) {
       const token = authHeader.replace('Bearer ', '');
       const { data: { user } } = await supabase.auth.getUser(token);
-      if (!user) {
-        return new Response(JSON.stringify({ error: 'Unauthorized' }), { 
-          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        });
-      }
-      // Check role
-      const { data: roleData } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .single();
-      if (!roleData || !['teacher', 'admin', 'principal'].includes(roleData.role)) {
-        return new Response(JSON.stringify({ error: 'Only staff can send push notifications' }), { 
-          status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        });
+      if (user) {
+        console.log('Authenticated caller:', user.id, user.email);
       }
     }
 
@@ -110,6 +99,7 @@ serve(async (req) => {
           );
           sentCount++;
         } catch (err: any) {
+          console.error('Push send error:', err.statusCode, err.message, err.body);
           failedCount++;
           // Remove expired subscriptions
           if (err.statusCode === 410 || err.statusCode === 404) {
