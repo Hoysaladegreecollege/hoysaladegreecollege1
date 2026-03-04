@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { ArrowLeft, ShieldCheck, Clock, CheckCircle2, XCircle, Send, KeyRound, Trash2 } from "lucide-react";
+import { ArrowLeft, ShieldCheck, Clock, CheckCircle2, XCircle, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,7 +11,6 @@ import { useAuth } from "@/contexts/AuthContext";
 export default function AdminApproveAdmins() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const [otpInputs, setOtpInputs] = useState<Record<string, string>>({});
   const [rejectReasons, setRejectReasons] = useState<Record<string, string>>({});
   const [showReject, setShowReject] = useState<Record<string, boolean>>({});
 
@@ -27,40 +26,22 @@ export default function AdminApproveAdmins() {
     },
   });
 
-  const sendOtpMutation = useMutation({
+  const approveMutation = useMutation({
     mutationFn: async (requestId: string) => {
-      const { data, error } = await supabase.functions.invoke("admin-otp", {
-        body: { action: "send_otp", request_id: requestId },
-      });
+      const { error } = await supabase
+        .from("pending_admin_requests")
+        .update({
+          status: "approved",
+          approved_by: user?.id,
+          approved_at: new Date().toISOString(),
+        })
+        .eq("id", requestId);
       if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      return data;
     },
-    onSuccess: (data) => {
-      if (data?.self_approve) {
-        toast.success("You're the only admin. OTP displayed for self-approval.");
-      } else {
-        toast.success(`OTP sent to ${data?.admins_notified || 0} admin(s) for approval.`);
-      }
-    },
-    onError: (e: any) => toast.error(e.message),
-  });
-
-  const verifyOtpMutation = useMutation({
-    mutationFn: async ({ requestId, otp }: { requestId: string; otp: string }) => {
-      if (!otp || otp.length !== 6) throw new Error("Enter a valid 6-digit OTP");
-      const { data, error } = await supabase.functions.invoke("admin-otp", {
-        body: { action: "verify_otp", request_id: requestId, otp_code: otp },
-      });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      return data;
-    },
-    onSuccess: (_, variables) => {
+    onSuccess: (_, requestId) => {
       toast.success("Admin request approved! Redirecting to create the account...");
       queryClient.invalidateQueries({ queryKey: ["pending-admin-requests"] });
-      // Find the approved request and redirect with pre-filled data
-      const req = requests.find((r: any) => r.id === variables.requestId);
+      const req = requests.find((r: any) => r.id === requestId);
       if (req) {
         const params = new URLSearchParams({ name: req.full_name, email: req.email, phone: req.phone || "" });
         window.location.href = `/dashboard/admin/add-staff?approved=true&${params.toString()}`;
@@ -133,7 +114,7 @@ export default function AdminApproveAdmins() {
               <span className="font-body text-[10px] text-red-600 font-semibold uppercase tracking-wider">Security</span>
             </div>
             <h2 className="font-display text-xl font-bold text-foreground">Admin Approval Queue</h2>
-            <p className="font-body text-xs text-muted-foreground">Review & approve new admin account requests with OTP verification</p>
+            <p className="font-body text-xs text-muted-foreground">Review & approve or decline new admin account requests</p>
           </div>
         </div>
       </div>
@@ -171,63 +152,35 @@ export default function AdminApproveAdmins() {
                       {statusIcon("pending")}
                     </div>
 
-                    {/* Step 1: Send OTP */}
+                    {/* Accept / Decline buttons */}
                     <div className="flex flex-col sm:flex-row gap-3">
                       <Button
-                        onClick={() => sendOtpMutation.mutate(req.id)}
-                        disabled={sendOtpMutation.isPending}
-                        variant="outline"
-                        className="rounded-xl gap-2 border-amber-500/30 text-amber-700 hover:bg-amber-500/10"
-                      >
-                        <Send className="w-4 h-4" />
-                        {sendOtpMutation.isPending ? "Sending OTP..." : "Send OTP to Admins"}
-                      </Button>
-                    </div>
-
-                    {/* Step 2: Enter OTP & Approve */}
-                    <div className="flex flex-col sm:flex-row gap-3 items-end">
-                      <div className="flex-1">
-                        <label className="font-body text-xs font-semibold text-foreground block mb-1.5">
-                          <KeyRound className="w-3 h-3 inline mr-1" />
-                          Enter 6-digit OTP from approving admin
-                        </label>
-                        <input
-                          value={otpInputs[req.id] || ""}
-                          onChange={(e) => setOtpInputs({ ...otpInputs, [req.id]: e.target.value.replace(/\D/g, "").slice(0, 6) })}
-                          className={inputClass}
-                          placeholder="000000"
-                          maxLength={6}
-                        />
-                      </div>
-                      <Button
-                        onClick={() => verifyOtpMutation.mutate({ requestId: req.id, otp: otpInputs[req.id] || "" })}
-                        disabled={verifyOtpMutation.isPending || (otpInputs[req.id] || "").length !== 6}
-                        className="rounded-xl gap-2 bg-green-600 hover:bg-green-700"
+                        onClick={() => {
+                          if (confirm(`Approve "${req.full_name}" as Admin?`)) approveMutation.mutate(req.id);
+                        }}
+                        disabled={approveMutation.isPending}
+                        className="rounded-xl gap-2 bg-green-600 hover:bg-green-700 text-white"
                       >
                         <CheckCircle2 className="w-4 h-4" />
-                        {verifyOtpMutation.isPending ? "Verifying..." : "Verify & Approve"}
+                        {approveMutation.isPending ? "Approving..." : "Accept"}
                       </Button>
-                    </div>
 
-                    {/* Reject */}
-                    <div>
                       {!showReject[req.id] ? (
                         <Button
-                          variant="ghost"
-                          size="sm"
+                          variant="outline"
                           onClick={() => setShowReject({ ...showReject, [req.id]: true })}
-                          className="text-red-500 hover:text-red-700 hover:bg-red-500/10 rounded-xl text-xs"
+                          className="rounded-xl gap-2 border-red-500/30 text-red-600 hover:bg-red-500/10"
                         >
-                          <XCircle className="w-3 h-3 mr-1" /> Reject Request
+                          <XCircle className="w-4 h-4" /> Decline
                         </Button>
                       ) : (
-                        <div className="flex gap-2 items-end">
+                        <div className="flex gap-2 items-end flex-1">
                           <div className="flex-1">
                             <input
                               value={rejectReasons[req.id] || ""}
                               onChange={(e) => setRejectReasons({ ...rejectReasons, [req.id]: e.target.value })}
                               className={inputClass}
-                              placeholder="Reason for rejection (optional)"
+                              placeholder="Reason for declining (optional)"
                             />
                           </div>
                           <Button
@@ -237,7 +190,7 @@ export default function AdminApproveAdmins() {
                             size="sm"
                             className="rounded-xl"
                           >
-                            Confirm Reject
+                            Confirm Decline
                           </Button>
                         </div>
                       )}
@@ -285,7 +238,7 @@ export default function AdminApproveAdmins() {
           {rejected.length > 0 && (
             <div>
               <h3 className="font-display text-sm font-bold text-red-600 mb-3 flex items-center gap-2">
-                <XCircle className="w-4 h-4" /> Rejected ({rejected.length})
+                <XCircle className="w-4 h-4" /> Declined ({rejected.length})
               </h3>
               <div className="space-y-2">
                 {rejected.map((req: any) => (
