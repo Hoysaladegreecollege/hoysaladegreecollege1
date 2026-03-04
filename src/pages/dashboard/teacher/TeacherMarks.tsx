@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { BarChart3 } from "lucide-react";
+import { notifyStudents } from "@/hooks/useNotifyStudents";
 
 export default function TeacherMarks() {
   const { user } = useAuth();
@@ -48,14 +49,25 @@ export default function TeacherMarks() {
         .filter(([_, v]) => v !== undefined && v !== null)
         .map(([student_id, obtained_marks]) => ({
           student_id, subject, exam_type: examType, semester, max_marks: maxMarks, obtained_marks, uploaded_by: user!.id,
+          course_id: courseFilter !== "all" ? courseFilter : undefined,
         }));
       if (records.length === 0) throw new Error("Enter marks for at least one student");
       const { error } = await supabase.from("marks").insert(records);
       if (error) throw error;
+      return records.length;
     },
-    onSuccess: () => {
+    onSuccess: (count) => {
       toast.success("Marks uploaded!");
       setMarksMap({});
+      // Notify students
+      notifyStudents({
+        courseId: courseFilter !== "all" ? courseFilter : null,
+        semester,
+        title: "📝 Marks Updated",
+        message: `${examType.charAt(0).toUpperCase() + examType.slice(1)} marks for ${subject} have been uploaded.`,
+        type: "marks",
+        link: "/dashboard/student/marks",
+      });
     },
     onError: (e: any) => toast.error(e.message),
   });
