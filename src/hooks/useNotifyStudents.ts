@@ -1,13 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
 
 /**
- * Notify students by inserting records into the notifications table.
- * @param courseId - optional course filter
- * @param semester - optional semester filter
- * @param title - notification title
- * @param message - notification body
- * @param type - notification type (attendance, material, announcement, promotion, etc.)
- * @param link - optional link to navigate to
+ * Notify students by inserting records into the notifications table
+ * AND sending browser push notifications.
  */
 export async function notifyStudents({
   courseId,
@@ -16,6 +11,7 @@ export async function notifyStudents({
   message,
   type = "general",
   link,
+  perStudentPush,
 }: {
   courseId?: string | null;
   semester?: number | null;
@@ -23,6 +19,8 @@ export async function notifyStudents({
   message: string;
   type?: string;
   link?: string;
+  /** For per-student push content (e.g. attendance with individual status) */
+  perStudentPush?: Array<{ user_id: string; title: string; body: string; url?: string }>;
 }) {
   try {
     let q = supabase.from("students").select("user_id").eq("is_active", true);
@@ -31,6 +29,7 @@ export async function notifyStudents({
     const { data: students } = await q;
     if (!students || students.length === 0) return;
 
+    // Insert in-app notifications
     const notifications = students.map((s) => ({
       user_id: s.user_id,
       title,
@@ -39,9 +38,27 @@ export async function notifyStudents({
       link: link || null,
     }));
 
-    // Insert in batches of 100
     for (let i = 0; i < notifications.length; i += 100) {
       await supabase.from("notifications").insert(notifications.slice(i, i + 100) as any);
+    }
+
+    // Send browser push notifications
+    try {
+      const pushNotifications = perStudentPush || students.map((s) => ({
+        user_id: s.user_id,
+        title,
+        body: message,
+        url: link || '/dashboard/student',
+        tag: `hdc-${type}-${Date.now()}`,
+      }));
+
+      if (pushNotifications.length > 0) {
+        await supabase.functions.invoke('send-push-notification', {
+          body: { notifications: pushNotifications },
+        });
+      }
+    } catch (pushErr) {
+      console.error("Push notification failed (non-critical):", pushErr);
     }
   } catch (err) {
     console.error("Failed to notify students:", err);

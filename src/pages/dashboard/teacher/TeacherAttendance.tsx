@@ -139,11 +139,26 @@ export default function TeacherAttendance() {
     },
     onSuccess: () => {
       toast.success("Attendance saved successfully!");
+      
+      // Build per-student push notifications with individual status
+      const perStudentPush = Object.entries(statuses).map(([studentId, status]) => {
+        const student = students.find((s: any) => s.id === studentId);
+        const name = student?.profile?.full_name || student?.roll_number || "Student";
+        const emoji = status === "present" ? "✅" : "❌";
+        const statusText = status === "present" ? "Present" : "Absent";
+        return {
+          user_id: student?.user_id || "",
+          title: `📋 Attendance - ${subject}`,
+          body: `${name} — ${statusText} ${emoji} (${date})`,
+          url: "/dashboard/student/attendance",
+        };
+      }).filter(n => n.user_id);
+      
       setStatuses({});
       queryClient.invalidateQueries({ queryKey: ["existing-attendance"] });
       queryClient.invalidateQueries({ queryKey: ["absent-students-date"] });
       queryClient.invalidateQueries({ queryKey: ["admin-absent-students"] });
-      // Notify students
+      // Notify students with per-student push
       notifyStudents({
         courseId: resolvedCourseId,
         semester: activeSemester,
@@ -151,6 +166,7 @@ export default function TeacherAttendance() {
         message: `Attendance for ${subject} on ${date} has been marked.`,
         type: "attendance",
         link: "/dashboard/student/attendance",
+        perStudentPush,
       });
     },
     onError: (e: any) => toast.error(e.message),
