@@ -56,6 +56,9 @@ export default function AdminSemesterPromotion() {
     },
   });
 
+  const [indCourse, setIndCourse] = useState("all");
+  const [indSem, setIndSem] = useState("all");
+
   // Individual promotion - search all students
   const { data: allStudents = [], isLoading: allStudentsLoading } = useQuery({
     queryKey: ["all-students-for-promotion"],
@@ -70,6 +73,8 @@ export default function AdminSemesterPromotion() {
   });
 
   const filteredIndividual = allStudents.filter((s: any) => {
+    if (indCourse !== "all" && s.course_id !== indCourse) return false;
+    if (indSem !== "all" && s.semester !== Number(indSem)) return false;
     if (!individualSearch) return true;
     const q = individualSearch.toLowerCase();
     return (s.profile?.full_name || "").toLowerCase().includes(q) || s.roll_number.toLowerCase().includes(q);
@@ -292,12 +297,22 @@ export default function AdminSemesterPromotion() {
       ) : (
         /* Individual Promotion Tab */
         <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
-          <div className="p-5 border-b border-border flex items-center gap-3">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input placeholder="Search student by name or roll number..." value={individualSearch} onChange={e => setIndividualSearch(e.target.value)} className="pl-9 rounded-xl text-sm" />
+          <div className="p-5 border-b border-border space-y-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="relative flex-1 min-w-[200px] max-w-sm">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input placeholder="Search by name or roll..." value={individualSearch} onChange={e => setIndividualSearch(e.target.value)} className="pl-9 rounded-xl text-sm" />
+              </div>
+              <select value={indCourse} onChange={e => setIndCourse(e.target.value)} className="border border-border rounded-xl px-3 py-2 font-body text-xs bg-background focus:outline-none focus:ring-2 focus:ring-primary/30">
+                <option value="all">All Courses</option>
+                {courses.map((c: any) => <option key={c.id} value={c.id}>{c.name} ({c.code})</option>)}
+              </select>
+              <select value={indSem} onChange={e => setIndSem(e.target.value)} className="border border-border rounded-xl px-3 py-2 font-body text-xs bg-background focus:outline-none focus:ring-2 focus:ring-primary/30">
+                <option value="all">All Semesters</option>
+                {[1,2,3,4,5,6].map(s => <option key={s} value={s}>Sem {s}</option>)}
+              </select>
+              <span className="font-body text-xs text-muted-foreground ml-auto">{filteredIndividual.length} student(s)</span>
             </div>
-            <span className="font-body text-xs text-muted-foreground">{filteredIndividual.length} student(s)</span>
           </div>
           {allStudentsLoading ? (
             <div className="p-4 space-y-3">{[1,2,3,4].map(i => <Skeleton key={i} className="h-12 rounded-xl" />)}</div>

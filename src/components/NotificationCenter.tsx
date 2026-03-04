@@ -119,7 +119,7 @@ export default function NotificationCenter() {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-12 z-50 w-80 sm:w-96 bg-card border border-border rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
+          <div className="fixed sm:absolute inset-x-2 sm:inset-x-auto top-14 sm:top-12 sm:right-0 z-50 w-auto sm:w-96 bg-card border border-border rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
             <div className="p-4 border-b border-border flex items-center justify-between bg-gradient-to-r from-primary/5 to-transparent">
               <div className="flex items-center gap-2">
                 <Bell className="w-4 h-4 text-primary" />

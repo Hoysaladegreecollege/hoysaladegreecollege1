@@ -29,7 +29,6 @@ export default function Faculty() {
 
   const handleFacultyClick = (f: any) => {
     setSelectedFaculty(f);
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const { data: dbFaculty = [], isLoading } = useQuery({
@@ -166,39 +165,39 @@ export default function Faculty() {
 
       {/* Faculty Detail Modal */}
       {selectedFaculty && (
-        <div className="fixed inset-0 bg-black/70 dark:bg-black/80 backdrop-blur-md z-50 flex items-start justify-center p-4 pt-24 overflow-y-auto animate-fade-in" onClick={() => setSelectedFaculty(null)}>
-          <div className="mb-auto">
-          <div className="bg-card rounded-3xl border border-border w-full max-w-md shadow-2xl animate-scale-bounce overflow-hidden" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/70 dark:bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-fade-in" onClick={() => setSelectedFaculty(null)}>
+          <div className="w-full max-w-sm sm:max-w-md my-auto">
+          <div className="bg-card rounded-2xl sm:rounded-3xl border border-border w-full shadow-2xl animate-scale-bounce overflow-hidden" onClick={e => e.stopPropagation()}>
             {/* Header gradient */}
-            <div className={`p-6 bg-gradient-to-br ${deptConfig[selectedFaculty.department]?.grad || "from-primary/10 to-secondary/5"} relative overflow-hidden`}>
+            <div className={`p-4 sm:p-6 bg-gradient-to-br ${deptConfig[selectedFaculty.department]?.grad || "from-primary/10 to-secondary/5"} relative overflow-hidden`}>
               <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-full blur-2xl" />
-              <div className="flex items-start gap-4 relative z-10">
+              <button onClick={() => setSelectedFaculty(null)} className="absolute top-3 right-3 p-1.5 rounded-xl hover:bg-background/50 transition-colors text-foreground/70 text-sm font-bold hover:scale-110 transition-all duration-200 z-20">✕</button>
+              <div className="flex flex-col items-center text-center gap-3 relative z-10">
                 {selectedFaculty.photo_url ? (
-                  <div className="w-28 h-28 rounded-2xl overflow-hidden border-2 border-background shadow-lg shrink-0">
+                  <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl overflow-hidden border-2 border-background shadow-lg shrink-0">
                     <img src={selectedFaculty.photo_url} alt={selectedFaculty.name} className="w-full h-full object-cover" />
                   </div>
                 ) : (
-                  <div className="w-28 h-28 rounded-2xl bg-background/80 flex items-center justify-center shrink-0 overflow-hidden border-2 border-background shadow-lg">
-                    <GraduationCap className={`w-12 h-12 ${deptConfig[selectedFaculty.department]?.iconColor || "text-primary"}`} />
+                  <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl bg-background/80 flex items-center justify-center shrink-0 overflow-hidden border-2 border-background shadow-lg">
+                    <GraduationCap className={`w-10 h-10 sm:w-14 sm:h-14 ${deptConfig[selectedFaculty.department]?.iconColor || "text-primary"}`} />
                   </div>
                 )}
-                <div className="flex-1">
-                  <h3 className="font-display text-xl font-bold text-foreground">{selectedFaculty.name}</h3>
-                  <p className="font-body text-sm text-secondary font-semibold">{selectedFaculty.role}</p>
-                  <span className={`inline-block mt-1.5 font-body text-xs font-semibold px-2.5 py-0.5 rounded-full border ${deptConfig[selectedFaculty.department]?.badge || "bg-muted text-muted-foreground border-border"}`}>
+                <div>
+                  <h3 className="font-display text-lg sm:text-xl font-bold text-foreground leading-tight">{selectedFaculty.name}</h3>
+                  <p className="font-body text-sm text-secondary font-semibold mt-0.5">{selectedFaculty.role}</p>
+                  <span className={`inline-block mt-1.5 font-body text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${deptConfig[selectedFaculty.department]?.badge || "bg-muted text-muted-foreground border-border"}`}>
                     {selectedFaculty.department}
                   </span>
                 </div>
-                <button onClick={() => setSelectedFaculty(null)} className="p-1.5 rounded-xl hover:bg-muted transition-colors text-muted-foreground text-sm font-bold hover:scale-110 transition-all duration-200">✕</button>
               </div>
             </div>
 
-            <div className="p-6 space-y-3">
+            <div className="p-4 sm:p-6 space-y-2.5">
               <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50 border border-border/40 hover:bg-muted transition-colors duration-200">
                 <Award className="w-4 h-4 text-primary shrink-0" />
-                <div>
+                <div className="min-w-0">
                   <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Qualification</p>
-                  <p className="font-body text-sm font-semibold text-foreground">{selectedFaculty.qualification}</p>
+                  <p className="font-body text-sm font-semibold text-foreground break-words">{selectedFaculty.qualification}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50 border border-border/40 hover:bg-muted transition-colors duration-200">
