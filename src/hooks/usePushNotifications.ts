@@ -32,7 +32,7 @@ export function usePushNotifications() {
       navigator.serviceWorker.register('/sw.js').then((reg) => {
         setSwRegistration(reg);
         // Check if already subscribed
-        (reg as any).pushManager.getSubscription().then((sub: any) => {
+      (reg as any).pushManager.getSubscription().then((sub: any) => {
           setIsSubscribed(!!sub);
         });
       }).catch((err: any) => {
@@ -57,19 +57,24 @@ export function usePushNotifications() {
       }
 
       const subscription = await (swRegistration as any).pushManager.subscribe({
-        userVisuallyIndicatesUserAction: true,
+        userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
       });
 
       const subJson = subscription.toJSON();
 
-      // Save to database
-      const { error } = await supabase.from('push_subscriptions' as any).upsert({
+      // Save to database - delete existing then insert to avoid unique constraint issues
+      await supabase.from('push_subscriptions')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('endpoint', subJson.endpoint as string);
+
+      const { error } = await supabase.from('push_subscriptions').insert({
         user_id: user.id,
-        endpoint: subJson.endpoint,
+        endpoint: subJson.endpoint as string,
         p256dh: subJson.keys?.p256dh || '',
         auth: subJson.keys?.auth || '',
-      }, { onConflict: 'user_id,endpoint' });
+      });
 
       if (error) throw error;
 
@@ -91,7 +96,7 @@ export function usePushNotifications() {
       if (subscription) {
         await subscription.unsubscribe();
         // Remove from database
-        await supabase.from('push_subscriptions' as any)
+        await supabase.from('push_subscriptions')
           .delete()
           .eq('user_id', user.id)
           .eq('endpoint', subscription.endpoint);
