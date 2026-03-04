@@ -553,6 +553,10 @@ export default function AdminFeeManagement() {
                     </td>
                     <td className="p-4">
                       <div className="flex items-center justify-center gap-1">
+                        <Link to={`/dashboard/admin/fees/${s.id}`}
+                          className="px-2.5 py-1.5 rounded-lg bg-accent text-accent-foreground font-body text-xs font-semibold hover:bg-accent/80 transition-all duration-200 hover:scale-105 inline-flex items-center">
+                          <Users className="w-3 h-3 inline mr-1" /> View
+                        </Link>
                         <button onClick={() => setSelectedStudent(s)}
                           className="px-2.5 py-1.5 rounded-lg bg-primary/10 text-primary font-body text-xs font-semibold hover:bg-primary/20 transition-all duration-200 hover:scale-105">
                           <Receipt className="w-3 h-3 inline mr-1" /> Pay
