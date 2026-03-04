@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { CheckCircle, XCircle, Users, Search, AlertTriangle, Phone, Calendar } from "lucide-react";
+import { notifyStudents } from "@/hooks/useNotifyStudents";
 
 const SEMESTER_LABELS: Record<number, string> = { 1: "Sem 1", 2: "Sem 2", 3: "Sem 3", 4: "Sem 4", 5: "Sem 5", 6: "Sem 6" };
 
@@ -140,9 +141,17 @@ export default function TeacherAttendance() {
       toast.success("Attendance saved successfully!");
       setStatuses({});
       queryClient.invalidateQueries({ queryKey: ["existing-attendance"] });
-      // Also invalidate absent report queries so they refresh
       queryClient.invalidateQueries({ queryKey: ["absent-students-date"] });
       queryClient.invalidateQueries({ queryKey: ["admin-absent-students"] });
+      // Notify students
+      notifyStudents({
+        courseId: resolvedCourseId,
+        semester: activeSemester,
+        title: "Attendance Updated",
+        message: `Attendance for ${subject} on ${date} has been marked.`,
+        type: "attendance",
+        link: "/dashboard/student/attendance",
+      });
     },
     onError: (e: any) => toast.error(e.message),
   });

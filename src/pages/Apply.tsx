@@ -76,7 +76,7 @@ export default function Apply() {
     navigate(`/application-status?app=${data.application_number}&email=${encodeURIComponent(form.email)}`);
   };
 
-  const inputClass = "w-full border border-border rounded-xl px-4 py-3 font-body text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all duration-300 placeholder:text-muted-foreground/40 hover:border-primary/30";
+  const inputClass = "w-full border border-border rounded-xl px-4 py-3 font-body text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all duration-300 placeholder:text-muted-foreground/40 hover:border-primary/30 relative z-10";
   const selectClass = `${inputClass} appearance-none cursor-pointer`;
 
   return (

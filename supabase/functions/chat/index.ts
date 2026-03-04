@@ -28,12 +28,19 @@ College Info:
 - Location: K.R.P. Arcade, UCO Bank Building, Paramanna Layout, Nelamangala Town, Bengaluru Rural Dist. - 562 123
 - Principal: Sri Gopal H.R (M.Sc, M.Ed, TET, KSET, Ph.D)
 
-Courses Offered:
-1. BCA (Bachelor of Computer Applications) - 3 Years, Fee: ₹35,000/year, Eligibility: 10+2 with Maths/CS, min 45%
-2. B.Com Regular - 3 Years, Fee: ₹25,000/year, Eligibility: 10+2 any stream, min 40%
-3. B.Com Professional (CA/CS/CMA coaching included) - 3 Years, Fee: ₹30,000/year
-4. BBA (Bachelor of Business Administration) - 3 Years, Fee: ₹30,000/year
-5. CA/CS Coaching - Integrated with B.Com Professional
+Courses Offered & Fees:
+1. BCA (Bachelor of Computer Applications) - 3 Years (6 Semesters), Total Fee: ₹1,05,000 (₹35,000/year or ~₹17,500/semester), Eligibility: 10+2 with Maths/CS, min 45%
+2. B.Com Regular - 3 Years (6 Semesters), Total Fee: ₹75,000 (₹25,000/year or ~₹12,500/semester), Eligibility: 10+2 any stream, min 40%
+3. B.Com Professional (CA/CS/CMA coaching included) - 3 Years (6 Semesters), Total Fee: ₹90,000 (₹30,000/year or ~₹15,000/semester)
+4. BBA (Bachelor of Business Administration) - 3 Years (6 Semesters), Total Fee: ₹90,000 (₹30,000/year or ~₹15,000/semester)
+5. CA/CS Coaching - Integrated with B.Com Professional (included in B.Com Professional fee)
+
+Fee Payment Info:
+- Fees can be paid semester-wise or yearly
+- Payment methods accepted: Cash, Online Transfer, UPI, Cheque, Demand Draft
+- For fee receipts, contact the accounts department or your admin
+- Students can view their fee status and payment history on the Student Dashboard after login
+- Fee defaulters will be notified and may face restrictions on exam hall tickets
 
 Contact Numbers: 7676272167, 7975344252, 8618181383, 7892508243
 Email: principal.hoysaladegreecollege@gmail.com
