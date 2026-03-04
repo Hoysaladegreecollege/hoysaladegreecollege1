@@ -1,5 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { BookOpen, Clock, BarChart3, Bell, Calendar, TrendingUp, CheckCircle, XCircle, Megaphone, ArrowRight, Sparkles, Upload, User, GraduationCap, FileText, Award, IndianRupee, Wallet } from "lucide-react";
+import { BookOpen, Clock, BarChart3, Bell, Calendar, TrendingUp, CheckCircle, XCircle, Megaphone, ArrowRight, Sparkles, Upload, User, GraduationCap, FileText, Award, IndianRupee, Wallet, AlertTriangle } from "lucide-react";
 import BirthdayPopup from "@/components/BirthdayPopup";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -133,6 +133,27 @@ export default function StudentDashboard() {
 
   const [feeSemFilter, setFeeSemFilter] = useState("all");
 
+  const { data: feeReminders = [] } = useQuery({
+    queryKey: ["student-fee-reminders", user?.id],
+    refetchInterval: 15000,
+    queryFn: async () => {
+      if (!user) return [];
+      const { data } = await supabase.from("notifications")
+        .select("id, title, message, created_at, is_read")
+        .eq("user_id", user.id)
+        .in("type", ["fee_reminder", "fee"])
+        .eq("is_read", false)
+        .order("created_at", { ascending: false })
+        .limit(5);
+      return data || [];
+    },
+    enabled: !!user,
+  });
+
+  const markReminderRead = async (id: string) => {
+    await supabase.from("notifications").update({ is_read: true }).eq("id", id);
+  };
+
   const { data: feeData } = useQuery({
     queryKey: ["student-fee-data", user?.id],
     queryFn: async () => {
@@ -205,7 +226,49 @@ export default function StudentDashboard() {
         </div>
       </div>
 
-      {/* Today's Attendance Status */}
+      {/* Fee Reminders - Important Hero Section */}
+      {feeReminders.length > 0 && (
+        <div className="relative overflow-hidden border-2 border-red-500/30 bg-gradient-to-r from-red-500/5 via-amber-500/5 to-red-500/5 rounded-2xl p-5 sm:p-6 animate-fade-in">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-xl bg-red-500/15 border border-red-500/20 flex items-center justify-center shrink-0 animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite]">
+              <AlertTriangle className="w-6 h-6 text-red-500" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-2">
+                <h3 className="font-body text-base font-bold text-red-500">Important Fee Reminders</h3>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-red-500/15 text-red-500 font-body text-[10px] font-bold uppercase tracking-wider">
+                  {feeReminders.length} Pending
+                </span>
+              </div>
+              <div className="space-y-2.5">
+                {feeReminders.map((r: any) => (
+                  <div key={r.id} className="group relative bg-card/60 backdrop-blur-sm border border-red-500/10 rounded-xl p-3.5 hover:border-red-500/25 transition-all duration-300">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-body text-sm font-semibold text-foreground">{r.title}</p>
+                        <p className="font-body text-xs text-muted-foreground mt-1 break-words">{r.message}</p>
+                        <p className="font-body text-[10px] text-muted-foreground/60 mt-1.5">
+                          {format(new Date(r.created_at), "dd MMM yyyy, hh:mm a")}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Link to="/dashboard/student/fees" className="px-2.5 py-1 rounded-lg bg-red-500/10 text-red-500 font-body text-[11px] font-semibold hover:bg-red-500/20 transition-all duration-200">
+                          Pay Now
+                        </Link>
+                        <button onClick={() => markReminderRead(r.id)} className="px-2 py-1 rounded-lg text-muted-foreground font-body text-[11px] hover:bg-muted/60 transition-all duration-200">
+                          Dismiss
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {!statsLoading && data && (
         <div className={`border rounded-2xl p-4 sm:p-5 flex items-center gap-4 transition-all duration-300 ${
           data.todayStatus === "present" ? "bg-emerald-500/5 border-emerald-500/20" : data.todayStatus === "absent" ? "bg-red-500/5 border-red-500/20" : "bg-card border-border/60"
