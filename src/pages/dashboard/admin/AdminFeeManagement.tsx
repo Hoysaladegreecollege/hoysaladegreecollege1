@@ -26,6 +26,9 @@ export default function AdminFeeManagement() {
   const [feeFilter, setFeeFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [semesterFilter, setSemesterFilter] = useState("all");
+  const [statsCourseFilter, setStatsCourseFilter] = useState("all");
+  const [statsSemFilter, setStatsSemFilter] = useState("all");
+  const [statsStudentSearch, setStatsStudentSearch] = useState("");
   const [feeEditStudent, setFeeEditStudent] = useState<any>(null);
   const [feeEditForm, setFeeEditForm] = useState({ total_fee: "", fee_due_date: "", fee_remarks: "", payment_method: "Cash", upi_number: "" });
   const [receiptStudent, setReceiptStudent] = useState<any>(null);
@@ -166,17 +169,27 @@ export default function AdminFeeManagement() {
     return matchSearch && matchFee && matchSem;
   });
 
-  const totalFees = students.reduce((sum: number, s: any) => sum + (s.total_fee || 0), 0);
-  const totalPaid = students.reduce((sum: number, s: any) => sum + (s.fee_paid || 0), 0);
+  // Stats-filtered students
+  const statsFilteredStudents = students.filter((s: any) => {
+    const matchCourse = statsCourseFilter === "all" || s.course_id === statsCourseFilter;
+    const matchSem = statsSemFilter === "all" || String(s.semester) === statsSemFilter;
+    const matchSearch = !statsStudentSearch || (s.profile?.full_name || "").toLowerCase().includes(statsStudentSearch.toLowerCase()) || (s.roll_number || "").toLowerCase().includes(statsStudentSearch.toLowerCase());
+    return matchCourse && matchSem && matchSearch;
+  });
+
+  const totalFees = statsFilteredStudents.reduce((sum: number, s: any) => sum + (s.total_fee || 0), 0);
+  const totalPaid = statsFilteredStudents.reduce((sum: number, s: any) => sum + (s.fee_paid || 0), 0);
   const totalDue = totalFees - totalPaid;
-  const dueCount = students.filter((s: any) => (s.total_fee || 0) - (s.fee_paid || 0) > 0).length;
-  const paidCount = students.filter((s: any) => (s.total_fee || 0) > 0 && (s.total_fee || 0) - (s.fee_paid || 0) <= 0).length;
-  const overdueCount = students.filter((s: any) => {
+  const dueCount = statsFilteredStudents.filter((s: any) => (s.total_fee || 0) - (s.fee_paid || 0) > 0).length;
+  const paidCount = statsFilteredStudents.filter((s: any) => (s.total_fee || 0) > 0 && (s.total_fee || 0) - (s.fee_paid || 0) <= 0).length;
+  const overdueCount = statsFilteredStudents.filter((s: any) => {
     const due = (s.total_fee || 0) - (s.fee_paid || 0);
     return due > 0 && s.fee_due_date && new Date(s.fee_due_date) < new Date();
   }).length;
   const collectionRate = totalFees > 0 ? Math.round((totalPaid / totalFees) * 100) : 0;
-  const onlinePaymentCount = allPayments.filter((p: any) => p.payment_method === "Online" || p.payment_method === "UPI").length;
+  const statsStudentIds = new Set(statsFilteredStudents.map((s: any) => s.id));
+  const statsPayments = allPayments.filter((p: any) => statsStudentIds.has(p.student_id));
+  const onlinePaymentCount = statsPayments.filter((p: any) => p.payment_method === "Online" || p.payment_method === "UPI").length;
 
   // Payment method breakdown
   const methodBreakdown = allPayments.reduce((acc: Record<string, number>, p: any) => {
@@ -282,6 +295,41 @@ export default function AdminFeeManagement() {
             <p className="font-body text-sm text-muted-foreground mt-1">Track payments, manage dues & generate reports</p>
           </div>
         </div>
+      </div>
+
+      {/* Stats Filter Section */}
+      <div className="bg-card border border-border/60 rounded-2xl p-4">
+        <h3 className="font-body text-xs font-semibold text-foreground mb-3 uppercase tracking-wider flex items-center gap-2">
+          <Filter className="w-3.5 h-3.5 text-primary" /> Filter Fee Summary
+        </h3>
+        <div className="flex flex-col sm:flex-row gap-3 flex-wrap">
+          <div className="relative flex-1 min-w-[160px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+            <input value={statsStudentSearch} onChange={e => setStatsStudentSearch(e.target.value)}
+              placeholder="Search student..."
+              className="w-full font-body text-xs border border-border rounded-xl pl-9 pr-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+          </div>
+          <select value={statsCourseFilter} onChange={e => setStatsCourseFilter(e.target.value)}
+            className="font-body text-xs border border-border rounded-xl px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
+            <option value="all">All Courses</option>
+            {courses.map((c: any) => <option key={c.id} value={c.id}>{c.name} ({c.code})</option>)}
+          </select>
+          <select value={statsSemFilter} onChange={e => setStatsSemFilter(e.target.value)}
+            className="font-body text-xs border border-border rounded-xl px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
+            <option value="all">All Semesters</option>
+            {[1,2,3,4,5,6].map(s => <option key={s} value={String(s)}>Semester {s}</option>)}
+          </select>
+          {(statsCourseFilter !== "all" || statsSemFilter !== "all" || statsStudentSearch) && (
+            <Button variant="ghost" size="sm" onClick={() => { setStatsCourseFilter("all"); setStatsSemFilter("all"); setStatsStudentSearch(""); }} className="rounded-xl font-body text-xs">
+              Clear
+            </Button>
+          )}
+        </div>
+        {(statsCourseFilter !== "all" || statsSemFilter !== "all" || statsStudentSearch) && (
+          <p className="font-body text-[10px] text-muted-foreground mt-2">
+            Showing stats for {statsFilteredStudents.length} of {students.length} students
+          </p>
+        )}
       </div>
 
       {/* Stats Cards */}
