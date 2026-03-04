@@ -5,16 +5,18 @@ import {
   Bell, Clock, LogOut, GraduationCap, Users, Upload,
   BarChart3, Settings, Award, Image, Megaphone, Shield,
   UserCog, Menu, X, Mail, Trophy, UserCheck,
-  DollarSign, Book, ArrowUpCircle, Cake, ImagePlus, ChevronLeft, ExternalLink
+  DollarSign, Book, ArrowUpCircle, Cake, ImagePlus, ChevronLeft, ExternalLink,
+  BellRing
 } from "lucide-react";
 import collegeLogo from "@/assets/college-logo.png";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PageLoader from "./PageLoader";
 import DarkModeToggle from "./DarkModeToggle";
 import ScrollToTop from "./ScrollToTop";
 import RefreshButton from "./RefreshButton";
 import NotificationBadge from "./NotificationBadge";
 import NotificationCenter from "./NotificationCenter";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 interface NavItem { label: string; path: string; icon: React.ElementType; }
 
@@ -82,6 +84,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { isSubscribed, isSupported, subscribe, isLoading: pushLoading } = usePushNotifications();
+  const [pushBannerDismissed, setPushBannerDismissed] = useState(() => {
+    return localStorage.getItem('hdc_push_banner_dismissed') === '1';
+  });
 
   const navItems = role === "student" ? studentNav
     : role === "teacher" ? teacherNav
@@ -188,6 +194,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
           <div className="flex items-center gap-2">
             <RefreshButton />
+            {isSupported && !isSubscribed && (
+              <button
+                onClick={subscribe}
+                disabled={pushLoading}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors font-body text-[12px] font-semibold"
+                title="Enable push notifications"
+              >
+                <BellRing className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{pushLoading ? 'Enabling...' : 'Enable Alerts'}</span>
+              </button>
+            )}
+            {isSubscribed && (
+              <span className="flex items-center gap-1 px-2 py-1 rounded-lg bg-primary/10 text-primary text-[11px] font-body font-semibold" title="Push notifications enabled">
+                <BellRing className="w-3 h-3" /> On
+              </span>
+            )}
             <NotificationCenter />
             
             <DarkModeToggle />
