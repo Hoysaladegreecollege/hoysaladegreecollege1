@@ -27,6 +27,8 @@ export default function AdminStudentFeeDetail() {
 
   // Edit form
   const [editForm, setEditForm] = useState({ total_fee: "", fee_due_date: "", fee_remarks: "" });
+  const [semesterFees, setSemesterFees] = useState<Record<number, string>>({});
+  const [editMode, setEditMode] = useState<"total" | "semester">("total");
 
   // Reminder form
   const [reminderMsg, setReminderMsg] = useState("");
@@ -51,7 +53,16 @@ export default function AdminStudentFeeDetail() {
     enabled: !!studentId,
   });
 
-  // Record Payment mutation
+  const { data: existingSemFees = [] } = useQuery({
+    queryKey: ["semester-fees", studentId],
+    queryFn: async () => {
+      const { data } = await supabase.from("semester_fees").select("*").eq("student_id", studentId!).order("semester", { ascending: true });
+      return data || [];
+    },
+    enabled: !!studentId,
+  });
+
+
   const recordPayment = useMutation({
     mutationFn: async () => {
       if (!student || !payForm.amount) throw new Error("Fill amount");
@@ -100,16 +111,40 @@ export default function AdminStudentFeeDetail() {
   const updateFee = useMutation({
     mutationFn: async () => {
       if (!student) return;
-      await supabase.from("students").update({
-        total_fee: parseFloat(editForm.total_fee) || 0,
-        fee_due_date: editForm.fee_due_date || null,
-        fee_remarks: editForm.fee_remarks || "",
-      }).eq("id", student.id);
+      if (editMode === "semester") {
+        // Upsert semester-wise fees
+        const entries = Object.entries(semesterFees).filter(([_, v]) => v && parseFloat(v) > 0);
+        for (const [sem, amount] of entries) {
+          await supabase.from("semester_fees").upsert({
+            student_id: student.id,
+            semester: parseInt(sem),
+            fee_amount: parseFloat(amount) || 0,
+            due_date: editForm.fee_due_date || null,
+            remarks: editForm.fee_remarks || "",
+            updated_by: user?.id,
+          }, { onConflict: "student_id,semester" });
+        }
+        // Auto-calculate total fee from all semester fees
+        const { data: allSemFees } = await supabase.from("semester_fees").select("fee_amount").eq("student_id", student.id);
+        const totalFromSemesters = (allSemFees || []).reduce((sum: number, f: any) => sum + Number(f.fee_amount), 0);
+        await supabase.from("students").update({
+          total_fee: totalFromSemesters,
+          fee_due_date: editForm.fee_due_date || null,
+          fee_remarks: editForm.fee_remarks || "",
+        }).eq("id", student.id);
+      } else {
+        await supabase.from("students").update({
+          total_fee: parseFloat(editForm.total_fee) || 0,
+          fee_due_date: editForm.fee_due_date || null,
+          fee_remarks: editForm.fee_remarks || "",
+        }).eq("id", student.id);
+      }
     },
     onSuccess: () => {
       toast.success("Fee details updated!");
       qc.invalidateQueries({ queryKey: ["fee-student-detail"] });
       qc.invalidateQueries({ queryKey: ["fee-students"] });
+      qc.invalidateQueries({ queryKey: ["semester-fees"] });
       setShowEditModal(false);
     },
     onError: () => toast.error("Failed to update"),
@@ -339,7 +374,7 @@ export default function AdminStudentFeeDetail() {
           <Button size="sm" onClick={() => { setShowPayModal(true); setPayForm(f => ({ ...f, semester: String(currentSemester) })); }} className="gap-1.5 text-xs">
             <Plus className="w-3.5 h-3.5" /> Record Payment
           </Button>
-          <Button size="sm" variant="outline" onClick={() => { setShowEditModal(true); setEditForm({ total_fee: String(student.total_fee || ""), fee_due_date: student.fee_due_date || "", fee_remarks: student.fee_remarks || "" }); }} className="gap-1.5 text-xs">
+          <Button size="sm" variant="outline" onClick={() => { setShowEditModal(true); setEditForm({ total_fee: String(student.total_fee || ""), fee_due_date: student.fee_due_date || "", fee_remarks: student.fee_remarks || "" }); setEditMode("total"); const semMap: Record<number, string> = {}; existingSemFees.forEach((sf: any) => { semMap[sf.semester] = String(sf.fee_amount); }); setSemesterFees(semMap); }} className="gap-1.5 text-xs">
             <FileText className="w-3.5 h-3.5" /> Edit Fee Details
           </Button>
           <Button size="sm" variant="outline" onClick={() => { setShowReminderModal(true); const due = totalDue; setReminderMsg(`Dear ${student.profile?.full_name}, you have a pending fee of ₹${due.toLocaleString()}. Please clear your dues at the earliest. - Hoysala Degree College`); }} className="gap-1.5 text-xs">
@@ -618,8 +653,8 @@ export default function AdminStudentFeeDetail() {
       {/* Edit Fee Details Modal */}
       {showEditModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-card rounded-2xl border border-border w-full max-w-md shadow-2xl animate-scale-in">
-            <div className="p-6 border-b border-border flex items-center justify-between">
+          <div className="bg-card rounded-2xl border border-border w-full max-w-lg shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-border flex items-center justify-between sticky top-0 bg-card z-10 rounded-t-2xl">
               <div>
                 <h3 className="font-display text-lg font-bold text-foreground">Edit Fee Details</h3>
                 <p className="font-body text-xs text-primary font-semibold">{student.profile?.full_name}</p>
@@ -627,10 +662,53 @@ export default function AdminStudentFeeDetail() {
               <button onClick={() => setShowEditModal(false)} className="p-2 rounded-xl hover:bg-muted transition-colors">✕</button>
             </div>
             <div className="p-6 space-y-4">
-              <div>
-                <label className="font-body text-xs text-muted-foreground mb-1 block">Total Fee (₹)</label>
-                <input value={editForm.total_fee} onChange={e => setEditForm(f => ({ ...f, total_fee: e.target.value }))} type="number" className={inputClass} />
+              {/* Mode Toggle */}
+              <div className="flex gap-2 p-1 bg-muted/40 rounded-xl">
+                <button onClick={() => setEditMode("total")}
+                  className={`flex-1 py-2 rounded-lg font-body text-xs font-semibold transition-all duration-200 ${editMode === "total" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+                  Total Fee
+                </button>
+                <button onClick={() => setEditMode("semester")}
+                  className={`flex-1 py-2 rounded-lg font-body text-xs font-semibold transition-all duration-200 ${editMode === "semester" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+                  Semester-wise Fee
+                </button>
               </div>
+
+              {editMode === "total" ? (
+                <div>
+                  <label className="font-body text-xs text-muted-foreground mb-1 block">Total Fee (₹)</label>
+                  <input value={editForm.total_fee} onChange={e => setEditForm(f => ({ ...f, total_fee: e.target.value }))} type="number" className={inputClass} />
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <p className="font-body text-xs text-muted-foreground">Set fee for each semester. Total fee will be auto-calculated.</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[1, 2, 3, 4, 5, 6].map(sem => (
+                      <div key={sem} className="relative">
+                        <label className="font-body text-[11px] text-muted-foreground mb-1 block">Semester {sem}</label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 font-body text-xs text-muted-foreground">₹</span>
+                          <input
+                            type="number"
+                            value={semesterFees[sem] || ""}
+                            onChange={e => setSemesterFees(prev => ({ ...prev, [sem]: e.target.value }))}
+                            className={`${inputClass} pl-7`}
+                            placeholder="0"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Auto-calculated total */}
+                  <div className="bg-primary/5 border border-primary/15 rounded-xl p-3 flex items-center justify-between">
+                    <span className="font-body text-xs font-semibold text-foreground">Auto-calculated Total</span>
+                    <span className="font-display text-lg font-bold text-primary tabular-nums">
+                      ₹{Object.values(semesterFees).reduce((sum, v) => sum + (parseFloat(v) || 0), 0).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              )}
+
               <div>
                 <label className="font-body text-xs text-muted-foreground mb-1 block">Due Date</label>
                 <input value={editForm.fee_due_date} onChange={e => setEditForm(f => ({ ...f, fee_due_date: e.target.value }))} type="date" className={inputClass} />
