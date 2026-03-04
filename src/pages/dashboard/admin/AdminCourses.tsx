@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
-import { Edit2, Save, X, Plus, Trash2, BookOpen, Search } from "lucide-react";
+import { Edit2, Save, X, Plus, Trash2, BookOpen, Search, Sparkles } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -18,8 +18,10 @@ export default function AdminCourses() {
   const [search, setSearch] = useState("");
   const [newCourse, setNewCourse] = useState({
     name: "", code: "", department_id: "", duration: "3 Years",
-    eligibility: "", fee: "", overview: "", is_active: true,
+    eligibility: "", fee: "", overview: "", is_active: true, highlights: [] as string[],
   });
+  const [newHighlight, setNewHighlight] = useState("");
+  const [editHighlight, setEditHighlight] = useState("");
 
   const { data: courses = [], isLoading } = useQuery({
     queryKey: ["admin-courses"],
@@ -40,6 +42,9 @@ export default function AdminCourses() {
   const createMutation = useMutation({
     mutationFn: async () => {
       if (!newCourse.name || !newCourse.code) throw new Error("Name and Code are required");
+      // Check for duplicate code
+      const { data: existing } = await supabase.from("courses").select("id").eq("code", newCourse.code).maybeSingle();
+      if (existing) throw new Error(`A course with code "${newCourse.code}" already exists. Please use a different code.`);
       const { error } = await supabase.from("courses").insert({
         name: newCourse.name,
         code: newCourse.code,
@@ -49,13 +54,15 @@ export default function AdminCourses() {
         fee: newCourse.fee,
         overview: newCourse.overview,
         is_active: newCourse.is_active,
+        highlights: newCourse.highlights,
       });
       if (error) throw error;
     },
     onSuccess: () => {
       toast({ title: "Course created successfully!" });
       setAdding(false);
-      setNewCourse({ name: "", code: "", department_id: "", duration: "3 Years", eligibility: "", fee: "", overview: "", is_active: true });
+      setNewCourse({ name: "", code: "", department_id: "", duration: "3 Years", eligibility: "", fee: "", overview: "", is_active: true, highlights: [] });
+      setNewHighlight("");
       queryClient.invalidateQueries({ queryKey: ["admin-courses"] });
     },
     onError: (e: any) => toast({ title: "Error", description: e.message, variant: "destructive" }),
@@ -72,6 +79,7 @@ export default function AdminCourses() {
         eligibility: editData.eligibility,
         overview: editData.overview,
         is_active: editData.is_active,
+        highlights: editData.highlights || [],
       }).eq("id", editing!);
       if (error) throw error;
     },
@@ -100,13 +108,66 @@ export default function AdminCourses() {
     setEditData({
       name: c.name, code: c.code, department_id: c.department_id || "",
       fee: c.fee, duration: c.duration, eligibility: c.eligibility,
-      overview: c.overview, is_active: c.is_active,
+      overview: c.overview, is_active: c.is_active, highlights: c.highlights || [],
     });
+    setEditHighlight("");
+  };
+
+  const addNewHighlight = () => {
+    if (!newHighlight.trim()) return;
+    setNewCourse({ ...newCourse, highlights: [...newCourse.highlights, newHighlight.trim()] });
+    setNewHighlight("");
+  };
+
+  const removeNewHighlight = (idx: number) => {
+    setNewCourse({ ...newCourse, highlights: newCourse.highlights.filter((_, i) => i !== idx) });
+  };
+
+  const addEditHighlight = () => {
+    if (!editHighlight.trim()) return;
+    setEditData({ ...editData, highlights: [...(editData.highlights || []), editHighlight.trim()] });
+    setEditHighlight("");
+  };
+
+  const removeEditHighlight = (idx: number) => {
+    setEditData({ ...editData, highlights: (editData.highlights || []).filter((_: string, i: number) => i !== idx) });
   };
 
   const filtered = courses.filter((c: any) =>
     c.name.toLowerCase().includes(search.toLowerCase()) ||
     c.code.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const HighlightsList = ({ items, onRemove, inputValue, setInputValue, onAdd }: any) => (
+    <div>
+      <label className="font-body text-[12px] text-muted-foreground mb-1 block flex items-center gap-1">
+        <Sparkles className="w-3 h-3" /> Course Highlights
+      </label>
+      <div className="flex gap-2 mb-2">
+        <Input
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); onAdd(); } }}
+          className="rounded-xl font-body text-[13px]"
+          placeholder="e.g. C, C++, Java Programming"
+        />
+        <Button type="button" size="sm" variant="outline" onClick={onAdd} className="rounded-xl font-body text-[12px] h-9 shrink-0">
+          <Plus className="w-3 h-3 mr-1" /> Add
+        </Button>
+      </div>
+      {items.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {items.map((h: string, i: number) => (
+            <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary/8 text-primary font-body text-[12px] font-medium">
+              {h}
+              <button type="button" onClick={() => onRemove(i)} className="hover:text-destructive transition-colors">
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
   );
 
   return (
@@ -121,7 +182,6 @@ export default function AdminCourses() {
         </Button>
       </div>
 
-      {/* Search */}
       <div className="relative max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
@@ -175,6 +235,13 @@ export default function AdminCourses() {
             <label className="font-body text-[12px] text-muted-foreground mb-1 block">Overview</label>
             <Textarea value={newCourse.overview} onChange={(e) => setNewCourse({ ...newCourse, overview: e.target.value })} className="rounded-xl font-body text-[13px] min-h-[80px]" placeholder="Brief description of the course..." />
           </div>
+          <HighlightsList
+            items={newCourse.highlights}
+            onRemove={removeNewHighlight}
+            inputValue={newHighlight}
+            setInputValue={setNewHighlight}
+            onAdd={addNewHighlight}
+          />
           <div className="flex gap-2 justify-end">
             <Button variant="ghost" size="sm" onClick={() => setAdding(false)} className="rounded-xl font-body text-[12px]">Cancel</Button>
             <Button size="sm" onClick={() => createMutation.mutate()} disabled={createMutation.isPending} className="rounded-xl font-body text-[12px] gap-1.5">
@@ -276,6 +343,13 @@ export default function AdminCourses() {
                     <label className="font-body text-[12px] text-muted-foreground mb-1 block">Overview</label>
                     <Textarea value={editData.overview} onChange={(e) => setEditData({ ...editData, overview: e.target.value })} className="rounded-xl font-body text-[13px] min-h-[80px]" />
                   </div>
+                  <HighlightsList
+                    items={editData.highlights || []}
+                    onRemove={removeEditHighlight}
+                    inputValue={editHighlight}
+                    setInputValue={setEditHighlight}
+                    onAdd={addEditHighlight}
+                  />
                   <div className="flex items-center gap-2">
                     <label className="font-body text-[12px] text-muted-foreground">Status:</label>
                     <Button size="sm" variant={editData.is_active ? "default" : "outline"} onClick={() => setEditData({ ...editData, is_active: !editData.is_active })} className="rounded-xl font-body text-[11px] h-7">
@@ -284,18 +358,30 @@ export default function AdminCourses() {
                   </div>
                 </div>
               ) : (
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-                  {[
-                    { label: "Fee", value: c.fee },
-                    { label: "Duration", value: c.duration },
-                    { label: "Eligibility", value: c.eligibility },
-                    { label: "Overview", value: c.overview },
-                  ].map(({ label, value }) => (
-                    <div key={label} className="p-2.5 rounded-xl bg-muted/30">
-                      <p className="font-body text-[11px] text-muted-foreground">{label}</p>
-                      <p className="font-body text-[13px] font-medium text-foreground mt-0.5 line-clamp-2">{value || "—"}</p>
+                <div className="space-y-3">
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                    {[
+                      { label: "Fee", value: c.fee },
+                      { label: "Duration", value: c.duration },
+                      { label: "Eligibility", value: c.eligibility },
+                      { label: "Overview", value: c.overview },
+                    ].map(({ label, value }) => (
+                      <div key={label} className="p-2.5 rounded-xl bg-muted/30">
+                        <p className="font-body text-[11px] text-muted-foreground">{label}</p>
+                        <p className="font-body text-[13px] font-medium text-foreground mt-0.5 line-clamp-2">{value || "—"}</p>
+                      </div>
+                    ))}
+                  </div>
+                  {(c.highlights as string[] | null)?.length ? (
+                    <div className="p-2.5 rounded-xl bg-muted/30">
+                      <p className="font-body text-[11px] text-muted-foreground mb-1.5 flex items-center gap-1"><Sparkles className="w-3 h-3" /> Highlights</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {(c.highlights as string[]).map((h: string, i: number) => (
+                          <span key={i} className="px-2 py-0.5 rounded-md bg-primary/8 text-primary font-body text-[11px] font-medium">{h}</span>
+                        ))}
+                      </div>
                     </div>
-                  ))}
+                  ) : null}
                 </div>
               )}
             </div>

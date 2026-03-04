@@ -299,6 +299,7 @@ export type Database = {
           duration: string | null
           eligibility: string | null
           fee: string | null
+          highlights: string[] | null
           id: string
           is_active: boolean | null
           name: string
@@ -311,6 +312,7 @@ export type Database = {
           duration?: string | null
           eligibility?: string | null
           fee?: string | null
+          highlights?: string[] | null
           id?: string
           is_active?: boolean | null
           name: string
@@ -323,6 +325,7 @@ export type Database = {
           duration?: string | null
           eligibility?: string | null
           fee?: string | null
+          highlights?: string[] | null
           id?: string
           is_active?: boolean | null
           name?: string

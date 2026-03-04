@@ -85,6 +85,7 @@ export default function Courses() {
   const courses = dbCourses.length > 0
     ? dbCourses.map((c: any) => {
         const staticMatch = staticCourses.find(sc => sc.name === c.name || sc.name === c.code);
+        const dbHighlights = (c.highlights as string[] | null) || [];
         return {
           name: c.code || c.name,
           full: c.name,
@@ -93,7 +94,7 @@ export default function Courses() {
           eligibility: c.eligibility || "Contact for details",
           fee: c.fee || "Contact for details",
           overview: c.overview || c.name,
-          highlights: staticMatch?.highlights || [],
+          highlights: dbHighlights.length > 0 ? dbHighlights : (staticMatch?.highlights || []),
           color: COLOR_MAP[c.code] || COLOR_MAP[c.name] || "from-primary/10 to-primary/5",
           accent: staticMatch?.accent || "text-primary",
         };
