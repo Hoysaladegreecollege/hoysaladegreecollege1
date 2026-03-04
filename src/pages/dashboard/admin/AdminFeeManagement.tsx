@@ -558,22 +558,28 @@ export default function AdminFeeManagement() {
                       </div>
                     </td>
                     <td className="p-4">
-                      <div className="flex items-center justify-center gap-1">
+                      <div className="flex items-center justify-center gap-1.5">
                         <Link to={`/dashboard/admin/fees/${s.id}`}
-                          className="px-2.5 py-1.5 rounded-lg bg-accent text-accent-foreground font-body text-xs font-semibold hover:bg-accent/80 transition-all duration-200 hover:scale-105 inline-flex items-center">
-                          <Users className="w-3 h-3 inline mr-1" /> View
+                          className="group relative px-3 py-1.5 rounded-xl font-body text-xs font-semibold inline-flex items-center gap-1.5 overflow-hidden border border-primary/20 bg-primary/5 text-primary backdrop-blur-md transition-all duration-300 hover:scale-[1.06] hover:shadow-[0_0_20px_hsl(var(--primary)/0.15)] hover:border-primary/40 hover:bg-primary/10 active:scale-[0.97]">
+                          <span className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 group-hover:animate-[shimmer_1.5s_ease-in-out]" />
+                          <Users className="w-3.5 h-3.5 relative z-10" />
+                          <span className="relative z-10">View</span>
                         </Link>
                         <button onClick={() => setSelectedStudent(s)}
-                          className="px-2.5 py-1.5 rounded-lg bg-primary/10 text-primary font-body text-xs font-semibold hover:bg-primary/20 transition-all duration-200 hover:scale-105">
-                          <Receipt className="w-3 h-3 inline mr-1" /> Pay
+                          className="group relative px-3 py-1.5 rounded-xl font-body text-xs font-semibold inline-flex items-center gap-1.5 overflow-hidden border border-emerald-500/20 bg-emerald-500/5 text-emerald-400 backdrop-blur-md transition-all duration-300 hover:scale-[1.06] hover:shadow-[0_0_20px_hsl(142_70%_40%/0.15)] hover:border-emerald-500/40 hover:bg-emerald-500/10 active:scale-[0.97]">
+                          <span className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/10 to-emerald-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                          <Receipt className="w-3.5 h-3.5 relative z-10" />
+                          <span className="relative z-10">Pay</span>
                         </button>
                         <button onClick={() => { setFeeEditStudent(s); setFeeEditForm({ total_fee: String(s.total_fee || ""), fee_due_date: s.fee_due_date || "", fee_remarks: s.fee_remarks || "", payment_method: "Cash", upi_number: "" }); }}
-                          className="px-2.5 py-1.5 rounded-lg bg-secondary/10 text-secondary-foreground font-body text-xs font-semibold hover:bg-secondary/20 transition-all duration-200 hover:scale-105">
-                          <FileText className="w-3 h-3 inline mr-1" /> Edit
+                          className="group relative px-3 py-1.5 rounded-xl font-body text-xs font-semibold inline-flex items-center gap-1.5 overflow-hidden border border-amber-500/20 bg-amber-500/5 text-amber-400 backdrop-blur-md transition-all duration-300 hover:scale-[1.06] hover:shadow-[0_0_20px_hsl(42_87%_55%/0.15)] hover:border-amber-500/40 hover:bg-amber-500/10 active:scale-[0.97]">
+                          <span className="absolute inset-0 bg-gradient-to-r from-amber-500/0 via-amber-500/10 to-amber-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                          <FileText className="w-3.5 h-3.5 relative z-10" />
+                          <span className="relative z-10">Edit</span>
                         </button>
                         {s.profile?.phone && (
-                          <a href={`tel:${s.profile.phone}`} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-all duration-200 hover:scale-110">
-                            <Phone className="w-3.5 h-3.5" />
+                          <a href={`tel:${s.profile.phone}`} className="group relative p-1.5 rounded-xl border border-muted-foreground/10 bg-muted/5 text-muted-foreground backdrop-blur-md transition-all duration-300 hover:scale-[1.1] hover:border-muted-foreground/30 hover:bg-muted/10 hover:text-foreground hover:shadow-[0_0_15px_hsl(var(--muted)/0.2)] active:scale-[0.95]">
+                            <Phone className="w-3.5 h-3.5 relative z-10" />
                           </a>
                         )}
                       </div>
