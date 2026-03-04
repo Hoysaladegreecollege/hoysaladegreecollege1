@@ -9,8 +9,28 @@
     <meta name="geo.placename" content="Nelamangala, Bengaluru Rural" />
     <meta name="geo.position" content="13.0977;77.3927" />
     <meta name="ICBM" content="13.0977, 77.3927" />
+
+    <!-- DNS prefetch & preconnect for faster resource loading -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+    <link rel="dns-prefetch" href="https://hgfulxwjwjohmjslhxhq.supabase.co" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://hgfulxwjwjohmjslhxhq.supabase.co" crossorigin />
+
+    <!-- Preload critical fonts to avoid FOUT on slow connections -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" /></noscript>
+
+    <!-- Inline critical splash styles for instant display -->
+    <style>
+      #root-loader{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#0a0c12;transition:opacity .4s}
+      #root-loader.hide{opacity:0;pointer-events:none}
+      #root-loader .spinner{width:48px;height:48px;border:3px solid rgba(255,255,255,.08);border-top-color:hsl(42,75%,55%);border-radius:50%;animation:rl-spin .7s linear infinite}
+      @keyframes rl-spin{to{transform:rotate(360deg)}}
+    </style>
+
     <meta property="og:title" content="Hoysala Degree College">
   <meta name="twitter:title" content="Hoysala Degree College">
   <meta name="description" content="Hoysala Degree College is a Bangalore University–affiliated institution committed to delivering quality higher education with academic excellence, innovation, a">
@@ -22,6 +42,8 @@
   <meta property="og:type" content="website">
 </head>
   <body>
+    <!-- Instant loader shown before JS bundle loads -->
+    <div id="root-loader"><div class="spinner"></div></div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

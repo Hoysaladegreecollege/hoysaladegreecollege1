@@ -24,3 +24,10 @@ createRoot(document.getElementById("root")!).render(
     <App />
   </HelmetProvider>
 );
+
+// Hide the HTML splash loader once React mounts
+const rootLoader = document.getElementById("root-loader");
+if (rootLoader) {
+  rootLoader.classList.add("hide");
+  setTimeout(() => rootLoader.remove(), 500);
+}
