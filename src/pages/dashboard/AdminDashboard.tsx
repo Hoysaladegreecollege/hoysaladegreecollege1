@@ -344,19 +344,19 @@ export default function AdminDashboard() {
   ];
 
   const quickActions = [
-    { icon: BookOpen, label: "Courses", desc: "Add & edit courses", path: "/dashboard/admin/courses" },
-    { icon: Megaphone, label: "Post Notice", desc: "Publish announcements", path: "/dashboard/admin/post-notice" },
-    { icon: ArrowUpCircle, label: "Semester Promotion", desc: "Promote students", path: "/dashboard/admin/semester-promotion" },
-    { icon: CalendarDays, label: "Academic Years", desc: "Manage sessions", path: "/dashboard/admin/academic-years" },
-    { icon: UserX, label: "Absent Report", desc: "View absent students", path: "/dashboard/admin/absent-report" },
-    { icon: FileText, label: "Applications", desc: `${counts?.pendingApps || 0} pending`, path: "/dashboard/admin/applications", badge: counts?.pendingApps },
-    { icon: Mail, label: "Messages", desc: `${counts?.newContacts || 0} new`, path: "/dashboard/admin/contacts", badge: counts?.newContacts },
-    { icon: Users, label: "Manage Users", desc: "View & edit users", path: "/dashboard/admin/users" },
-    { icon: UserPlus, label: "Add Staff", desc: "Create accounts", path: "/dashboard/admin/add-staff" },
-    { icon: Calendar, label: "Timetable", desc: "Class schedules", path: "/dashboard/admin/timetable" },
-    { icon: Image, label: "Events", desc: "Post events", path: "/dashboard/admin/events" },
-    { icon: Shield, label: "Roles", desc: "Role distribution", path: "/dashboard/admin/roles" },
-    { icon: Settings, label: "Settings", desc: "System health", path: "/dashboard/admin/settings" },
+    { icon: BookOpen, label: "Courses", desc: "Add & edit courses", path: "/dashboard/admin/courses", color: "bg-blue-500/10", iconColor: "text-blue-500" },
+    { icon: Megaphone, label: "Post Notice", desc: "Publish announcements", path: "/dashboard/admin/post-notice", color: "bg-amber-500/10", iconColor: "text-amber-500" },
+    { icon: ArrowUpCircle, label: "Semester Promotion", desc: "Promote students", path: "/dashboard/admin/semester-promotion", color: "bg-emerald-500/10", iconColor: "text-emerald-500" },
+    { icon: CalendarDays, label: "Academic Years", desc: "Manage sessions", path: "/dashboard/admin/academic-years", color: "bg-purple-500/10", iconColor: "text-purple-500" },
+    { icon: UserX, label: "Absent Report", desc: "View absent students", path: "/dashboard/admin/absent-report", color: "bg-red-500/10", iconColor: "text-red-500" },
+    { icon: FileText, label: "Applications", desc: `${counts?.pendingApps || 0} pending`, path: "/dashboard/admin/applications", badge: counts?.pendingApps, color: "bg-teal-500/10", iconColor: "text-teal-500" },
+    { icon: Mail, label: "Messages", desc: `${counts?.newContacts || 0} new`, path: "/dashboard/admin/contacts", badge: counts?.newContacts, color: "bg-orange-500/10", iconColor: "text-orange-500" },
+    { icon: Users, label: "Manage Users", desc: "View & edit users", path: "/dashboard/admin/users", color: "bg-cyan-500/10", iconColor: "text-cyan-500" },
+    { icon: UserPlus, label: "Add Staff", desc: "Create accounts", path: "/dashboard/admin/add-staff", color: "bg-indigo-500/10", iconColor: "text-indigo-500" },
+    { icon: Calendar, label: "Timetable", desc: "Class schedules", path: "/dashboard/admin/timetable", color: "bg-rose-500/10", iconColor: "text-rose-500" },
+    { icon: Image, label: "Events", desc: "Post events", path: "/dashboard/admin/events", color: "bg-pink-500/10", iconColor: "text-pink-500" },
+    { icon: Shield, label: "Roles", desc: "Role distribution", path: "/dashboard/admin/roles", color: "bg-violet-500/10", iconColor: "text-violet-500" },
+    { icon: Settings, label: "Settings", desc: "System health", path: "/dashboard/admin/settings", color: "bg-slate-500/10", iconColor: "text-slate-500" },
   ];
 
   // Semester chart data
@@ -759,8 +759,8 @@ export default function AdminDashboard() {
               to={a.path}
               className="relative flex items-center gap-2.5 p-3.5 rounded-xl bg-muted/30 hover:bg-muted/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"
             >
-              <div className="w-9 h-9 rounded-xl bg-card border border-border/40 flex items-center justify-center shrink-0 group-hover:border-primary/30 transition-colors duration-200">
-                <a.icon className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors duration-200" />
+              <div className={`w-9 h-9 rounded-xl ${a.color || "bg-primary/10"} flex items-center justify-center shrink-0 transition-colors duration-200`}>
+                <a.icon className={`w-4 h-4 ${a.iconColor || "text-primary"} transition-colors duration-200`} />
               </div>
               <div className="min-w-0">
                 <p className="font-body text-[12px] font-medium text-foreground truncate">{a.label}</p>
