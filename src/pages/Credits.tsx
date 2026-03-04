@@ -95,6 +95,26 @@ export default function Credits() {
                       Designed and developed the entire Hoysala Degree College web portal — from the public-facing website to the comprehensive admin, teacher, and student dashboards — with passion and precision.
                     </p>
 
+                    {/* Social Links */}
+                    <div className="flex items-center gap-3">
+                      {[
+                        { href: "https://github.com/pavan-a", icon: Github, label: "GitHub" },
+                        { href: "https://linkedin.com/in/pavan-a", icon: Linkedin, label: "LinkedIn" },
+                        { href: "mailto:pavanaofficial05@gmail.com", icon: Mail, label: "Email" },
+                      ].map((social) => (
+                        <a
+                          key={social.label}
+                          href={social.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={social.label}
+                          className="group/social w-11 h-11 rounded-xl bg-muted/50 hover:bg-secondary/20 border border-border/50 hover:border-secondary/40 flex items-center justify-center transition-all duration-300"
+                        >
+                          <social.icon className="w-4.5 h-4.5 text-muted-foreground group-hover/social:text-secondary transition-colors duration-300" />
+                        </a>
+                      ))}
+                    </div>
+
                     {/* Link */}
                     <a
                       href="https://hoysaladegreecollege1.lovable.app"
