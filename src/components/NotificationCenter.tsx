@@ -165,8 +165,8 @@ export default function NotificationCenter() {
                             {timeAgo(n.created_at)}
                           </span>
                         </div>
-                        <p className={`font-body text-sm truncate ${!n.is_read ? "font-bold text-foreground" : "font-medium text-foreground/80"}`}>{n.title}</p>
-                        <p className="font-body text-xs text-muted-foreground truncate">{n.message}</p>
+                        <p className={`font-body text-sm ${!n.is_read ? "font-bold text-foreground" : "font-medium text-foreground/80"}`}>{n.title}</p>
+                        <p className="font-body text-xs text-muted-foreground whitespace-pre-wrap break-words">{n.message}</p>
                       </div>
                       {n.link && <ExternalLink className="w-3 h-3 text-muted-foreground shrink-0 mt-1" />}
                     </div>
