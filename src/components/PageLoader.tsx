@@ -13,7 +13,10 @@ export default function PageLoader() {
     if (isInitial) {
       sessionStorage.setItem("hdc-loaded", "1");
       setShowLogo(true);
-      setTimeout(() => setShowLogo(false), 4000);
+      // Shorter splash on slow connections (detected via Network Information API)
+      const conn = (navigator as any).connection;
+      const isSlow = conn && (conn.effectiveType === "2g" || conn.effectiveType === "slow-2g" || conn.saveData);
+      setTimeout(() => setShowLogo(false), isSlow ? 2000 : 3500);
     }
   }, []);
 
