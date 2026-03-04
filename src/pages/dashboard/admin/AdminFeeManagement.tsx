@@ -361,18 +361,23 @@ export default function AdminFeeManagement() {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-7 gap-3">
         {[
-          { label: "Total Fees", value: `₹${totalFees.toLocaleString()}`, icon: IndianRupee, gradient: "from-primary/10 to-primary/3", iconColor: "text-primary" },
-          { label: "Collected", value: `₹${totalPaid.toLocaleString()}`, icon: CheckCircle, gradient: "from-emerald-500/10 to-emerald-500/3", iconColor: "text-emerald-600" },
-          { label: "Pending", value: `₹${totalDue.toLocaleString()}`, icon: AlertCircle, gradient: "from-destructive/10 to-destructive/3", iconColor: "text-destructive" },
-          { label: "Collection Rate", value: `${collectionRate}%`, icon: TrendingUp, gradient: "from-secondary/10 to-secondary/3", iconColor: "text-secondary-foreground" },
-          { label: "Fee Due", value: dueCount, icon: Users, gradient: "from-orange-500/10 to-orange-500/3", iconColor: "text-orange-600" },
-          { label: "Overdue", value: overdueCount, icon: Clock, gradient: "from-red-600/10 to-red-600/3", iconColor: "text-red-600" },
-          { label: "Online Payments", value: onlinePaymentCount, icon: CreditCard, gradient: "from-purple-500/10 to-purple-500/3", iconColor: "text-purple-600" },
-        ].map(({ label, value, icon: Icon, gradient, iconColor }) => (
-          <div key={label} className={`relative overflow-hidden bg-gradient-to-br ${gradient} border border-border rounded-2xl p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group`}>
-            <Icon className={`w-5 h-5 ${iconColor} mb-2 group-hover:scale-110 transition-transform duration-300`} />
-            <p className="font-display text-xl font-bold text-foreground">{value}</p>
-            <p className="font-body text-[10px] text-muted-foreground mt-0.5 uppercase tracking-wider">{label}</p>
+          { label: "Total Fees", value: `₹${totalFees.toLocaleString()}`, icon: IndianRupee, bg: "bg-gradient-to-br from-[#1a1f2e] via-[#1e2538] to-[#141824]", border: "border-primary/15", iconBg: "bg-primary/15", iconColor: "text-primary", glow: "hover:shadow-[0_0_30px_hsl(var(--primary)/0.12)]" },
+          { label: "Collected", value: `₹${totalPaid.toLocaleString()}`, icon: CheckCircle, bg: "bg-gradient-to-br from-[#0f2318] via-[#132b1e] to-[#141824]", border: "border-emerald-500/15", iconBg: "bg-emerald-500/15", iconColor: "text-emerald-400", glow: "hover:shadow-[0_0_30px_hsl(142_70%_40%/0.12)]" },
+          { label: "Pending", value: `₹${totalDue.toLocaleString()}`, icon: AlertCircle, bg: "bg-gradient-to-br from-[#2a1215] via-[#2e161a] to-[#141824]", border: "border-red-500/15", iconBg: "bg-red-500/15", iconColor: "text-red-400", glow: "hover:shadow-[0_0_30px_hsl(0_84%_60%/0.12)]" },
+          { label: "Collection Rate", value: `${collectionRate}%`, icon: TrendingUp, bg: "bg-gradient-to-br from-[#1a1a2e] via-[#1e1e38] to-[#141824]", border: "border-blue-500/15", iconBg: "bg-blue-500/15", iconColor: "text-blue-400", glow: "hover:shadow-[0_0_30px_hsl(217_72%_50%/0.12)]" },
+          { label: "Fee Due", value: dueCount, icon: Users, bg: "bg-gradient-to-br from-[#2a1e0e] via-[#2e2414] to-[#141824]", border: "border-orange-500/15", iconBg: "bg-orange-500/15", iconColor: "text-orange-400", glow: "hover:shadow-[0_0_30px_hsl(30_90%_50%/0.12)]" },
+          { label: "Overdue", value: overdueCount, icon: Clock, bg: "bg-gradient-to-br from-[#2a0e0e] via-[#301414] to-[#141824]", border: "border-red-600/15", iconBg: "bg-red-600/15", iconColor: "text-red-500", glow: "hover:shadow-[0_0_30px_hsl(0_70%_45%/0.12)]" },
+          { label: "Online Payments", value: onlinePaymentCount, icon: CreditCard, bg: "bg-gradient-to-br from-[#1a102a] via-[#201430] to-[#141824]", border: "border-purple-500/15", iconBg: "bg-purple-500/15", iconColor: "text-purple-400", glow: "hover:shadow-[0_0_30px_hsl(280_60%_55%/0.12)]" },
+        ].map(({ label, value, icon: Icon, bg, border, iconBg, iconColor, glow }) => (
+          <div key={label} className={`group relative overflow-hidden ${bg} border ${border} rounded-2xl p-4 backdrop-blur-xl hover:-translate-y-1 transition-all duration-500 cursor-default ${glow}`}>
+            {/* Glass shimmer overlay */}
+            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/[0.03] to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+            <div className="absolute top-0 right-0 w-20 h-20 bg-white/[0.02] rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:bg-white/[0.04] transition-all duration-700" />
+            <div className={`w-9 h-9 rounded-xl ${iconBg} backdrop-blur-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-500`}>
+              <Icon className={`w-4.5 h-4.5 ${iconColor}`} fill="currentColor" strokeWidth={1} />
+            </div>
+            <p className="text-xl font-bold text-foreground tabular-nums tracking-tight" style={{ fontFamily: "'Poppins', sans-serif" }}>{value}</p>
+            <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-[0.12em] font-medium" style={{ fontFamily: "'Poppins', sans-serif" }}>{label}</p>
           </div>
         ))}
       </div>
