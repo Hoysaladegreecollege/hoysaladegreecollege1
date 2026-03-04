@@ -3,11 +3,12 @@ import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
 import PageHeader from "@/components/PageHeader";
 import { GraduationCap, Briefcase, Mail, Phone, Award, BookOpen, Star, Sparkles } from "lucide-react";
+import { createPortal } from "react-dom";
 import PremiumStatsStrip from "@/components/PremiumStatsStrip";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
 const staticFaculty = [
   { id: "s1", name: "Sri Gopal H.R", role: "Principal", department: "Administration", qualification: "M.Sc, M.Ed, TET, KSET, Ph.D", experience: "20+ years", photo_url: "", email: "", phone: "", subjects: [] },
@@ -29,8 +30,16 @@ export default function Faculty() {
 
   const handleFacultyClick = (f: any) => {
     setSelectedFaculty(f);
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  useEffect(() => {
+    if (selectedFaculty) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [selectedFaculty]);
 
   const { data: dbFaculty = [], isLoading } = useQuery({
     queryKey: ["public-faculty"],
@@ -165,80 +174,81 @@ export default function Faculty() {
       </section>
 
       {/* Faculty Detail Modal */}
-      {selectedFaculty && (
-        <div className="fixed inset-0 bg-black/70 dark:bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-fade-in" onClick={() => setSelectedFaculty(null)}>
-          <div className="w-full max-w-sm sm:max-w-md my-auto">
-          <div className="bg-card rounded-2xl sm:rounded-3xl border border-border w-full shadow-2xl animate-scale-bounce overflow-hidden" onClick={e => e.stopPropagation()}>
-            {/* Header gradient */}
-            <div className={`p-4 sm:p-6 bg-gradient-to-br ${deptConfig[selectedFaculty.department]?.grad || "from-primary/10 to-secondary/5"} relative overflow-hidden`}>
-              <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-full blur-2xl" />
-              <button onClick={() => setSelectedFaculty(null)} className="absolute top-3 right-3 p-1.5 rounded-xl hover:bg-background/50 transition-colors text-foreground/70 text-sm font-bold hover:scale-110 transition-all duration-200 z-20">✕</button>
-              <div className="flex flex-col items-center text-center gap-3 relative z-10">
-                {selectedFaculty.photo_url ? (
-                  <div className="w-40 h-40 sm:w-52 sm:h-52 rounded-2xl overflow-hidden border-2 border-background shadow-lg shrink-0">
-                    <img src={selectedFaculty.photo_url} alt={selectedFaculty.name} className="w-full h-full object-cover" />
+      {selectedFaculty && createPortal(
+        <div className="fixed inset-0 bg-black/70 dark:bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-3 sm:p-4 animate-fade-in" onClick={() => setSelectedFaculty(null)}>
+          <div className="w-full max-w-sm sm:max-w-md max-h-[90vh] overflow-y-auto rounded-2xl sm:rounded-3xl" onClick={e => e.stopPropagation()}>
+            <div className="bg-card rounded-2xl sm:rounded-3xl border border-border w-full shadow-2xl animate-scale-bounce overflow-hidden">
+              {/* Header gradient */}
+              <div className={`p-4 sm:p-6 bg-gradient-to-br ${deptConfig[selectedFaculty.department]?.grad || "from-primary/10 to-secondary/5"} relative overflow-hidden`}>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-full blur-2xl" />
+                <button onClick={() => setSelectedFaculty(null)} className="absolute top-3 right-3 p-1.5 rounded-xl hover:bg-background/50 transition-colors text-foreground/70 text-sm font-bold hover:scale-110 z-20">✕</button>
+                <div className="flex flex-col items-center text-center gap-3 relative z-10">
+                  {selectedFaculty.photo_url ? (
+                    <div className="w-40 h-40 sm:w-52 sm:h-52 rounded-2xl overflow-hidden border-2 border-background shadow-lg shrink-0">
+                      <img src={selectedFaculty.photo_url} alt={selectedFaculty.name} className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <div className="w-40 h-40 sm:w-52 sm:h-52 rounded-2xl bg-background/80 flex items-center justify-center shrink-0 overflow-hidden border-2 border-background shadow-lg">
+                      <GraduationCap className={`w-14 h-14 sm:w-20 sm:h-20 ${deptConfig[selectedFaculty.department]?.iconColor || "text-primary"}`} />
+                    </div>
+                  )}
+                  <div>
+                    <h3 className="font-display text-lg sm:text-xl font-bold text-foreground leading-tight">{selectedFaculty.name}</h3>
+                    <p className="font-body text-sm text-secondary font-semibold mt-0.5">{selectedFaculty.role}</p>
+                    <span className={`inline-block mt-1.5 font-body text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${deptConfig[selectedFaculty.department]?.badge || "bg-muted text-muted-foreground border-border"}`}>
+                      {selectedFaculty.department}
+                    </span>
                   </div>
-                ) : (
-                  <div className="w-40 h-40 sm:w-52 sm:h-52 rounded-2xl bg-background/80 flex items-center justify-center shrink-0 overflow-hidden border-2 border-background shadow-lg">
-                    <GraduationCap className={`w-14 h-14 sm:w-20 sm:h-20 ${deptConfig[selectedFaculty.department]?.iconColor || "text-primary"}`} />
+                </div>
+              </div>
+
+              <div className="p-4 sm:p-6 space-y-2.5">
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50 border border-border/40 hover:bg-muted transition-colors duration-200">
+                  <Award className="w-4 h-4 text-primary shrink-0" />
+                  <div className="min-w-0">
+                    <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Qualification</p>
+                    <p className="font-body text-sm font-semibold text-foreground break-words">{selectedFaculty.qualification}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50 border border-border/40 hover:bg-muted transition-colors duration-200">
+                  <Briefcase className="w-4 h-4 text-primary shrink-0" />
+                  <div>
+                    <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Experience</p>
+                    <p className="font-body text-sm font-semibold text-foreground">{selectedFaculty.experience}</p>
+                  </div>
+                </div>
+                {selectedFaculty.subjects?.length > 0 && (
+                  <div className="p-3 rounded-xl bg-muted/50 border border-border/40">
+                    <div className="flex items-center gap-2 mb-2">
+                      <BookOpen className="w-4 h-4 text-primary" />
+                      <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Subjects</p>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {selectedFaculty.subjects.map((s: string) => (
+                        <span key={s} className="font-body text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/15">{s}</span>
+                      ))}
+                    </div>
                   </div>
                 )}
-                <div>
-                  <h3 className="font-display text-lg sm:text-xl font-bold text-foreground leading-tight">{selectedFaculty.name}</h3>
-                  <p className="font-body text-sm text-secondary font-semibold mt-0.5">{selectedFaculty.role}</p>
-                  <span className={`inline-block mt-1.5 font-body text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${deptConfig[selectedFaculty.department]?.badge || "bg-muted text-muted-foreground border-border"}`}>
-                    {selectedFaculty.department}
-                  </span>
-                </div>
+                {(selectedFaculty.email || selectedFaculty.phone) && (
+                  <div className="flex gap-2 pt-1">
+                    {selectedFaculty.email && (
+                      <a href={`mailto:${selectedFaculty.email}`} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-border hover:bg-primary/5 hover:border-primary/30 font-body text-xs font-semibold transition-all duration-200 group">
+                        <Mail className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" /> Email
+                      </a>
+                    )}
+                    {selectedFaculty.phone && (
+                      <a href={`tel:${selectedFaculty.phone}`} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-border hover:bg-emerald-500/5 hover:border-emerald-300 font-body text-xs font-semibold transition-all duration-200 group">
+                        <Phone className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" /> Call
+                      </a>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
-
-            <div className="p-4 sm:p-6 space-y-2.5">
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50 border border-border/40 hover:bg-muted transition-colors duration-200">
-                <Award className="w-4 h-4 text-primary shrink-0" />
-                <div className="min-w-0">
-                  <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Qualification</p>
-                  <p className="font-body text-sm font-semibold text-foreground break-words">{selectedFaculty.qualification}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50 border border-border/40 hover:bg-muted transition-colors duration-200">
-                <Briefcase className="w-4 h-4 text-primary shrink-0" />
-                <div>
-                  <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Experience</p>
-                  <p className="font-body text-sm font-semibold text-foreground">{selectedFaculty.experience}</p>
-                </div>
-              </div>
-              {selectedFaculty.subjects?.length > 0 && (
-                <div className="p-3 rounded-xl bg-muted/50 border border-border/40">
-                  <div className="flex items-center gap-2 mb-2">
-                    <BookOpen className="w-4 h-4 text-primary" />
-                    <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Subjects</p>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {selectedFaculty.subjects.map((s: string) => (
-                      <span key={s} className="font-body text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/15">{s}</span>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {(selectedFaculty.email || selectedFaculty.phone) && (
-                <div className="flex gap-2 pt-1">
-                  {selectedFaculty.email && (
-                    <a href={`mailto:${selectedFaculty.email}`} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-border hover:bg-primary/5 hover:border-primary/30 font-body text-xs font-semibold transition-all duration-200 group">
-                      <Mail className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" /> Email
-                    </a>
-                  )}
-                  {selectedFaculty.phone && (
-                    <a href={`tel:${selectedFaculty.phone}`} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-border hover:bg-emerald-500/5 hover:border-emerald-300 font-body text-xs font-semibold transition-all duration-200 group">
-                      <Phone className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" /> Call
-                    </a>
-                  )}
-                </div>
-              )}
-            </div>
           </div>
-          </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
