@@ -519,6 +519,72 @@ export default function AdminFeeManagement() {
         </div>
       </div>
 
+      {/* Fee Defaulters Section */}
+      <div className="bg-card border border-destructive/20 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300">
+        <div className="p-5 border-b border-border bg-destructive/5 flex items-center justify-between">
+          <h3 className="font-display text-sm font-bold text-foreground flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-destructive" /> Fee Defaulters — Not Cleared
+          </h3>
+          <span className="font-body text-xs bg-destructive/10 text-destructive px-2.5 py-1 rounded-full font-bold">{students.filter((s: any) => (s.total_fee || 0) - (s.fee_paid || 0) > 0).length} student(s)</span>
+        </div>
+        {(() => {
+          const defaulters = students.filter((s: any) => (s.total_fee || 0) - (s.fee_paid || 0) > 0);
+          if (defaulters.length === 0) return (
+            <div className="p-8 text-center">
+              <CheckCircle className="w-10 h-10 text-emerald-500 mx-auto mb-2" />
+              <p className="font-body text-sm text-muted-foreground">All fees are cleared! 🎉</p>
+            </div>
+          );
+
+          // Group by semester
+          const bySemester: Record<number, any[]> = {};
+          defaulters.forEach((s: any) => {
+            const sem = s.semester || 0;
+            if (!bySemester[sem]) bySemester[sem] = [];
+            bySemester[sem].push(s);
+          });
+
+          return (
+            <div className="divide-y divide-border/50">
+              {Object.entries(bySemester).sort(([a], [b]) => Number(a) - Number(b)).map(([sem, studs]) => (
+                <div key={sem}>
+                  <div className="px-5 py-2.5 bg-muted/20 flex items-center justify-between">
+                    <span className="font-body text-xs font-bold text-foreground flex items-center gap-2">
+                      <Layers className="w-3 h-3 text-primary" /> {Number(sem) > 0 ? `Semester ${sem}` : "No Semester"}
+                    </span>
+                    <span className="font-body text-[10px] text-muted-foreground">{studs.length} defaulter(s) · ₹{studs.reduce((s: number, st: any) => s + ((st.total_fee || 0) - (st.fee_paid || 0)), 0).toLocaleString()} pending</span>
+                  </div>
+                  {studs.map((s: any) => {
+                    const due = (s.total_fee || 0) - (s.fee_paid || 0);
+                    return (
+                      <div key={s.id} className="flex items-center gap-3 px-5 py-3 hover:bg-muted/20 transition-colors">
+                        <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center shrink-0">
+                          <IndianRupee className="w-3.5 h-3.5 text-destructive" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-body text-sm font-semibold text-foreground truncate">{s.profile?.full_name || "—"}</p>
+                          <p className="font-body text-[10px] text-muted-foreground">{s.roll_number} · {s.courses?.code || "—"}</p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="font-body text-sm font-bold text-destructive">₹{due.toLocaleString()}</p>
+                          <p className="font-body text-[10px] text-muted-foreground">of ₹{(s.total_fee || 0).toLocaleString()}</p>
+                        </div>
+                        <div className="flex gap-1 shrink-0">
+                          <button onClick={() => setSelectedStudent(s)} className="px-2 py-1 rounded-lg bg-primary/10 text-primary font-body text-[10px] font-semibold hover:bg-primary/20 transition-colors">Pay</button>
+                          {s.profile?.phone && (
+                            <a href={`tel:${s.profile.phone}`} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground"><Phone className="w-3 h-3" /></a>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          );
+        })()}
+      </div>
+
       {/* Recent Payments */}
       {allPayments.length > 0 && (
         <div className="bg-card border border-border rounded-2xl p-5 hover:shadow-lg transition-all duration-300">

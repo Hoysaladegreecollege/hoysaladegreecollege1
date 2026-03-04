@@ -257,7 +257,7 @@ export default function AdminUsers() {
       </div>
 
       {/* Role Filter Tabs */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 bg-card border border-border rounded-2xl p-3">
         {[
           { key: "All", label: "All Users", icon: Users, count: users.length },
           { key: "student", label: "Students", icon: GraduationCap, count: roleCounts["student"] || 0 },
@@ -268,10 +268,10 @@ export default function AdminUsers() {
           <button
             key={key}
             onClick={() => setRoleFilter(key)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-body text-xs font-semibold transition-all duration-200 border ${
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-body text-xs font-semibold transition-all duration-200 border ${
               roleFilter === key
-                ? "bg-primary text-primary-foreground border-primary shadow-md"
-                : "bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground"
+                ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20"
+                : "bg-background text-muted-foreground border-border hover:bg-muted hover:text-foreground hover:shadow-sm"
             }`}
           >
             <Icon className="w-3.5 h-3.5" />
@@ -591,20 +591,20 @@ export default function AdminUsers() {
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-1 shrink-0">
+                <div className="flex items-center gap-1.5 shrink-0">
                   <select value={u.role} onChange={(e) => updateRoleMutation.mutate({ userId: u.user_id, newRole: e.target.value })}
-                    className="text-[10px] rounded-lg border border-input bg-background px-1.5 py-1 font-body hidden sm:block">
+                    className="text-[10px] rounded-xl border border-input bg-background px-2 py-1.5 font-body font-semibold hidden sm:block focus:ring-2 focus:ring-primary/30 focus:outline-none transition-all">
                     <option value="student">Student</option>
                     <option value="teacher">Teacher</option>
                     <option value="principal">Principal</option>
                     <option value="admin">Admin</option>
                   </select>
-                  <button onClick={() => setViewUser(u)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:scale-110 transition-all duration-200" title="View"><Eye className="w-4 h-4" /></button>
-                  <button onClick={() => startEdit(u)} className="p-1.5 rounded-lg hover:bg-primary/10 text-primary hover:scale-110 transition-all duration-200" title="Edit"><Edit3 className="w-4 h-4" /></button>
+                  <button onClick={() => setViewUser(u)} className="p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary hover:scale-110 transition-all duration-200" title="View"><Eye className="w-4 h-4" /></button>
+                  <button onClick={() => startEdit(u)} className="p-2 rounded-xl hover:bg-secondary/10 text-muted-foreground hover:text-secondary-foreground hover:scale-110 transition-all duration-200" title="Edit"><Edit3 className="w-4 h-4" /></button>
                   <button onClick={() => { setResetPwUser(u); setNewPassword(""); }}
-                    className="p-1.5 rounded-lg hover:bg-secondary/10 text-secondary-foreground hover:scale-110 transition-all duration-200" title="Reset Password"><KeyRound className="w-4 h-4" /></button>
+                    className="p-2 rounded-xl hover:bg-amber-500/10 text-muted-foreground hover:text-amber-600 hover:scale-110 transition-all duration-200" title="Reset Password"><KeyRound className="w-4 h-4" /></button>
                   <button onClick={() => setDeleteConfirm(u)}
-                    className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive hover:scale-110 transition-all duration-200" title="Delete"><Trash2 className="w-4 h-4" /></button>
+                    className="p-2 rounded-xl hover:bg-destructive/10 text-muted-foreground hover:text-destructive hover:scale-110 transition-all duration-200" title="Delete"><Trash2 className="w-4 h-4" /></button>
                 </div>
               </div>
             )}
