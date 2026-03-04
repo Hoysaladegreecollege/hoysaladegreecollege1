@@ -173,12 +173,15 @@ export default function Faculty() {
             <div className={`p-6 bg-gradient-to-br ${deptConfig[selectedFaculty.department]?.grad || "from-primary/10 to-secondary/5"} relative overflow-hidden`}>
               <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-full blur-2xl" />
               <div className="flex items-start gap-4 relative z-10">
-                <div className="w-16 h-16 rounded-2xl bg-background/80 flex items-center justify-center shrink-0 overflow-hidden border-2 border-background shadow-md">
-                  {selectedFaculty.photo_url
-                    ? <img src={selectedFaculty.photo_url} alt={selectedFaculty.name} className="w-full h-full object-cover" />
-                    : <GraduationCap className={`w-8 h-8 ${deptConfig[selectedFaculty.department]?.iconColor || "text-primary"}`} />
-                  }
-                </div>
+                {selectedFaculty.photo_url ? (
+                  <div className="w-28 h-28 rounded-2xl overflow-hidden border-2 border-background shadow-lg shrink-0">
+                    <img src={selectedFaculty.photo_url} alt={selectedFaculty.name} className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="w-28 h-28 rounded-2xl bg-background/80 flex items-center justify-center shrink-0 overflow-hidden border-2 border-background shadow-lg">
+                    <GraduationCap className={`w-12 h-12 ${deptConfig[selectedFaculty.department]?.iconColor || "text-primary"}`} />
+                  </div>
+                )}
                 <div className="flex-1">
                   <h3 className="font-display text-xl font-bold text-foreground">{selectedFaculty.name}</h3>
                   <p className="font-body text-sm text-secondary font-semibold">{selectedFaculty.role}</p>

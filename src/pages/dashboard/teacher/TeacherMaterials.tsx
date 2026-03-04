@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Upload, Trash2, ExternalLink, FileText, Download, File, Image, Video, FileArchive } from "lucide-react";
+import { notifyStudents } from "@/hooks/useNotifyStudents";
 
 function fileIcon(url: string) {
   const ext = url?.split(".").pop()?.toLowerCase() || "";
@@ -79,6 +80,15 @@ export default function TeacherMaterials() {
     },
     onSuccess: () => {
       toast.success(`${materialFiles.length} file(s) uploaded!`);
+      // Notify students
+      notifyStudents({
+        courseId: courseId || null,
+        semester: semester ? parseInt(semester) : null,
+        title: "New Study Material",
+        message: `${title} - ${subject} has been uploaded.`,
+        type: "material",
+        link: "/dashboard/student/materials",
+      });
       setTitle(""); setSubject(""); setMaterialFiles([]); setCourseId(""); setSemester("");
       setUploading(false); setUploadProgress(0);
       queryClient.invalidateQueries({ queryKey: ["teacher-materials"] });

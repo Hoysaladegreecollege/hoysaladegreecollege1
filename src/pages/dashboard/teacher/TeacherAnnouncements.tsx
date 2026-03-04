@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Megaphone, Plus, Trash2, ArrowLeft, Bell, BookOpen, Clock } from "lucide-react";
+import { notifyStudents } from "@/hooks/useNotifyStudents";
 import { Link } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
@@ -52,6 +53,15 @@ export default function TeacherAnnouncements() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["teacher-announcements"] });
       toast.success("Announcement posted! Students will see it instantly.");
+      // Notify students
+      notifyStudents({
+        courseId: form.course_id || null,
+        semester: form.semester !== "0" ? parseInt(form.semester) : null,
+        title: "New Announcement",
+        message: form.title,
+        type: "announcement",
+        link: "/dashboard/student/announcements",
+      });
       setForm({ title: "", content: "", course_id: "", semester: "0" });
       setPosting(false);
     },
