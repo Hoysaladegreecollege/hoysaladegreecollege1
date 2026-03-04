@@ -189,7 +189,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="flex items-center gap-2">
             <RefreshButton />
             <NotificationCenter />
-            <NotificationBadge />
+            
             <DarkModeToggle />
             <Link
               to="/"
