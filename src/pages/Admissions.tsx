@@ -5,33 +5,47 @@ import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { FileText, CheckCircle, Calendar, ArrowRight, Sparkles, GraduationCap, Phone, Shield, Upload } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const steps = [
-{ step: "01", title: "Check Eligibility", desc: "Verify you meet the eligibility criteria for your chosen course.", icon: Shield, color: "from-blue-500/20 to-blue-500/5" },
-{ step: "02", title: "Fill Application Form", desc: "Complete the online application form with accurate details.", icon: FileText, color: "from-primary/15 to-primary/5" },
-{ step: "03", title: "Submit Documents", desc: "Submit required documents: 10th & 12th marksheets, ID proof, photos.", icon: Upload, color: "from-secondary/20 to-secondary/5" },
-{ step: "04", title: "Pay Registration Fee", desc: "Pay the non-refundable registration fee to confirm your application.", icon: CheckCircle, color: "from-emerald-500/15 to-emerald-500/5" },
-{ step: "05", title: "Admission Confirmation", desc: "Receive your admission confirmation letter and welcome kit.", icon: GraduationCap, color: "from-purple-500/15 to-purple-500/5" }];
-
+  { step: "01", title: "Check Eligibility", desc: "Verify you meet the eligibility criteria for your chosen course.", icon: Shield, color: "from-blue-500/20 to-blue-500/5" },
+  { step: "02", title: "Fill Application Form", desc: "Complete the online application form with accurate details.", icon: FileText, color: "from-primary/15 to-primary/5" },
+  { step: "03", title: "Submit Documents", desc: "Submit required documents: 10th & 12th marksheets, ID proof, photos.", icon: Upload, color: "from-secondary/20 to-secondary/5" },
+  { step: "04", title: "Pay Registration Fee", desc: "Pay the non-refundable registration fee to confirm your application.", icon: CheckCircle, color: "from-emerald-500/15 to-emerald-500/5" },
+  { step: "05", title: "Admission Confirmation", desc: "Receive your admission confirmation letter and welcome kit.", icon: GraduationCap, color: "from-purple-500/15 to-purple-500/5" },
+];
 
 const documents = [
-"10th & 12th Marksheets (Original + 2 copies)",
-"Transfer Certificate from previous institution",
-"Migration Certificate (if applicable)",
-"Aadhar Card / ID Proof",
-"Passport size photographs (6 copies)",
-"Caste Certificate (if applicable)",
-"Income Certificate (for scholarship applicants)"];
+  "10th & 12th Marksheets (Original + 2 copies)",
+  "Transfer Certificate from previous institution",
+  "Migration Certificate (if applicable)",
+  "Aadhar Card / ID Proof",
+  "Passport size photographs (6 copies)",
+  "Caste Certificate (if applicable)",
+  "Income Certificate (for scholarship applicants)",
+];
 
-
-const courses = [
-{ name: "BCA", seats: "60 Seats", fee: "₹80,000/yr", icon: "🖥️" },
-{ name: "B.Com Regular", seats: "120 Seats", fee: "₹60,000/yr", icon: "📊" },
-{ name: "B.Com Professional", seats: "60 Seats", fee: "₹60,000/yr", icon: "📈" },
-{ name: "BBA", seats: "60 Seats", fee: "₹70,000/yr", icon: "💼" }];
-
+const defaultCourses = [
+  { name: "BCA", code: "BCA", seats: 60, fee: "₹80,000/yr", icon: "🖥️" },
+  { name: "B.Com Regular", code: "BCOM", seats: 120, fee: "₹60,000/yr", icon: "📊" },
+  { name: "B.Com Professional", code: "BCOM_PROF", seats: 60, fee: "₹60,000/yr", icon: "📈" },
+  { name: "BBA", code: "BBA", seats: 60, fee: "₹70,000/yr", icon: "💼" },
+];
 
 export default function Admissions() {
+  const { data: seatData } = useQuery({
+    queryKey: ["admission-seats"],
+    queryFn: async () => {
+      const { data } = await (supabase as any).from("admission_seats").select("course_code, total_seats");
+      return data || [];
+    },
+  });
+
+  const courses = defaultCourses.map(c => {
+    const dbSeat = (seatData || []).find((s: any) => s.course_code === c.code);
+    return { ...c, seats: dbSeat ? dbSeat.total_seats : c.seats };
+  });
 
   return (
     <div className="page-enter">
@@ -63,9 +77,7 @@ export default function Admissions() {
                 style={{ background: "linear-gradient(135deg, hsl(42,87%,52%), hsl(38,92%,44%), hsl(42,87%,60%))", boxShadow: "0 8px 32px hsla(42,87%,52%,0.4), inset 0 1px 0 rgba(255,255,255,0.2)" }}>
                 <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                 <span className="relative flex items-center justify-center gap-2">
-                  <Sparkles className="w-4 sm:w-5 h-4 sm:h-5" />
-                  Apply Now
-                  <ArrowRight className="w-4 sm:w-5 h-4 sm:h-5 group-hover:translate-x-1 transition-transform duration-300" />
+                  <Sparkles className="w-4 sm:w-5 h-4 sm:h-5" /> Apply Now <ArrowRight className="w-4 sm:w-5 h-4 sm:h-5 group-hover:translate-x-1 transition-transform duration-300" />
                 </span>
               </Link>
               <Link to="/application-status" className="w-full sm:w-auto">
@@ -84,29 +96,24 @@ export default function Admissions() {
         <div className="container px-4 relative">
           <ScrollReveal><SectionHeading title="Available Programs" subtitle="Choose the right course for your future" /></ScrollReveal>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto">
-            {courses.map((c, i) =>
-            <ScrollReveal key={c.name} delay={i * 80}>
+            {courses.map((c, i) => (
+              <ScrollReveal key={c.name} delay={i * 80}>
                 <Link to="/apply" className="relative premium-card p-5 sm:p-7 text-center group cursor-pointer overflow-hidden border-glow card-stack block">
                   <div className="absolute inset-0 bg-gradient-to-br from-secondary/8 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
                   <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-secondary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="relative z-10">
                     <div className="text-4xl sm:text-5xl mb-3 sm:mb-4 group-hover:scale-125 group-hover:-rotate-6 transition-all duration-400 inline-block filter group-hover:drop-shadow-lg">{c.icon}</div>
                     <h3 className="font-display text-base sm:text-lg font-bold text-foreground group-hover:text-primary transition-colors duration-300">{c.name}</h3>
-                    <p className="font-body text-xs sm:text-sm text-muted-foreground mt-1.5">{c.seats}</p>
+                    <p className="font-body text-xs sm:text-sm text-muted-foreground mt-1.5">{c.seats} Seats</p>
                     <p className="font-body text-xs sm:text-sm text-secondary font-bold mt-2 sm:mt-3 bg-secondary/10 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full inline-block border border-secondary/20">{c.fee}</p>
-                    
-
-
-
-
-
                   </div>
                 </Link>
               </ScrollReveal>
-            )}
+            ))}
           </div>
         </div>
       </section>
+
       {/* Admission Steps */}
       <section className="py-20 sm:py-28 bg-cream relative overflow-hidden">
         <div className="absolute right-0 top-0 w-64 h-64 bg-secondary/5 rounded-full blur-3xl" />
@@ -114,17 +121,12 @@ export default function Admissions() {
         <div className="container max-w-4xl px-4 relative">
           <ScrollReveal><SectionHeading title="Admission Process" subtitle="Follow these simple steps to join Hoysala Degree College" /></ScrollReveal>
           <div className="space-y-4">
-            {steps.map((s, i) =>
-            <ScrollReveal key={s.step} delay={i * 80}>
+            {steps.map((s, i) => (
+              <ScrollReveal key={s.step} delay={i * 80}>
                 <div className="flex gap-4 sm:gap-5 items-start bg-card border border-border rounded-2xl p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-400 relative overflow-hidden group border-glow">
                   <div className={`absolute inset-0 bg-gradient-to-r ${s.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl`} />
-                  {/* Connector line */}
-                  {i < steps.length - 1 &&
-                <div className="absolute left-[2.1rem] top-[4.5rem] bottom-[-1rem] w-0.5 bg-gradient-to-b from-primary/20 to-transparent z-20 pointer-events-none" />
-                }
-                  <div className="relative z-10 w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-navy-dark flex items-center justify-center text-primary-foreground font-display font-bold text-lg shrink-0 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                    {s.step}
-                  </div>
+                  {i < steps.length - 1 && <div className="absolute left-[2.1rem] top-[4.5rem] bottom-[-1rem] w-0.5 bg-gradient-to-b from-primary/20 to-transparent z-20 pointer-events-none" />}
+                  <div className="relative z-10 w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-navy-dark flex items-center justify-center text-primary-foreground font-display font-bold text-lg shrink-0 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">{s.step}</div>
                   <div className="relative z-10 flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <s.icon className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
@@ -135,7 +137,7 @@ export default function Admissions() {
                   <CheckCircle className="w-5 h-5 text-muted-foreground/20 group-hover:text-emerald-500 transition-all duration-500 group-hover:scale-110 shrink-0 mt-1 relative z-10" />
                 </div>
               </ScrollReveal>
-            )}
+            ))}
           </div>
         </div>
       </section>
@@ -147,12 +149,12 @@ export default function Admissions() {
           <ScrollReveal delay={150}>
             <div className="premium-card p-7 sm:p-10">
               <div className="grid sm:grid-cols-2 gap-4">
-                {documents.map((d, i) =>
-                <div key={d} className="flex items-start gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors duration-200 group">
+                {documents.map((d) => (
+                  <div key={d} className="flex items-start gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors duration-200 group">
                     <CheckCircle className="w-4 h-4 text-secondary shrink-0 mt-0.5 group-hover:scale-110 transition-transform duration-200" />
                     <span className="font-body text-sm text-foreground/80 group-hover:text-foreground transition-colors duration-200">{d}</span>
                   </div>
-                )}
+                ))}
               </div>
             </div>
           </ScrollReveal>
@@ -182,6 +184,6 @@ export default function Admissions() {
           </ScrollReveal>
         </div>
       </section>
-    </div>);
-
+    </div>
+  );
 }
