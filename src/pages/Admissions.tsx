@@ -25,10 +25,10 @@ const documents = [
 
 
 const courses = [
-{ name: "BCA", seats: "60 Seats", fee: "₹35,000/yr", icon: "🖥️" },
-{ name: "B.Com Regular", seats: "120 Seats", fee: "₹25,000/yr", icon: "📊" },
-{ name: "B.Com Professional", seats: "60 Seats", fee: "₹30,000/yr", icon: "📈" },
-{ name: "BBA", seats: "60 Seats", fee: "₹30,000/yr", icon: "💼" }];
+{ name: "BCA", seats: "60 Seats", fee: "₹80,000/yr", icon: "🖥️" },
+{ name: "B.Com Regular", seats: "120 Seats", fee: "₹60,000/yr", icon: "📊" },
+{ name: "B.Com Professional", seats: "60 Seats", fee: "₹60,000/yr", icon: "📈" },
+{ name: "BBA", seats: "60 Seats", fee: "₹70,000/yr", icon: "💼" }];
 
 
 export default function Admissions() {
