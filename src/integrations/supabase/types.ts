@@ -142,6 +142,30 @@ export type Database = {
         }
         Relationships: []
       }
+      admission_seats: {
+        Row: {
+          course_code: string
+          id: string
+          total_seats: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          course_code: string
+          id?: string
+          total_seats?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          course_code?: string
+          id?: string
+          total_seats?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       announcements: {
         Row: {
           content: string

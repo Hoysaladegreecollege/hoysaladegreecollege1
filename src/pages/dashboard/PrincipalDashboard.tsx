@@ -1,14 +1,15 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { Users, GraduationCap, Award, Megaphone, Image, BookOpen, Settings, BarChart3, Activity, TrendingUp, Clock } from "lucide-react";
+import { Users, GraduationCap, Award, Megaphone, Image, BookOpen, Settings, BarChart3, Activity, TrendingUp, Clock, IndianRupee, UserCheck, FileText, PieChart } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, Cell, PieChart as RePieChart, Pie } from "recharts";
 import { useState, useEffect, useRef } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import ActionCenter from "@/components/ActionCenter";
 
 const CHART_COLORS = ["hsl(215, 90%, 55%)", "hsl(145, 65%, 42%)", "hsl(42, 70%, 52%)", "hsl(280, 60%, 55%)"];
+const PIE_COLORS = ["hsl(215, 90%, 55%)", "hsl(145, 65%, 42%)", "hsl(42, 70%, 52%)", "hsl(280, 60%, 55%)", "hsl(0, 70%, 58%)"];
 
 function useAnimatedCounter(target: number, duration = 1200) {
   const [count, setCount] = useState(0);
@@ -41,11 +42,16 @@ function CircularProgress({ pct, size = 88, stroke = 8, color = "hsl(var(--prima
   const [animated, setAnimated] = useState(0);
   useEffect(() => { const t = setTimeout(() => setAnimated(pct), 150); return () => clearTimeout(t); }, [pct]);
   return (
-    <svg width={size} height={size} className="-rotate-90" viewBox={`0 0 ${size} ${size}`}>
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="hsl(var(--muted))" strokeWidth={stroke} />
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={stroke} strokeLinecap="round"
-        strokeDasharray={circ} strokeDashoffset={circ * (1 - animated / 100)} className="transition-all duration-1000 ease-out" />
-    </svg>
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="-rotate-90" viewBox={`0 0 ${size} ${size}`}>
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="hsl(var(--muted))" strokeWidth={stroke} />
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={stroke} strokeLinecap="round"
+          strokeDasharray={circ} strokeDashoffset={circ * (1 - animated / 100)} className="transition-all duration-1000 ease-out" />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="font-body text-lg font-bold text-foreground tabular-nums">{Math.round(animated)}%</span>
+      </div>
+    </div>
   );
 }
 
@@ -70,19 +76,63 @@ export default function PrincipalDashboard() {
     queryKey: ["principal-stats", attDate],
     refetchInterval: 30000,
     queryFn: async () => {
-      const [students, teachers, courses, notices, attendance] = await Promise.all([
-        supabase.from("students").select("id, semester", { count: "exact" }).eq("is_active", true),
+      const [students, teachers, courses, notices, attendance, events, pendingApps] = await Promise.all([
+        supabase.from("students").select("id, semester, course_id", { count: "exact" }).eq("is_active", true),
         supabase.from("teachers").select("id", { count: "exact", head: true }).eq("is_active", true),
         supabase.from("courses").select("id", { count: "exact", head: true }).eq("is_active", true),
         supabase.from("notices").select("id", { count: "exact", head: true }).eq("is_active", true),
         supabase.from("attendance").select("status").eq("date", attDate),
+        supabase.from("events").select("id", { count: "exact", head: true }).eq("is_active", true),
+        supabase.from("admission_applications").select("id", { count: "exact", head: true }).eq("status", "pending"),
       ]);
       const semCounts: Record<number, number> = {};
       (students.data || []).forEach((s: any) => { semCounts[s.semester] = (semCounts[s.semester] || 0) + 1; });
       const att = attendance.data || [];
       const present = att.filter(a => a.status === "present").length;
       const pct = att.length > 0 ? Math.round((present / att.length) * 100) : 0;
-      return { students: students.count || 0, teachers: teachers.count || 0, courses: courses.count || 0, notices: notices.count || 0, semesterBreakdown: semCounts, attendancePct: pct, totalAtt: att.length, presentAtt: present };
+      return { students: students.count || 0, teachers: teachers.count || 0, courses: courses.count || 0, notices: notices.count || 0, events: events.count || 0, pendingApps: pendingApps.count || 0, semesterBreakdown: semCounts, attendancePct: pct, totalAtt: att.length, presentAtt: present, studentData: students.data || [] };
+    },
+  });
+
+  // Course distribution for pie chart
+  const { data: courseDistribution = [] } = useQuery({
+    queryKey: ["principal-course-dist"],
+    queryFn: async () => {
+      const { data: students } = await supabase.from("students").select("course_id, courses(name, code)").eq("is_active", true);
+      if (!students) return [];
+      const c: Record<string, { name: string; count: number }> = {};
+      students.forEach((s: any) => { const n = s.courses?.code || "N/A"; if (!c[n]) c[n] = { name: n, count: 0 }; c[n].count++; });
+      return Object.values(c);
+    },
+  });
+
+  // Fee overview
+  const { data: feeOverview } = useQuery({
+    queryKey: ["principal-fee-overview"],
+    queryFn: async () => {
+      const { data: students } = await supabase.from("students").select("total_fee, fee_paid").eq("is_active", true);
+      if (!students) return { totalFee: 0, totalPaid: 0, pending: 0, pct: 0 };
+      const totalFee = students.reduce((s: number, x: any) => s + (Number(x.total_fee) || 0), 0);
+      const totalPaid = students.reduce((s: number, x: any) => s + (Number(x.fee_paid) || 0), 0);
+      return { totalFee, totalPaid, pending: totalFee - totalPaid, pct: totalFee > 0 ? Math.round((totalPaid / totalFee) * 100) : 0 };
+    },
+  });
+
+  // Recent activities
+  const { data: recentActivity = [] } = useQuery({
+    queryKey: ["principal-recent-activity"],
+    refetchInterval: 30000,
+    queryFn: async () => {
+      const activities: any[] = [];
+      const [apps, noticez, evts] = await Promise.all([
+        supabase.from("admission_applications").select("id, full_name, course, status, created_at").order("created_at", { ascending: false }).limit(4),
+        supabase.from("notices").select("id, title, type, created_at").order("created_at", { ascending: false }).limit(4),
+        supabase.from("events").select("id, title, category, created_at").order("created_at", { ascending: false }).limit(3),
+      ]);
+      (apps.data || []).forEach((a: any) => activities.push({ id: a.id, icon: FileText, title: `Application: ${a.full_name}`, desc: `${a.course} · ${a.status}`, time: a.created_at, color: "text-orange-500", bg: "bg-orange-500/10" }));
+      (noticez.data || []).forEach((n: any) => activities.push({ id: n.id, icon: Megaphone, title: `Notice: ${n.title}`, desc: n.type, time: n.created_at, color: "text-blue-500", bg: "bg-blue-500/10" }));
+      (evts.data || []).forEach((e: any) => activities.push({ id: e.id, icon: Image, title: `Event: ${e.title}`, desc: e.category, time: e.created_at, color: "text-purple-500", bg: "bg-purple-500/10" }));
+      return activities.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 8);
     },
   });
 
@@ -93,6 +143,8 @@ export default function PrincipalDashboard() {
     { label: "Faculty Members", value: String(counts?.teachers ?? 0), icon: GraduationCap, color: "bg-emerald-500" },
     { label: "Active Courses", value: String(counts?.courses ?? 0), icon: BookOpen, color: "bg-amber-500" },
     { label: "Active Notices", value: String(counts?.notices ?? 0), icon: Megaphone, color: "bg-purple-500" },
+    { label: "Active Events", value: String(counts?.events ?? 0), icon: Image, color: "bg-cyan-500" },
+    { label: "Pending Apps", value: String(counts?.pendingApps ?? 0), icon: FileText, color: "bg-orange-500" },
   ];
 
   const actions = [
@@ -102,6 +154,7 @@ export default function PrincipalDashboard() {
     { icon: BookOpen, label: "Courses & Fees", desc: "Update details", path: "/dashboard/principal/courses", color: "bg-emerald-500/10", iconColor: "text-emerald-500" },
     { icon: GraduationCap, label: "Departments", desc: "Manage departments", path: "/dashboard/principal/departments", color: "bg-cyan-500/10", iconColor: "text-cyan-500" },
     { icon: Settings, label: "Teachers", desc: "Manage faculty", path: "/dashboard/principal/teachers", color: "bg-rose-500/10", iconColor: "text-rose-500" },
+    { icon: Users, label: "Students", desc: "View all students", path: "/dashboard/principal/students", color: "bg-indigo-500/10", iconColor: "text-indigo-500" },
   ];
 
   return (
@@ -120,43 +173,72 @@ export default function PrincipalDashboard() {
 
       {/* Stats */}
       {isLoading ? (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {[1,2,3,4].map(i => <Skeleton key={i} className="h-32 rounded-2xl" />)}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {[1,2,3,4,5,6].map(i => <Skeleton key={i} className="h-32 rounded-2xl" />)}
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {stats.map((s) => <StatCard key={s.label} {...s} />)}
         </div>
       )}
 
-      {/* Summary Strip */}
-      <div className="grid grid-cols-3 gap-3">
+      {/* Summary Strip — Ratio, Attendance, Fee */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div className="bg-card border border-border/60 rounded-2xl p-4">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
-              <TrendingUp className="w-4 h-4 text-blue-500" />
-            </div>
+            <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center"><TrendingUp className="w-4 h-4 text-blue-500" /></div>
           </div>
           <p className="font-body text-2xl font-bold text-foreground tabular-nums">{counts ? `${Math.round((counts.students || 1) / Math.max(counts.teachers || 1, 1))}:1` : "—"}</p>
           <p className="font-body text-[11px] text-muted-foreground mt-0.5">Student-Teacher Ratio</p>
         </div>
         <div className="bg-card border border-border/60 rounded-2xl p-4">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-              <Clock className="w-4 h-4 text-emerald-500" />
-            </div>
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center"><Clock className="w-4 h-4 text-emerald-500" /></div>
           </div>
           <p className="font-body text-2xl font-bold text-foreground tabular-nums">{counts?.attendancePct || 0}%</p>
-          <p className="font-body text-[11px] text-muted-foreground mt-0.5">Attendance Rate</p>
+          <p className="font-body text-[11px] text-muted-foreground mt-0.5">Today's Attendance</p>
         </div>
         <div className="bg-card border border-border/60 rounded-2xl p-4">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
-              <BookOpen className="w-4 h-4 text-amber-500" />
-            </div>
+            <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center"><IndianRupee className="w-4 h-4 text-amber-500" /></div>
           </div>
-          <p className="font-body text-2xl font-bold text-foreground tabular-nums">{counts?.courses || 0}</p>
-          <p className="font-body text-[11px] text-muted-foreground mt-0.5">Active Courses</p>
+          <p className="font-body text-2xl font-bold text-foreground tabular-nums">₹{((feeOverview?.totalPaid || 0) / 1000).toFixed(0)}K</p>
+          <p className="font-body text-[11px] text-muted-foreground mt-0.5">Fee Collected</p>
+        </div>
+        <div className="bg-card border border-border/60 rounded-2xl p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center"><IndianRupee className="w-4 h-4 text-red-500" /></div>
+          </div>
+          <p className="font-body text-2xl font-bold text-foreground tabular-nums">₹{((feeOverview?.pending || 0) / 1000).toFixed(0)}K</p>
+          <p className="font-body text-[11px] text-muted-foreground mt-0.5">Fee Pending</p>
+        </div>
+      </div>
+
+      {/* Fee Collection Progress */}
+      <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center"><IndianRupee className="w-4 h-4 text-amber-500" /></div>
+            <h3 className="font-body text-[14px] font-semibold text-foreground">Fee Collection Progress</h3>
+          </div>
+          <span className="font-body text-xs text-muted-foreground">{feeOverview?.pct || 0}% collected</span>
+        </div>
+        <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
+          <div className="h-full rounded-full transition-all duration-1000 ease-out" style={{ width: `${feeOverview?.pct || 0}%`, background: "linear-gradient(90deg, hsl(145, 65%, 42%), hsl(42, 70%, 52%))" }} />
+        </div>
+        <div className="grid grid-cols-3 gap-4 mt-4">
+          <div className="text-center">
+            <p className="font-body text-lg font-bold text-foreground tabular-nums">₹{((feeOverview?.totalFee || 0) / 1000).toFixed(0)}K</p>
+            <p className="font-body text-[10px] text-muted-foreground">Total Expected</p>
+          </div>
+          <div className="text-center">
+            <p className="font-body text-lg font-bold text-emerald-500 tabular-nums">₹{((feeOverview?.totalPaid || 0) / 1000).toFixed(0)}K</p>
+            <p className="font-body text-[10px] text-muted-foreground">Collected</p>
+          </div>
+          <div className="text-center">
+            <p className="font-body text-lg font-bold text-red-500 tabular-nums">₹{((feeOverview?.pending || 0) / 1000).toFixed(0)}K</p>
+            <p className="font-body text-[10px] text-muted-foreground">Pending</p>
+          </div>
         </div>
       </div>
 
@@ -164,9 +246,7 @@ export default function PrincipalDashboard() {
       <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-              <Clock className="w-4 h-4 text-emerald-500" />
-            </div>
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center"><Clock className="w-4 h-4 text-emerald-500" /></div>
             <h3 className="font-body text-[14px] font-semibold text-foreground">Attendance Overview</h3>
           </div>
           <input type="date" value={attDate} onChange={e => setAttDate(e.target.value)}
@@ -181,23 +261,20 @@ export default function PrincipalDashboard() {
             <p className="font-body text-2xl font-bold text-red-500 tabular-nums">{(counts?.totalAtt || 0) - (counts?.presentAtt || 0)}</p>
             <p className="font-body text-[10px] text-muted-foreground">Absent</p>
           </div>
-          <div className="bg-muted/40 rounded-xl p-3 text-center">
-            <p className="font-body text-2xl font-bold text-foreground tabular-nums">{counts?.attendancePct || 0}%</p>
-            <p className="font-body text-[10px] text-muted-foreground">Rate</p>
+          <div className="bg-muted/40 rounded-xl p-3 text-center flex flex-col items-center justify-center">
+            <CircularProgress pct={counts?.attendancePct || 0} size={56} stroke={5} color="hsl(145, 65%, 42%)" />
+            <p className="font-body text-[10px] text-muted-foreground mt-1">Rate</p>
           </div>
         </div>
-        {(counts?.totalAtt || 0) === 0 && (
-          <p className="font-body text-xs text-muted-foreground text-center mt-3">No attendance records for this date</p>
-        )}
+        {(counts?.totalAtt || 0) === 0 && <p className="font-body text-xs text-muted-foreground text-center mt-3">No attendance records for this date</p>}
       </div>
 
-      {/* Chart + Management */}
+      {/* Charts Row */}
       <div className="grid md:grid-cols-2 gap-4">
+        {/* Students by Semester */}
         <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
           <div className="flex items-center gap-2 mb-5">
-            <div className="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center">
-              <Activity className="w-4 h-4 text-cyan-500" />
-            </div>
+            <div className="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center"><Activity className="w-4 h-4 text-cyan-500" /></div>
             <h3 className="font-body text-[14px] font-semibold text-foreground">Students by Semester</h3>
           </div>
           <div className="h-52">
@@ -219,6 +296,70 @@ export default function PrincipalDashboard() {
           </div>
         </div>
 
+        {/* Course Distribution Pie */}
+        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+          <div className="flex items-center gap-2 mb-5">
+            <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center"><PieChart className="w-4 h-4 text-purple-500" /></div>
+            <h3 className="font-body text-[14px] font-semibold text-foreground">Course Distribution</h3>
+          </div>
+          {courseDistribution.length > 0 ? (
+            <div className="h-52 flex items-center justify-center">
+              <ResponsiveContainer width="100%" height="100%">
+                <RePieChart>
+                  <Pie data={courseDistribution} cx="50%" cy="50%" innerRadius={40} outerRadius={80} paddingAngle={3} dataKey="count" nameKey="name">
+                    {courseDistribution.map((_: any, i: number) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
+                  </Pie>
+                  <Tooltip contentStyle={{ borderRadius: 12, fontFamily: "Inter", fontSize: 12, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }} />
+                </RePieChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <div className="h-52 flex items-center justify-center"><p className="text-sm text-muted-foreground">No data</p></div>
+          )}
+          {courseDistribution.length > 0 && (
+            <div className="flex flex-wrap gap-3 mt-3 justify-center">
+              {courseDistribution.map((c: any, i: number) => (
+                <div key={c.name} className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ background: PIE_COLORS[i % PIE_COLORS.length] }} />
+                  <span className="font-body text-[11px] text-muted-foreground">{c.name}: {c.count}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Recent Activity + Management */}
+      <div className="grid md:grid-cols-2 gap-4">
+        {/* Recent Activity */}
+        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+          <h3 className="font-body text-[14px] font-semibold text-foreground mb-4 flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center"><Activity className="w-4 h-4 text-orange-500" /></div>
+            Recent Activity
+          </h3>
+          {recentActivity.length === 0 ? (
+            <p className="font-body text-sm text-muted-foreground text-center py-8">No recent activity</p>
+          ) : (
+            <div className="space-y-2 max-h-72 overflow-y-auto">
+              {recentActivity.map((a: any) => (
+                <div key={a.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-muted/30 transition-colors">
+                  <div className={`w-8 h-8 rounded-lg ${a.bg} flex items-center justify-center shrink-0`}>
+                    <a.icon className={`w-4 h-4 ${a.color}`} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-body text-[12px] font-medium text-foreground truncate">{a.title}</p>
+                    <p className="font-body text-[10px] text-muted-foreground truncate">{a.desc}</p>
+                  </div>
+                  <span className="font-body text-[9px] text-muted-foreground shrink-0">
+                    {new Date(a.time).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Management Actions */}
         <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
           <h3 className="font-body text-[14px] font-semibold text-foreground mb-4">Management</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">

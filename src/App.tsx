@@ -98,6 +98,7 @@ const AdminCourses = lazy(() => import("./pages/dashboard/admin/AdminCourses"));
 const AdminAttendanceOverview = lazy(() => import("./pages/dashboard/admin/AdminAttendanceOverview"));
 const AdminApproveAdmins = lazy(() => import("./pages/dashboard/admin/AdminApproveAdmins"));
 const AdminStudentFeeDetail = lazy(() => import("./pages/dashboard/admin/AdminStudentFeeDetail"));
+const AdminSeats = lazy(() => import("./pages/dashboard/admin/AdminSeats"));
 
 const queryClient = new QueryClient();
 
@@ -224,6 +225,7 @@ const App = () => (
             <Route path="/dashboard/admin/attendance-overview" element={<AdminRoute><AdminAttendanceOverview /></AdminRoute>} />
             <Route path="/dashboard/admin/approve-admins" element={<AdminRoute><AdminApproveAdmins /></AdminRoute>} />
             <Route path="/dashboard/admin/fees/:studentId" element={<AdminRoute><AdminStudentFeeDetail /></AdminRoute>} />
+            <Route path="/dashboard/admin/seats" element={<AdminRoute><AdminSeats /></AdminRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
