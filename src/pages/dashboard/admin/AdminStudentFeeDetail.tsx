@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { ArrowLeft, IndianRupee, Calendar, User, BookOpen, Receipt, Phone, Mail, MapPin, CheckCircle, AlertCircle, Layers, CreditCard, TrendingUp, Plus, Printer, Bell, FileText, Send, Download } from "lucide-react";
+import { ArrowLeft, IndianRupee, Calendar, User, BookOpen, Receipt, Phone, Mail, MapPin, CheckCircle, AlertCircle, Layers, CreditCard, TrendingUp, Plus, Printer, Bell, FileText, Send, Download, MessageCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
@@ -180,9 +180,28 @@ export default function AdminStudentFeeDetail() {
       } catch (pushErr) {
         console.error("Push notification failed (non-critical):", pushErr);
       }
+      // Send email reminder
+      const studentEmail = student.profile?.email;
+      if (studentEmail) {
+        try {
+          await supabase.functions.invoke("send-fee-reminder", {
+            body: {
+              studentEmail,
+              studentName: student.profile?.full_name || "",
+              rollNumber: student.roll_number || "",
+              courseName: student.courses?.name || "",
+              dueAmount: due,
+              dueDate: student.fee_due_date ? new Date(student.fee_due_date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : null,
+              message: msg,
+            },
+          });
+        } catch (emailErr) {
+          console.error("Email reminder failed (non-critical):", emailErr);
+        }
+      }
     },
     onSuccess: () => {
-      toast.success("Reminder sent to student (in-app + push notification)!");
+      toast.success("Reminder sent to student (in-app + push + email)!");
       setReminderMsg("");
       setShowReminderModal(false);
     },
@@ -385,6 +404,15 @@ export default function AdminStudentFeeDetail() {
           </Button>
           <Button size="sm" variant="outline" onClick={exportStudentCSV} className="gap-1.5 text-xs">
             <Download className="w-3.5 h-3.5" /> Export CSV
+          </Button>
+          <Button size="sm" variant="outline" className="gap-1.5 text-xs" asChild>
+            <a
+              href={`https://wa.me/${(student.parent_phone || student.phone || student.profile?.phone || "").replace(/\D/g, "").replace(/^0/, "91")}?text=${encodeURIComponent(`Dear ${student.profile?.full_name || "Student"},\n\nThis is a reminder from Hoysala Degree College regarding your pending fee of ₹${totalDue.toLocaleString()}.\n\nPlease clear your dues at the earliest.\n\nRoll No: ${student.roll_number}\nCourse: ${student.courses?.name || ""}\n${student.fee_due_date ? `Due Date: ${new Date(student.fee_due_date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}` : ""}\n\nThank you,\nHoysala Degree College`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <MessageCircle className="w-3.5 h-3.5" /> WhatsApp Reminder
+            </a>
           </Button>
         </div>
       </div>
