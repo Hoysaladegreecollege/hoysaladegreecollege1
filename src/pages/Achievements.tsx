@@ -50,10 +50,9 @@ function RankCard({ a, isDefault = false }: { a: any; isDefault?: boolean }) {
   const ringColor = a.rank <= 3 ? RANK_RING_COLORS[a.rank - 1] : "hsl(var(--secondary))";
 
   return (
-    <div className="relative group overflow-hidden rounded-3xl border border-border/10 p-8 sm:p-10 text-center transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl"
+    <div className="relative group overflow-hidden rounded-3xl border border-border p-8 sm:p-10 text-center transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl bg-card"
       style={{
-        background: "linear-gradient(135deg, hsl(222 30% 12% / 0.95), hsl(222 30% 8% / 0.98))",
-        boxShadow: "0 15px 60px -12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.03)",
+        boxShadow: "0 15px 60px -12px rgba(0,0,0,0.15)",
       }}>
       {/* Ambient glow */}
       <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"
@@ -63,7 +62,7 @@ function RankCard({ a, isDefault = false }: { a: any; isDefault?: boolean }) {
         style={{ background: `linear-gradient(90deg, transparent, ${ringColor}60, transparent)` }} />
 
       {/* Rank ribbon */}
-      <div className="absolute top-0 right-0 px-5 py-2 rounded-bl-2xl font-display text-xs font-bold shadow-lg text-background"
+      <div className="absolute top-0 right-0 px-5 py-2 rounded-bl-2xl font-display text-xs font-bold shadow-lg text-white"
         style={{ background: a.rank === 1 ? "linear-gradient(135deg, #C6A75E, #B8860B)" : a.rank === 2 ? "linear-gradient(135deg, #9CA3AF, #6B7280)" : "linear-gradient(135deg, #CD7F32, #8B4513)" }}>
         {RANK_LABELS[Math.min(a.rank - 1, 5)]} Rank #{a.rank}
       </div>
@@ -75,8 +74,8 @@ function RankCard({ a, isDefault = false }: { a: any; isDefault?: boolean }) {
             className="w-28 h-28 rounded-2xl object-cover shadow-2xl group-hover:scale-105 transition-all duration-500 relative z-10"
             style={{ border: `3px solid ${ringColor}60` }} />
         ) : (
-          <div className="w-28 h-28 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500 relative z-10 shadow-2xl"
-            style={{ border: `3px solid ${ringColor}40`, background: `linear-gradient(135deg, ${ringColor}20, ${ringColor}05)` }}>
+          <div className="w-28 h-28 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500 relative z-10 shadow-2xl bg-muted"
+            style={{ border: `3px solid ${ringColor}40` }}>
             <Medal className="w-12 h-12" style={{ color: ringColor }} />
           </div>
         )}
@@ -89,13 +88,13 @@ function RankCard({ a, isDefault = false }: { a: any; isDefault?: boolean }) {
       <h3 className="font-display text-xl font-bold text-foreground group-hover:text-secondary transition-colors duration-300">
         {a.student_name || a.name}
       </h3>
-      {(a.usn || isDefault) && <p className="font-body text-xs text-muted-foreground/40 mt-1 tracking-wider">USN: {a.usn}</p>}
+      {(a.usn || isDefault) && <p className="font-body text-xs text-muted-foreground mt-1 tracking-wider">USN: {a.usn}</p>}
       {a.percentage && (
         <p className="font-display text-4xl font-bold mt-4" style={{ color: ringColor }}>{a.percentage}</p>
       )}
       <p className="font-body text-sm text-foreground/70 mt-3 font-medium">{a.course}</p>
       {(a.batch || a.year) && (
-        <p className="font-body text-xs text-muted-foreground/40 mt-1">Batch: {a.batch || a.year}</p>
+        <p className="font-body text-xs text-muted-foreground mt-1">Batch: {a.batch || a.year}</p>
       )}
 
       {/* Bottom shimmer */}
@@ -137,11 +136,10 @@ export default function Achievements() {
         </div>
       </section>
 
-      {/* Stats strip — dark themed */}
-      <section className="py-12 sm:py-16 relative overflow-hidden"
-        style={{ background: "linear-gradient(135deg, hsl(222 30% 8%), hsl(222 30% 10%))" }}>
+      {/* Stats strip — themed */}
+      <section className="py-12 sm:py-16 relative overflow-hidden bg-muted/50">
         <div className="absolute inset-0 opacity-[0.03]"
-          style={{ backgroundImage: "linear-gradient(rgba(198,167,94,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(198,167,94,0.3) 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
+          style={{ backgroundImage: "linear-gradient(hsl(var(--secondary) / 0.3) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--secondary) / 0.3) 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
         <div className="relative container px-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
             {[
@@ -152,9 +150,9 @@ export default function Achievements() {
             ].map((s, i) => (
               <ScrollReveal key={s.label} delay={i * 100}>
                 <div className="group">
-                  <s.icon className="w-7 h-7 mx-auto mb-2 group-hover:scale-125 transition-transform duration-300" style={{ color: "hsl(45, 80%, 55%)" }} />
+                  <s.icon className="w-7 h-7 mx-auto mb-2 text-secondary group-hover:scale-125 transition-transform duration-300" />
                   <div className="font-display text-3xl font-bold text-foreground">{s.value}</div>
-                  <div className="font-body text-xs text-muted-foreground/40 mt-1 uppercase tracking-wider">{s.label}</div>
+                  <div className="font-body text-xs text-muted-foreground mt-1 uppercase tracking-wider">{s.label}</div>
                 </div>
               </ScrollReveal>
             ))}
@@ -174,11 +172,11 @@ export default function Achievements() {
             {isLoading ? (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="rounded-3xl border border-border/10 p-8 text-center space-y-4" style={{ background: "hsl(222 30% 11%)" }}>
-                    <Skeleton className="w-28 h-28 rounded-2xl mx-auto bg-border/5" />
-                    <Skeleton className="h-5 w-2/3 mx-auto bg-border/5" />
-                    <Skeleton className="h-3 w-1/2 mx-auto bg-border/5" />
-                    <Skeleton className="h-8 w-full rounded-xl bg-border/5" />
+                  <div key={i} className="rounded-3xl border border-border p-8 text-center space-y-4 bg-card">
+                    <Skeleton className="w-28 h-28 rounded-2xl mx-auto" />
+                    <Skeleton className="h-5 w-2/3 mx-auto" />
+                    <Skeleton className="h-3 w-1/2 mx-auto" />
+                    <Skeleton className="h-8 w-full rounded-xl" />
                   </div>
                 ))}
               </div>
@@ -199,18 +197,17 @@ export default function Achievements() {
       <section className="py-16 sm:py-20 bg-background">
         <div className="container max-w-2xl px-4 text-center">
           <ScrollReveal>
-            <div className="relative overflow-hidden rounded-3xl p-8 sm:p-12 group border border-border/10"
-              style={{ background: "linear-gradient(135deg, hsl(222 30% 12%), hsl(222 30% 8%))", boxShadow: "0 20px 60px -12px rgba(0,0,0,0.4)" }}>
+            <div className="relative overflow-hidden rounded-3xl p-8 sm:p-12 group border border-border bg-card"
+              style={{ boxShadow: "0 20px 60px -12px rgba(0,0,0,0.15)" }}>
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-                style={{ background: "radial-gradient(ellipse at 50% 30%, rgba(198,167,94,0.08), transparent 70%)" }} />
-              <Sparkles className="w-12 h-12 mx-auto mb-4 animate-float" style={{ color: "hsl(45, 80%, 55%)" }} />
+                style={{ background: "radial-gradient(ellipse at 50% 30%, hsl(var(--secondary) / 0.08), transparent 70%)" }} />
+              <Sparkles className="w-12 h-12 mx-auto mb-4 animate-float text-secondary" />
               <h3 className="font-display text-2xl sm:text-3xl font-bold text-foreground mb-3">Be the Next Achiever</h3>
-              <p className="font-body text-muted-foreground/60 text-sm mb-6 leading-relaxed">
+              <p className="font-body text-muted-foreground text-sm mb-6 leading-relaxed">
                 Join Hoysala Degree College and write your own success story. Excellence is not just an aspiration — it's a tradition here.
               </p>
               <Link to="/admissions"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl font-body font-bold text-sm text-background hover:scale-105 transition-all duration-300 shadow-xl"
-                style={{ background: "linear-gradient(135deg, hsl(45 80% 45%), hsl(45 80% 55%))" }}>
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl font-body font-bold text-sm text-primary-foreground hover:scale-105 transition-all duration-300 shadow-xl bg-primary">
                 <Trophy className="w-4 h-4" /> Start Your Journey
               </Link>
             </div>
