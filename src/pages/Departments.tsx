@@ -4,40 +4,45 @@ import ScrollReveal from "@/components/ScrollReveal";
 import PageHeader from "@/components/PageHeader";
 import { Monitor, TrendingUp, Briefcase, Award, ChevronRight, Users, GraduationCap, BookOpen } from "lucide-react";
 import PremiumStatsStrip from "@/components/PremiumStatsStrip";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
-const departments = [
+const staticDepartments = [
   {
     name: "Department of Computer Applications",
+    code: "BCA",
     icon: Monitor,
     course: "BCA — Bachelor of Computer Applications",
-    hod: "Dr. Meena Sharma",
-    hodQual: "Ph.D. in Computer Science",
+    hod: "Ms. SHILPA RANI G M",
+    hodQual: "M.Sc in Computer Science",
     desc: "Offering cutting-edge education in computer science, programming, and IT. Students learn through hands-on lab sessions, industry projects, and workshops covering AI, ML, Python, and modern web development.",
     facilities: ["Computer Lab with 60+ systems", "Internet & Wi-Fi enabled campus", "Programming contests & hackathons", "AI/ML workshop lab"],
     color: "from-blue-500/12 to-blue-500/4",
     headerGrad: "from-blue-600/15 to-primary/8",
     iconBg: "bg-blue-500/10",
     iconColor: "text-blue-600",
-    badge: "bg-blue-50 text-blue-700 border-blue-200",
+    badge: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20",
     stat: { students: "120+", faculty: "8+", year: "2017" },
   },
   {
     name: "Department of Commerce",
+    code: "BCOM",
     icon: TrendingUp,
     course: "BCom — Regular & Professional",
-    hod: "Prof. Renuka parasad R",
-    hodQual: "M.Com, Bed",
+    hod: "Prof. Renuka Parasad R",
+    hodQual: "M.Com, B.Ed",
     desc: "Providing comprehensive knowledge in accounting, finance, and business operations. Our Commerce department prepares students for CA, ICWA, and MBA pathways with dedicated coaching and expert mentoring.",
     facilities: ["Dedicated commerce library", "Tally & accounting software lab", "Industry guest lectures", "CA/CS coaching sessions"],
     color: "from-secondary/12 to-secondary/4",
     headerGrad: "from-secondary/18 to-amber-500/8",
     iconBg: "bg-secondary/15",
     iconColor: "text-secondary-foreground",
-    badge: "bg-amber-50 text-amber-700 border-amber-200",
+    badge: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20",
     stat: { students: "200+", faculty: "10+", year: "2017" },
   },
   {
     name: "Department of Business Administration",
+    code: "BBA",
     icon: Briefcase,
     course: "BBA — Bachelor of Business Administration",
     hod: "Dr. Priya Nair",
@@ -48,12 +53,46 @@ const departments = [
     headerGrad: "from-emerald-500/15 to-primary/8",
     iconBg: "bg-emerald-500/10",
     iconColor: "text-emerald-600",
-    badge: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    badge: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20",
     stat: { students: "80+", faculty: "6+", year: "2019" },
   },
 ];
 
+const ICON_MAP: Record<string, typeof Monitor> = { BCA: Monitor, BCOM: TrendingUp, BBA: Briefcase };
+const COLOR_MAP: Record<string, { color: string; headerGrad: string; iconBg: string; iconColor: string; badge: string }> = {
+  BCA: { color: "from-blue-500/12 to-blue-500/4", headerGrad: "from-blue-600/15 to-primary/8", iconBg: "bg-blue-500/10", iconColor: "text-blue-600", badge: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20" },
+  BCOM: { color: "from-secondary/12 to-secondary/4", headerGrad: "from-secondary/18 to-amber-500/8", iconBg: "bg-secondary/15", iconColor: "text-secondary-foreground", badge: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20" },
+  BBA: { color: "from-emerald-500/12 to-emerald-500/4", headerGrad: "from-emerald-500/15 to-primary/8", iconBg: "bg-emerald-500/10", iconColor: "text-emerald-600", badge: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" },
+};
+
 export default function Departments() {
+  const { data: dbDepts = [] } = useQuery({
+    queryKey: ["public-departments"],
+    queryFn: async () => {
+      const { data } = await supabase.from("departments").select("*").eq("is_active", true).order("name");
+      return data || [];
+    },
+  });
+
+  // Merge DB data with static styling
+  const departments = dbDepts.length > 0
+    ? dbDepts.map((d: any) => {
+        const staticMatch = staticDepartments.find(sd => sd.code === d.code);
+        const colors = COLOR_MAP[d.code] || COLOR_MAP["BCA"];
+        return {
+          name: d.name,
+          icon: ICON_MAP[d.code] || Monitor,
+          course: staticMatch?.course || d.name,
+          hod: d.hod_name || staticMatch?.hod || "—",
+          hodQual: staticMatch?.hodQual || "",
+          desc: d.description || staticMatch?.desc || "",
+          facilities: staticMatch?.facilities || [],
+          ...colors,
+          stat: staticMatch?.stat || { students: "—", faculty: "—", year: "—" },
+        };
+      })
+    : staticDepartments;
+
   return (
     <div className="page-enter">
       <SEOHead title="Departments" description="Explore departments at Hoysala Degree College – Computer Applications, Commerce, and Business Administration. Specialized faculty and modern facilities." canonical="/departments" />
@@ -119,7 +158,7 @@ export default function Departments() {
                     <Award className="w-4 h-4 text-secondary" /> Key Facilities
                   </h4>
                   <div className="grid sm:grid-cols-2 gap-2">
-                    {d.facilities.map((f) => (
+                    {d.facilities.map((f: string) => (
                       <div key={f} className="flex items-center gap-3 font-body text-sm text-muted-foreground p-2.5 rounded-xl hover:bg-muted/50 transition-all duration-200 group/item border border-transparent hover:border-border/50">
                         <ChevronRight className="w-4 h-4 text-secondary shrink-0 group-hover/item:translate-x-0.5 transition-transform duration-200" />
                         {f}

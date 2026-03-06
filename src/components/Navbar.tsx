@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ChevronDown, Phone, Mail, Sparkles, FileText, TrendingUp, Building } from "lucide-react";
+import { ChevronDown, Phone, Mail, Sparkles, FileText, TrendingUp, Building, Users, BookOpen, GraduationCap, Monitor } from "lucide-react";
 import collegeLogo from "@/assets/college-logo.png";
 import DarkModeToggle from "./DarkModeToggle";
 
@@ -11,13 +11,24 @@ const aboutDropdown = [
   { label: "Campus", path: "/campus", icon: Building, desc: "Virtual campus tour" },
 ];
 
+const facultyDropdown = [
+  { label: "Faculty", path: "/faculty", icon: Users, desc: "Our teaching staff" },
+  { label: "Management", path: "/management", icon: Building, desc: "College management" },
+  { label: "Departments", path: "/departments", icon: Monitor, desc: "Academic departments" },
+];
+
+const admissionsDropdown = [
+  { label: "Admissions", path: "/admissions", icon: BookOpen, desc: "Admission details & fees" },
+  { label: "Apply Now", path: "/apply", icon: GraduationCap, desc: "Online application form" },
+  { label: "Track Application", path: "/application-status", icon: FileText, desc: "Check your status" },
+];
+
 const navLinks = [
   { label: "Home", path: "/" },
-  { label: "About", path: "/about", hasDropdown: true },
+  { label: "About", path: "/about", hasDropdown: true, dropdownKey: "about" },
   { label: "Courses", path: "/courses" },
-  { label: "Admissions", path: "/admissions" },
-  { label: "Departments", path: "/departments" },
-  { label: "Faculty", path: "/faculty" },
+  { label: "Admissions", path: "/admissions", hasDropdown: true, dropdownKey: "admissions" },
+  { label: "Faculty", path: "/faculty", hasDropdown: true, dropdownKey: "faculty" },
   { label: "Events", path: "/events" },
   { label: "Notices", path: "/notices" },
   { label: "Gallery", path: "/gallery" },
@@ -26,14 +37,20 @@ const navLinks = [
   { label: "Contact", path: "/contact" },
 ];
 
+const dropdownMap: Record<string, typeof aboutDropdown> = {
+  about: aboutDropdown,
+  faculty: facultyDropdown,
+  admissions: admissionsDropdown,
+};
+
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, opacity: 0 });
-  const [aboutOpen, setAboutOpen] = useState(false);
-  const [mobileAboutOpen, setMobileAboutOpen] = useState(false);
-  const aboutTimeout = useRef<ReturnType<typeof setTimeout>>();
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [mobileOpenDropdown, setMobileOpenDropdown] = useState<string | null>(null);
+  const dropdownTimeout = useRef<ReturnType<typeof setTimeout>>();
   const navRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
 
@@ -46,7 +63,7 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => { setOpen(false); setMobileAboutOpen(false); }, [location.pathname]);
+  useEffect(() => { setOpen(false); setMobileOpenDropdown(null); }, [location.pathname]);
 
   useEffect(() => {
     if (!navRef.current) return;
@@ -62,12 +79,18 @@ export default function Navbar() {
 
   const progress = Math.min(scrollY / 300, 1);
 
-  const handleAboutEnter = () => {
-    clearTimeout(aboutTimeout.current);
-    setAboutOpen(true);
+  const handleDropdownEnter = (key: string) => {
+    clearTimeout(dropdownTimeout.current);
+    setOpenDropdown(key);
   };
-  const handleAboutLeave = () => {
-    aboutTimeout.current = setTimeout(() => setAboutOpen(false), 200);
+  const handleDropdownLeave = () => {
+    dropdownTimeout.current = setTimeout(() => setOpenDropdown(null), 200);
+  };
+
+  const isDropdownActive = (link: any) => {
+    if (!link.hasDropdown || !link.dropdownKey) return location.pathname === link.path;
+    const items = dropdownMap[link.dropdownKey] || [];
+    return items.some(d => location.pathname === d.path);
   };
 
   return (
@@ -140,15 +163,16 @@ export default function Navbar() {
             style={{ left: indicatorStyle.left, width: indicatorStyle.width, opacity: indicatorStyle.opacity }}
           />
           {navLinks.map((link) => {
-            const active = location.pathname === link.path || (link.hasDropdown && aboutDropdown.some(d => location.pathname === d.path));
+            const active = isDropdownActive(link);
             
-            if (link.hasDropdown) {
+            if (link.hasDropdown && link.dropdownKey) {
+              const items = dropdownMap[link.dropdownKey] || [];
               return (
                 <div
                   key={link.path}
                   className="relative"
-                  onMouseEnter={handleAboutEnter}
-                  onMouseLeave={handleAboutLeave}
+                  onMouseEnter={() => handleDropdownEnter(link.dropdownKey!)}
+                  onMouseLeave={handleDropdownLeave}
                 >
                   <button
                     data-active={active}
@@ -158,16 +182,15 @@ export default function Navbar() {
                   >
                     <span className="absolute inset-0 rounded-lg bg-primary/0 group-hover/link:bg-primary/5 transition-colors duration-300" />
                     <span className="relative">{link.label}</span>
-                    <ChevronDown className={`relative w-3 h-3 transition-transform duration-300 ${aboutOpen ? "rotate-180" : ""}`} />
+                    <ChevronDown className={`relative w-3 h-3 transition-transform duration-300 ${openDropdown === link.dropdownKey ? "rotate-180" : ""}`} />
                   </button>
 
                   {/* Dropdown */}
-                  <div className={`absolute top-full left-1/2 -translate-x-1/2 pt-2 transition-all duration-300 ${aboutOpen ? "opacity-100 visible translate-y-0" : "opacity-0 invisible -translate-y-2"}`}>
+                  <div className={`absolute top-full left-1/2 -translate-x-1/2 pt-2 transition-all duration-300 ${openDropdown === link.dropdownKey ? "opacity-100 visible translate-y-0" : "opacity-0 invisible -translate-y-2"}`}>
                     <div className="w-64 rounded-2xl border border-border/40 bg-card/95 backdrop-blur-xl shadow-2xl overflow-hidden">
-                      {/* Top accent */}
                       <div className="h-[2px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
                       <div className="p-2">
-                        {aboutDropdown.map((item) => {
+                        {items.map((item) => {
                           const Icon = item.icon;
                           const isActive = location.pathname === item.path;
                           return (
@@ -271,13 +294,15 @@ export default function Navbar() {
 
           <div className="flex flex-col gap-0.5">
             {navLinks.map((link, i) => {
-              const active = location.pathname === link.path || (link.hasDropdown && aboutDropdown.some(d => location.pathname === d.path));
+              const active = isDropdownActive(link);
 
-              if (link.hasDropdown) {
+              if (link.hasDropdown && link.dropdownKey) {
+                const items = dropdownMap[link.dropdownKey] || [];
+                const isOpen = mobileOpenDropdown === link.dropdownKey;
                 return (
                   <div key={link.path}>
                     <button
-                      onClick={() => setMobileAboutOpen(!mobileAboutOpen)}
+                      onClick={() => setMobileOpenDropdown(isOpen ? null : link.dropdownKey!)}
                       style={{ animationDelay: open ? `${i * 35}ms` : "0ms" }}
                       className={`w-full px-4 py-3 text-[14px] font-body rounded-xl transition-all duration-300 flex items-center justify-between touch-manipulation active:scale-[0.98] ${
                         open ? "animate-fade-in-up" : ""
@@ -288,12 +313,12 @@ export default function Navbar() {
                       }`}
                     >
                       <span>{link.label}</span>
-                      <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${mobileAboutOpen ? "rotate-180" : ""}`} />
+                      <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
                     </button>
                     {/* Mobile sub-menu */}
-                    <div className={`overflow-hidden transition-all duration-400 ease-out ${mobileAboutOpen ? "max-h-80 opacity-100" : "max-h-0 opacity-0"}`}>
+                    <div className={`overflow-hidden transition-all duration-400 ease-out ${isOpen ? "max-h-80 opacity-100" : "max-h-0 opacity-0"}`}>
                       <div className="pl-4 py-1 flex flex-col gap-0.5">
-                        {aboutDropdown.map((item) => {
+                        {items.map((item) => {
                           const Icon = item.icon;
                           const subActive = location.pathname === item.path;
                           return (
