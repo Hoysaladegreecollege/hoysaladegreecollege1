@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Monitor, Save, Edit2, Plus } from "lucide-react";
+import { ArrowLeft, Monitor, Save, Edit2, Plus, Trash2, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,6 +22,30 @@ export default function AdminDepartments() {
     },
   });
 
+  // Get student counts per department (via courses)
+  const { data: deptStats = {} } = useQuery({
+    queryKey: ["admin-dept-stats"],
+    queryFn: async () => {
+      const { data: courses } = await supabase.from("courses").select("id, department_id").eq("is_active", true);
+      const { data: students } = await supabase.from("students").select("id, course_id").eq("is_active", true);
+      const { data: teachers } = await supabase.from("teachers").select("id, department_id").eq("is_active", true);
+      const stats: Record<string, { students: number; courses: number; teachers: number }> = {};
+      (courses || []).forEach((c: any) => {
+        if (!c.department_id) return;
+        if (!stats[c.department_id]) stats[c.department_id] = { students: 0, courses: 0, teachers: 0 };
+        stats[c.department_id].courses++;
+        const stuCount = (students || []).filter((s: any) => s.course_id === c.id).length;
+        stats[c.department_id].students += stuCount;
+      });
+      (teachers || []).forEach((t: any) => {
+        if (!t.department_id) return;
+        if (!stats[t.department_id]) stats[t.department_id] = { students: 0, courses: 0, teachers: 0 };
+        stats[t.department_id].teachers++;
+      });
+      return stats;
+    },
+  });
+
   const handleEdit = (dept: any) => {
     setEditing(dept.id);
     setForm({ name: dept.name, code: dept.code, hod_name: dept.hod_name || "", description: dept.description || "" });
@@ -35,6 +59,21 @@ export default function AdminDepartments() {
     if (error) { toast.error("Failed: " + error.message); return; }
     toast.success("Department updated!");
     setEditing(null);
+    qc.invalidateQueries({ queryKey: ["admin-departments"] });
+  };
+
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to delete "${name}"? This action cannot be undone.`)) return;
+    const { error } = await supabase.from("departments").delete().eq("id", id);
+    if (error) { toast.error("Failed to delete: " + error.message); return; }
+    toast.success("Department deleted!");
+    qc.invalidateQueries({ queryKey: ["admin-departments"] });
+  };
+
+  const handleToggleActive = async (id: string, currentActive: boolean) => {
+    const { error } = await supabase.from("departments").update({ is_active: !currentActive }).eq("id", id);
+    if (error) { toast.error("Failed: " + error.message); return; }
+    toast.success(currentActive ? "Department deactivated" : "Department activated");
     qc.invalidateQueries({ queryKey: ["admin-departments"] });
   };
 
@@ -52,7 +91,7 @@ export default function AdminDepartments() {
           </div>
           <div>
             <h2 className="font-display text-xl font-bold text-foreground">Manage Departments</h2>
-            <p className="font-body text-sm text-muted-foreground">Edit department details visible on the main website</p>
+            <p className="font-body text-sm text-muted-foreground">Edit department details, HODs, key facilities, and manage visibility</p>
           </div>
         </div>
       </div>
@@ -65,53 +104,79 @@ export default function AdminDepartments() {
         </div>
       ) : (
         <div className="space-y-4">
-          {departments.map((dept: any) => (
-            <div key={dept.id} className="bg-card border border-border rounded-2xl overflow-hidden">
-              {editing === dept.id ? (
-                <div className="p-6 space-y-4">
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="font-body text-xs text-muted-foreground mb-1 block">Department Name</label>
-                      <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className={inputClass} />
+          {departments.map((dept: any) => {
+            const stats = deptStats[dept.id] || { students: 0, courses: 0, teachers: 0 };
+            return (
+              <div key={dept.id} className="bg-card border border-border rounded-2xl overflow-hidden">
+                {editing === dept.id ? (
+                  <div className="p-6 space-y-4">
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="font-body text-xs text-muted-foreground mb-1 block">Department Name</label>
+                        <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className={inputClass} />
+                      </div>
+                      <div>
+                        <label className="font-body text-xs text-muted-foreground mb-1 block">Code</label>
+                        <input value={form.code} onChange={e => setForm(f => ({ ...f, code: e.target.value }))} className={inputClass} />
+                      </div>
+                      <div>
+                        <label className="font-body text-xs text-muted-foreground mb-1 block">HOD Name</label>
+                        <input value={form.hod_name} onChange={e => setForm(f => ({ ...f, hod_name: e.target.value }))} className={inputClass} />
+                      </div>
                     </div>
                     <div>
-                      <label className="font-body text-xs text-muted-foreground mb-1 block">Code</label>
-                      <input value={form.code} onChange={e => setForm(f => ({ ...f, code: e.target.value }))} className={inputClass} />
+                      <label className="font-body text-xs text-muted-foreground mb-1 block">Description (Key Facilities, Qualifications, etc.)</label>
+                      <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={4} className={inputClass} placeholder="Describe key facilities, teacher qualifications, labs, etc." />
                     </div>
-                    <div>
-                      <label className="font-body text-xs text-muted-foreground mb-1 block">HOD Name</label>
-                      <input value={form.hod_name} onChange={e => setForm(f => ({ ...f, hod_name: e.target.value }))} className={inputClass} />
+                    <div className="flex gap-2">
+                      <Button onClick={handleSave} className="gap-1.5 text-xs"><Save className="w-3.5 h-3.5" /> Save</Button>
+                      <Button variant="outline" onClick={() => setEditing(null)} className="text-xs">Cancel</Button>
                     </div>
                   </div>
-                  <div>
-                    <label className="font-body text-xs text-muted-foreground mb-1 block">Description</label>
-                    <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={3} className={inputClass} />
-                  </div>
-                  <div className="flex gap-2">
-                    <Button onClick={handleSave} className="gap-1.5 text-xs"><Save className="w-3.5 h-3.5" /> Save</Button>
-                    <Button variant="outline" onClick={() => setEditing(null)} className="text-xs">Cancel</Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="p-6 flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-body text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold">{dept.code}</span>
-                      <span className={`font-body text-[10px] px-2 py-0.5 rounded-full font-bold ${dept.is_active ? "bg-emerald-500/10 text-emerald-600" : "bg-destructive/10 text-destructive"}`}>
-                        {dept.is_active ? "Active" : "Inactive"}
-                      </span>
+                ) : (
+                  <div className="p-6">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <span className="font-body text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold">{dept.code}</span>
+                          <span className={`font-body text-[10px] px-2 py-0.5 rounded-full font-bold ${dept.is_active ? "bg-emerald-500/10 text-emerald-600" : "bg-destructive/10 text-destructive"}`}>
+                            {dept.is_active ? "Active" : "Inactive"}
+                          </span>
+                        </div>
+                        <h3 className="font-display text-lg font-bold text-foreground">{dept.name}</h3>
+                        {dept.hod_name && <p className="font-body text-sm text-muted-foreground mt-1">HOD: <span className="font-semibold text-foreground">{dept.hod_name}</span></p>}
+                        {dept.description && <p className="font-body text-sm text-muted-foreground mt-1 line-clamp-3">{dept.description}</p>}
+                        
+                        {/* Stats */}
+                        <div className="flex items-center gap-4 mt-3 flex-wrap">
+                          <span className="font-body text-xs text-muted-foreground">
+                            <span className="font-semibold text-foreground">{stats.students}</span> Students
+                          </span>
+                          <span className="font-body text-xs text-muted-foreground">
+                            <span className="font-semibold text-foreground">{stats.courses}</span> Courses
+                          </span>
+                          <span className="font-body text-xs text-muted-foreground">
+                            <span className="font-semibold text-foreground">{stats.teachers}</span> Teachers
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Button size="sm" variant="outline" onClick={() => handleEdit(dept)} className="gap-1.5 text-xs">
+                          <Edit2 className="w-3.5 h-3.5" /> Edit
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => handleToggleActive(dept.id, dept.is_active)} className="text-xs">
+                          {dept.is_active ? "Deactivate" : "Activate"}
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => handleDelete(dept.id, dept.name)} className="gap-1.5 text-xs text-destructive hover:bg-destructive/10 border-destructive/20">
+                          <Trash2 className="w-3.5 h-3.5" /> Delete
+                        </Button>
+                      </div>
                     </div>
-                    <h3 className="font-display text-lg font-bold text-foreground">{dept.name}</h3>
-                    {dept.hod_name && <p className="font-body text-sm text-muted-foreground mt-1">HOD: <span className="font-semibold text-foreground">{dept.hod_name}</span></p>}
-                    {dept.description && <p className="font-body text-sm text-muted-foreground mt-1 line-clamp-2">{dept.description}</p>}
                   </div>
-                  <Button size="sm" variant="outline" onClick={() => handleEdit(dept)} className="gap-1.5 text-xs shrink-0">
-                    <Edit2 className="w-3.5 h-3.5" /> Edit
-                  </Button>
-                </div>
-              )}
-            </div>
-          ))}
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

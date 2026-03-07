@@ -6,7 +6,7 @@ import {
   BarChart3, Settings, Award, Image, Megaphone, Shield,
   UserCog, Menu, X, Mail, Trophy, UserCheck,
   DollarSign, Book, ArrowUpCircle, Cake, ImagePlus, ChevronLeft, ExternalLink,
-  BellRing
+  BellRing, Monitor, Armchair
 } from "lucide-react";
 import collegeLogo from "@/assets/college-logo.png";
 import { useState, useEffect } from "react";
@@ -39,7 +39,6 @@ const teacherNav: NavItem[] = [
   { label: "Attendance Overview", path: "/dashboard/teacher/attendance-overview", icon: UserCheck },
   { label: "Marks", path: "/dashboard/teacher/marks", icon: BarChart3 },
   { label: "Timetable", path: "/dashboard/teacher/timetable", icon: Calendar },
-  { label: "Absent Notes", path: "/dashboard/teacher/absent", icon: Bell },
   { label: "Materials", path: "/dashboard/teacher/materials", icon: Upload },
   { label: "Announcements", path: "/dashboard/teacher/announcements", icon: Megaphone },
   { label: "Notices", path: "/dashboard/teacher/notices", icon: Bell },
@@ -62,6 +61,8 @@ const adminNav: NavItem[] = [
   { label: "Semester Promotion", path: "/dashboard/admin/semester-promotion", icon: ArrowUpCircle },
   { label: "Academic Years", path: "/dashboard/admin/academic-years", icon: Calendar },
   { label: "Courses", path: "/dashboard/admin/courses", icon: BookOpen },
+  { label: "Departments", path: "/dashboard/admin/departments", icon: Monitor },
+  { label: "Available Seats", path: "/dashboard/admin/seats", icon: Armchair },
   { label: "Absent Report", path: "/dashboard/admin/absent-report", icon: Clock },
   { label: "Attendance Overview", path: "/dashboard/admin/attendance-overview", icon: UserCheck },
   { label: "Applications", path: "/dashboard/admin/applications", icon: FileText },
@@ -98,7 +99,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const handleLogout = async () => { await signOut(); navigate("/"); };
 
-  // Find current page title
   const currentPage = navItems.find(item => location.pathname === item.path)?.label || roleLabel + " Dashboard";
 
   return (
@@ -106,7 +106,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <ScrollToTop />
       <PageLoader />
 
-      {/* Mobile overlay */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-foreground/20 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-200"
@@ -114,9 +113,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         />
       )}
 
-      {/* Sidebar — Apple dark style */}
       <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-[240px] bg-[hsl(220,20%,10%)] dark:bg-[hsl(0,0%,7%)] text-white/90 transform transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col`}>
-        {/* Brand */}
         <div className="px-5 pt-5 pb-4 shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
@@ -134,7 +131,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-3 pb-3 space-y-0.5">
           {navItems.map((item) => {
             const active = location.pathname === item.path;
@@ -156,7 +152,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           })}
         </nav>
 
-        {/* User + Logout */}
         <div className="px-3 py-4 border-t border-white/8 shrink-0">
           <div className="flex items-center gap-2.5 px-3 mb-3">
             <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center shrink-0">
@@ -176,9 +171,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
 
-      {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top header — clean minimal */}
         <header className="bg-card/80 dark:bg-card/60 backdrop-blur-lg border-b border-border/60 px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between sticky top-0 z-30">
           <div className="flex items-center gap-3">
             <button
@@ -211,7 +204,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </span>
             )}
             <NotificationCenter />
-            
             <DarkModeToggle />
             <Link
               to="/"
@@ -223,7 +215,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </header>
 
-        {/* Push notification banner for students */}
         {isSupported && !isSubscribed && !pushBannerDismissed && role === 'student' && (
           <div className="mx-4 sm:mx-6 lg:mx-8 mt-4 flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/20 animate-fade-in">
             <BellRing className="w-5 h-5 text-primary shrink-0" />
@@ -241,7 +232,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         )}
 
-        {/* Page content */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
           <div className="max-w-7xl mx-auto animate-fade-in">{children}</div>
         </main>

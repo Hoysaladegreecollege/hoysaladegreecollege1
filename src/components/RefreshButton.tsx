@@ -10,8 +10,15 @@ export default function RefreshButton() {
   const handleRefresh = async () => {
     setSpinning(true);
     try {
+      // Clear all query cache and force refetch
+      qc.clear();
       await qc.refetchQueries({ type: 'active' });
-      toast.success("Data refreshed!");
+      // Clear browser caches
+      if ("caches" in window) {
+        const names = await caches.keys();
+        await Promise.all(names.map(name => caches.delete(name)));
+      }
+      toast.success("Data refreshed with latest information!");
     } catch {
       toast.error("Failed to refresh some data");
     } finally {
