@@ -26,20 +26,45 @@ export function usePushNotifications() {
   const [isLoading, setIsLoading] = useState(false);
   const [swRegistration, setSwRegistration] = useState<ServiceWorkerRegistration | null>(null);
 
-  // Register service worker
+  // Register service worker and check existing subscription
   useEffect(() => {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').then((reg) => {
         setSwRegistration(reg);
-        // Check if already subscribed
-      (reg as any).pushManager.getSubscription().then((sub: any) => {
-          setIsSubscribed(!!sub);
+        // Check if already subscribed via pushManager
+        (reg as any).pushManager.getSubscription().then((sub: any) => {
+          if (sub) {
+            setIsSubscribed(true);
+            // Also verify the subscription exists in the database for this user
+            if (user) {
+              supabase.from('push_subscriptions')
+                .select('id')
+                .eq('user_id', user.id)
+                .eq('endpoint', sub.endpoint)
+                .then(({ data }) => {
+                  if (!data || data.length === 0) {
+                    // Re-save subscription to DB (it was lost)
+                    const subJson = sub.toJSON();
+                    supabase.from('push_subscriptions').insert({
+                      user_id: user.id,
+                      endpoint: subJson.endpoint as string,
+                      p256dh: subJson.keys?.p256dh || '',
+                      auth: subJson.keys?.auth || '',
+                    }).then(() => {
+                      console.log('Push subscription re-saved to DB');
+                    });
+                  }
+                });
+            }
+          } else {
+            setIsSubscribed(false);
+          }
         });
       }).catch((err: any) => {
         console.error('SW registration failed:', err);
       });
     }
-  }, []);
+  }, [user]);
 
   const subscribe = useCallback(async () => {
     if (!user || !swRegistration || !VAPID_PUBLIC_KEY) return;

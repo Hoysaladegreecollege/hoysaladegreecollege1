@@ -53,7 +53,6 @@ export default function TeacherAnnouncements() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["teacher-announcements"] });
       toast.success("Announcement posted! Students will see it instantly.");
-      // Notify students
       notifyStudents({
         courseId: form.course_id || null,
         semester: form.semester !== "0" ? parseInt(form.semester) : null,
@@ -70,10 +69,12 @@ export default function TeacherAnnouncements() {
 
   const deleteAnn = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("announcements").update({ is_active: false }).eq("id", id);
+      // Actually delete the record instead of soft-delete
+      const { error } = await supabase.from("announcements").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["teacher-announcements"] }); toast.success("Removed"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["teacher-announcements"] }); toast.success("Announcement deleted"); },
+    onError: (e: any) => toast.error("Failed to delete: " + e.message),
   });
 
   const inputClass = "w-full border border-border rounded-xl px-3 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all";
@@ -153,7 +154,7 @@ export default function TeacherAnnouncements() {
                     <span className="text-[10px] font-body text-muted-foreground">{format(new Date(a.created_at), "MMM d, yyyy · h:mm a")}</span>
                   </div>
                 </div>
-                <button onClick={() => { if (confirm("Remove this announcement?")) deleteAnn.mutate(a.id); }}
+                <button onClick={() => { if (confirm("Delete this announcement permanently?")) deleteAnn.mutate(a.id); }}
                   className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive opacity-0 group-hover:opacity-100 transition-all shrink-0">
                   <Trash2 className="w-4 h-4" />
                 </button>
