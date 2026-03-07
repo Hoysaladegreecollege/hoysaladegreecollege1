@@ -1,6 +1,7 @@
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 // Simple in-memory rate limiter (per isolate)
@@ -23,7 +24,7 @@ const SYSTEM_PROMPT = `You are the official AI assistant for Hoysala Degree Coll
 
 **College Identity:**
 - Full Name: Hoysala Degree College
-- Established: 2017 under Shri Shirdi Sai Educational Trust(R)
+- Established: 2019 under Shri Shirdi Sai Educational Trust(R)
 - Affiliated to Bangalore University, Approved by AICTE New Delhi
 - College Code: BU 26 (P21GEF0099)
 - Location: K.R.P. Arcade, UCO Bank Building, Paramanna Layout, Nelamangala Town, Bengaluru Rural Dist. - 562 123
@@ -100,10 +101,13 @@ Deno.serve(async (req) => {
     // Rate limiting by IP
     const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
     if (isRateLimited(clientIp)) {
-      return new Response(JSON.stringify({ reply: "You're sending too many messages. Please wait a moment and try again. 🙏" }), {
-        status: 429,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({ reply: "You're sending too many messages. Please wait a moment and try again. 🙏" }),
+        {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
     }
 
     const { message, history } = await req.json();
@@ -117,7 +121,7 @@ Deno.serve(async (req) => {
 
     // Build messages array with conversation history
     const messages: any[] = [{ role: "system", content: SYSTEM_PROMPT }];
-    
+
     if (history && Array.isArray(history)) {
       for (const h of history.slice(-6)) {
         if (h.text && typeof h.text === "string") {
@@ -143,16 +147,23 @@ Deno.serve(async (req) => {
     }
 
     const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content || "I'm sorry, I couldn't process that. Please try again or call 7676272167.";
+    const reply =
+      data.choices?.[0]?.message?.content || "I'm sorry, I couldn't process that. Please try again or call 7676272167.";
 
     return new Response(JSON.stringify({ reply }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error: any) {
     console.error("Chat error:", error.message);
-    return new Response(JSON.stringify({ reply: "I'm having trouble connecting right now. Please try again or call us at 7676272167 for immediate assistance! 📞" }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({
+        reply:
+          "I'm having trouble connecting right now. Please try again or call us at 7676272167 for immediate assistance! 📞",
+      }),
+      {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
   }
 });

@@ -1,16 +1,5 @@
 import { Link } from "react-router-dom";
-import {
-  MapPin,
-  Phone,
-  Mail,
-  Facebook,
-  Twitter,
-  Instagram,
-  Youtube,
-  ArrowUpRight,
-  Heart,
-  ArrowUp,
-} from "lucide-react";
+import { MapPin, Phone, Mail, Facebook, Twitter, Instagram, Youtube, ArrowUpRight, Heart, ArrowUp } from "lucide-react";
 import collegeLogo from "@/assets/college-logo.png";
 import { useState, useEffect } from "react";
 
@@ -47,7 +36,7 @@ export default function Footer() {
               </div>
               <div>
                 <span className="font-display text-base sm:text-lg font-bold block">Hoysala Degree College</span>
-                <span className="text-[9px] text-secondary/80 font-body">Est. 2017</span>
+                <span className="text-[9px] text-secondary/80 font-body">Est. 2019</span>
               </div>
             </div>
             <p className="text-xs font-body opacity-60 leading-relaxed mb-1">
@@ -176,7 +165,9 @@ export default function Footer() {
           <span className="flex items-center gap-1">
             Made with <Heart className="w-3 h-3 text-secondary fill-secondary" /> ಶ್ರೀಶಿರಡಿ ಸಾಯಿ ಎಜುಕೇಷನಲ್ ಟ್ರಸ್ಟ್ (ರಿ.)
           </span>
-          <Link to="/credits" className="hover:text-secondary transition-colors">Website Credits</Link>
+          <Link to="/credits" className="hover:text-secondary transition-colors">
+            Website Credits
+          </Link>
         </div>
       </div>
 
@@ -188,12 +179,27 @@ export default function Footer() {
       >
         {/* Scroll progress ring */}
         <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 56 56">
-          <circle cx="28" cy="28" r="26" fill="none" stroke="hsl(var(--border))" strokeWidth="2.5" className="opacity-25" />
-          <circle cx="28" cy="28" r="26" fill="none" stroke="hsl(var(--gold))" strokeWidth="2.5"
+          <circle
+            cx="28"
+            cy="28"
+            r="26"
+            fill="none"
+            stroke="hsl(var(--border))"
+            strokeWidth="2.5"
+            className="opacity-25"
+          />
+          <circle
+            cx="28"
+            cy="28"
+            r="26"
+            fill="none"
+            stroke="hsl(var(--gold))"
+            strokeWidth="2.5"
             strokeDasharray={`${2 * Math.PI * 26}`}
             strokeDashoffset={`${2 * Math.PI * 26 * (1 - scrollProgress)}`}
             strokeLinecap="round"
-            className="transition-all duration-150 drop-shadow-[0_0_4px_hsl(var(--gold)/0.4)]" />
+            className="transition-all duration-150 drop-shadow-[0_0_4px_hsl(var(--gold)/0.4)]"
+          />
         </svg>
         {/* Button bg */}
         <span className="absolute inset-[4px] rounded-full bg-card border border-border/40 group-hover/top:border-[hsl(var(--gold))]/40 group-hover/top:shadow-[0_0_20px_hsl(var(--gold)/0.2)] transition-all duration-300" />
