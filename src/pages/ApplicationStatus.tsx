@@ -7,6 +7,13 @@ import { FileText, CheckCircle, XCircle, Clock, Search, Download, ArrowLeft, Spa
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 
+async function getPhotoUrl(photoPath: string | null): Promise<string | null> {
+  if (!photoPath) return null;
+  if (photoPath.startsWith("http")) return photoPath;
+  const { data } = await supabase.storage.from("admission-photos").createSignedUrl(photoPath, 3600);
+  return data?.signedUrl || null;
+}
+
 export default function ApplicationStatus() {
   const [searchParams] = useSearchParams();
   const initialApp = searchParams.get("app") || "";
