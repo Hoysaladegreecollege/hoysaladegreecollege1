@@ -39,7 +39,12 @@ export default function ApplicationStatus() {
     queryKey: ["track-application", appNumber, email],
     queryFn: async () => {
       const { data } = await supabase.rpc("get_application_status", { _app_number: appNumber, _email: email });
-      return data?.[0] || null;
+      const app = data?.[0] || null;
+      if (app?.photo_url) {
+        const signedUrl = await getPhotoUrl(app.photo_url);
+        if (signedUrl) app.photo_url = signedUrl;
+      }
+      return app;
     },
     enabled: searched && !!appNumber && !!email,
   });
