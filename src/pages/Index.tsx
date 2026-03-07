@@ -86,11 +86,11 @@ function useAnimatedCounter(target: number, duration = 2000) {
 }
 
 const statColors = [
-  { bg: "from-blue-500/20 to-cyan-500/10", border: "border-blue-400/20", text: "text-blue-400", glow: "group-hover:shadow-blue-500/20" },
-  { bg: "from-emerald-500/20 to-green-500/10", border: "border-emerald-400/20", text: "text-emerald-400", glow: "group-hover:shadow-emerald-500/20" },
-  { bg: "from-amber-500/20 to-yellow-500/10", border: "border-amber-400/20", text: "text-amber-400", glow: "group-hover:shadow-amber-500/20" },
-  { bg: "from-purple-500/20 to-violet-500/10", border: "border-purple-400/20", text: "text-purple-400", glow: "group-hover:shadow-purple-500/20" },
-];
+{ bg: "from-blue-500/20 to-cyan-500/10", border: "border-blue-400/20", text: "text-blue-400", glow: "group-hover:shadow-blue-500/20" },
+{ bg: "from-emerald-500/20 to-green-500/10", border: "border-emerald-400/20", text: "text-emerald-400", glow: "group-hover:shadow-emerald-500/20" },
+{ bg: "from-amber-500/20 to-yellow-500/10", border: "border-amber-400/20", text: "text-amber-400", glow: "group-hover:shadow-amber-500/20" },
+{ bg: "from-purple-500/20 to-violet-500/10", border: "border-purple-400/20", text: "text-purple-400", glow: "group-hover:shadow-purple-500/20" }];
+
 
 function AnimatedStat({ value, label, icon: Icon, suffix = "", index = 0 }: {value: number;label: string;icon: any;suffix?: string;index?: number;}) {
   const { count, ref } = useAnimatedCounter(value);
@@ -213,7 +213,7 @@ export default function Index() {
           <div className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full border border-primary-foreground/20 mb-6 sm:mb-6 animate-fade-in backdrop-blur-md badge-float"
           style={{ background: "rgba(255,255,255,0.08)" }}>
             <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-secondary animate-sparkle" />
-            <span className="font-body text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] uppercase text-secondary font-bold">Excellence Since 2017</span>
+            <span className="font-body text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] uppercase text-secondary font-bold">Excellence Since 2019</span>
             <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-secondary animate-sparkle animation-delay-300" />
           </div>
 
@@ -354,7 +354,7 @@ export default function Index() {
             {highlights.map((h, i) =>
             <ScrollReveal key={h.label} delay={i * 40}>
                 <div className="relative p-4 sm:p-6 cursor-default group overflow-hidden h-full border border-border/40 rounded-2xl bg-card active:scale-[0.97] touch-manipulation"
-                  style={{ transition: "all 0.6s cubic-bezier(0.16,1,0.3,1)", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+              style={{ transition: "all 0.6s cubic-bezier(0.16,1,0.3,1)", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
                   
                   {/* Top gold accent line */}
                   <div className="absolute top-0 left-6 right-6 h-[0.5px] opacity-0 group-hover:opacity-100 transition-all duration-500" style={{ background: "linear-gradient(90deg, transparent, hsl(42 87% 55% / 0.35), transparent)" }} />
@@ -367,7 +367,7 @@ export default function Index() {
 
                   <div className="relative flex flex-col items-center text-center gap-2.5 sm:gap-3 z-10">
                     <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110 group-hover:-rotate-3 border border-border/30 group-hover:border-secondary/30"
-                      style={{ background: "linear-gradient(135deg, hsla(var(--primary),0.08), hsla(var(--secondary),0.08))" }}>
+                  style={{ background: "linear-gradient(135deg, hsla(var(--primary),0.08), hsla(var(--secondary),0.08))" }}>
                       <h.icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary group-hover:text-secondary transition-colors duration-400" />
                     </div>
                     <div>
@@ -394,7 +394,7 @@ export default function Index() {
             <ScrollReveal key={img.title} delay={i * 60}>
                 <div
                 className="relative group cursor-pointer overflow-hidden rounded-xl sm:rounded-2xl border border-border aspect-[4/3] hover:shadow-2xl active:scale-[0.97] transition-all duration-500 touch-manipulation"
-                onClick={() => { setLightboxIdx(i); window.scrollTo({ top: 0, behavior: "smooth" }); document.body.style.overflow = "hidden"; document.documentElement.style.overflow = "hidden"; }}>
+                onClick={() => {setLightboxIdx(i);window.scrollTo({ top: 0, behavior: "smooth" });document.body.style.overflow = "hidden";document.documentElement.style.overflow = "hidden";}}>
 
                   <img src={img.src} alt={img.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" />
                   <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -419,40 +419,40 @@ export default function Index() {
 
       {/* Full-screen Lightbox */}
       {lightboxIdx !== null && createPortal(
-      <div className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-md animate-fade-in flex items-center justify-center"
-        onClick={() => { setLightboxIdx(null); document.body.style.removeProperty("overflow"); document.documentElement.style.removeProperty("overflow"); }}
+        <div className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-md animate-fade-in flex items-center justify-center"
+        onClick={() => {setLightboxIdx(null);document.body.style.removeProperty("overflow");document.documentElement.style.removeProperty("overflow");}}
         role="dialog" aria-modal="true" aria-label="Image lightbox"
         onKeyDown={(e) => {
-          if (e.key === "Escape") { setLightboxIdx(null); document.body.style.removeProperty("overflow"); document.documentElement.style.removeProperty("overflow"); }
+          if (e.key === "Escape") {setLightboxIdx(null);document.body.style.removeProperty("overflow");document.documentElement.style.removeProperty("overflow");}
           if (e.key === "ArrowRight") setLightboxIdx((lightboxIdx + 1) % galleryImages.length);
           if (e.key === "ArrowLeft") setLightboxIdx((lightboxIdx - 1 + galleryImages.length) % galleryImages.length);
         }}
         tabIndex={0}
-        ref={el => el?.focus()}>
-          <div className="relative w-[90vw] max-w-3xl" onClick={e => e.stopPropagation()}
-            onTouchStart={e => { (e.currentTarget as any)._touchX = e.touches[0].clientX; }}
-            onTouchEnd={e => {
-              const startX = (e.currentTarget as any)._touchX;
-              if (startX == null) return;
-              const diff = e.changedTouches[0].clientX - startX;
-              if (Math.abs(diff) > 50) {
-                diff > 0 ? setLightboxIdx((lightboxIdx - 1 + galleryImages.length) % galleryImages.length) : setLightboxIdx((lightboxIdx + 1) % galleryImages.length);
-              }
-            }}>
+        ref={(el) => el?.focus()}>
+          <div className="relative w-[90vw] max-w-3xl" onClick={(e) => e.stopPropagation()}
+          onTouchStart={(e) => {(e.currentTarget as any)._touchX = e.touches[0].clientX;}}
+          onTouchEnd={(e) => {
+            const startX = (e.currentTarget as any)._touchX;
+            if (startX == null) return;
+            const diff = e.changedTouches[0].clientX - startX;
+            if (Math.abs(diff) > 50) {
+              diff > 0 ? setLightboxIdx((lightboxIdx - 1 + galleryImages.length) % galleryImages.length) : setLightboxIdx((lightboxIdx + 1) % galleryImages.length);
+            }
+          }}>
             {/* Close button */}
             <button className="absolute -top-2 -right-2 sm:top-0 sm:right-0 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 z-20 shadow-lg border border-white/10"
-              onClick={(e) => { e.stopPropagation(); setLightboxIdx(null); document.body.style.removeProperty("overflow"); document.documentElement.style.removeProperty("overflow"); }}
-              aria-label="Close lightbox"><X className="w-5 h-5" /></button>
+            onClick={(e) => {e.stopPropagation();setLightboxIdx(null);document.body.style.removeProperty("overflow");document.documentElement.style.removeProperty("overflow");}}
+            aria-label="Close lightbox"><X className="w-5 h-5" /></button>
             {/* Nav arrows */}
             <button className="absolute left-0 sm:-left-14 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 z-10 shadow-lg border border-white/10"
-              onClick={(e) => { e.stopPropagation(); setLightboxIdx((lightboxIdx - 1 + galleryImages.length) % galleryImages.length); }}
-              aria-label="Previous image"><ChevronLeft className="w-5 h-5" /></button>
+            onClick={(e) => {e.stopPropagation();setLightboxIdx((lightboxIdx - 1 + galleryImages.length) % galleryImages.length);}}
+            aria-label="Previous image"><ChevronLeft className="w-5 h-5" /></button>
             <button className="absolute right-0 sm:-right-14 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 z-10 shadow-lg border border-white/10"
-              onClick={(e) => { e.stopPropagation(); setLightboxIdx((lightboxIdx + 1) % galleryImages.length); }}
-              aria-label="Next image"><ChevronRight className="w-5 h-5" /></button>
+            onClick={(e) => {e.stopPropagation();setLightboxIdx((lightboxIdx + 1) % galleryImages.length);}}
+            aria-label="Next image"><ChevronRight className="w-5 h-5" /></button>
             {/* Image */}
             <img src={galleryImages[lightboxIdx].src} alt={galleryImages[lightboxIdx].title}
-              className="w-full max-h-[65dvh] sm:max-h-[75vh] object-contain rounded-2xl shadow-2xl animate-scale-bounce" key={lightboxIdx} />
+            className="w-full max-h-[65dvh] sm:max-h-[75vh] object-contain rounded-2xl shadow-2xl animate-scale-bounce" key={lightboxIdx} />
             {/* Caption */}
             <div className="mt-4 text-center bg-black/40 backdrop-blur-sm px-6 py-3 rounded-xl border border-white/10">
               <p className="font-display text-base sm:text-lg font-bold text-white">{galleryImages[lightboxIdx].title}</p>
@@ -571,11 +571,11 @@ export default function Index() {
           <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto">
             {currentTestimonials.map((t, i) =>
             <div key={t.name} className="relative p-5 sm:p-8 group animate-fade-in-up overflow-hidden rounded-2xl border border-border/40 bg-card"
-              style={{ 
-                animationDelay: `${i * 150}ms`,
-                transition: "all 0.6s cubic-bezier(0.16,1,0.3,1)",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
-              }}>
+            style={{
+              animationDelay: `${i * 150}ms`,
+              transition: "all 0.6s cubic-bezier(0.16,1,0.3,1)",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.04)"
+            }}>
                 {/* Top gold accent */}
                 <div className="absolute top-0 left-6 right-6 h-[0.5px] opacity-0 group-hover:opacity-100 transition-all duration-500" style={{ background: "linear-gradient(90deg, transparent, hsl(42 87% 55% / 0.35), transparent)" }} />
                 
@@ -600,7 +600,7 @@ export default function Index() {
                   <p className="font-body text-[13px] sm:text-sm text-muted-foreground leading-[1.8] italic mb-4 sm:mb-5">"{t.text}"</p>
                   <div className="flex items-center gap-2.5 sm:gap-3 pt-3 sm:pt-4 border-t border-border/30">
                     <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border border-border/40 group-hover:border-secondary/30 transition-all duration-500 group-hover:scale-105"
-                      style={{ background: "linear-gradient(135deg, hsla(var(--primary),0.12), hsla(42,87%,55%,0.12))" }}>
+                  style={{ background: "linear-gradient(135deg, hsla(var(--primary),0.12), hsla(42,87%,55%,0.12))" }}>
                       <span className="font-display text-xs sm:text-sm font-bold text-primary group-hover:text-secondary transition-colors duration-400">{t.name[0]}</span>
                     </div>
                     <div>
@@ -618,9 +618,9 @@ export default function Index() {
             {Array.from({ length: totalSlides }).map((_, i) =>
             <button key={i} onClick={() => setTestimonialIndex(i)}
             className={`rounded-full transition-all duration-500 touch-manipulation ${i === testimonialIndex ? "w-7 sm:w-8 h-2.5" : "w-2.5 h-2.5 hover:scale-125"}`}
-            style={i === testimonialIndex 
-              ? { background: "linear-gradient(90deg, hsl(42 87% 55%), hsl(42 70% 45%))", boxShadow: "0 0 8px hsla(42,87%,55%,0.3)" }
-              : { background: "hsl(var(--muted))" }
+            style={i === testimonialIndex ?
+            { background: "linear-gradient(90deg, hsl(42 87% 55%), hsl(42 70% 45%))", boxShadow: "0 0 8px hsla(42,87%,55%,0.3)" } :
+            { background: "hsl(var(--muted))" }
             } />
             )}
           </div>
