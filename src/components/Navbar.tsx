@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronDown, Phone, Mail, Sparkles, FileText, TrendingUp, Building, Users, BookOpen, GraduationCap, Monitor } from "lucide-react";
 import collegeLogo from "@/assets/college-logo.png";
+import saiBabaImg from "@/assets/sai-baba.png";
 import DarkModeToggle from "./DarkModeToggle";
 
 const aboutDropdown = [
