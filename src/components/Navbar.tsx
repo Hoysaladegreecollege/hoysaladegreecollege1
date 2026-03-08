@@ -11,6 +11,7 @@ const aboutDropdown = [
   { label: "Placements", path: "/placements", icon: TrendingUp, desc: "Career support & stats" },
   { label: "Campus", path: "/campus", icon: Building, desc: "Virtual campus tour" },
   { label: "Alumni Network", path: "/alumni", icon: Users, desc: "Success stories" },
+  { label: "Clubs & Societies", path: "/clubs", icon: Sparkles, desc: "Student life" },
 ];
 
 const facultyDropdown = [
