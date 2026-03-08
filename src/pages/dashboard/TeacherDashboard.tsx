@@ -221,6 +221,7 @@ export default function TeacherDashboard() {
     { icon: Calendar, label: "Timetable", desc: "View schedules", path: "/dashboard/teacher/timetable", color: "bg-rose-500/10", iconColor: "text-rose-500" },
     { icon: Bell, label: "Absent Notes", desc: "Student absences", path: "/dashboard/teacher/absent", color: "bg-orange-500/10", iconColor: "text-orange-500" },
     { icon: Megaphone, label: "Announcements", desc: "Post messages", path: "/dashboard/teacher/announcements", color: "bg-indigo-500/10", iconColor: "text-indigo-500" },
+    { icon: MessageCircle, label: "Messages", desc: "Student inbox", path: "/dashboard/teacher/messages", color: "bg-teal-500/10", iconColor: "text-teal-500" },
   ];
 
   const hour = new Date().getHours();
