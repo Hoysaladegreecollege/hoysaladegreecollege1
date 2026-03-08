@@ -1,5 +1,14 @@
-import ScrollReveal from "@/components/ScrollReveal";
 import { Terminal, Sparkles } from "lucide-react";
+import { motion } from "framer-motion";
+
+const heroChild = {
+  hidden: { opacity: 0, y: 24 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: 0.2 + i * 0.12, duration: 0.6, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
+  }),
+};
 
 export function CreditsHero() {
   return (
@@ -34,34 +43,44 @@ export function CreditsHero() {
         ))}
       </div>
 
-      <div className="container relative px-5 text-center">
-        <ScrollReveal>
+      <motion.div
+        className="container relative px-5 text-center"
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div custom={0} variants={heroChild}>
           <div className="group/pill inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/5 border border-secondary/10 text-secondary text-xs font-body font-medium mb-6 backdrop-blur-sm cursor-default hover:bg-secondary/10 hover:border-secondary/25 hover:shadow-[0_0_20px_hsl(var(--secondary)/0.1)] transition-all duration-500">
             <Terminal className="w-3.5 h-3.5 group-hover/pill:rotate-12 transition-transform duration-500" />
             <span className="group-hover/pill:tracking-wider transition-all duration-500">Crafted with passion & precision</span>
           </div>
-        </ScrollReveal>
-        <ScrollReveal delay={100}>
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight leading-[1.1]">
-            Website <span className="text-secondary relative">
-              Credits
-              <span className="absolute -bottom-2 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-secondary/60 to-transparent animate-[shimmerLine_3s_ease-in-out_infinite]" />
-            </span>
-          </h1>
-        </ScrollReveal>
-        <ScrollReveal delay={200}>
-          <p className="mt-5 text-muted-foreground font-body text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
-            Acknowledging the talent, dedication, and modern craft behind this digital experience.
-          </p>
-        </ScrollReveal>
-        <ScrollReveal delay={250}>
-          <div className="flex items-center justify-center gap-2 mt-6">
-            <div className="w-12 h-[1px] bg-gradient-to-r from-transparent to-secondary/40" />
-            <Sparkles className="w-4 h-4 text-secondary/60 animate-[creditsSpin_6s_linear_infinite]" />
-            <div className="w-12 h-[1px] bg-gradient-to-l from-transparent to-secondary/40" />
-          </div>
-        </ScrollReveal>
-      </div>
+        </motion.div>
+
+        <motion.h1
+          custom={1}
+          variants={heroChild}
+          className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight leading-[1.1]"
+        >
+          Website{" "}
+          <span className="text-secondary relative">
+            Credits
+            <span className="absolute -bottom-2 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-secondary/60 to-transparent animate-[shimmerLine_3s_ease-in-out_infinite]" />
+          </span>
+        </motion.h1>
+
+        <motion.p
+          custom={2}
+          variants={heroChild}
+          className="mt-5 text-muted-foreground font-body text-base sm:text-lg max-w-xl mx-auto leading-relaxed"
+        >
+          Acknowledging the talent, dedication, and modern craft behind this digital experience.
+        </motion.p>
+
+        <motion.div custom={3} variants={heroChild} className="flex items-center justify-center gap-2 mt-6">
+          <div className="w-12 h-[1px] bg-gradient-to-r from-transparent to-secondary/40" />
+          <Sparkles className="w-4 h-4 text-secondary/60 animate-[creditsSpin_6s_linear_infinite]" />
+          <div className="w-12 h-[1px] bg-gradient-to-l from-transparent to-secondary/40" />
+        </motion.div>
+      </motion.div>
     </section>
   );
 }
