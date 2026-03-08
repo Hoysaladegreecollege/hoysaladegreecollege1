@@ -435,8 +435,22 @@ export default function AdminDashboard() {
         {stats.map((s) => <StatCard key={s.label} {...s} />)}
       </div>
 
-      {/* KPI Strip */}
-      <div className="grid grid-cols-3 gap-3">
+      {/* Institution Health Score + KPI Strip */}
+      <div className="grid grid-cols-4 gap-3">
+        {/* Health Score */}
+        <div className="bg-card border border-border/60 rounded-2xl p-4 hover:shadow-lg transition-all duration-300 group">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-8 h-8 rounded-lg bg-pink-500/10 flex items-center justify-center">
+              <Heart className="w-4 h-4 text-pink-500" />
+            </div>
+          </div>
+          <p className={`font-body text-2xl font-bold tabular-nums ${healthScore >= 80 ? "text-emerald-500" : healthScore >= 50 ? "text-amber-500" : "text-red-500"}`}>{healthScore}%</p>
+          <p className="font-body text-[11px] text-muted-foreground mt-0.5">Health Score</p>
+          <div className="h-1.5 bg-muted rounded-full overflow-hidden mt-2">
+            <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${healthScore}%`, background: healthScore >= 80 ? "hsl(145, 65%, 42%)" : healthScore >= 50 ? "hsl(42, 70%, 52%)" : "hsl(0, 70%, 58%)" }} />
+          </div>
+        </div>
+
         <Link to="/dashboard/admin/applications" className="bg-card border border-border/60 rounded-2xl p-4 hover:border-primary/30 hover:shadow-md transition-all duration-300 group">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center">
@@ -444,7 +458,7 @@ export default function AdminDashboard() {
             </div>
           </div>
           <p className="font-body text-2xl font-bold text-foreground tabular-nums">{counts?.pendingApps || 0}</p>
-          <p className="font-body text-[11px] text-muted-foreground mt-0.5">Pending Applications</p>
+          <p className="font-body text-[11px] text-muted-foreground mt-0.5">Pending Apps</p>
         </Link>
         <Link to="/dashboard/admin/contacts" className="bg-card border border-border/60 rounded-2xl p-4 hover:border-primary/30 hover:shadow-md transition-all duration-300 group">
           <div className="flex items-center gap-2 mb-2">
