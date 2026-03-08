@@ -170,31 +170,36 @@ export default function StudentAttendance() {
       )}
 
       {/* Recent Records */}
-      <div className="bg-card border border-border rounded-2xl p-5">
-        <h3 className="font-display text-base font-bold text-foreground mb-4 flex items-center gap-2">
+      <div className="relative overflow-hidden bg-card border border-border/40 rounded-3xl p-6">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent" />
+        <h3 className="font-display text-base font-bold text-foreground mb-5 flex items-center gap-2">
           <Calendar className="w-4 h-4 text-primary" /> Recent Records
         </h3>
         {isLoading ? (
-          <div className="space-y-2">{[1,2,3].map(i => <Skeleton key={i} className="h-12 rounded-xl" />)}</div>
+          <div className="space-y-2">{[1,2,3].map(i => <div key={i} className="h-14 rounded-2xl bg-muted/30 animate-pulse border border-border/10" />)}</div>
         ) : attendance.length === 0 ? (
-          <div className="text-center py-8">
-            <Clock className="w-10 h-10 text-muted-foreground/20 mx-auto mb-2" />
+          <div className="text-center py-10">
+            <div className="w-14 h-14 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-3">
+              <Clock className="w-7 h-7 text-muted-foreground/30" />
+            </div>
             <p className="font-body text-sm text-muted-foreground">No attendance records yet.</p>
           </div>
         ) : (
           <div className="space-y-2">
-            {attendance.slice(0, 25).map((a) => (
-              <div key={a.id} className={`flex items-center justify-between p-3 rounded-xl border transition-all duration-200 ${a.status === "present" ? "bg-primary/4 border-primary/15" : "bg-destructive/4 border-destructive/15"}`}>
+            {attendance.slice(0, 25).map((a, i) => (
+              <div key={a.id} className={`flex items-center justify-between p-3.5 rounded-2xl border transition-all duration-300 hover:-translate-y-0.5 ${a.status === "present" ? "bg-primary/[0.03] border-primary/15 hover:border-primary/25" : "bg-destructive/[0.03] border-destructive/15 hover:border-destructive/25"}`} style={{ animationDelay: `${i * 30}ms` }}>
                 <div className="flex items-center gap-3">
-                  {a.status === "present"
-                    ? <CheckCircle className="w-4 h-4 text-primary shrink-0" />
-                    : <XCircle className="w-4 h-4 text-destructive shrink-0" />}
+                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${a.status === "present" ? "bg-primary/10" : "bg-destructive/10"}`}>
+                    {a.status === "present"
+                      ? <CheckCircle className="w-4 h-4 text-primary" />
+                      : <XCircle className="w-4 h-4 text-destructive" />}
+                  </div>
                   <div>
-                    <p className="font-body text-sm font-medium text-foreground">{a.subject}</p>
-                    <p className="font-body text-xs text-muted-foreground">{a.date}</p>
+                    <p className="font-body text-sm font-semibold text-foreground">{a.subject}</p>
+                    <p className="font-body text-[10px] text-muted-foreground">{a.date}</p>
                   </div>
                 </div>
-                <span className={`font-body text-xs font-bold px-2.5 py-1 rounded-full ${a.status === "present" ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive"}`}>
+                <span className={`font-body text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${a.status === "present" ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive"}`}>
                   {a.status}
                 </span>
               </div>
