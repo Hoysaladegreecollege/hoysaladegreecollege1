@@ -25,6 +25,9 @@ export default function AdminFeeManagement() {
   const [pinInput, setPinInput] = useState("");
   const [pinError, setPinError] = useState("");
   const [pinChecking, setPinChecking] = useState(false);
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [lockoutUntil, setLockoutUntil] = useState<number | null>(null);
+  const [lockoutRemaining, setLockoutRemaining] = useState(0);
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [paymentForm, setPaymentForm] = useState({ amount: "", payment_method: "Cash", remarks: "", upi_number: "", semester: "" });
   const [courseFilter, setCourseFilter] = useState("all");
@@ -194,14 +197,41 @@ export default function AdminFeeManagement() {
     onError: () => toast.error("Failed to update fee details"),
   });
 
+  // Lockout countdown timer
+  useEffect(() => {
+    if (!lockoutUntil) return;
+    const interval = setInterval(() => {
+      const remaining = Math.max(0, Math.ceil((lockoutUntil - Date.now()) / 1000));
+      setLockoutRemaining(remaining);
+      if (remaining <= 0) {
+        setLockoutUntil(null);
+        setLockoutRemaining(0);
+        setPinError("");
+      }
+    }, 200);
+    return () => clearInterval(interval);
+  }, [lockoutUntil]);
+
   const handlePinSubmit = () => {
+    if (lockoutUntil && Date.now() < lockoutUntil) return;
     setPinChecking(true);
     setPinError("");
     if (pinInput === pinData) {
       setPinUnlocked(true);
       setPinChecking(false);
+      setFailedAttempts(0);
     } else {
-      setPinError("Incorrect PIN. Please try again.");
+      const newAttempts = failedAttempts + 1;
+      setFailedAttempts(newAttempts);
+      if (newAttempts >= 3) {
+        const unlockTime = Date.now() + 30000;
+        setLockoutUntil(unlockTime);
+        setLockoutRemaining(30);
+        setPinError("Too many failed attempts. Locked for 30 seconds.");
+        setFailedAttempts(0);
+      } else {
+        setPinError(`Incorrect PIN. ${3 - newAttempts} attempt(s) remaining.`);
+      }
       setPinInput("");
       setPinChecking(false);
     }
@@ -277,9 +307,15 @@ export default function AdminFeeManagement() {
                 className="relative w-full text-center text-3xl tracking-[0.5em] font-mono rounded-2xl h-[72px] bg-muted/50 border border-border/80 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 focus:bg-muted/70 outline-none transition-all duration-300 placeholder:text-muted-foreground/30 placeholder:tracking-[0.3em] placeholder:text-xl"
               />
               {pinError && (
-                <div className="mt-3 flex items-center justify-center gap-2 text-destructive animate-fade-in">
+                <div className={`mt-3 flex items-center justify-center gap-2 animate-fade-in ${lockoutUntil ? "text-amber-500" : "text-destructive"}`}>
                   <AlertCircle className="w-3.5 h-3.5" />
                   <p className="font-body text-xs font-medium">{pinError}</p>
+                </div>
+              )}
+              {lockoutRemaining > 0 && (
+                <div className="mt-2 flex items-center justify-center gap-2 animate-fade-in">
+                  <div className="w-5 h-5 rounded-full border-2 border-amber-500/30 border-t-amber-500 animate-spin" />
+                  <p className="font-body text-xs text-amber-500 font-semibold tabular-nums">Retry in {lockoutRemaining}s</p>
                 </div>
               )}
             </div>
@@ -287,7 +323,7 @@ export default function AdminFeeManagement() {
             {/* Unlock Button */}
             <button
               onClick={handlePinSubmit}
-              disabled={pinInput.length !== 6 || pinChecking}
+              disabled={pinInput.length !== 6 || pinChecking || lockoutRemaining > 0}
               className="group relative w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-primary/90 text-primary-foreground font-body font-semibold text-sm disabled:opacity-40 overflow-hidden transition-all duration-300 hover:shadow-[0_8px_30px_hsl(var(--primary)/0.3)] active:scale-[0.98]"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
