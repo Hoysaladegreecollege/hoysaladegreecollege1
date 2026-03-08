@@ -1,5 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { Users, GraduationCap, BookOpen, Calendar, FileText, Settings, Mail, TrendingUp, Trophy, Shield, Image, BarChart3, PieChart, Megaphone, ArrowUpCircle, Download, UserX, CalendarDays, AlertTriangle, IndianRupee, UserPlus, Activity, Clock, Target, Bell, Cake, CreditCard, CheckCircle2, XCircle, UserCheck, FileCheck } from "lucide-react";
+import { Users, GraduationCap, BookOpen, Calendar, FileText, Settings, Mail, TrendingUp, Trophy, Shield, Image, BarChart3, PieChart, Megaphone, ArrowUpCircle, Download, UserX, CalendarDays, AlertTriangle, IndianRupee, UserPlus, Activity, Clock, Target, Bell, Cake, CreditCard, CheckCircle2, XCircle, UserCheck, FileCheck, Wallet, Star, Zap, Heart } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
@@ -213,7 +213,42 @@ export default function AdminDashboard() {
 
   const filteredSemFeeData = feeChartSem === "all" ? semFeeData : semFeeData.filter((d: any) => d.sem === Number(feeChartSem));
 
-  // Recent Activity Feed
+  // Recent fee transactions
+  const { data: recentTransactions = [] } = useQuery({
+    queryKey: ["admin-recent-fee-transactions"],
+    refetchInterval: 30000,
+    queryFn: async () => {
+      const { data: payments } = await supabase.from("fee_payments").select("id, amount, payment_date, payment_method, semester, student_id, created_at, receipt_number").order("created_at", { ascending: false }).limit(8);
+      if (!payments?.length) return [];
+      const studentIds = payments.map(p => p.student_id).filter(Boolean);
+      const { data: students } = await supabase.from("students").select("id, roll_number, user_id").in("id", studentIds);
+      const userIds = (students || []).map(s => s.user_id);
+      const { data: profiles } = await supabase.from("profiles").select("user_id, full_name").in("user_id", userIds);
+      return payments.map((p: any) => {
+        const stu = students?.find(s => s.id === p.student_id);
+        const prof = profiles?.find(pr => pr.user_id === stu?.user_id);
+        return { ...p, studentName: prof?.full_name || stu?.roll_number || "Unknown", rollNumber: stu?.roll_number || "" };
+      });
+    },
+  });
+
+  // Institution health score
+  const healthScore = (() => {
+    if (!counts || !attendanceStats) return 0;
+    let score = 0;
+    // Attendance component (40%)
+    score += Math.min(40, (attendanceStats.percentage / 100) * 40);
+    // Student enrollment (20%)
+    score += Math.min(20, counts.students > 0 ? 20 : 0);
+    // Course offering (15%)
+    score += Math.min(15, counts.courses > 0 ? 15 : 0);
+    // Pending applications handled (15%) - fewer pending = better
+    score += Math.min(15, counts.pendingApps === 0 ? 15 : Math.max(0, 15 - counts.pendingApps));
+    // Messages handled (10%)
+    score += Math.min(10, counts.newContacts === 0 ? 10 : Math.max(0, 10 - counts.newContacts));
+    return Math.round(score);
+  })();
+
   const { data: recentActivity = [] } = useQuery({
     queryKey: ["admin-recent-activity"],
     refetchInterval: 30000,
@@ -400,8 +435,22 @@ export default function AdminDashboard() {
         {stats.map((s) => <StatCard key={s.label} {...s} />)}
       </div>
 
-      {/* KPI Strip */}
-      <div className="grid grid-cols-3 gap-3">
+      {/* Institution Health Score + KPI Strip */}
+      <div className="grid grid-cols-4 gap-3">
+        {/* Health Score */}
+        <div className="bg-card border border-border/60 rounded-2xl p-4 hover:shadow-lg transition-all duration-300 group">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-8 h-8 rounded-lg bg-pink-500/10 flex items-center justify-center">
+              <Heart className="w-4 h-4 text-pink-500" />
+            </div>
+          </div>
+          <p className={`font-body text-2xl font-bold tabular-nums ${healthScore >= 80 ? "text-emerald-500" : healthScore >= 50 ? "text-amber-500" : "text-red-500"}`}>{healthScore}%</p>
+          <p className="font-body text-[11px] text-muted-foreground mt-0.5">Health Score</p>
+          <div className="h-1.5 bg-muted rounded-full overflow-hidden mt-2">
+            <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${healthScore}%`, background: healthScore >= 80 ? "hsl(145, 65%, 42%)" : healthScore >= 50 ? "hsl(42, 70%, 52%)" : "hsl(0, 70%, 58%)" }} />
+          </div>
+        </div>
+
         <Link to="/dashboard/admin/applications" className="bg-card border border-border/60 rounded-2xl p-4 hover:border-primary/30 hover:shadow-md transition-all duration-300 group">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center">
@@ -409,7 +458,7 @@ export default function AdminDashboard() {
             </div>
           </div>
           <p className="font-body text-2xl font-bold text-foreground tabular-nums">{counts?.pendingApps || 0}</p>
-          <p className="font-body text-[11px] text-muted-foreground mt-0.5">Pending Applications</p>
+          <p className="font-body text-[11px] text-muted-foreground mt-0.5">Pending Apps</p>
         </Link>
         <Link to="/dashboard/admin/contacts" className="bg-card border border-border/60 rounded-2xl p-4 hover:border-primary/30 hover:shadow-md transition-all duration-300 group">
           <div className="flex items-center gap-2 mb-2">
@@ -756,6 +805,45 @@ export default function AdminDashboard() {
               <p className="font-body text-[11px] text-muted-foreground/60 mt-1">Try selecting a different course or semester</p>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Recent Fee Transactions */}
+      {recentTransactions.length > 0 && (
+        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                <Wallet className="w-4 h-4 text-emerald-500" />
+              </div>
+              <h3 className="font-body text-[14px] font-semibold text-foreground">Recent Fee Transactions</h3>
+            </div>
+            <Link to="/dashboard/admin/fees" className="font-body text-[11px] text-primary flex items-center gap-0.5 hover:gap-1.5 transition-all duration-200">
+              View all <TrendingUp className="w-3 h-3" />
+            </Link>
+          </div>
+          <div className="space-y-1.5 max-h-[280px] overflow-y-auto">
+            {recentTransactions.map((t: any) => (
+              <div key={t.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors duration-200">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
+                    <IndianRupee className="w-4 h-4 text-emerald-500" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-body text-[12px] font-semibold text-foreground truncate">{t.studentName}</p>
+                    <p className="font-body text-[10px] text-muted-foreground">
+                      {t.rollNumber} · {t.payment_method || "Cash"}
+                      {t.semester && <span className="ml-1 px-1.5 py-0.5 rounded bg-primary/10 text-primary text-[9px]">Sem {t.semester}</span>}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right shrink-0 ml-3">
+                  <p className="font-body text-[13px] font-bold text-emerald-600 tabular-nums">₹{Number(t.amount).toLocaleString()}</p>
+                  <p className="font-body text-[9px] text-muted-foreground">{formatDistanceToNow(new Date(t.created_at), { addSuffix: true })}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

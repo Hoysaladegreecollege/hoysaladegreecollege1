@@ -2,7 +2,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   Users, Clock, BarChart3, Upload, Bell, Megaphone, Calendar, BookOpen, CheckCircle,
   TrendingUp, Activity, ListTodo, Plus, Trash2, Award,
-  ArrowRight, Eye, Phone, User, IndianRupee
+  ArrowRight, Eye, Phone, User, IndianRupee, Flame, Target, Zap, Star, FileText
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,6 +14,9 @@ import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell, Legend } from "recharts";
+
+const CHART_COLORS = ["hsl(215, 90%, 55%)", "hsl(145, 65%, 42%)", "hsl(42, 70%, 52%)", "hsl(280, 60%, 55%)", "hsl(0, 70%, 58%)", "hsl(180, 60%, 45%)"];
 
 function useAnimatedCounter(target: number, duration = 1200) {
   const [count, setCount] = useState(0);
@@ -67,7 +70,6 @@ function StatCard({ label, value, suffix = "", icon: Icon, color }: { label: str
   );
 }
 
-// Local storage for quick notes (no DB needed)
 function useTeacherNotes() {
   const [notes, setNotes] = useState<{ id: string; text: string; done: boolean; created: string }[]>(() => {
     try { return JSON.parse(localStorage.getItem("hdc_teacher_notes") || "[]"); } catch { return []; }
@@ -105,7 +107,7 @@ export default function TeacherDashboard() {
     },
   });
 
-  // Class summary: course-wise student counts, avg attendance, avg marks
+  // Class summary
   const { data: classSummary = [] } = useQuery({
     queryKey: ["teacher-class-summary"],
     refetchInterval: 30000,
@@ -129,14 +131,53 @@ export default function TeacherDashboard() {
     },
   });
 
+  // Weekly attendance trend for teacher
+  const { data: weeklyAttTrend = [] } = useQuery({
+    queryKey: ["teacher-weekly-att-trend"],
+    queryFn: async () => {
+      const last7 = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(); d.setDate(d.getDate() - (6 - i));
+        return d.toISOString().split("T")[0];
+      });
+      const { data: attendance } = await supabase.from("attendance").select("status, date").gte("date", last7[0]).lte("date", last7[6]);
+      return last7.map(date => {
+        const dayRecords = (attendance || []).filter(a => a.date === date);
+        const present = dayRecords.filter(a => a.status === "present").length;
+        return {
+          day: format(new Date(date), "EEE"),
+          present,
+          absent: dayRecords.length - present,
+          total: dayRecords.length,
+        };
+      });
+    },
+  });
+
+  // Recent notices for teacher
+  const { data: recentNotices = [] } = useQuery({
+    queryKey: ["teacher-recent-notices"],
+    queryFn: async () => {
+      const { data } = await supabase.from("notices").select("title, created_at, type").eq("is_active", true).order("created_at", { ascending: false }).limit(5);
+      return data || [];
+    },
+  });
+
+  // Upcoming events
+  const { data: upcomingEvents = [] } = useQuery({
+    queryKey: ["teacher-upcoming-events"],
+    queryFn: async () => {
+      const today = new Date().toISOString().split("T")[0];
+      const { data } = await supabase.from("events").select("id, title, event_date, category").eq("is_active", true).gte("event_date", today).order("event_date").limit(3);
+      return data || [];
+    },
+  });
+
   // Performance analytics: top performers
   const { data: perfData } = useQuery({
     queryKey: ["teacher-performance-analytics"],
     queryFn: async () => {
       const { data: marks } = await supabase.from("marks").select("student_id, obtained_marks, max_marks");
       if (!marks?.length) return null;
-
-      // Top 5 performers
       const studentScores: Record<string, { total: number; count: number }> = {};
       marks.forEach(m => {
         if (!studentScores[m.student_id]) studentScores[m.student_id] = { total: 0, count: 0 };
@@ -147,29 +188,18 @@ export default function TeacherDashboard() {
         .map(([id, { total, count }]) => ({ id, avg: Math.round(total / count) }))
         .sort((a, b) => b.avg - a.avg)
         .slice(0, 5);
-
       const { data: profiles } = await supabase.from("students").select("id, roll_number, user_id, phone, parent_phone, father_name, mother_name, semester, date_of_birth, address, course_id, courses(name)").in("id", topStudentIds.map(s => s.id));
       const { data: names } = await supabase.from("profiles").select("user_id, full_name, email").in("user_id", (profiles || []).map(p => p.user_id));
-
       const topPerformers = topStudentIds.map(t => {
         const stu = profiles?.find(p => p.id === t.id);
         const name = names?.find(n => n.user_id === stu?.user_id);
         return {
-          name: name?.full_name || "Unknown",
-          email: name?.email || "",
-          roll: stu?.roll_number || "",
-          avg: t.avg,
-          phone: stu?.phone || "",
-          parent_phone: stu?.parent_phone || "",
-          father_name: stu?.father_name || "",
-          mother_name: stu?.mother_name || "",
-          semester: stu?.semester,
-          date_of_birth: stu?.date_of_birth || "",
-          address: stu?.address || "",
-          course: (stu as any)?.courses?.name || "",
+          name: name?.full_name || "Unknown", email: name?.email || "", roll: stu?.roll_number || "", avg: t.avg,
+          phone: stu?.phone || "", parent_phone: stu?.parent_phone || "", father_name: stu?.father_name || "",
+          mother_name: stu?.mother_name || "", semester: stu?.semester, date_of_birth: stu?.date_of_birth || "",
+          address: stu?.address || "", course: (stu as any)?.courses?.name || "",
         };
       });
-
       return { topPerformers };
     },
   });
@@ -193,17 +223,37 @@ export default function TeacherDashboard() {
     { icon: Megaphone, label: "Announcements", desc: "Post messages", path: "/dashboard/teacher/announcements", color: "bg-indigo-500/10", iconColor: "text-indigo-500" },
   ];
 
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
 
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Welcome */}
-      <div>
-        <h2 className="font-body text-xl sm:text-2xl font-semibold text-foreground tracking-tight">
-          Welcome back, {profile?.full_name?.split(" ")[0] || "Teacher"}
-        </h2>
-        <p className="font-body text-[13px] text-muted-foreground mt-1">
-          {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
-        </p>
+      <div className="bg-card border border-border/60 rounded-2xl p-6 md:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 bg-primary/8 border border-primary/15 rounded-full px-3 py-1 mb-3">
+              <Star className="w-3 h-3 text-primary" />
+              <span className="font-body text-[11px] text-primary font-semibold uppercase tracking-wider">Teacher Portal</span>
+            </div>
+            <h2 className="font-body text-xl sm:text-2xl font-bold text-foreground tracking-tight">
+              {greeting}, {profile?.full_name?.split(" ")[0] || "Teacher"}
+            </h2>
+            <p className="font-body text-[13px] text-muted-foreground mt-1">
+              {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <div className="bg-muted/40 rounded-xl px-4 py-2.5 text-center">
+              <p className="font-body text-lg font-bold text-foreground">{counts?.students ?? 0}</p>
+              <p className="font-body text-[10px] text-muted-foreground">Students</p>
+            </div>
+            <div className="bg-muted/40 rounded-xl px-4 py-2.5 text-center">
+              <p className="font-body text-lg font-bold text-foreground">{counts?.materials ?? 0}</p>
+              <p className="font-body text-[10px] text-muted-foreground">Materials</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <ActionCenter role="teacher" />
@@ -295,7 +345,91 @@ export default function TeacherDashboard() {
         )}
       </div>
 
-      {/* ═══ CLASS SUMMARY CARDS ═══ */}
+      {/* ═══ NEW: Weekly Attendance Trend Chart ═══ */}
+      {weeklyAttTrend.length > 0 && (
+        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+              <TrendingUp className="w-4 h-4 text-cyan-500" />
+            </div>
+            <h3 className="font-body text-[14px] font-semibold text-foreground">Weekly Attendance Trend</h3>
+          </div>
+          <div className="h-48">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={weeklyAttTrend} barGap={2}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                <XAxis dataKey="day" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{ borderRadius: 12, fontSize: 12, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }} />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
+                <Bar dataKey="present" name="Present" fill="hsl(145, 65%, 42%)" radius={[6, 6, 0, 0]} barSize={20} />
+                <Bar dataKey="absent" name="Absent" fill="hsl(0, 70%, 58%)" radius={[6, 6, 0, 0]} barSize={20} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
+
+      {/* ═══ NEW: Recent Notices + Upcoming Events ═══ */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                <Bell className="w-4 h-4 text-amber-500" />
+              </div>
+              <h3 className="font-body text-[14px] font-semibold text-foreground">Recent Notices</h3>
+            </div>
+            <Link to="/dashboard/teacher/notices" className="font-body text-[11px] text-primary flex items-center gap-0.5 hover:gap-1.5 transition-all duration-200">
+              View all <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+          {recentNotices.length === 0 ? (
+            <p className="font-body text-xs text-muted-foreground text-center py-8">No notices yet</p>
+          ) : (
+            <div className="space-y-2">
+              {recentNotices.map((n: any, i: number) => (
+                <div key={i} className="p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors duration-200">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-body text-[12px] font-medium text-foreground truncate">{n.title}</p>
+                    <span className="font-body text-[9px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-semibold shrink-0">{n.type}</span>
+                  </div>
+                  <p className="font-body text-[9px] text-muted-foreground/60 mt-1">{format(new Date(n.created_at), "MMM d, yyyy")}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
+              <Calendar className="w-4 h-4 text-purple-500" />
+            </div>
+            <h3 className="font-body text-[14px] font-semibold text-foreground">Upcoming Events</h3>
+          </div>
+          {upcomingEvents.length === 0 ? (
+            <p className="font-body text-xs text-muted-foreground text-center py-8">No upcoming events</p>
+          ) : (
+            <div className="space-y-2">
+              {upcomingEvents.map((e: any) => (
+                <div key={e.id} className="flex items-center gap-3 p-3 rounded-xl bg-purple-500/5 hover:bg-purple-500/10 transition-colors duration-200">
+                  <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex flex-col items-center justify-center shrink-0">
+                    <span className="font-body text-[10px] text-purple-500 font-bold leading-none">{format(new Date(e.event_date), "MMM")}</span>
+                    <span className="font-body text-lg font-bold text-foreground leading-none">{format(new Date(e.event_date), "d")}</span>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-body text-[12px] font-semibold text-foreground truncate">{e.title}</p>
+                    <p className="font-body text-[10px] text-muted-foreground">{e.category}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* CLASS SUMMARY CARDS */}
       {classSummary.length > 0 && (
         <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
@@ -332,7 +466,7 @@ export default function TeacherDashboard() {
         </div>
       )}
 
-      {/* ═══ TOP PERFORMERS ═══ */}
+      {/* TOP PERFORMERS */}
       {perfData && (
         <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
@@ -392,7 +526,6 @@ export default function TeacherDashboard() {
                   <span className="font-body text-sm font-bold text-emerald-600">{selectedPerformer.avg}% Avg</span>
                 </div>
               </div>
-
               <div className="grid grid-cols-2 gap-3">
                 {[
                   { label: "Course", value: selectedPerformer.course },
@@ -408,29 +541,23 @@ export default function TeacherDashboard() {
                   </div>
                 ))}
               </div>
-
               {selectedPerformer.address && (
                 <div className="p-2.5 rounded-xl bg-muted/20">
                   <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Address</p>
                   <p className="font-body text-xs font-semibold text-foreground mt-0.5">{selectedPerformer.address}</p>
                 </div>
               )}
-
               <div className="flex gap-2">
-                <a
-                  href={selectedPerformer.phone ? `tel:${selectedPerformer.phone}` : "#"}
+                <a href={selectedPerformer.phone ? `tel:${selectedPerformer.phone}` : "#"}
                   className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl font-body text-xs font-semibold transition-colors ${
                     selectedPerformer.phone ? "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20" : "bg-muted/30 text-muted-foreground cursor-not-allowed"
-                  }`}
-                >
+                  }`}>
                   <Phone className="w-3.5 h-3.5" /> Call Student
                 </a>
-                <a
-                  href={selectedPerformer.parent_phone ? `tel:${selectedPerformer.parent_phone}` : "#"}
+                <a href={selectedPerformer.parent_phone ? `tel:${selectedPerformer.parent_phone}` : "#"}
                   className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl font-body text-xs font-semibold transition-colors ${
                     selectedPerformer.parent_phone ? "bg-blue-500/10 text-blue-600 hover:bg-blue-500/20" : "bg-muted/30 text-muted-foreground cursor-not-allowed"
-                  }`}
-                >
+                  }`}>
                   <Phone className="w-3.5 h-3.5" /> Call Parent
                 </a>
               </div>
@@ -439,8 +566,7 @@ export default function TeacherDashboard() {
         </DialogContent>
       </Dialog>
 
-
-      {/* ═══ QUICK NOTES / TO-DO ═══ */}
+      {/* QUICK NOTES / TO-DO */}
       <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
         <div className="flex items-center gap-2 mb-4">
           <div className="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center">

@@ -1,13 +1,14 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { BookOpen, Clock, BarChart3, Bell, Calendar, TrendingUp, CheckCircle, XCircle, Megaphone, ArrowRight, Sparkles, Upload, User, GraduationCap, FileText, Award, IndianRupee, Wallet, AlertTriangle } from "lucide-react";
+import { BookOpen, Clock, BarChart3, Bell, Calendar, TrendingUp, CheckCircle, XCircle, Megaphone, ArrowRight, Sparkles, Upload, User, GraduationCap, FileText, Award, IndianRupee, Wallet, AlertTriangle, Target, Flame, Calculator, Timer, Star, Zap, Trophy } from "lucide-react";
 import BirthdayPopup from "@/components/BirthdayPopup";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect, useRef } from "react";
-import { format } from "date-fns";
+import { format, differenceInDays } from "date-fns";
 import ActionCenter from "@/components/ActionCenter";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from "recharts";
 
 const NOTICE_TYPE_COLORS: Record<string, string> = {
   Exam: "bg-red-500/10 text-red-500",
@@ -70,8 +71,35 @@ function StatCard({ label, value, suffix = "", icon: Icon, color, delay = 0 }: a
   );
 }
 
+// Study streak tracker (localStorage)
+function useStudyStreak() {
+  const [streak, setStreak] = useState(0);
+  const [lastDate, setLastDate] = useState("");
+  useEffect(() => {
+    const saved = localStorage.getItem("hdc_study_streak");
+    if (saved) {
+      const { streak: s, lastDate: d } = JSON.parse(saved);
+      const today = new Date().toISOString().split("T")[0];
+      const diff = differenceInDays(new Date(today), new Date(d));
+      if (diff === 0) { setStreak(s); setLastDate(d); }
+      else if (diff === 1) { setStreak(s); setLastDate(d); }
+      else { setStreak(0); setLastDate(""); }
+    }
+  }, []);
+  const logStudy = () => {
+    const today = new Date().toISOString().split("T")[0];
+    const diff = lastDate ? differenceInDays(new Date(today), new Date(lastDate)) : 2;
+    const newStreak = diff <= 1 ? (today === lastDate ? streak : streak + 1) : 1;
+    setStreak(newStreak); setLastDate(today);
+    localStorage.setItem("hdc_study_streak", JSON.stringify({ streak: newStreak, lastDate: today }));
+  };
+  const isLoggedToday = lastDate === new Date().toISOString().split("T")[0];
+  return { streak, logStudy, isLoggedToday };
+}
+
 export default function StudentDashboard() {
   const { profile, user } = useAuth();
+  const { streak, logStudy, isLoggedToday } = useStudyStreak();
 
   const { data, isLoading: statsLoading } = useQuery({
     queryKey: ["student-dashboard-stats", user?.id],
@@ -83,8 +111,8 @@ export default function StudentDashboard() {
 
       const today = new Date().toISOString().split("T")[0];
       const [attendance, marks, notices, materials, todayAttendance, announcements] = await Promise.all([
-        supabase.from("attendance").select("status").eq("student_id", student.id),
-        supabase.from("marks").select("obtained_marks, max_marks, subject, exam_type").eq("student_id", student.id),
+        supabase.from("attendance").select("status, date").eq("student_id", student.id),
+        supabase.from("marks").select("obtained_marks, max_marks, subject, exam_type, semester").eq("student_id", student.id),
         supabase.from("notices").select("id", { count: "exact", head: true }).eq("is_active", true),
         supabase.from("study_materials").select("id", { count: "exact", head: true }),
         supabase.from("attendance").select("status").eq("student_id", student.id).eq("date", today),
@@ -101,13 +129,39 @@ export default function StudentDashboard() {
       let todayStatus: "present" | "absent" | "none" = "none";
       if (todayRecords.length > 0) todayStatus = todayRecords.some(r => r.status === "absent") ? "absent" : "present";
 
+      // Weekly attendance trend (last 7 days)
+      const last7 = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(); d.setDate(d.getDate() - (6 - i));
+        return d.toISOString().split("T")[0];
+      });
+      const weeklyTrend = last7.map(date => {
+        const dayRecords = (attendance.data || []).filter(a => a.date === date);
+        const dayPresent = dayRecords.filter(a => a.status === "present").length;
+        return { day: format(new Date(date), "EEE"), present: dayPresent, total: dayRecords.length, pct: dayRecords.length > 0 ? Math.round((dayPresent / dayRecords.length) * 100) : 0 };
+      });
+
+      // Subject-wise marks for chart
+      const subjectMarks: Record<string, { total: number; count: number }> = {};
+      marksData.forEach(m => {
+        if (!subjectMarks[m.subject]) subjectMarks[m.subject] = { total: 0, count: 0 };
+        subjectMarks[m.subject].total += (m.obtained_marks / m.max_marks) * 100;
+        subjectMarks[m.subject].count++;
+      });
+      const subjectChartData = Object.entries(subjectMarks).map(([subject, { total, count }]) => ({
+        subject: subject.length > 10 ? subject.slice(0, 10) + "…" : subject,
+        avg: Math.round(total / count),
+      })).slice(0, 8);
+
+      // GPA calculation (simple: 90+=10, 80+=9, etc.)
+      const gpa = avgMarks >= 90 ? 10 : avgMarks >= 80 ? 9 : avgMarks >= 70 ? 8 : avgMarks >= 60 ? 7 : avgMarks >= 50 ? 6 : avgMarks >= 40 ? 5 : 0;
+
       return {
         attendance: pct, avgMarks, notices: notices.count || 0,
         materials: materials.count || 0, announcements: announcements.count || 0,
         present, absent: total - present, total, todayStatus,
         semester: student.semester, rollNumber: student.roll_number,
         courseName: (student as any).courses?.name, courseCode: (student as any).courses?.code,
-        totalSubjects: marksData.length,
+        totalSubjects: marksData.length, weeklyTrend, subjectChartData, gpa,
       };
     },
     enabled: !!user,
@@ -129,6 +183,16 @@ export default function StudentDashboard() {
       return data || [];
     },
     enabled: !!user,
+  });
+
+  // Upcoming events
+  const { data: upcomingEvents = [] } = useQuery({
+    queryKey: ["student-upcoming-events"],
+    queryFn: async () => {
+      const today = new Date().toISOString().split("T")[0];
+      const { data } = await supabase.from("events").select("id, title, event_date, category").eq("is_active", true).gte("event_date", today).order("event_date").limit(4);
+      return data || [];
+    },
   });
 
   const [feeSemFilter, setFeeSemFilter] = useState("all");
@@ -188,6 +252,8 @@ export default function StudentDashboard() {
     { icon: User, label: "My Profile", desc: "View details", path: "/dashboard/student/profile", color: "bg-indigo-500/10", iconColor: "text-indigo-500" },
   ];
 
+  const CHART_COLORS = ["hsl(215, 90%, 55%)", "hsl(145, 65%, 42%)", "hsl(42, 70%, 52%)", "hsl(280, 60%, 55%)", "hsl(0, 70%, 58%)", "hsl(180, 60%, 45%)", "hsl(330, 60%, 55%)", "hsl(60, 70%, 50%)"];
+
   return (
     <div className="space-y-5 sm:space-y-6 animate-fade-in">
       <BirthdayPopup />
@@ -226,7 +292,7 @@ export default function StudentDashboard() {
         </div>
       </div>
 
-      {/* Fee Reminders - Important Hero Section */}
+      {/* Fee Reminders */}
       {feeReminders.length > 0 && (
         <div className="relative overflow-hidden border-2 border-red-500/30 bg-gradient-to-r from-red-500/5 via-amber-500/5 to-red-500/5 rounded-2xl p-5 sm:p-6 animate-fade-in">
           <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
@@ -305,6 +371,69 @@ export default function StudentDashboard() {
         </div>
       )}
 
+      {/* ═══ NEW: GPA + Study Streak + Upcoming Events ═══ */}
+      <div className="grid sm:grid-cols-3 gap-3">
+        {/* GPA Card */}
+        <div className="bg-card border border-border/60 rounded-2xl p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
+              <Trophy className="w-5 h-5 text-amber-500" />
+            </div>
+          </div>
+          <p className="font-body text-[32px] font-bold text-foreground tabular-nums leading-none group-hover:text-amber-500 transition-colors duration-300">
+            {data?.gpa ?? 0}<span className="text-base text-muted-foreground">/10</span>
+          </p>
+          <p className="font-body text-[11px] text-muted-foreground mt-1.5 uppercase tracking-wider">CGPA Score</p>
+          <p className="font-body text-[10px] mt-1 text-muted-foreground/70">
+            {(data?.gpa ?? 0) >= 9 ? "🌟 Outstanding!" : (data?.gpa ?? 0) >= 7 ? "👍 Good performance" : (data?.gpa ?? 0) >= 5 ? "📚 Keep improving" : "💪 Focus on studies"}
+          </p>
+        </div>
+
+        {/* Study Streak */}
+        <div className="bg-card border border-border/60 rounded-2xl p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center">
+              <Flame className="w-5 h-5 text-orange-500" />
+            </div>
+            {!isLoggedToday && (
+              <button onClick={logStudy} className="px-3 py-1.5 rounded-xl bg-orange-500/10 text-orange-500 font-body text-[11px] font-semibold hover:bg-orange-500/20 transition-all">
+                <Zap className="w-3 h-3 inline mr-1" />Log Today
+              </button>
+            )}
+          </div>
+          <p className="font-body text-[32px] font-bold text-foreground tabular-nums leading-none">
+            {streak}<span className="text-base text-muted-foreground ml-1">days</span>
+          </p>
+          <p className="font-body text-[11px] text-muted-foreground mt-1.5 uppercase tracking-wider">Study Streak</p>
+          {isLoggedToday && <p className="font-body text-[10px] mt-1 text-emerald-500 font-medium">✓ Logged today</p>}
+        </div>
+
+        {/* Upcoming Events Mini */}
+        <div className="bg-card border border-border/60 rounded-2xl p-5 hover:shadow-lg transition-all duration-300">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
+              <Calendar className="w-5 h-5 text-purple-500" />
+            </div>
+          </div>
+          {upcomingEvents.length > 0 ? (
+            <div className="space-y-2">
+              {upcomingEvents.slice(0, 2).map((e: any) => (
+                <div key={e.id} className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-purple-500/5 flex flex-col items-center justify-center shrink-0">
+                    <span className="font-body text-[9px] text-purple-500 font-bold leading-none">{format(new Date(e.event_date), "MMM")}</span>
+                    <span className="font-body text-xs font-bold text-foreground leading-none">{format(new Date(e.event_date), "d")}</span>
+                  </div>
+                  <p className="font-body text-[11px] font-medium text-foreground truncate">{e.title}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="font-body text-[11px] text-muted-foreground">No upcoming events</p>
+          )}
+          <p className="font-body text-[11px] text-muted-foreground mt-2 uppercase tracking-wider">Upcoming Events</p>
+        </div>
+      </div>
+
       {/* Attendance + Marks Rings */}
       <div className="grid md:grid-cols-2 gap-4">
         <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6 hover:shadow-lg transition-shadow duration-300">
@@ -377,6 +506,63 @@ export default function StudentDashboard() {
         </div>
       </div>
 
+      {/* ═══ NEW: Weekly Attendance Trend + Subject Marks Chart ═══ */}
+      <div className="grid md:grid-cols-2 gap-4">
+        {/* Weekly Attendance Trend */}
+        {data?.weeklyTrend && (
+          <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 text-cyan-500" />
+              </div>
+              <h3 className="font-body text-[14px] font-semibold text-foreground">Weekly Attendance Trend</h3>
+            </div>
+            <div className="h-44">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={data.weeklyTrend}>
+                  <defs>
+                    <linearGradient id="attGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(145, 65%, 42%)" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(145, 65%, 42%)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                  <XAxis dataKey="day" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} />
+                  <Tooltip contentStyle={{ borderRadius: 12, fontSize: 12, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }} />
+                  <Area type="monotone" dataKey="pct" stroke="hsl(145, 65%, 42%)" fill="url(#attGrad)" strokeWidth={2.5} dot={{ r: 4, fill: "hsl(145, 65%, 42%)", strokeWidth: 2, stroke: "hsl(var(--card))" }} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        )}
+
+        {/* Subject-wise Marks Chart */}
+        {data?.subjectChartData && data.subjectChartData.length > 0 && (
+          <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center">
+                <Award className="w-4 h-4 text-indigo-500" />
+              </div>
+              <h3 className="font-body text-[14px] font-semibold text-foreground">Subject Performance</h3>
+            </div>
+            <div className="h-44">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={data.subjectChartData} barSize={24}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                  <XAxis dataKey="subject" tick={{ fontSize: 9, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={{ borderRadius: 12, fontSize: 12, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }} formatter={(v: number) => [`${v}%`, "Average"]} />
+                  <Bar dataKey="avg" radius={[6, 6, 0, 0]}>
+                    {data.subjectChartData.map((_: any, i: number) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Quick Actions */}
       <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
         <h3 className="font-body text-[14px] font-semibold text-foreground mb-4">Quick Actions</h3>
@@ -415,7 +601,6 @@ export default function StudentDashboard() {
             </select>
           </div>
 
-          {/* Fee Summary Cards */}
           {(() => {
             const filteredPayments = feeSemFilter === "all"
               ? feeData.payments
@@ -444,7 +629,6 @@ export default function StudentDashboard() {
                   </div>
                 </div>
 
-                {/* Progress Bar */}
                 <div className="mb-4">
                   <div className="flex justify-between mb-1">
                     <span className="font-body text-[10px] text-muted-foreground">Payment Progress</span>
@@ -463,7 +647,6 @@ export default function StudentDashboard() {
                   )}
                 </div>
 
-                {/* Recent Payments */}
                 {filteredPayments.length > 0 ? (
                   <div>
                     <h4 className="font-body text-[11px] font-bold text-foreground mb-2 uppercase tracking-wider">Payment History</h4>
