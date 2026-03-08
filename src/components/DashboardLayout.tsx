@@ -75,6 +75,7 @@ const adminNav: NavItem[] = [
   { label: "Gallery", path: "/dashboard/admin/gallery", icon: ImagePlus },
   { label: "Birthday Wishes", path: "/dashboard/admin/birthday-settings", icon: Cake },
   { label: "Roles", path: "/dashboard/admin/roles", icon: Shield },
+  { label: "Reports & Export", path: "/dashboard/admin/reports", icon: Download },
   { label: "Settings", path: "/dashboard/admin/settings", icon: Settings },
 ];
 
