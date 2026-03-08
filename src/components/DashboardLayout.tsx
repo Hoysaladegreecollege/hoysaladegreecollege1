@@ -6,7 +6,7 @@ import {
   BarChart3, Settings, Award, Image, Megaphone, Shield,
   UserCog, Menu, X, Mail, Trophy, UserCheck,
   DollarSign, Book, ArrowUpCircle, Cake, ImagePlus, ChevronLeft, ExternalLink,
-  BellRing, Monitor, Armchair, Download
+  BellRing, Monitor, Armchair, Download, MessageSquare, Activity
 } from "lucide-react";
 import collegeLogo from "@/assets/college-logo.png";
 import { useState, useEffect } from "react";
@@ -29,6 +29,7 @@ const studentNav: NavItem[] = [
   { label: "Notices", path: "/dashboard/student/notices", icon: Bell },
   { label: "Announcements", path: "/dashboard/student/announcements", icon: Megaphone },
   { label: "Materials", path: "/dashboard/student/materials", icon: BookOpen },
+  { label: "Feedback", path: "/dashboard/student/feedback", icon: MessageSquare },
 ];
 
 const teacherNav: NavItem[] = [
@@ -77,6 +78,8 @@ const adminNav: NavItem[] = [
   { label: "Roles", path: "/dashboard/admin/roles", icon: Shield },
   { label: "Reports & Export", path: "/dashboard/admin/reports", icon: Download },
   { label: "Alumni", path: "/dashboard/admin/alumni", icon: GraduationCap },
+  { label: "Feedback", path: "/dashboard/admin/feedback", icon: MessageSquare },
+  { label: "Activity Log", path: "/dashboard/admin/activity-log", icon: Activity },
   { label: "Settings", path: "/dashboard/admin/settings", icon: Settings },
 ];
 
