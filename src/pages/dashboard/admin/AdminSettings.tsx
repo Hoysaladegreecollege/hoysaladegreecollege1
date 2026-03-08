@@ -1,5 +1,5 @@
-import { Settings, Globe, Calendar, Shield, TrendingUp, Activity, Download, Users, Database, Server, CheckCircle, AlertCircle, Clock, ArrowLeft, Cpu, HardDrive, Wifi, BarChart3, Zap, RefreshCw, ExternalLink } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { Settings, Globe, Calendar, Shield, TrendingUp, Activity, Download, Users, Database, Server, CheckCircle, AlertCircle, Clock, ArrowLeft, Cpu, HardDrive, Wifi, BarChart3, Zap, RefreshCw, ExternalLink, Lock, KeyRound } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -7,6 +7,9 @@ import { ResponsiveContainer, AreaChart, Area, CartesianGrid, XAxis, YAxis, Tool
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { useAuth } from "@/contexts/AuthContext";
 
 function useAnimatedCounter(target: number) {
   const [count, setCount] = useState(0);
