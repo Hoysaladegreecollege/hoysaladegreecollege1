@@ -7,7 +7,7 @@ export function CreditsFooter() {
       <div className="flex items-center justify-center gap-3">
         <div className="w-20 h-[1px] bg-gradient-to-r from-transparent to-secondary/30" />
         <div className="relative">
-          <Hexagon className="w-4 h-4 text-secondary/30 animate-[creditsSpin_10s_linear_infinite]" />
+          <Hexagon className="w-4 h-4 text-secondary/30" />
           <div className="absolute inset-0 blur-sm bg-secondary/10 rounded-full" />
         </div>
         <div className="w-20 h-[1px] bg-gradient-to-l from-transparent to-secondary/30" />
