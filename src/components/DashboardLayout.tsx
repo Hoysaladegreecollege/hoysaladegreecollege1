@@ -6,7 +6,7 @@ import {
   BarChart3, Settings, Award, Image, Megaphone, Shield,
   UserCog, Menu, X, Mail, Trophy, UserCheck,
   DollarSign, Book, ArrowUpCircle, Cake, ImagePlus, ChevronLeft, ExternalLink,
-  BellRing, Monitor, Armchair
+  BellRing, Monitor, Armchair, Download
 } from "lucide-react";
 import collegeLogo from "@/assets/college-logo.png";
 import { useState, useEffect } from "react";
@@ -75,6 +75,7 @@ const adminNav: NavItem[] = [
   { label: "Gallery", path: "/dashboard/admin/gallery", icon: ImagePlus },
   { label: "Birthday Wishes", path: "/dashboard/admin/birthday-settings", icon: Cake },
   { label: "Roles", path: "/dashboard/admin/roles", icon: Shield },
+  { label: "Reports & Export", path: "/dashboard/admin/reports", icon: Download },
   { label: "Settings", path: "/dashboard/admin/settings", icon: Settings },
 ];
 
