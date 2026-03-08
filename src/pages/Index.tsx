@@ -531,69 +531,92 @@ export default function Index() {
               subtitle="Choose from our carefully designed undergraduate programs & professional coaching"
             />
           </ScrollReveal>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5">
+           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 sm:gap-6">
             {courses.map((c, i) => (
               <ScrollReveal key={c.name} delay={i * 80}>
                 <Link to="/courses" className="block h-full">
                   <div
-                    className="relative p-5 sm:p-7 cursor-pointer h-full group overflow-hidden rounded-2xl border border-border/40 bg-card active:scale-[0.97] touch-manipulation"
+                    className={`relative p-6 sm:p-7 cursor-pointer h-full group overflow-hidden rounded-3xl border border-border/30 bg-gradient-to-b from-card via-card to-background/50 active:scale-[0.97] touch-manipulation backdrop-blur-xl ${c.borderAccent}`}
                     style={{
-                      transition: "all 0.6s cubic-bezier(0.16,1,0.3,1)",
-                      boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+                      transition: "all 0.7s cubic-bezier(0.16,1,0.3,1)",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.03)",
                     }}
                     onMouseEnter={() => setHoveredCard(i)}
                     onMouseLeave={() => setHoveredCard(null)}
                   >
-                    {/* Hover background gradient */}
+                    {/* Ambient glow on hover */}
                     <div
-                      className={`absolute inset-0 bg-gradient-to-br ${c.color} opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-2xl`}
+                      className="absolute -bottom-12 -right-12 w-40 h-40 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-1000 blur-[60px] pointer-events-none"
+                      style={{ background: `hsla(${c.accentHsl}, 0.15)` }}
+                    />
+                    <div
+                      className="absolute -top-8 -left-8 w-32 h-32 rounded-full opacity-0 group-hover:opacity-60 transition-all duration-1000 blur-[50px] pointer-events-none"
+                      style={{ background: `hsla(${c.accentHsl}, 0.08)` }}
                     />
 
-                    {/* Top gold accent line */}
+                    {/* Hover background gradient */}
                     <div
-                      className="absolute top-0 left-6 right-6 h-[0.5px] opacity-0 group-hover:opacity-100 transition-all duration-500"
-                      style={{ background: "linear-gradient(90deg, transparent, hsl(42 87% 55% / 0.4), transparent)" }}
+                      className={`absolute inset-0 bg-gradient-to-br ${c.color} opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-3xl`}
+                    />
+
+                    {/* Top accent line - scales from center */}
+                    <div
+                      className="absolute top-0 left-0 right-0 h-[1px] scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-center"
+                      style={{ background: `linear-gradient(90deg, transparent 5%, hsla(${c.accentHsl}, 0.5) 50%, transparent 95%)` }}
                     />
 
                     {/* Shimmer sweep */}
                     <div
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent translate-x-[-100%] group-hover:translate-x-[100%] rounded-2xl pointer-events-none"
-                      style={{ transition: "transform 0.9s ease" }}
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent translate-x-[-100%] group-hover:translate-x-[100%] rounded-3xl pointer-events-none"
+                      style={{ transition: "transform 1.2s cubic-bezier(0.16,1,0.3,1)" }}
                     />
 
-                    {/* Hover border glow */}
+                    {/* Glass inner border on hover */}
                     <div
-                      className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                      style={{ boxShadow: "inset 0 0 0 1px hsla(42,87%,55%,0.12), 0 8px 32px rgba(0,0,0,0.08)" }}
+                      className="absolute inset-[1px] rounded-[23px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                      style={{ boxShadow: `inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 0 1px hsla(${c.accentHsl}, 0.08)` }}
                     />
+
+                    {/* Floating particles on hover */}
+                    <div className="absolute top-4 right-4 w-1 h-1 rounded-full opacity-0 group-hover:opacity-40 group-hover:-translate-y-3 transition-all duration-1000 pointer-events-none"
+                      style={{ background: `hsla(${c.accentHsl}, 0.6)` }} />
+                    <div className="absolute top-8 right-8 w-0.5 h-0.5 rounded-full opacity-0 group-hover:opacity-30 group-hover:-translate-y-5 transition-all duration-[1.4s] delay-200 pointer-events-none"
+                      style={{ background: `hsla(${c.accentHsl}, 0.5)` }} />
 
                     <div className="relative z-10">
-                      <div className="text-3xl sm:text-4xl mb-3 sm:mb-4 inline-block group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] filter group-hover:drop-shadow-lg">
-                        {c.icon}
+                      {/* Premium icon container */}
+                      <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl ${c.iconBg} backdrop-blur-sm flex items-center justify-center mb-4 sm:mb-5 group-hover:scale-110 group-hover:shadow-lg transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] border border-white/[0.04] group-hover:border-white/[0.08]`}
+                        style={{ boxShadow: `0 4px 12px hsla(${c.accentHsl}, 0.05)` }}>
+                        <span className="text-2xl sm:text-3xl filter group-hover:drop-shadow-lg transition-all duration-500 group-hover:scale-105">
+                          {c.icon}
+                        </span>
                       </div>
-                      <h3 className="font-display text-lg sm:text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-400">
+
+                      <h3 className="font-display text-lg sm:text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-500">
                         {c.name}
                       </h3>
-                      <p className="font-body text-[11px] text-muted-foreground mt-1 sm:mt-1.5 font-medium tracking-wide uppercase opacity-60">
+                      <p className="font-body text-[10px] sm:text-[11px] text-muted-foreground mt-1.5 font-semibold tracking-[0.15em] uppercase opacity-50 group-hover:opacity-70 transition-opacity duration-500">
                         {c.full}
                       </p>
-                      <p className="font-body text-sm text-muted-foreground mt-2 sm:mt-3 leading-relaxed line-clamp-2">
+                      <p className="font-body text-sm text-muted-foreground/80 mt-3 sm:mt-4 leading-relaxed line-clamp-2 group-hover:text-muted-foreground transition-colors duration-500">
                         {c.desc}
                       </p>
-                      <div className="mt-4 sm:mt-5 flex items-center justify-between">
+
+                      {/* Bottom section with divider */}
+                      <div className="mt-5 sm:mt-6 pt-4 border-t border-border/30 group-hover:border-border/50 transition-colors duration-500 flex items-center justify-between">
                         <span
-                          className="text-[10px] font-body font-semibold px-3 py-1.5 rounded-full border transition-colors duration-300"
+                          className="text-[10px] font-body font-semibold px-3 py-1.5 rounded-full border transition-all duration-500 group-hover:shadow-sm"
                           style={{
-                            color: "hsl(42,87%,55%)",
-                            background: "hsla(42,87%,55%,0.08)",
-                            borderColor: "hsla(42,87%,55%,0.15)",
+                            color: `hsl(${c.accentHsl})`,
+                            background: `hsla(${c.accentHsl}, 0.06)`,
+                            borderColor: `hsla(${c.accentHsl}, 0.12)`,
                           }}
                         >
                           {c.duration}
                         </span>
-                        <span className="text-primary text-xs font-body font-semibold flex items-center gap-1 group-hover:gap-2 transition-all duration-400 opacity-60 group-hover:opacity-100">
+                        <span className="text-primary text-xs font-body font-semibold flex items-center gap-1 group-hover:gap-2 transition-all duration-500 opacity-40 group-hover:opacity-100">
                           Details{" "}
-                          <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-400" />
+                          <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-500" />
                         </span>
                       </div>
                     </div>
