@@ -422,9 +422,6 @@ export default function AdminDashboard() {
           </h2>
           <p className="font-body text-[13px] text-muted-foreground mt-1">Here's an overview of your institution.</p>
         </div>
-        <Button onClick={exportStudentsCSV} variant="outline" className="rounded-xl font-body text-[12px] h-9 gap-1.5">
-          <Download className="w-3.5 h-3.5" /> Export CSV
-        </Button>
       </div>
 
       {/* Action Center */}
