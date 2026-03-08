@@ -730,7 +730,58 @@ export default function About() {
             </div>
           </section>
         </div>
-      </div>
+    </div>
+
+      {/* Lightbox Portal */}
+      {lightboxIdx !== null && createPortal(
+        <div
+          className="fixed inset-0 bg-black/90 backdrop-blur-xl z-[9999] flex items-center justify-center animate-fade-in"
+          onClick={() => setLightboxIdx(null)}
+          onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
+          onTouchEnd={(e) => {
+            if (touchStartX === null) return;
+            const diff = e.changedTouches[0].clientX - touchStartX;
+            if (Math.abs(diff) > 50) {
+              if (diff > 0) setLightboxIdx((p) => (p! - 1 + galleryImages.length) % galleryImages.length);
+              else setLightboxIdx((p) => (p! + 1) % galleryImages.length);
+            }
+            setTouchStartX(null);
+          }}
+        >
+          {/* Close */}
+          <button onClick={() => setLightboxIdx(null)} className="absolute top-4 right-4 w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 transition-all duration-200 z-10">
+            <X className="w-5 h-5" />
+          </button>
+
+          {/* Prev */}
+          <button
+            onClick={(e) => { e.stopPropagation(); setLightboxIdx((p) => (p! - 1 + galleryImages.length) % galleryImages.length); }}
+            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 transition-all duration-200 z-10"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+
+          {/* Next */}
+          <button
+            onClick={(e) => { e.stopPropagation(); setLightboxIdx((p) => (p! + 1) % galleryImages.length); }}
+            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 transition-all duration-200 z-10"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+
+          {/* Image */}
+          <div className="max-w-[90vw] max-h-[80vh] flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={(galleryImages[lightboxIdx] as any).image_url}
+              alt={(galleryImages[lightboxIdx] as any).title}
+              className="max-w-full max-h-[75vh] object-contain rounded-2xl shadow-2xl animate-scale-in"
+            />
+            <p className="font-body text-sm text-white/70 mt-4 font-semibold">{(galleryImages[lightboxIdx] as any).title}</p>
+            <p className="font-body text-xs text-white/40 mt-1">{lightboxIdx + 1} / {galleryImages.length}</p>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }
