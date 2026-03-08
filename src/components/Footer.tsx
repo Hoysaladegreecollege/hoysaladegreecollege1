@@ -39,34 +39,33 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer className="relative overflow-hidden" style={{ background: "hsl(228, 14%, 6%)" }}>
+    <footer className="relative overflow-hidden bg-card border-t border-border">
       {/* Top decorative border */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[hsl(var(--gold))]/30 to-transparent" />
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-secondary/30 to-transparent" />
       
       {/* Ambient glows */}
-      <div className="absolute top-20 right-[10%] w-[400px] h-[400px] rounded-full blur-[180px] pointer-events-none" style={{ background: "hsla(var(--gold), 0.03)" }} />
-      <div className="absolute bottom-20 left-[5%] w-[300px] h-[300px] rounded-full blur-[150px] pointer-events-none" style={{ background: "hsla(220, 80%, 55%, 0.02)" }} />
+      <div className="absolute top-20 right-[10%] w-[400px] h-[400px] rounded-full blur-[180px] pointer-events-none bg-secondary/[0.03]" />
+      <div className="absolute bottom-20 left-[5%] w-[300px] h-[300px] rounded-full blur-[150px] pointer-events-none bg-primary/[0.02]" />
       
       {/* Dot pattern */}
-      <div className="absolute inset-0 opacity-[0.015] pointer-events-none" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+      <div className="absolute inset-0 opacity-[0.015] pointer-events-none" style={{ backgroundImage: "radial-gradient(hsl(var(--foreground) / 0.5) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
 
       {/* Newsletter / CTA strip */}
-      <div className="relative border-b border-white/[0.06]">
+      <div className="relative border-b border-border/50">
         <div className="container py-8 sm:py-10 px-5 sm:px-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-5">
             <div className="flex items-center gap-3 text-center sm:text-left">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: "linear-gradient(135deg, hsla(var(--gold), 0.15), hsla(var(--gold), 0.05))", border: "1px solid hsla(var(--gold), 0.1)" }}>
-                <GraduationCap className="w-5 h-5" style={{ color: "hsl(var(--gold))" }} />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-secondary/10 border border-secondary/15">
+                <GraduationCap className="w-5 h-5 text-secondary" />
               </div>
               <div>
-                <p className="font-display text-base sm:text-lg font-bold text-white/90">Start Your Journey Today</p>
-                <p className="font-body text-xs text-white/40">Admissions open for 2026–27 academic year</p>
+                <p className="font-display text-base sm:text-lg font-bold text-foreground/90">Start Your Journey Today</p>
+                <p className="font-body text-xs text-muted-foreground">Admissions open for 2026–27 academic year</p>
               </div>
             </div>
             <Link
               to="/admissions"
-              className="group relative inline-flex items-center gap-2 px-6 py-3 rounded-full font-body text-sm font-semibold transition-all duration-400 overflow-hidden border"
-              style={{ background: "linear-gradient(135deg, hsl(var(--gold)), hsla(var(--gold), 0.85))", color: "hsl(228, 14%, 6%)", borderColor: "hsla(var(--gold), 0.3)" }}
+              className="group relative inline-flex items-center gap-2 px-6 py-3 rounded-full font-body text-sm font-semibold transition-all duration-400 overflow-hidden border bg-secondary text-secondary-foreground border-secondary/30 hover:shadow-lg hover:shadow-secondary/20"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-600 pointer-events-none" />
               <span className="relative z-10">Apply Now</span>
@@ -82,18 +81,18 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-12 h-12 rounded-2xl overflow-hidden shrink-0 border border-white/[0.08] shadow-[0_4px_20px_-4px_hsla(var(--gold),0.15)]">
+              <div className="w-12 h-12 rounded-2xl overflow-hidden shrink-0 border border-border shadow-lg shadow-secondary/10">
                 <img src={collegeLogo} alt="Hoysala Degree College Logo" className="w-full h-full object-contain" />
               </div>
               <div>
-                <span className="font-display text-base sm:text-lg font-bold block text-white/95">Hoysala Degree College</span>
-                <span className="text-[9px] font-body font-semibold tracking-[0.15em] uppercase" style={{ color: "hsl(var(--gold))" }}>Est. 2019</span>
+                <span className="font-display text-base sm:text-lg font-bold block text-foreground">Hoysala Degree College</span>
+                <span className="text-[9px] font-body font-semibold tracking-[0.15em] uppercase text-secondary">Est. 2019</span>
               </div>
             </div>
-            <p className="text-xs font-body text-white/45 leading-relaxed mb-1.5">
+            <p className="text-xs font-body text-muted-foreground leading-relaxed mb-1.5">
               Affiliated To Bangalore University & Approved by AICTE New Delhi
             </p>
-            <p className="text-[11px] font-body text-white/30">College Code: BU 26 (P21GEF0099)</p>
+            <p className="text-[11px] font-body text-muted-foreground/60">College Code: BU 26 (P21GEF0099)</p>
             
             {/* Social icons */}
             <div className="flex gap-2.5 mt-6">
@@ -102,12 +101,11 @@ export default function Footer() {
                   key={label}
                   href="#"
                   aria-label={label}
-                  className="w-10 h-10 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center transition-all duration-400 group/social touch-manipulation border border-white/[0.06] hover:border-white/[0.12] hover:-translate-y-0.5"
-                  style={{ background: "hsla(0, 0%, 100%, 0.04)" }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = `hsla(${hsl}, 0.12)`; e.currentTarget.style.boxShadow = `0 8px 25px -5px hsla(${hsl}, 0.2)`; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = "hsla(0, 0%, 100%, 0.04)"; e.currentTarget.style.boxShadow = "none"; }}
+                  className="w-10 h-10 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center transition-all duration-400 group/social touch-manipulation border border-border hover:border-border/80 hover:-translate-y-0.5 bg-muted/50 hover:bg-muted"
+                  onMouseEnter={(e) => { e.currentTarget.style.boxShadow = `0 8px 25px -5px hsla(${hsl}, 0.2)`; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "none"; }}
                 >
-                  <Icon className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white/50 group-hover/social:text-white/90 transition-colors duration-300" />
+                  <Icon className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-muted-foreground group-hover/social:text-foreground transition-colors duration-300" />
                 </a>
               ))}
             </div>
@@ -115,18 +113,18 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-display text-sm sm:text-base font-semibold mb-5 flex items-center gap-2.5 text-white/90">
-              <span className="w-1 h-5 rounded-full" style={{ background: "hsl(var(--gold))" }} />
+            <h3 className="font-display text-sm sm:text-base font-semibold mb-5 flex items-center gap-2.5 text-foreground">
+              <span className="w-1 h-5 rounded-full bg-secondary" />
               Quick Links
             </h3>
-            <div className="flex flex-col gap-3 sm:gap-2.5 font-body text-sm text-white/50">
+            <div className="flex flex-col gap-3 sm:gap-2.5 font-body text-sm text-muted-foreground">
               {quickLinks.map((l) => (
                 <Link
                   key={l.label}
                   to={l.path}
-                  className="hover:text-white/90 active:opacity-70 transition-all duration-300 inline-flex items-center gap-1.5 group touch-manipulation py-0.5 hover:translate-x-1"
+                  className="hover:text-foreground active:opacity-70 transition-all duration-300 inline-flex items-center gap-1.5 group touch-manipulation py-0.5 hover:translate-x-1"
                 >
-                  <span className="w-0 group-hover:w-2 h-px transition-all duration-300" style={{ background: "hsl(var(--gold))" }} />
+                  <span className="w-0 group-hover:w-2 h-px transition-all duration-300 bg-secondary" />
                   {l.label}
                   <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-60 transition-all duration-300" />
                 </Link>
@@ -136,18 +134,18 @@ export default function Footer() {
 
           {/* Courses */}
           <div>
-            <h3 className="font-display text-sm sm:text-base font-semibold mb-5 flex items-center gap-2.5 text-white/90">
-              <span className="w-1 h-5 rounded-full" style={{ background: "hsl(var(--gold))" }} />
+            <h3 className="font-display text-sm sm:text-base font-semibold mb-5 flex items-center gap-2.5 text-foreground">
+              <span className="w-1 h-5 rounded-full bg-secondary" />
               Our Courses
             </h3>
-            <div className="flex flex-col gap-3 sm:gap-2.5 font-body text-sm text-white/50">
+            <div className="flex flex-col gap-3 sm:gap-2.5 font-body text-sm text-muted-foreground">
               {courseLinks.map((c) => (
                 <Link
                   key={c}
                   to="/courses"
-                  className="hover:text-white/90 active:opacity-70 transition-all duration-300 inline-flex items-center gap-1.5 group touch-manipulation py-0.5 hover:translate-x-1"
+                  className="hover:text-foreground active:opacity-70 transition-all duration-300 inline-flex items-center gap-1.5 group touch-manipulation py-0.5 hover:translate-x-1"
                 >
-                  <span className="w-0 group-hover:w-2 h-px transition-all duration-300" style={{ background: "hsl(var(--gold))" }} />
+                  <span className="w-0 group-hover:w-2 h-px transition-all duration-300 bg-secondary" />
                   {c}
                   <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-60 transition-all duration-300" />
                 </Link>
@@ -157,39 +155,39 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="font-display text-sm sm:text-base font-semibold mb-5 flex items-center gap-2.5 text-white/90">
-              <span className="w-1 h-5 rounded-full" style={{ background: "hsl(var(--gold))" }} />
+            <h3 className="font-display text-sm sm:text-base font-semibold mb-5 flex items-center gap-2.5 text-foreground">
+              <span className="w-1 h-5 rounded-full bg-secondary" />
               Contact Us
             </h3>
-            <div className="flex flex-col gap-4 sm:gap-3.5 font-body text-sm text-white/50">
+            <div className="flex flex-col gap-4 sm:gap-3.5 font-body text-sm text-muted-foreground">
               <a
                 href={MAPS_LINK}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex gap-3 items-start hover:text-white/80 active:opacity-70 transition-all duration-300 group touch-manipulation"
+                className="flex gap-3 items-start hover:text-foreground active:opacity-70 transition-all duration-300 group touch-manipulation"
               >
-                <div className="w-9 h-9 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5 border border-white/[0.06] group-hover:border-white/[0.12] transition-all duration-300" style={{ background: "hsla(0, 0%, 100%, 0.04)" }}>
-                  <MapPin className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white/40 group-hover:text-white/70 transition-colors" />
+                <div className="w-9 h-9 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5 border border-border group-hover:border-border/80 transition-all duration-300 bg-muted/50">
+                  <MapPin className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
                 </div>
                 <span className="leading-relaxed text-[13px] sm:text-sm">
                   K.R.P. Arcade, UCO Bank Building, Paramanna Layout, Nelamangala Town - 562 123
                 </span>
               </a>
               <div className="flex gap-3 items-center">
-                <div className="w-9 h-9 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center shrink-0 border border-white/[0.06]" style={{ background: "hsla(0, 0%, 100%, 0.04)" }}>
-                  <Phone className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white/40" />
+                <div className="w-9 h-9 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center shrink-0 border border-border bg-muted/50">
+                  <Phone className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-muted-foreground" />
                 </div>
                 <div className="flex flex-wrap gap-x-3 gap-y-1.5">
                   {["7676272167", "7975344252", "8618181383"].map((n) => (
-                    <a key={n} href={`tel:${n}`} className="hover:text-white/80 active:opacity-70 transition-colors touch-manipulation text-[13px] sm:text-sm">{n}</a>
+                    <a key={n} href={`tel:${n}`} className="hover:text-foreground active:opacity-70 transition-colors touch-manipulation text-[13px] sm:text-sm">{n}</a>
                   ))}
                 </div>
               </div>
               <div className="flex gap-3 items-center">
-                <div className="w-9 h-9 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center shrink-0 border border-white/[0.06]" style={{ background: "hsla(0, 0%, 100%, 0.04)" }}>
-                  <Mail className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white/40" />
+                <div className="w-9 h-9 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center shrink-0 border border-border bg-muted/50">
+                  <Mail className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-muted-foreground" />
                 </div>
-                <a href="mailto:principal.hoysaladegreecollege@gmail.com" className="hover:text-white/80 active:opacity-70 transition-colors text-[12px] sm:text-xs break-all touch-manipulation">
+                <a href="mailto:principal.hoysaladegreecollege@gmail.com" className="hover:text-foreground active:opacity-70 transition-colors text-[12px] sm:text-xs break-all touch-manipulation">
                   principal.hoysaladegreecollege@gmail.com
                 </a>
               </div>
@@ -199,16 +197,16 @@ export default function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="relative border-t border-white/[0.05]">
+      <div className="relative border-t border-border/50">
         {/* Subtle gold accent */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/4 h-px bg-gradient-to-r from-transparent via-[hsl(var(--gold))]/15 to-transparent" />
-        <div className="container py-5 px-5 sm:px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] sm:text-xs font-body text-white/30">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/4 h-px bg-gradient-to-r from-transparent via-secondary/15 to-transparent" />
+        <div className="container py-5 px-5 sm:px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] sm:text-xs font-body text-muted-foreground">
           <span>© {new Date().getFullYear()} Hoysala Degree College. All rights reserved.</span>
           <span className="flex items-center gap-1.5">
-            Made with <Heart className="w-3 h-3 fill-current" style={{ color: "hsl(var(--gold))" }} /> 
+            Made with <Heart className="w-3 h-3 fill-current text-secondary" /> 
             <span className="hidden sm:inline">ಶ್ರೀಶಿರಡಿ ಸಾಯಿ ಎಜುಕೇಷನಲ್ ಟ್ರಸ್ಟ್ (ರಿ.)</span>
           </span>
-          <Link to="/credits" className="transition-all duration-300 flex items-center gap-1 group" style={{ color: "hsla(var(--gold), 0.5)" }} onMouseEnter={(e) => e.currentTarget.style.color = "hsl(var(--gold))"} onMouseLeave={(e) => e.currentTarget.style.color = "hsla(var(--gold), 0.5)"}>
+          <Link to="/credits" className="transition-all duration-300 flex items-center gap-1 group text-secondary/50 hover:text-secondary">
             <Sparkles className="w-3 h-3" />
             Website Credits
           </Link>
@@ -222,19 +220,19 @@ export default function Footer() {
         aria-label="Back to top"
       >
         <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 56 56">
-          <circle cx="28" cy="28" r="26" fill="none" stroke="hsla(0,0%,100%,0.08)" strokeWidth="2.5" />
+          <circle cx="28" cy="28" r="26" fill="none" className="stroke-border" strokeWidth="2.5" />
           <circle
             cx="28" cy="28" r="26" fill="none"
-            stroke="hsl(var(--gold))"
+            className="stroke-secondary drop-shadow-[0_0_6px_hsl(var(--secondary)/0.4)]"
             strokeWidth="2.5"
             strokeDasharray={`${2 * Math.PI * 26}`}
             strokeDashoffset={`${2 * Math.PI * 26 * (1 - scrollProgress)}`}
             strokeLinecap="round"
-            className="transition-all duration-150 drop-shadow-[0_0_6px_hsla(var(--gold),0.4)]"
+            style={{ transition: "all 150ms" }}
           />
         </svg>
-        <span className="absolute inset-[4px] rounded-full border border-white/[0.06] group-hover/top:border-[hsl(var(--gold))]/30 group-hover/top:shadow-[0_0_24px_hsla(var(--gold),0.15)] transition-all duration-300" style={{ background: "hsl(228, 14%, 8%)" }} />
-        <ArrowUp className="w-4.5 h-4.5 relative text-white/60 group-hover/top:text-[hsl(var(--gold))] group-hover/top:-translate-y-0.5 transition-all duration-300" />
+        <span className="absolute inset-[4px] rounded-full border border-border group-hover/top:border-secondary/30 group-hover/top:shadow-[0_0_24px_hsl(var(--secondary)/0.15)] transition-all duration-300 bg-card" />
+        <ArrowUp className="w-4.5 h-4.5 relative text-muted-foreground group-hover/top:text-secondary group-hover/top:-translate-y-0.5 transition-all duration-300" />
       </button>
     </footer>
   );
