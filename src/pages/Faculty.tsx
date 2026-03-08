@@ -331,7 +331,7 @@ export default function Faculty() {
                       <div className="absolute -top-16 -right-16 w-40 h-40 rounded-full blur-3xl pointer-events-none" style={{ background: `hsla(${accent}, 0.1)` }} />
                       <div className="absolute top-0 left-0 right-0 h-1 pointer-events-none" style={{ background: `linear-gradient(90deg, transparent 10%, hsla(${accent}, ${isLeader ? "0.5" : "0.3"}) 50%, transparent 90%)` }} />
 
-                      <button onClick={() => setSelectedFaculty(null)} className="absolute top-4 right-4 w-8 h-8 rounded-xl bg-background/50 backdrop-blur-sm border border-border/30 flex items-center justify-center hover:bg-background/80 transition-all duration-200 hover:scale-110 z-20 text-muted-foreground hover:text-foreground">
+                      <button onClick={closeModal} className="absolute top-4 right-4 w-8 h-8 rounded-xl bg-background/50 backdrop-blur-sm border border-border/30 flex items-center justify-center hover:bg-background/80 transition-all duration-200 hover:scale-110 z-20 text-muted-foreground hover:text-foreground">
                         <X className="w-4 h-4" />
                       </button>
 
