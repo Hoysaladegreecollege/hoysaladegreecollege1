@@ -3,7 +3,7 @@ import { HelmetProvider } from "react-helmet-async";
 import App from "./App.tsx";
 import "./index.css";
 
-// On every page load: unregister stale service workers and clear old caches
+// On every page load: clear old caches on version change (but preserve PWA SW)
 function ensureFreshContent() {
   try {
     const APP_VERSION_KEY = 'hdc_app_version';
@@ -12,20 +12,6 @@ function ensureFreshContent() {
 
     if (storedVersion !== currentVersion) {
       localStorage.setItem(APP_VERSION_KEY, currentVersion);
-
-      // Clear all caches
-      if ("caches" in window) {
-        caches.keys().then((names) => {
-          names.forEach((name) => caches.delete(name));
-        });
-      }
-
-      // Unregister all service workers to prevent stale content
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.getRegistrations().then((registrations) => {
-          registrations.forEach((reg) => reg.unregister());
-        });
-      }
 
       // Force hard reload if this isn't the first visit (version changed)
       if (storedVersion) {
