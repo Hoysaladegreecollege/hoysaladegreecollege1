@@ -62,9 +62,6 @@ export function CreditsHero() {
           Website{" "}
           <span className="text-secondary relative inline-block">
             Credits
-            <span className="absolute -bottom-2 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-secondary to-transparent animate-[shimmerLine_3s_ease-in-out_infinite]" />
-            {/* Holographic text glow */}
-            <span className="absolute inset-0 text-secondary blur-[20px] opacity-30 animate-[creditsPulseGlow_3s_ease-in-out_infinite] pointer-events-none" aria-hidden>Credits</span>
           </span>
         </motion.h1>
 
