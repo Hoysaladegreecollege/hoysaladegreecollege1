@@ -2,7 +2,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   Users, Clock, BarChart3, Upload, Bell, Megaphone, Calendar, BookOpen, CheckCircle,
   TrendingUp, Activity, ListTodo, Plus, Trash2, Award,
-  ArrowRight, Eye, Phone, User, IndianRupee, Flame, Target, Zap, Star, FileText
+  ArrowRight, Eye, Phone, User, IndianRupee, Flame, Target, Zap, Star, FileText, MessageCircle
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
