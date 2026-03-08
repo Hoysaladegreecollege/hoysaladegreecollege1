@@ -2,11 +2,11 @@ import developerPhoto from "@/assets/developer-pavan.jpg";
 import { Code2, GraduationCap, Globe, Award, ArrowUpRight, MessageCircle, Instagram, Mail, Github, Scan, CircuitBoard } from "lucide-react";
 
 const socialLinks = [
-  { href: "https://pavan-05.framer.ai/", icon: Globe, label: "Portfolio" },
-  { href: "https://github.com/pavana05", icon: Github, label: "GitHub" },
-  { href: "https://www.instagram.com/_pavan_05._/", icon: Instagram, label: "Instagram" },
-  { href: "https://api.whatsapp.com/send/?phone=9036048950&text=Hello+pavan+%F0%9F%91%8B&type=phone_number&app_absent=0", icon: MessageCircle, label: "WhatsApp" },
-  { href: "mailto:pavan05@flash.co", icon: Mail, label: "Email" },
+  { href: "https://pavan-05.framer.ai/", icon: Globe, label: "Portfolio", hoverColor: "hover:border-secondary/40 hover:shadow-[0_0_20px_hsl(var(--secondary)/0.2)]" },
+  { href: "https://github.com/pavana05", icon: Github, label: "GitHub", hoverColor: "hover:border-purple-500/40 hover:shadow-[0_0_20px_rgba(168,85,247,0.2)]" },
+  { href: "https://www.instagram.com/_pavan_05._/", icon: Instagram, label: "Instagram", hoverColor: "hover:border-pink-500/40 hover:shadow-[0_0_20px_rgba(236,72,153,0.2)]" },
+  { href: "https://api.whatsapp.com/send/?phone=9036048950&text=Hello+pavan+%F0%9F%91%8B&type=phone_number&app_absent=0", icon: MessageCircle, label: "WhatsApp", hoverColor: "hover:border-emerald-500/40 hover:shadow-[0_0_20px_rgba(16,185,129,0.2)]" },
+  { href: "mailto:pavan05@flash.co", icon: Mail, label: "Email", hoverColor: "hover:border-cyan-500/40 hover:shadow-[0_0_20px_rgba(6,182,212,0.2)]" },
 ];
 
 export function DeveloperShowcase() {
