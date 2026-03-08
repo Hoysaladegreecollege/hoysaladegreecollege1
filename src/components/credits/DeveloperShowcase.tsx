@@ -64,7 +64,7 @@ export function DeveloperShowcase() {
             <div className="flex-1 text-center lg:text-left space-y-5">
               <div>
                 <div className="flex items-center justify-center lg:justify-start gap-2 mb-2">
-                  <Award className="w-5 h-5 text-secondary animate-[creditsPulseGlow_3s_ease-in-out_infinite]" />
+                  <Award className="w-5 h-5 text-secondary" />
                   <span className="font-mono text-[10px] text-secondary font-semibold tracking-[0.3em] uppercase">// Lead Developer</span>
                 </div>
                 <h2 className="font-display text-4xl sm:text-5xl font-bold text-foreground tracking-tight group-hover:tracking-wide transition-all duration-700">
