@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import SEOHead from "@/components/SEOHead";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -24,14 +25,35 @@ import {
   Star,
   Sparkles,
   ChevronRight,
+  ChevronLeft,
   Quote,
   Calendar,
   CheckCircle2,
   ArrowRight,
   Zap,
   Building2,
+  Camera,
+  X,
+  Expand,
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import principalImage from "@/assets/principal.jpg";
+import galleryCampus from "@/assets/gallery-campus.jpg";
+import galleryLab from "@/assets/gallery-lab.jpg";
+import galleryLibrary from "@/assets/gallery-library.jpg";
+import galleryClassroom from "@/assets/gallery-classroom.jpg";
+import galleryEvents from "@/assets/gallery-events.jpg";
+import gallerySports from "@/assets/gallery-sports.jpg";
+
+const fallbackGallery = [
+  { id: "g1", title: "Campus Building", image_url: galleryCampus },
+  { id: "g2", title: "Computer Lab", image_url: galleryLab },
+  { id: "g3", title: "Library", image_url: galleryLibrary },
+  { id: "g4", title: "Classroom", image_url: galleryClassroom },
+  { id: "g5", title: "Annual Day", image_url: galleryEvents },
+  { id: "g6", title: "Sports Ground", image_url: gallerySports },
+];
 
 const tocSections = [
   { id: "about-intro", label: "About", icon: BookOpen },
