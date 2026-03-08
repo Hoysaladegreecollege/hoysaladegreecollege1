@@ -115,14 +115,15 @@ export default function StudentAttendance() {
       </div>
 
       {/* Circular Progress */}
-      <div className="bg-card border border-border rounded-2xl p-5">
+      <div className="relative overflow-hidden bg-card border border-border/40 rounded-3xl p-6">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent" />
         <div className="flex items-center gap-6">
           <div className="relative w-24 h-24 shrink-0">
             <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-              <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--muted))" strokeWidth="10" />
+              <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--muted))" strokeWidth="8" />
               <circle cx="50" cy="50" r="40" fill="none"
                 stroke={percentage >= 75 ? "hsl(var(--primary))" : "hsl(var(--destructive))"}
-                strokeWidth="10"
+                strokeWidth="8"
                 strokeDasharray={`${(percentage / 100) * 251.2} 251.2`}
                 strokeLinecap="round"
                 className="transition-all duration-1000" />
@@ -132,11 +133,11 @@ export default function StudentAttendance() {
             </div>
           </div>
           <div className="flex-1">
-            <h3 className="font-display text-base font-bold text-foreground mb-2">Overall Attendance</h3>
-            <div className="space-y-1.5">
-              <div className="flex justify-between font-body text-sm"><span className="text-muted-foreground">Present</span><span className="font-semibold text-primary">{present} days</span></div>
-              <div className="flex justify-between font-body text-sm"><span className="text-muted-foreground">Absent</span><span className="font-semibold text-destructive">{absent} days</span></div>
-              <div className="flex justify-between font-body text-sm"><span className="text-muted-foreground">Required (75%)</span><span className={`font-semibold ${percentage >= 75 ? "text-primary" : "text-destructive"}`}>{percentage >= 75 ? "✅ Met" : `⚠️ Need ${Math.ceil(0.75 * total) - present} more`}</span></div>
+            <h3 className="font-display text-base font-bold text-foreground mb-3">Overall Attendance</h3>
+            <div className="space-y-2">
+              <div className="flex justify-between font-body text-sm"><span className="text-muted-foreground">Present</span><span className="font-bold text-primary">{present} days</span></div>
+              <div className="flex justify-between font-body text-sm"><span className="text-muted-foreground">Absent</span><span className="font-bold text-destructive">{absent} days</span></div>
+              <div className="flex justify-between font-body text-sm"><span className="text-muted-foreground">Required (75%)</span><span className={`font-bold ${percentage >= 75 ? "text-primary" : "text-destructive"}`}>{percentage >= 75 ? "✅ Met" : `⚠️ Need ${Math.ceil(0.75 * total) - present} more`}</span></div>
             </div>
           </div>
         </div>
