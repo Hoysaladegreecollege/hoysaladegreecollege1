@@ -64,6 +64,7 @@ const tocSections = [
   { id: "achievements", label: "Achievements", icon: Award },
   { id: "core-values", label: "Core Values", icon: Heart },
   { id: "facilities", label: "Facilities", icon: Shield },
+  { id: "campus-gallery", label: "Campus Gallery", icon: Camera },
   { id: "testimonials", label: "Testimonials", icon: Quote },
   { id: "contact", label: "Reach Us", icon: MapPin },
 ];
