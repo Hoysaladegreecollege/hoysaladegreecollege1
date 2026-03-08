@@ -57,6 +57,9 @@ const courses = [
     desc: "Master programming, databases, networking and emerging technologies.",
     duration: "3 Years",
     color: "from-blue-500/15 to-cyan-500/5",
+    accentHsl: "217 72% 50%",
+    iconBg: "bg-blue-500/10",
+    borderAccent: "group-hover:border-blue-500/20",
   },
   {
     name: "B.Com Regular",
@@ -65,6 +68,9 @@ const courses = [
     desc: "Build expertise in accounting, finance, taxation and business law.",
     duration: "3 Years",
     color: "from-emerald-500/15 to-green-500/5",
+    accentHsl: "142 70% 40%",
+    iconBg: "bg-emerald-500/10",
+    borderAccent: "group-hover:border-emerald-500/20",
   },
   {
     name: "B.Com Professional",
@@ -73,6 +79,9 @@ const courses = [
     desc: "Professional coaching integrated with commerce degree.",
     duration: "3 Years",
     color: "from-secondary/20 to-amber-500/5",
+    accentHsl: "42 87% 55%",
+    iconBg: "bg-amber-500/10",
+    borderAccent: "group-hover:border-secondary/20",
   },
   {
     name: "BBA",
@@ -81,6 +90,9 @@ const courses = [
     desc: "Develop leadership, management, and entrepreneurial skills.",
     duration: "3 Years",
     color: "from-purple-500/15 to-violet-500/5",
+    accentHsl: "280 60% 55%",
+    iconBg: "bg-purple-500/10",
+    borderAccent: "group-hover:border-purple-500/20",
   },
   {
     name: "CA / CS",
@@ -89,6 +101,9 @@ const courses = [
     desc: "Exclusive coaching for CA & CS Foundation aspirants.",
     duration: "Integrated",
     color: "from-rose-500/15 to-red-500/5",
+    accentHsl: "0 84% 60%",
+    iconBg: "bg-rose-500/10",
+    borderAccent: "group-hover:border-rose-500/20",
   },
 ];
 
