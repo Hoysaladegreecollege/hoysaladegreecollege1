@@ -75,7 +75,7 @@ export function DeveloperShowcase() {
                   <span className="flex items-center gap-1.5 text-muted-foreground font-body text-sm">
                     <GraduationCap className="w-4 h-4 text-secondary/80" /> BCA Department
                   </span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-secondary/30 animate-pulse" />
+                  <span className="w-1 h-1 rounded-full bg-secondary/30" />
                   <span className="flex items-center gap-1.5 text-muted-foreground font-body text-sm">
                     <Globe className="w-4 h-4 text-secondary/80" /> Web Developer
                   </span>
