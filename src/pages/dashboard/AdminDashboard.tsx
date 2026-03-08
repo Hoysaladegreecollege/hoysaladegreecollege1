@@ -213,7 +213,42 @@ export default function AdminDashboard() {
 
   const filteredSemFeeData = feeChartSem === "all" ? semFeeData : semFeeData.filter((d: any) => d.sem === Number(feeChartSem));
 
-  // Recent Activity Feed
+  // Recent fee transactions
+  const { data: recentTransactions = [] } = useQuery({
+    queryKey: ["admin-recent-fee-transactions"],
+    refetchInterval: 30000,
+    queryFn: async () => {
+      const { data: payments } = await supabase.from("fee_payments").select("id, amount, payment_date, payment_method, semester, student_id, created_at, receipt_number").order("created_at", { ascending: false }).limit(8);
+      if (!payments?.length) return [];
+      const studentIds = payments.map(p => p.student_id).filter(Boolean);
+      const { data: students } = await supabase.from("students").select("id, roll_number, user_id").in("id", studentIds);
+      const userIds = (students || []).map(s => s.user_id);
+      const { data: profiles } = await supabase.from("profiles").select("user_id, full_name").in("user_id", userIds);
+      return payments.map((p: any) => {
+        const stu = students?.find(s => s.id === p.student_id);
+        const prof = profiles?.find(pr => pr.user_id === stu?.user_id);
+        return { ...p, studentName: prof?.full_name || stu?.roll_number || "Unknown", rollNumber: stu?.roll_number || "" };
+      });
+    },
+  });
+
+  // Institution health score
+  const healthScore = (() => {
+    if (!counts || !attendanceStats) return 0;
+    let score = 0;
+    // Attendance component (40%)
+    score += Math.min(40, (attendanceStats.percentage / 100) * 40);
+    // Student enrollment (20%)
+    score += Math.min(20, counts.students > 0 ? 20 : 0);
+    // Course offering (15%)
+    score += Math.min(15, counts.courses > 0 ? 15 : 0);
+    // Pending applications handled (15%) - fewer pending = better
+    score += Math.min(15, counts.pendingApps === 0 ? 15 : Math.max(0, 15 - counts.pendingApps));
+    // Messages handled (10%)
+    score += Math.min(10, counts.newContacts === 0 ? 10 : Math.max(0, 10 - counts.newContacts));
+    return Math.round(score);
+  })();
+
   const { data: recentActivity = [] } = useQuery({
     queryKey: ["admin-recent-activity"],
     refetchInterval: 30000,
