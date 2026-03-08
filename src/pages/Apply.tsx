@@ -42,10 +42,13 @@ export default function Apply() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.full_name || !form.email || !form.phone || !form.course) {
-      toast.error("Please fill in all required fields");
+    const result = applySchema.safeParse(form);
+    if (!result.success) {
+      const firstError = result.error.errors[0]?.message || "Invalid input";
+      toast.error(firstError);
       return;
     }
+    const validated = result.data;
     setSubmitting(true);
 
     let photoUrl: string | null = null;
