@@ -1,11 +1,24 @@
 // Service Worker for Web Push Notifications - HDC Portal
+// Version tag forces update on each deploy
+const SW_VERSION = 'v-' + Date.now();
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(clients.claim());
+  // Clear ALL old caches on activation to ensure fresh content
+  event.waitUntil(
+    caches.keys().then((names) => {
+      return Promise.all(names.map((name) => caches.delete(name)));
+    }).then(() => clients.claim())
+  );
+});
+
+// Do NOT cache any fetch requests - always go to network
+self.addEventListener('fetch', (event) => {
+  // Let all requests pass through to network (no caching)
+  return;
 });
 
 self.addEventListener('push', (event) => {
@@ -35,14 +48,12 @@ self.addEventListener('notificationclick', (event) => {
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      // Try to focus an existing window
       for (const client of clientList) {
         if (client.url.includes(self.location.origin) && 'focus' in client) {
           client.navigate(targetUrl);
           return client.focus();
         }
       }
-      // Open new window
       if (clients.openWindow) {
         return clients.openWindow(targetUrl);
       }
