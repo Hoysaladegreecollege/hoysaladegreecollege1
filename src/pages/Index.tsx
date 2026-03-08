@@ -816,7 +816,7 @@ export default function Index() {
                   <img
                     alt="Principal"
                     className="w-full max-w-xs sm:max-w-sm mx-auto shadow-2xl group-hover:scale-[1.03] transition-transform duration-700"
-                    src="/lovable-uploads/bacc5b2d-3f25-473a-a2ee-a0d75a0cb7e3.png"
+                    src={principalImage}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-primary/40 via-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   {/* Removed backdrop-blur to keep image clear on hover */}
