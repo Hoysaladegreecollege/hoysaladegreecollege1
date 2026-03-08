@@ -184,7 +184,7 @@ export default function StudentFees() {
         {/* Current Semester Remaining Box */}
         <div className={`border rounded-2xl p-4 hover:shadow-md transition-all duration-300 ${currentSemRemaining > 0 ? "bg-amber-500/5 border-amber-500/20" : "bg-emerald-500/5 border-emerald-500/20"}`}>
           <Calendar className={`w-5 h-5 mb-2 ${currentSemRemaining > 0 ? "text-amber-600" : "text-emerald-600"}`} />
-          <p className={`font-display text-lg font-bold tabular-nums ${currentSemRemaining > 0 ? "text-amber-600" : "text-emerald-600"}`}>
+          <p className={`font-body text-base font-medium tabular-nums ${currentSemRemaining > 0 ? "text-amber-600" : "text-emerald-600"}`}>
             {currentSemRemaining > 0 ? `₹${currentSemRemaining.toLocaleString()}` : "✓ Paid"}
           </p>
           <p className="font-body text-[10px] text-muted-foreground mt-0.5 uppercase tracking-wider">Sem {currentSemester} Due</p>
