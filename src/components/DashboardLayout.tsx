@@ -78,6 +78,8 @@ const adminNav: NavItem[] = [
   { label: "Roles", path: "/dashboard/admin/roles", icon: Shield },
   { label: "Reports & Export", path: "/dashboard/admin/reports", icon: Download },
   { label: "Alumni", path: "/dashboard/admin/alumni", icon: GraduationCap },
+  { label: "Feedback", path: "/dashboard/admin/feedback", icon: MessageSquare },
+  { label: "Activity Log", path: "/dashboard/admin/activity-log", icon: Activity },
   { label: "Settings", path: "/dashboard/admin/settings", icon: Settings },
 ];
 
