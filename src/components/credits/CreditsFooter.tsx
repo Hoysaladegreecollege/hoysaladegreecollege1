@@ -14,10 +14,10 @@ export function CreditsFooter() {
       </div>
 
       {/* Main footer badge */}
-      <div className="group/footer inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-card/50 backdrop-blur-xl border border-border/30 text-muted-foreground text-xs sm:text-sm font-body shadow-lg cursor-default hover:border-secondary/25 hover:shadow-[0_0_30px_hsl(var(--secondary)/0.12),inset_0_0_15px_hsl(var(--secondary)/0.03)] hover:-translate-y-1 transition-all duration-500">
-        Made with <Heart className="w-3.5 h-3.5 text-red-500 animate-[creditsPulseGlow_2s_ease-in-out_infinite] group-hover/footer:scale-125 transition-transform duration-300" /> by Pavan A
+      <div className="group/footer inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-card/50 backdrop-blur-xl border border-border/30 text-muted-foreground text-xs sm:text-sm font-body shadow-lg cursor-default hover:border-secondary/25 transition-all duration-500">
+        Made with <Heart className="w-3.5 h-3.5 text-red-500" /> by Pavan A
         <span className="text-secondary/30">|</span>
-        <Star className="w-3.5 h-3.5 text-secondary group-hover/footer:rotate-[72deg] group-hover/footer:drop-shadow-[0_0_4px_hsl(var(--secondary)/0.5)] transition-all duration-500" /> 2024–2025
+        <Star className="w-3.5 h-3.5 text-secondary" /> 2024–2025
       </div>
 
       {/* System footer */}

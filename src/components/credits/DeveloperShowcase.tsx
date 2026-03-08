@@ -110,12 +110,11 @@ export function DeveloperShowcase() {
                 href="https://pavan-05.framer.ai/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group/cta relative inline-flex items-center gap-2.5 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-secondary/15 to-secondary/5 hover:from-secondary/25 hover:to-secondary/15 border border-secondary/25 hover:border-secondary/50 text-foreground font-semibold text-sm overflow-hidden transition-all duration-500 shadow-lg shadow-secondary/5 hover:shadow-[0_0_40px_hsl(var(--secondary)/0.25)] hover:-translate-y-1"
+                className="group/cta relative inline-flex items-center gap-2.5 px-7 py-3.5 rounded-2xl bg-secondary/10 hover:bg-secondary/20 border border-secondary/20 hover:border-secondary/40 text-foreground font-semibold text-sm transition-all duration-300"
               >
-                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent -translate-x-full group-hover/cta:translate-x-full transition-transform duration-700" />
-                <Globe className="relative w-4 h-4 text-secondary group-hover/cta:rotate-[360deg] transition-transform duration-700" />
+                <Globe className="relative w-4 h-4 text-secondary" />
                 <span className="relative">View Full Portfolio</span>
-                <ArrowUpRight className="relative w-4 h-4 text-muted-foreground group-hover/cta:text-secondary group-hover/cta:-translate-y-1 group-hover/cta:translate-x-1 transition-all duration-300" />
+                <ArrowUpRight className="relative w-4 h-4 text-muted-foreground group-hover/cta:text-secondary group-hover/cta:-translate-y-0.5 group-hover/cta:translate-x-0.5 transition-all duration-300" />
               </a>
             </div>
           </div>

@@ -75,10 +75,7 @@ export function CreditsHero() {
 
         <motion.div custom={3} variants={heroChild} className="flex items-center justify-center gap-3 mt-8">
           <div className="w-16 h-[1px] bg-gradient-to-r from-transparent to-secondary/40" />
-          <div className="relative">
-            <Sparkles className="w-5 h-5 text-secondary/70 animate-[creditsSpin_6s_linear_infinite]" />
-            <div className="absolute inset-0 blur-md bg-secondary/20 rounded-full animate-[creditsPulseGlow_2s_ease-in-out_infinite]" />
-          </div>
+          <Sparkles className="w-5 h-5 text-secondary/70" />
           <div className="w-16 h-[1px] bg-gradient-to-l from-transparent to-secondary/40" />
         </motion.div>
 

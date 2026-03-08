@@ -42,12 +42,10 @@ export function FeatureHighlights() {
             whileInView="visible"
             viewport={{ once: true }}
             variants={itemVariants}
-            className="group/f relative flex items-start gap-4 p-5 rounded-2xl bg-card/40 backdrop-blur-sm border border-border/30 overflow-hidden cursor-default hover:border-secondary/25 hover:bg-card/60 hover:shadow-[0_0_25px_hsl(var(--secondary)/0.08),inset_0_0_15px_hsl(var(--secondary)/0.02)] hover:-translate-y-0.5 transition-all duration-400"
+            className="group/f relative flex items-start gap-4 p-5 rounded-2xl bg-card/40 backdrop-blur-sm border border-border/30 overflow-hidden cursor-default hover:border-secondary/25 hover:bg-card/60 transition-all duration-400"
           >
-            {/* Shimmer on hover */}
-            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent -translate-x-full group-hover/f:translate-x-full transition-transform duration-[1s]" />
-            {/* Neon left accent line */}
-            <div className="absolute left-0 top-2 bottom-2 w-[2px] rounded-full bg-secondary/0 group-hover/f:bg-secondary/50 group-hover/f:shadow-[0_0_8px_hsl(var(--secondary)/0.4)] transition-all duration-500" />
+            {/* Left accent line */}
+            <div className="absolute left-0 top-2 bottom-2 w-[2px] rounded-full bg-secondary/0 group-hover/f:bg-secondary/50 transition-all duration-500" />
 
             <div className="relative w-8 h-8 rounded-lg bg-gradient-to-br from-secondary/15 to-secondary/5 border border-secondary/15 flex items-center justify-center shrink-0 mt-0.5 group-hover/f:scale-110 group-hover/f:border-secondary/30 group-hover/f:shadow-[0_0_15px_hsl(var(--secondary)/0.2)] transition-all duration-400">
               <ChevronRight className="w-3.5 h-3.5 text-secondary group-hover/f:translate-x-0.5 transition-transform duration-300" />
