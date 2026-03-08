@@ -78,7 +78,8 @@ export default function Navbar() {
     }
   }, [location.pathname]);
 
-  const progress = Math.min(scrollY / 300, 1);
+  const maxScroll = typeof document !== 'undefined' ? document.documentElement.scrollHeight - window.innerHeight : 1;
+  const progress = maxScroll > 0 ? Math.min(scrollY / maxScroll, 1) : 0;
 
   const handleDropdownEnter = (key: string) => {
     clearTimeout(dropdownTimeout.current);
