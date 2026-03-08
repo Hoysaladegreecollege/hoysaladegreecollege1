@@ -25,6 +25,9 @@ export default function AdminFeeManagement() {
   const [pinInput, setPinInput] = useState("");
   const [pinError, setPinError] = useState("");
   const [pinChecking, setPinChecking] = useState(false);
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [lockoutUntil, setLockoutUntil] = useState<number | null>(null);
+  const [lockoutRemaining, setLockoutRemaining] = useState(0);
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [paymentForm, setPaymentForm] = useState({ amount: "", payment_method: "Cash", remarks: "", upi_number: "", semester: "" });
   const [courseFilter, setCourseFilter] = useState("all");
