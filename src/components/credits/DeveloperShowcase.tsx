@@ -2,11 +2,11 @@ import developerPhoto from "@/assets/developer-pavan.jpg";
 import { Code2, GraduationCap, Globe, Award, ArrowUpRight, MessageCircle, Instagram, Mail, Github, Scan, CircuitBoard } from "lucide-react";
 
 const socialLinks = [
-  { href: "https://pavan-05.framer.ai/", icon: Globe, label: "Portfolio" },
-  { href: "https://github.com/pavana05", icon: Github, label: "GitHub" },
-  { href: "https://www.instagram.com/_pavan_05._/", icon: Instagram, label: "Instagram" },
-  { href: "https://api.whatsapp.com/send/?phone=9036048950&text=Hello+pavan+%F0%9F%91%8B&type=phone_number&app_absent=0", icon: MessageCircle, label: "WhatsApp" },
-  { href: "mailto:pavan05@flash.co", icon: Mail, label: "Email" },
+  { href: "https://pavan-05.framer.ai/", icon: Globe, label: "Portfolio", hoverColor: "hover:border-secondary/40 hover:shadow-[0_0_20px_hsl(var(--secondary)/0.2)]" },
+  { href: "https://github.com/pavana05", icon: Github, label: "GitHub", hoverColor: "hover:border-purple-500/40 hover:shadow-[0_0_20px_rgba(168,85,247,0.2)]" },
+  { href: "https://www.instagram.com/_pavan_05._/", icon: Instagram, label: "Instagram", hoverColor: "hover:border-pink-500/40 hover:shadow-[0_0_20px_rgba(236,72,153,0.2)]" },
+  { href: "https://api.whatsapp.com/send/?phone=9036048950&text=Hello+pavan+%F0%9F%91%8B&type=phone_number&app_absent=0", icon: MessageCircle, label: "WhatsApp", hoverColor: "hover:border-emerald-500/40 hover:shadow-[0_0_20px_rgba(16,185,129,0.2)]" },
+  { href: "mailto:pavan05@flash.co", icon: Mail, label: "Email", hoverColor: "hover:border-cyan-500/40 hover:shadow-[0_0_20px_rgba(6,182,212,0.2)]" },
 ];
 
 export function DeveloperShowcase() {
@@ -104,11 +104,11 @@ export function DeveloperShowcase() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={social.label}
-                    className="group/s relative flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-muted/20 border border-border/30 text-muted-foreground overflow-hidden hover:bg-secondary/10 hover:border-secondary/30 hover:text-foreground hover:shadow-[0_0_20px_hsl(var(--secondary)/0.12),inset_0_0_10px_hsl(var(--secondary)/0.05)] hover:-translate-y-0.5 transition-all duration-300 backdrop-blur-sm"
+                    className={`group/s relative flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-muted/20 border border-border/30 text-muted-foreground overflow-hidden hover:text-foreground hover:-translate-y-0.5 transition-all duration-300 backdrop-blur-sm ${social.hoverColor}`}
                     style={{ animationDelay: `${i * 80}ms` }}
                   >
                     <span className="absolute inset-0 bg-gradient-to-r from-secondary/0 via-secondary/5 to-secondary/0 opacity-0 group-hover/s:opacity-100 transition-opacity duration-500" />
-                    <social.icon className="relative w-4 h-4 group-hover/s:text-secondary group-hover/s:scale-110 group-hover/s:drop-shadow-[0_0_4px_hsl(var(--secondary)/0.5)] transition-all duration-300" />
+                    <social.icon className="relative w-4 h-4 group-hover/s:scale-110 group-hover/s:drop-shadow-[0_0_4px_hsl(var(--secondary)/0.5)] transition-all duration-300" />
                     <span className="relative font-mono text-[11px] font-medium">{social.label}</span>
                   </a>
                 ))}
