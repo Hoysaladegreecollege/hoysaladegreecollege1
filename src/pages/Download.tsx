@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import SEOHead from "@/components/SEOHead";
 import PageHeader from "@/components/PageHeader";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -21,6 +21,8 @@ import {
   Clock,
   Users,
   Fingerprint,
+  Globe,
+  MonitorSmartphone,
 } from "lucide-react";
 
 const features = [
