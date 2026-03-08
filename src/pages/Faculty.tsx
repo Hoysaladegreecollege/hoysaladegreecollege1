@@ -33,7 +33,16 @@ function isLeadership(role: string) {
 
 export default function Faculty() {
   const [selectedFaculty, setSelectedFaculty] = useState<any>(null);
+  const [isClosing, setIsClosing] = useState(false);
   const [selectedDept, setSelectedDept] = useState("All");
+
+  const closeModal = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setSelectedFaculty(null);
+      setIsClosing(false);
+    }, 250);
+  };
 
   useEffect(() => {
     if (selectedFaculty) document.body.style.overflow = 'hidden';
@@ -303,12 +312,12 @@ export default function Faculty() {
 
       {/* Faculty Detail Modal */}
       {selectedFaculty && createPortal(
-        <div className="fixed inset-0 bg-black/70 z-[100] flex items-center justify-center p-3 sm:p-4 animate-modal-backdrop" onClick={() => setSelectedFaculty(null)}>
+        <div className={`fixed inset-0 bg-black/70 z-[100] flex items-center justify-center p-3 sm:p-4 ${isClosing ? 'animate-modal-backdrop-out' : 'animate-modal-backdrop'}`} onClick={closeModal}>
           {/* Ambient glow behind card */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-80 h-80 rounded-full blur-[80px] animate-modal-glow" style={{ background: `hsl(var(--gold))` }} />
+            <div className={`w-80 h-80 rounded-full blur-[80px] ${isClosing ? 'animate-modal-glow-out' : 'animate-modal-glow'}`} style={{ background: `hsl(var(--gold))` }} />
           </div>
-          <div className="w-full max-w-sm sm:max-w-md max-h-[90vh] overflow-y-auto rounded-3xl animate-modal-card relative [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" onClick={e => e.stopPropagation()}>
+          <div className={`w-full max-w-sm sm:max-w-md max-h-[90vh] overflow-y-auto rounded-3xl ${isClosing ? 'animate-modal-card-out' : 'animate-modal-card'} relative [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`} onClick={e => e.stopPropagation()}>
             <div className="bg-card rounded-3xl border border-border/30 w-full shadow-[0_30px_80px_-20px_hsla(var(--secondary),0.25)] overflow-hidden">
               {(() => {
                 const accent = deptConfig[selectedFaculty.department]?.accentHsl || defaultAccent;
@@ -322,7 +331,7 @@ export default function Faculty() {
                       <div className="absolute -top-16 -right-16 w-40 h-40 rounded-full blur-3xl pointer-events-none" style={{ background: `hsla(${accent}, 0.1)` }} />
                       <div className="absolute top-0 left-0 right-0 h-1 pointer-events-none" style={{ background: `linear-gradient(90deg, transparent 10%, hsla(${accent}, ${isLeader ? "0.5" : "0.3"}) 50%, transparent 90%)` }} />
 
-                      <button onClick={() => setSelectedFaculty(null)} className="absolute top-4 right-4 w-8 h-8 rounded-xl bg-background/50 backdrop-blur-sm border border-border/30 flex items-center justify-center hover:bg-background/80 transition-all duration-200 hover:scale-110 z-20 text-muted-foreground hover:text-foreground">
+                      <button onClick={closeModal} className="absolute top-4 right-4 w-8 h-8 rounded-xl bg-background/50 backdrop-blur-sm border border-border/30 flex items-center justify-center hover:bg-background/80 transition-all duration-200 hover:scale-110 z-20 text-muted-foreground hover:text-foreground">
                         <X className="w-4 h-4" />
                       </button>
 
