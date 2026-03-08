@@ -98,8 +98,7 @@ const AdminCourses = lazy(() => import("./pages/dashboard/admin/AdminCourses"));
 const AdminAttendanceOverview = lazy(() => import("./pages/dashboard/admin/AdminAttendanceOverview"));
 const AdminApproveAdmins = lazy(() => import("./pages/dashboard/admin/AdminApproveAdmins"));
 const AdminStudentFeeDetail = lazy(() => import("./pages/dashboard/admin/AdminStudentFeeDetail"));
-const AdminSeats = lazy(() => import("./pages/dashboard/admin/AdminSeats"));
-const AdminDepartments = lazy(() => import("./pages/dashboard/admin/AdminDepartments"));
+const AdminDepartmentsAndSeats = lazy(() => import("./pages/dashboard/admin/AdminDepartmentsAndSeats"));
 
 const queryClient = new QueryClient();
 
@@ -186,7 +185,7 @@ const App = () => (
             <Route path="/dashboard/teacher/attendance" element={<TeacherRoute><TeacherAttendance /></TeacherRoute>} />
             <Route path="/dashboard/teacher/attendance-overview" element={<TeacherRoute><TeacherAttendanceOverview /></TeacherRoute>} />
             <Route path="/dashboard/teacher/marks" element={<TeacherRoute><TeacherMarks /></TeacherRoute>} />
-            <Route path="/dashboard/teacher/absent" element={<TeacherRoute><TeacherAbsent /></TeacherRoute>} />
+            <Route path="/dashboard/teacher/absent" element={<TeacherRoute><TeacherAttendanceOverview /></TeacherRoute>} />
             <Route path="/dashboard/teacher/materials" element={<TeacherRoute><TeacherMaterials /></TeacherRoute>} />
             <Route path="/dashboard/teacher/notices" element={<TeacherRoute><TeacherNotices /></TeacherRoute>} />
             <Route path="/dashboard/teacher/timetable" element={<TeacherRoute><TeacherTimetable /></TeacherRoute>} />
@@ -226,8 +225,8 @@ const App = () => (
             <Route path="/dashboard/admin/attendance-overview" element={<AdminRoute><AdminAttendanceOverview /></AdminRoute>} />
             <Route path="/dashboard/admin/approve-admins" element={<AdminRoute><AdminApproveAdmins /></AdminRoute>} />
             <Route path="/dashboard/admin/fees/:studentId" element={<AdminRoute><AdminStudentFeeDetail /></AdminRoute>} />
-            <Route path="/dashboard/admin/seats" element={<AdminRoute><AdminSeats /></AdminRoute>} />
-            <Route path="/dashboard/admin/departments" element={<AdminRoute><AdminDepartments /></AdminRoute>} />
+            <Route path="/dashboard/admin/seats" element={<AdminRoute><AdminDepartmentsAndSeats /></AdminRoute>} />
+            <Route path="/dashboard/admin/departments" element={<AdminRoute><AdminDepartmentsAndSeats /></AdminRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
