@@ -52,9 +52,9 @@ export function DeveloperShowcase() {
                   {/* Holographic overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-secondary/15 via-transparent to-primary/5 opacity-0 group-hover/photo:opacity-100 transition-opacity duration-500 mix-blend-overlay" />
                 </div>
-                {/* Badge with neon glow */}
-                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-secondary text-secondary-foreground px-5 py-2 rounded-full text-xs font-bold shadow-[0_4px_20px_hsl(var(--secondary)/0.3)] whitespace-nowrap border border-secondary/50 group-hover:-translate-y-1 group-hover:shadow-[0_8px_30px_hsl(var(--secondary)/0.5)] transition-all duration-500">
-                  <Code2 className="w-3.5 h-3.5 group-hover:rotate-12 transition-transform duration-500" />
+                {/* Badge */}
+                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-secondary text-secondary-foreground px-5 py-2 rounded-full text-xs font-bold shadow-lg whitespace-nowrap border border-secondary/20 transition-all duration-500">
+                  <Code2 className="w-3.5 h-3.5" />
                   Full-Stack Developer
                 </div>
               </div>
