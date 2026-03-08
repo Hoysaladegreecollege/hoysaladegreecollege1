@@ -88,6 +88,7 @@ export default function PageLoader() {
                 style={{
                   border: "1px solid rgba(255,255,255,0.08)",
                   boxShadow: "0 20px 60px -15px rgba(0,0,0,0.8), 0 0 40px -10px hsla(var(--gold), 0.15)",
+                  background: "rgba(255,255,255,0.95)",
                 }}
               >
                 <img src={collegeLogo} alt="Logo" className="w-full h-full object-contain" />
