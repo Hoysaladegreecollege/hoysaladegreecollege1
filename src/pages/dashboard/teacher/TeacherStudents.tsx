@@ -51,20 +51,27 @@ export default function TeacherStudents() {
 
   return (
     <div className="space-y-5 sm:space-y-6">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-primary/5 to-secondary/5 border border-border rounded-2xl p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div>
-            <h2 className="font-display text-lg sm:text-xl font-bold text-foreground flex items-center gap-2">
-              <Users className="w-5 h-5 text-primary" /> Students
-            </h2>
-            <p className="font-body text-xs sm:text-sm text-muted-foreground mt-1">{filtered.length} of {students.length} active students</p>
+      {/* Premium Header */}
+      <div className="relative overflow-hidden bg-card border border-border/40 rounded-3xl p-5 sm:p-7">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.06] via-transparent to-secondary/[0.04]" />
+        <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full blur-[80px] pointer-events-none" style={{ background: "hsla(var(--gold), 0.08)" }} />
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+        <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+              <Users className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="font-display text-lg sm:text-xl font-bold text-foreground">Students</h2>
+              <p className="font-body text-xs text-muted-foreground mt-0.5">{filtered.length} of {students.length} active students</p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-card border border-border rounded-2xl p-4">
+      <div className="relative overflow-hidden bg-card border border-border/40 rounded-3xl p-5">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent" />
         <div className="flex items-center gap-2 mb-3">
           <Filter className="w-4 h-4 text-primary" />
           <h3 className="font-body text-sm font-bold text-foreground">Filter Students</h3>
