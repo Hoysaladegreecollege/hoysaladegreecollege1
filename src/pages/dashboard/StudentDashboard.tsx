@@ -567,6 +567,9 @@ export default function StudentDashboard() {
         )}
       </div>
 
+      {/* Exam Countdown */}
+      <ExamCountdown courseId={data?.courseId} semester={data?.semester} />
+
       {/* Quick Actions */}
       <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
         <h3 className="font-body text-[14px] font-semibold text-foreground mb-4">Quick Actions</h3>
