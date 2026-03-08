@@ -308,7 +308,7 @@ export default function Faculty() {
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="w-80 h-80 rounded-full blur-[80px] animate-modal-glow" style={{ background: `hsl(var(--gold))` }} />
           </div>
-          <div className="w-full max-w-sm sm:max-w-md max-h-[90vh] overflow-y-auto rounded-3xl animate-modal-card relative" onClick={e => e.stopPropagation()}>
+          <div className="w-full max-w-sm sm:max-w-md max-h-[90vh] overflow-y-auto rounded-3xl animate-modal-card relative [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" onClick={e => e.stopPropagation()}>
             <div className="bg-card rounded-3xl border border-border/30 w-full shadow-[0_30px_80px_-20px_hsla(var(--secondary),0.25)] overflow-hidden">
               {(() => {
                 const accent = deptConfig[selectedFaculty.department]?.accentHsl || defaultAccent;
