@@ -13,14 +13,10 @@ export function DeveloperShowcase() {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="group relative rounded-[2rem] overflow-hidden bg-card/60 backdrop-blur-2xl border border-border/30 shadow-2xl hover:shadow-[0_30px_80px_-20px_hsl(var(--secondary)/0.25)] hover:border-secondary/20 transition-all duration-700">
-        {/* Animated top accent — neon pulse */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-secondary/60 to-transparent" />
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-secondary/0 via-secondary to-secondary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+        {/* Subtle top accent */}
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-secondary/30 to-transparent" />
         {/* Bottom accent line */}
-        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-secondary/20 to-transparent" />
-
-        {/* Shimmer sweep */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-[1.8s] ease-in-out" />
+        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-secondary/10 to-transparent" />
 
         {/* Circuit pattern overlay */}
         <div className="absolute inset-0 opacity-[0.02] group-hover:opacity-[0.04] transition-opacity duration-700"
