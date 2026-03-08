@@ -323,7 +323,7 @@ export default function AdminFeeManagement() {
             {/* Unlock Button */}
             <button
               onClick={handlePinSubmit}
-              disabled={pinInput.length !== 6 || pinChecking}
+              disabled={pinInput.length !== 6 || pinChecking || lockoutRemaining > 0}
               className="group relative w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-primary/90 text-primary-foreground font-body font-semibold text-sm disabled:opacity-40 overflow-hidden transition-all duration-300 hover:shadow-[0_8px_30px_hsl(var(--primary)/0.3)] active:scale-[0.98]"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
