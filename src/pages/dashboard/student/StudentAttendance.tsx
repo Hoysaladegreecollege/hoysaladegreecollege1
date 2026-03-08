@@ -145,21 +145,22 @@ export default function StudentAttendance() {
 
       {/* Subject-wise */}
       {Object.keys(bySubject).length > 0 && (
-        <div className="bg-card border border-border rounded-2xl p-5">
-          <h3 className="font-display text-base font-bold text-foreground mb-4 flex items-center gap-2">
+        <div className="relative overflow-hidden bg-card border border-border/40 rounded-3xl p-6">
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent" />
+          <h3 className="font-display text-base font-bold text-foreground mb-5 flex items-center gap-2">
             <BookOpen className="w-4 h-4 text-primary" /> Subject-wise Attendance
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {Object.entries(bySubject).map(([subject, data]) => {
               const pct = Math.round((data.present / data.total) * 100);
               return (
-                <div key={subject} className="space-y-1">
+                <div key={subject} className="space-y-1.5 p-3 rounded-2xl bg-muted/20 border border-border/20 hover:border-border/40 transition-all duration-300">
                   <div className="flex justify-between items-center">
-                    <span className="font-body text-sm font-medium text-foreground">{subject}</span>
-                    <span className={`font-body text-xs font-bold ${pct >= 75 ? "text-primary" : "text-destructive"}`}>{pct}% ({data.present}/{data.total})</span>
+                    <span className="font-body text-sm font-semibold text-foreground">{subject}</span>
+                    <span className={`font-body text-xs font-bold px-2.5 py-1 rounded-full ${pct >= 75 ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive"}`}>{pct}% ({data.present}/{data.total})</span>
                   </div>
-                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                    <div className={`h-full rounded-full transition-all duration-700 ${pct >= 75 ? "bg-primary" : "bg-destructive"}`} style={{ width: `${pct}%` }} />
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div className={`h-full rounded-full transition-all duration-1000 ${pct >= 75 ? "bg-primary" : "bg-destructive"}`} style={{ width: `${pct}%` }} />
                   </div>
                 </div>
               );
