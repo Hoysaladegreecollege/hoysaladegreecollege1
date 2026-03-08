@@ -251,6 +251,7 @@ export default function StudentDashboard() {
     { icon: BookOpen, label: "Materials", desc: "Study resources", path: "/dashboard/student/materials", color: "bg-amber-500/10", iconColor: "text-amber-500" },
     { icon: Bell, label: "Notices", desc: "Updates", path: "/dashboard/student/notices", color: "bg-cyan-500/10", iconColor: "text-cyan-500" },
     { icon: Megaphone, label: "Announcements", desc: "Messages", path: "/dashboard/student/announcements", color: "bg-rose-500/10", iconColor: "text-rose-500" },
+    { icon: MessageCircle, label: "Messages", desc: "Ask teachers", path: "/dashboard/student/messages", color: "bg-teal-500/10", iconColor: "text-teal-500" },
     { icon: User, label: "My Profile", desc: "View details", path: "/dashboard/student/profile", color: "bg-indigo-500/10", iconColor: "text-indigo-500" },
   ];
 
