@@ -125,7 +125,10 @@ export function usePushNotifications() {
   }, [user]);
 
   const subscribe = useCallback(async () => {
-    if (!user || !swRegistration || !VAPID_PUBLIC_KEY) return;
+    if (!user || !swRegistration || !VAPID_PUBLIC_KEY) {
+      toast.error('Push notifications are not available in this environment yet.');
+      return;
+    }
 
     setIsLoading(true);
     try {
