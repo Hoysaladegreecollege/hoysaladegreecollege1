@@ -23,12 +23,119 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" /></noscript>
 
-    <!-- Inline critical splash styles for instant display -->
+    <!-- Ultra-premium splash screen styles -->
     <style>
-      #root-loader{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#0a0c12;transition:opacity .4s}
-      #root-loader.hide{opacity:0;pointer-events:none}
-      #root-loader .spinner{width:48px;height:48px;border:3px solid rgba(255,255,255,.08);border-top-color:hsl(42,75%,55%);border-radius:50%;animation:rl-spin .7s linear infinite}
-      @keyframes rl-spin{to{transform:rotate(360deg)}}
+      :root { --rl-gold: 42, 75%, 55%; --rl-bg: #070810; --rl-ring: hsla(42,75%,55%,0.6); }
+      #root-loader {
+        position: fixed; inset: 0; z-index: 9999;
+        display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 28px;
+        background: var(--rl-bg);
+        transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1);
+        overflow: hidden;
+      }
+      #root-loader.hide { opacity: 0; transform: scale(1.04); pointer-events: none; }
+
+      /* Ambient aurora background */
+      #root-loader::before {
+        content: ''; position: absolute; width: 600px; height: 600px;
+        background: radial-gradient(ellipse, hsla(var(--rl-gold), 0.06) 0%, hsla(220,55%,48%,0.04) 40%, transparent 70%);
+        top: 50%; left: 50%; transform: translate(-50%, -50%);
+        animation: rl-aurora 6s ease-in-out infinite;
+      }
+      /* Subtle grid pattern */
+      #root-loader::after {
+        content: ''; position: absolute; inset: 0;
+        background-image: radial-gradient(hsla(var(--rl-gold), 0.025) 1px, transparent 1px);
+        background-size: 48px 48px;
+        mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, black 30%, transparent 70%);
+        -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, black 30%, transparent 70%);
+      }
+
+      /* Logo container with conic ring */
+      .rl-logo-wrap {
+        position: relative; width: 88px; height: 88px; z-index: 2;
+        animation: rl-logo-enter 1s cubic-bezier(0.34,1.56,0.64,1) 0.1s both;
+      }
+      .rl-logo-ring {
+        position: absolute; inset: -6px; border-radius: 22px;
+        background: conic-gradient(from 0deg, hsla(var(--rl-gold),0.7), hsla(220,55%,48%,0.4), transparent, hsla(var(--rl-gold),0.7));
+        animation: rl-spin 2.4s linear infinite;
+        opacity: 0; transition: opacity 0.5s 0.3s;
+      }
+      .rl-logo-ring-inner {
+        position: absolute; inset: 2px; border-radius: 19px;
+        background: var(--rl-bg);
+      }
+      .rl-logo-img-wrap {
+        position: relative; width: 88px; height: 88px; border-radius: 20px; overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.08);
+        box-shadow: 0 20px 60px -15px rgba(0,0,0,0.8), 0 0 40px -10px hsla(var(--rl-gold),0.15);
+        z-index: 1;
+      }
+      .rl-logo-img-wrap img { width: 100%; height: 100%; object-fit: contain; }
+
+      /* Text */
+      .rl-text {
+        text-align: center; z-index: 2;
+        animation: rl-text-enter 0.7s cubic-bezier(0.16,1,0.3,1) 0.5s both;
+      }
+      .rl-title {
+        font-family: 'Playfair Display', Georgia, serif;
+        font-size: 22px; font-weight: 700; color: rgba(255,255,255,0.92);
+        letter-spacing: 0.02em; margin: 0;
+      }
+      .rl-subtitle {
+        font-family: 'Inter', system-ui, sans-serif;
+        font-size: 9px; color: rgba(255,255,255,0.35);
+        letter-spacing: 0.3em; text-transform: uppercase; margin-top: 8px;
+      }
+
+      /* Premium progress */
+      .rl-progress {
+        width: 180px; height: 3px; border-radius: 99px; z-index: 2;
+        background: rgba(255,255,255,0.06);
+        animation: rl-progress-enter 0.5s ease-out 0.7s both;
+        overflow: hidden;
+      }
+      .rl-progress-bar {
+        height: 100%; border-radius: 99px; width: 0%;
+        background: linear-gradient(90deg, hsla(var(--rl-gold),0.8), hsla(220,55%,60%,0.6), hsla(var(--rl-gold),0.8));
+        background-size: 200% 100%;
+        animation: rl-progress-fill 2.2s cubic-bezier(0.4,0,0.2,1) 0.9s forwards, rl-shimmer 1.4s linear infinite;
+      }
+
+      /* Floating particles */
+      .rl-particle {
+        position: absolute; border-radius: 50%; z-index: 1;
+        background: hsla(var(--rl-gold), 0.2);
+        animation: rl-particle 4s ease-in-out infinite;
+        filter: blur(1px);
+      }
+
+      @keyframes rl-spin { to { transform: rotate(360deg); } }
+      @keyframes rl-aurora {
+        0%, 100% { transform: translate(-50%,-50%) scale(1) rotate(0deg); opacity: 0.6; }
+        50% { transform: translate(-50%,-50%) scale(1.2) rotate(15deg); opacity: 1; }
+      }
+      @keyframes rl-logo-enter {
+        0% { transform: scale(0.3) rotate(-60deg); opacity: 0; filter: blur(8px); }
+        60% { transform: scale(1.06) rotate(3deg); opacity: 1; filter: blur(0); }
+        100% { transform: scale(1) rotate(0); opacity: 1; filter: blur(0); }
+      }
+      @keyframes rl-text-enter {
+        from { opacity: 0; transform: translateY(18px); filter: blur(4px); }
+        to { opacity: 1; transform: translateY(0); filter: blur(0); }
+      }
+      @keyframes rl-progress-enter {
+        from { opacity: 0; width: 0; }
+        to { opacity: 1; width: 180px; }
+      }
+      @keyframes rl-progress-fill { to { width: 100%; } }
+      @keyframes rl-shimmer { from { background-position: -200% 0; } to { background-position: 200% 0; } }
+      @keyframes rl-particle {
+        0%, 100% { opacity: 0; transform: translateY(0) scale(0.5); }
+        50% { opacity: 0.5; transform: translateY(-30px) scale(1); }
+      }
     </style>
 
     <meta property="og:title" content="Hoysala Degree College">
@@ -42,8 +149,40 @@
   <meta property="og:type" content="website">
 </head>
   <body>
-    <!-- Instant loader shown before JS bundle loads -->
-    <div id="root-loader"><div class="spinner"></div></div>
+    <!-- Ultra-premium loader -->
+    <div id="root-loader">
+      <!-- Floating particles -->
+      <div class="rl-particle" style="left:12%;top:18%;width:5px;height:5px;animation-delay:0s;"></div>
+      <div class="rl-particle" style="left:78%;top:25%;width:4px;height:4px;animation-delay:0.8s;"></div>
+      <div class="rl-particle" style="left:25%;top:72%;width:6px;height:6px;animation-delay:1.5s;"></div>
+      <div class="rl-particle" style="left:68%;top:68%;width:3px;height:3px;animation-delay:0.4s;"></div>
+      <div class="rl-particle" style="left:45%;top:15%;width:4px;height:4px;animation-delay:2s;"></div>
+      <div class="rl-particle" style="left:85%;top:55%;width:5px;height:5px;animation-delay:1.2s;"></div>
+      <div class="rl-particle" style="left:10%;top:50%;width:3px;height:3px;animation-delay:1.8s;"></div>
+      <div class="rl-particle" style="left:55%;top:85%;width:4px;height:4px;animation-delay:0.6s;"></div>
+
+      <!-- Logo with conic ring -->
+      <div class="rl-logo-wrap">
+        <div class="rl-logo-ring" style="opacity:0.6;">
+          <div class="rl-logo-ring-inner"></div>
+        </div>
+        <div class="rl-logo-img-wrap">
+          <img src="/lovable-uploads/bacc5b2d-3f25-473a-a2ee-a0d75a0cb7e3.png" alt="HDC" />
+        </div>
+      </div>
+
+      <!-- Title -->
+      <div class="rl-text">
+        <p class="rl-title">Hoysala Degree College</p>
+        <p class="rl-subtitle">Right Choice For Better Future</p>
+      </div>
+
+      <!-- Progress -->
+      <div class="rl-progress">
+        <div class="rl-progress-bar"></div>
+      </div>
+    </div>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
