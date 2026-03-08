@@ -239,68 +239,105 @@ export default function Courses() {
       </section>
 
       <Dialog open={!!selectedCourse} onOpenChange={() => setSelectedCourse(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border-border/50">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border-border/30 bg-card/95 backdrop-blur-2xl p-0 shadow-2xl">
           {selectedCourse && (
-            <>
-              <DialogHeader>
-                <div className={`flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-br ${selectedCourse.color} border border-border/30 mb-2 relative overflow-hidden`}>
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent" />
-                  <div className="w-16 h-16 rounded-2xl bg-background/80 backdrop-blur-sm flex items-center justify-center text-4xl shrink-0 shadow-lg border border-border/30">
-                    {selectedCourse.icon}
+            <div className="relative overflow-hidden">
+              {/* Dialog ambient glow */}
+              <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full blur-[100px] pointer-events-none"
+                style={{ background: `hsla(${selectedCourse.accentHsl || '220 55% 48%'}, 0.08)` }} />
+              <div className="absolute -bottom-20 -left-20 w-48 h-48 bg-secondary/[0.04] rounded-full blur-[80px] pointer-events-none" />
+
+              {/* Hero header with gradient */}
+              <div className={`relative p-6 sm:p-8 bg-gradient-to-br ${selectedCourse.color} border-b border-border/20 overflow-hidden`}>
+                <div className="absolute inset-0 opacity-[0.02]"
+                  style={{ backgroundImage: "repeating-linear-gradient(45deg, rgba(255,255,255,0.3) 0, rgba(255,255,255,0.3) 1px, transparent 1px, transparent 30px)" }} />
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent" />
+                
+                <DialogHeader className="relative z-10">
+                  <div className="flex items-center gap-5">
+                    <div className="w-[72px] h-[72px] rounded-2xl bg-background/90 backdrop-blur-xl flex items-center justify-center text-[2.5rem] shrink-0 shadow-xl border border-border/40 ring-2 ring-white/[0.03]">
+                      {selectedCourse.icon}
+                    </div>
+                    <div>
+                      <DialogTitle className="font-display text-2xl sm:text-[1.75rem] font-bold tracking-[-0.01em]">{selectedCourse.name}</DialogTitle>
+                      <DialogDescription className="font-body text-xs sm:text-sm mt-1 opacity-70">{selectedCourse.full}</DialogDescription>
+                    </div>
                   </div>
-                  <div className="relative">
-                    <DialogTitle className="font-display text-2xl">{selectedCourse.name}</DialogTitle>
-                    <DialogDescription className="font-body">{selectedCourse.full}</DialogDescription>
-                  </div>
-                </div>
-              </DialogHeader>
-              <div className="space-y-5">
+                </DialogHeader>
+              </div>
+
+              {/* Content body */}
+              <div className="p-6 sm:p-8 space-y-6 relative">
                 <p className="font-body text-muted-foreground leading-relaxed text-sm">{selectedCourse.overview}</p>
+                
+                {/* Info cards */}
                 <div className="grid sm:grid-cols-3 gap-3">
                   {[
-                    { icon: Clock, label: "Duration", value: selectedCourse.duration },
-                    { icon: CheckCircle, label: "Eligibility", value: selectedCourse.eligibility },
-                    { icon: IndianRupee, label: "Fee", value: selectedCourse.fee },
+                    { icon: Clock, label: "Duration", value: selectedCourse.duration, hsl: "217 72% 50%" },
+                    { icon: CheckCircle, label: "Eligibility", value: selectedCourse.eligibility, hsl: "142 70% 40%" },
+                    { icon: IndianRupee, label: "Fee", value: selectedCourse.fee, hsl: "42 87% 55%" },
                   ].map((item) => (
-                    <div key={item.label} className="flex items-start gap-3 bg-muted/30 rounded-xl p-3.5 border border-border/50 hover:bg-muted/50 hover:border-primary/15 transition-all duration-300 group">
-                      <item.icon className="w-4 h-4 text-primary shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
-                      <div>
-                        <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">{item.label}</p>
-                        <p className="font-body text-xs font-medium text-foreground mt-0.5">{item.value}</p>
+                    <div key={item.label} className="relative flex items-start gap-3 rounded-2xl p-4 border border-border/40 bg-muted/20 hover:bg-muted/40 transition-all duration-400 group overflow-hidden">
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl"
+                        style={{ background: `linear-gradient(135deg, hsla(${item.hsl}, 0.04), transparent)` }} />
+                      <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border border-border/30 group-hover:scale-110 transition-all duration-300 relative z-10"
+                        style={{ background: `hsla(${item.hsl}, 0.08)` }}>
+                        <item.icon className="w-4 h-4" style={{ color: `hsl(${item.hsl})` }} />
+                      </div>
+                      <div className="relative z-10">
+                        <p className="font-body text-[10px] font-bold text-muted-foreground uppercase tracking-[0.15em]">{item.label}</p>
+                        <p className="font-body text-xs font-semibold text-foreground mt-1 leading-snug">{item.value}</p>
                       </div>
                     </div>
                   ))}
                 </div>
+
+                {/* Highlights */}
                 {selectedCourse.highlights?.length > 0 && (
                   <div>
-                    <h4 className="font-display text-base font-semibold text-foreground mb-3 flex items-center gap-2">
-                      <Star className="w-4 h-4 text-secondary" /> Course Highlights
-                    </h4>
+                    <div className="flex items-center gap-2.5 mb-4">
+                      <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center border border-secondary/15">
+                        <Star className="w-4 h-4 text-secondary" />
+                      </div>
+                      <h4 className="font-display text-base font-bold text-foreground">Course Highlights</h4>
+                    </div>
                     <div className="grid sm:grid-cols-2 gap-2">
-                      {selectedCourse.highlights.map((h: string) => (
-                        <div key={h} className="flex items-center gap-2.5 font-body text-sm text-muted-foreground p-2.5 rounded-xl hover:bg-muted/40 transition-colors duration-200 group">
-                          <CheckCircle className="w-4 h-4 text-secondary shrink-0 group-hover:scale-110 transition-transform" /> {h}
+                      {selectedCourse.highlights.map((h: string, idx: number) => (
+                        <div key={h} className="flex items-center gap-3 font-body text-sm text-muted-foreground p-3 rounded-xl border border-border/20 hover:bg-muted/30 hover:border-border/40 transition-all duration-300 group"
+                          style={{ animationDelay: `${idx * 40}ms` }}>
+                          <div className="w-5 h-5 rounded-md bg-secondary/10 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:bg-secondary/20 transition-all duration-300">
+                            <CheckCircle className="w-3 h-3 text-secondary" />
+                          </div>
+                          <span className="group-hover:text-foreground transition-colors duration-200">{h}</span>
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
-                <Link to="/apply">
+
+                {/* Premium Apply Button */}
+                <Link to="/apply" className="block mt-3">
                   <button
-                    className="relative w-full group overflow-hidden px-6 py-3.5 rounded-xl font-body text-sm font-bold text-primary-foreground transition-all duration-300 hover:scale-[1.02] shadow-lg mt-2"
+                    className="relative w-full group overflow-hidden px-6 py-4 rounded-2xl font-body text-sm font-bold transition-all duration-500 hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98] touch-manipulation"
                     style={{
-                      background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--navy-dark)))",
-                      boxShadow: "0 4px 20px hsl(var(--primary) / 0.25)",
+                      background: "linear-gradient(135deg, hsl(42,87%,58%), hsl(38,92%,50%), hsl(35,85%,45%))",
+                      color: "hsl(30,10%,10%)",
+                      boxShadow: "0 8px 32px hsla(42,87%,52%,0.35), inset 0 1px 0 hsla(50,100%,90%,0.3)",
                     }}
                   >
-                    <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/12 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 rounded-xl" />
-                    <span className="relative flex items-center justify-center gap-2">
-                      Apply Now <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                    {/* Shimmer sweep */}
+                    <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/25 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 rounded-2xl" />
+                    {/* Glowing border ring */}
+                    <span className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/20 pointer-events-none" />
+                    <span className="relative flex items-center justify-center gap-2.5">
+                      <GraduationCap className="w-5 h-5" />
+                      Apply Now
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" />
                     </span>
                   </button>
                 </Link>
               </div>
-            </>
+            </div>
           )}
         </DialogContent>
       </Dialog>
