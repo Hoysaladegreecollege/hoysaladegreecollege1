@@ -43,6 +43,7 @@ const CampusPage = lazy(() => import("./pages/Campus"));
 const Alumni = lazy(() => import("./pages/Alumni"));
 const Clubs = lazy(() => import("./pages/Clubs"));
 const Library = lazy(() => import("./pages/Library"));
+const InstallApp = lazy(() => import("./pages/Install"));
 
 // Lazy load student dashboard
 const StudentDashboard = lazy(() => import("./pages/dashboard/StudentDashboard"));
@@ -166,6 +167,7 @@ const App = () => (
               <Route path="/alumni" element={<SuspenseWrap><Alumni /></SuspenseWrap>} />
               <Route path="/clubs" element={<SuspenseWrap><Clubs /></SuspenseWrap>} />
               <Route path="/library" element={<SuspenseWrap><Library /></SuspenseWrap>} />
+              <Route path="/install" element={<SuspenseWrap><InstallApp /></SuspenseWrap>} />
             </Route>
 
             <Route path="/login" element={<SuspenseWrap><Login /></SuspenseWrap>} />
