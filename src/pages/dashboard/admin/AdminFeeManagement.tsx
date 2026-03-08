@@ -307,9 +307,15 @@ export default function AdminFeeManagement() {
                 className="relative w-full text-center text-3xl tracking-[0.5em] font-mono rounded-2xl h-[72px] bg-muted/50 border border-border/80 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 focus:bg-muted/70 outline-none transition-all duration-300 placeholder:text-muted-foreground/30 placeholder:tracking-[0.3em] placeholder:text-xl"
               />
               {pinError && (
-                <div className="mt-3 flex items-center justify-center gap-2 text-destructive animate-fade-in">
+                <div className={`mt-3 flex items-center justify-center gap-2 animate-fade-in ${lockoutUntil ? "text-amber-500" : "text-destructive"}`}>
                   <AlertCircle className="w-3.5 h-3.5" />
                   <p className="font-body text-xs font-medium">{pinError}</p>
+                </div>
+              )}
+              {lockoutRemaining > 0 && (
+                <div className="mt-2 flex items-center justify-center gap-2 animate-fade-in">
+                  <div className="w-5 h-5 rounded-full border-2 border-amber-500/30 border-t-amber-500 animate-spin" />
+                  <p className="font-body text-xs text-amber-500 font-semibold tabular-nums">Retry in {lockoutRemaining}s</p>
                 </div>
               )}
             </div>
