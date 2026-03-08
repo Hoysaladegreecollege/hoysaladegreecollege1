@@ -40,12 +40,7 @@ export function DeveloperShowcase() {
           <div className="flex flex-col lg:flex-row items-center lg:items-start gap-10">
             {/* Photo with holographic border */}
             <div className="relative shrink-0">
-              <div className="absolute -inset-4 rounded-[1.8rem] bg-gradient-to-br from-secondary/25 via-transparent to-primary/15 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 animate-[creditsSpin_8s_linear_infinite]" style={{ animationTimingFunction: "linear" }} />
-              
-              {/* Scan line over photo */}
-              <div className="absolute inset-0 z-10 rounded-[1.5rem] overflow-hidden pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                <div className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-secondary/50 to-transparent animate-[creditsPhotoScan_3s_ease-in-out_infinite]" />
-              </div>
+              <div className="absolute -inset-4 rounded-[1.8rem] bg-gradient-to-br from-secondary/10 via-transparent to-primary/5 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
               <div className="relative group/photo">
                 <div className="w-48 h-48 sm:w-56 sm:h-56 rounded-[1.5rem] overflow-hidden border-2 border-secondary/15 shadow-2xl group-hover:border-secondary/40 group-hover/photo:shadow-[0_20px_60px_-15px_hsl(var(--secondary)/0.35)] transition-all duration-700">
