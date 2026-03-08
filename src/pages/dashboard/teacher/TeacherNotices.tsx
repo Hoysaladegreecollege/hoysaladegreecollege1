@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
-import { Trash2, Pin } from "lucide-react";
+import { Trash2, Pin, Bell, Plus, Sparkles } from "lucide-react";
 
 export default function TeacherNotices() {
   const { user } = useAuth();
@@ -46,42 +46,73 @@ export default function TeacherNotices() {
     },
   });
 
+  const inputClass = "w-full border border-border/40 rounded-2xl px-4 py-3 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-300";
+
   return (
     <div className="space-y-6">
-      <h2 className="font-display text-2xl font-bold text-foreground">Notices</h2>
+      {/* Premium Header */}
+      <div className="relative overflow-hidden bg-card border border-border/40 rounded-3xl p-6 sm:p-8">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.06] via-transparent to-secondary/[0.04]" />
+        <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full blur-[80px] pointer-events-none" style={{ background: "hsla(var(--gold), 0.08)" }} />
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+        <div className="relative flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+            <Bell className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h2 className="font-display text-xl font-bold text-foreground">Notices</h2>
+            <p className="font-body text-xs text-muted-foreground mt-0.5">Post and manage college notices</p>
+          </div>
+        </div>
+      </div>
 
-      <div className="bg-card border border-border rounded-xl p-6">
-        <h3 className="font-display text-lg font-bold text-foreground mb-4">Post Notice</h3>
+      {/* Post Form */}
+      <div className="relative overflow-hidden bg-card border border-border/40 rounded-3xl p-6 sm:p-8">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent" />
+        <h3 className="font-display text-sm font-bold text-foreground mb-5 flex items-center gap-2">
+          <Plus className="w-4 h-4 text-primary" /> Post Notice
+        </h3>
         <div className="space-y-4">
-          <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Notice title" />
+          <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Notice title" className="rounded-2xl border-border/40 focus:border-primary/30" />
           <textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder="Notice content" rows={3}
-            className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
-          <select value={type} onChange={(e) => setType(e.target.value)} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+            className={`${inputClass} resize-none`} />
+          <select value={type} onChange={(e) => setType(e.target.value)} className={inputClass}>
             <option value="General">General</option>
             <option value="Academic">Academic</option>
             <option value="Exam">Exam</option>
             <option value="Event">Event</option>
           </select>
-          <Button disabled={!title || !content || addMutation.isPending} onClick={() => addMutation.mutate()}>
+          <Button disabled={!title || !content || addMutation.isPending} onClick={() => addMutation.mutate()} className="rounded-2xl font-body shadow-lg hover:shadow-xl transition-all duration-300">
             {addMutation.isPending ? "Posting..." : "Post Notice"}
           </Button>
         </div>
       </div>
 
+      {/* Notices List */}
       <div className="space-y-3">
-        {notices.map((n: any) => (
-          <div key={n.id} className={`bg-card border rounded-xl p-5 ${n.is_pinned ? "border-secondary" : "border-border"}`}>
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  {n.is_pinned && <Pin className="w-3 h-3 text-secondary" />}
-                  <span className="font-body text-xs px-2 py-0.5 rounded bg-primary/10 text-primary">{n.type}</span>
-                  <span className="font-body text-xs text-muted-foreground">{new Date(n.created_at).toLocaleDateString()}</span>
+        {notices.map((n: any, i: number) => (
+          <div key={n.id}
+            className={`relative overflow-hidden bg-card border rounded-3xl p-5 sm:p-6 hover:shadow-[0_12px_40px_-10px_hsla(var(--primary),0.08)] transition-all duration-500 hover:-translate-y-0.5 group ${n.is_pinned ? "border-primary/25" : "border-border/40"}`}>
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent" />
+            {n.is_pinned && <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />}
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  {n.is_pinned && (
+                    <span className="font-body text-[10px] font-bold text-primary flex items-center gap-1">
+                      <Sparkles className="w-3 h-3" /> Pinned
+                    </span>
+                  )}
+                  <span className="font-body text-[10px] font-bold px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/10 uppercase tracking-wider">{n.type}</span>
+                  <span className="font-body text-[10px] text-muted-foreground">{new Date(n.created_at).toLocaleDateString()}</span>
                 </div>
-                <h4 className="font-display text-base font-bold text-foreground">{n.title}</h4>
-                <p className="font-body text-sm text-muted-foreground mt-1">{n.content}</p>
+                <h4 className="font-display text-base font-bold text-foreground group-hover:text-primary transition-colors duration-300">{n.title}</h4>
+                <p className="font-body text-sm text-muted-foreground mt-1.5 leading-relaxed">{n.content}</p>
               </div>
-              <Button size="icon" variant="ghost" onClick={() => deleteMutation.mutate(n.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
+              <Button size="icon" variant="ghost" onClick={() => deleteMutation.mutate(n.id)}
+                className="rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-destructive/10">
+                <Trash2 className="w-4 h-4 text-destructive" />
+              </Button>
             </div>
           </div>
         ))}
