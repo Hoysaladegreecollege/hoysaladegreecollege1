@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import SEOHead from "@/components/SEOHead";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -24,14 +25,35 @@ import {
   Star,
   Sparkles,
   ChevronRight,
+  ChevronLeft,
   Quote,
   Calendar,
   CheckCircle2,
   ArrowRight,
   Zap,
   Building2,
+  Camera,
+  X,
+  Expand,
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import principalImage from "@/assets/principal.jpg";
+import galleryCampus from "@/assets/gallery-campus.jpg";
+import galleryLab from "@/assets/gallery-lab.jpg";
+import galleryLibrary from "@/assets/gallery-library.jpg";
+import galleryClassroom from "@/assets/gallery-classroom.jpg";
+import galleryEvents from "@/assets/gallery-events.jpg";
+import gallerySports from "@/assets/gallery-sports.jpg";
+
+const fallbackGallery = [
+  { id: "g1", title: "Campus Building", image_url: galleryCampus },
+  { id: "g2", title: "Computer Lab", image_url: galleryLab },
+  { id: "g3", title: "Library", image_url: galleryLibrary },
+  { id: "g4", title: "Classroom", image_url: galleryClassroom },
+  { id: "g5", title: "Annual Day", image_url: galleryEvents },
+  { id: "g6", title: "Sports Ground", image_url: gallerySports },
+];
 
 const tocSections = [
   { id: "about-intro", label: "About", icon: BookOpen },
@@ -42,6 +64,7 @@ const tocSections = [
   { id: "achievements", label: "Achievements", icon: Award },
   { id: "core-values", label: "Core Values", icon: Heart },
   { id: "facilities", label: "Facilities", icon: Shield },
+  { id: "campus-gallery", label: "Campus Gallery", icon: Camera },
   { id: "testimonials", label: "Testimonials", icon: Quote },
   { id: "contact", label: "Reach Us", icon: MapPin },
 ];
@@ -203,12 +226,43 @@ function CounterCard({ fact, index }: { fact: typeof quickFacts[0]; index: numbe
 export default function About() {
   const activeSection = useActiveSection(tocSections.map((s) => s.id));
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+
+  // Fetch gallery images from DB
+  const { data: dbGallery = [] } = useQuery({
+    queryKey: ["about-gallery"],
+    queryFn: async () => {
+      const { data } = await supabase.from("gallery_images").select("*").eq("is_active", true).order("sort_order").limit(6);
+      return data || [];
+    },
+  });
+  const galleryImages = dbGallery.length > 0 ? dbGallery : fallbackGallery;
 
   // Auto-rotate testimonials
   useEffect(() => {
     const timer = setInterval(() => setActiveTestimonial((p) => (p + 1) % testimonials.length), 5000);
     return () => clearInterval(timer);
   }, []);
+
+  // Lightbox body scroll lock
+  useEffect(() => {
+    if (lightboxIdx !== null) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = '';
+    return () => { document.body.style.overflow = ''; };
+  }, [lightboxIdx]);
+
+  // Lightbox keyboard nav
+  useEffect(() => {
+    if (lightboxIdx === null) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightboxIdx(null);
+      if (e.key === "ArrowRight") setLightboxIdx((p) => (p! + 1) % galleryImages.length);
+      if (e.key === "ArrowLeft") setLightboxIdx((p) => (p! - 1 + galleryImages.length) % galleryImages.length);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [lightboxIdx, galleryImages.length]);
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
@@ -535,7 +589,50 @@ export default function About() {
             </div>
           </section>
 
-          {/* Testimonials - NEW */}
+          {/* Campus Gallery - with Lightbox */}
+          <section id="campus-gallery" className="py-16 sm:py-24 bg-background relative overflow-hidden scroll-mt-24">
+            <div className="absolute bottom-20 right-10 w-[400px] h-[400px] rounded-full blur-[150px] pointer-events-none" style={{ background: "hsla(var(--primary), 0.03)" }} />
+            <div className="container max-w-5xl px-4 relative">
+              <ScrollReveal>
+                <SectionHeading title="Campus Highlights" subtitle="A glimpse into our vibrant campus life" />
+              </ScrollReveal>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+                {galleryImages.map((img: any, i: number) => (
+                  <ScrollReveal key={img.id} delay={i * 80}>
+                    <div
+                      onClick={() => setLightboxIdx(i)}
+                      className="relative rounded-2xl overflow-hidden cursor-pointer group aspect-[4/3] border border-border/20 hover:border-border/40 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_16px_50px_-12px_hsla(var(--secondary),0.12)]"
+                    >
+                      <img src={img.image_url} alt={img.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
+                      {/* Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      {/* Shimmer */}
+                      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 pointer-events-none" />
+                      {/* Title + expand */}
+                      <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+                        <div className="flex items-center justify-between">
+                          <p className="font-body text-xs font-semibold text-white drop-shadow-lg">{img.title}</p>
+                          <Expand className="w-3.5 h-3.5 text-white/70" />
+                        </div>
+                      </div>
+                    </div>
+                  </ScrollReveal>
+                ))}
+              </div>
+              {/* View all link */}
+              <ScrollReveal delay={400}>
+                <div className="flex justify-center mt-8">
+                  <a href="/gallery" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-card border border-border/30 hover:border-secondary/30 text-sm font-body font-semibold text-muted-foreground hover:text-foreground transition-all duration-300 hover:shadow-[0_8px_30px_-8px_hsla(var(--secondary),0.1)] group">
+                    <Camera className="w-4 h-4 text-secondary" />
+                    View Full Gallery
+                    <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform duration-300" />
+                  </a>
+                </div>
+              </ScrollReveal>
+            </div>
+          </section>
+
+
           <section id="testimonials" className="py-16 sm:py-24 bg-background relative overflow-hidden scroll-mt-24">
             <div className="absolute top-10 right-10 w-[400px] h-[400px] rounded-full blur-[150px] pointer-events-none" style={{ background: "hsla(var(--secondary), 0.03)" }} />
             <div className="container max-w-3xl px-4 relative">
@@ -633,7 +730,58 @@ export default function About() {
             </div>
           </section>
         </div>
-      </div>
+    </div>
+
+      {/* Lightbox Portal */}
+      {lightboxIdx !== null && createPortal(
+        <div
+          className="fixed inset-0 bg-black/90 backdrop-blur-xl z-[9999] flex items-center justify-center animate-fade-in"
+          onClick={() => setLightboxIdx(null)}
+          onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
+          onTouchEnd={(e) => {
+            if (touchStartX === null) return;
+            const diff = e.changedTouches[0].clientX - touchStartX;
+            if (Math.abs(diff) > 50) {
+              if (diff > 0) setLightboxIdx((p) => (p! - 1 + galleryImages.length) % galleryImages.length);
+              else setLightboxIdx((p) => (p! + 1) % galleryImages.length);
+            }
+            setTouchStartX(null);
+          }}
+        >
+          {/* Close */}
+          <button onClick={() => setLightboxIdx(null)} className="absolute top-4 right-4 w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 transition-all duration-200 z-10">
+            <X className="w-5 h-5" />
+          </button>
+
+          {/* Prev */}
+          <button
+            onClick={(e) => { e.stopPropagation(); setLightboxIdx((p) => (p! - 1 + galleryImages.length) % galleryImages.length); }}
+            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 transition-all duration-200 z-10"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+
+          {/* Next */}
+          <button
+            onClick={(e) => { e.stopPropagation(); setLightboxIdx((p) => (p! + 1) % galleryImages.length); }}
+            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 transition-all duration-200 z-10"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+
+          {/* Image */}
+          <div className="max-w-[90vw] max-h-[80vh] flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={(galleryImages[lightboxIdx] as any).image_url}
+              alt={(galleryImages[lightboxIdx] as any).title}
+              className="max-w-full max-h-[75vh] object-contain rounded-2xl shadow-2xl animate-scale-in"
+            />
+            <p className="font-body text-sm text-white/70 mt-4 font-semibold">{(galleryImages[lightboxIdx] as any).title}</p>
+            <p className="font-body text-xs text-white/40 mt-1">{lightboxIdx + 1} / {galleryImages.length}</p>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }
