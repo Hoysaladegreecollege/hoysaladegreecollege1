@@ -63,9 +63,11 @@ export default function AdminFeeManagement() {
   };
 
   // If no PIN is set, auto-unlock
-  if (!pinLoading && !pinData && !pinUnlocked) {
-    setPinUnlocked(true);
-  }
+  useEffect(() => {
+    if (!pinLoading && !pinData) {
+      setPinUnlocked(true);
+    }
+  }, [pinLoading, pinData]);
 
   // Show PIN gate
   if (pinLoading) {
