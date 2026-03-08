@@ -13,14 +13,10 @@ export function DeveloperShowcase() {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="group relative rounded-[2rem] overflow-hidden bg-card/60 backdrop-blur-2xl border border-border/30 shadow-2xl hover:shadow-[0_30px_80px_-20px_hsl(var(--secondary)/0.25)] hover:border-secondary/20 transition-all duration-700">
-        {/* Animated top accent — neon pulse */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-secondary/60 to-transparent" />
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-secondary/0 via-secondary to-secondary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+        {/* Subtle top accent */}
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-secondary/30 to-transparent" />
         {/* Bottom accent line */}
-        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-secondary/20 to-transparent" />
-
-        {/* Shimmer sweep */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-[1.8s] ease-in-out" />
+        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-secondary/10 to-transparent" />
 
         {/* Circuit pattern overlay */}
         <div className="absolute inset-0 opacity-[0.02] group-hover:opacity-[0.04] transition-opacity duration-700"
@@ -44,12 +40,7 @@ export function DeveloperShowcase() {
           <div className="flex flex-col lg:flex-row items-center lg:items-start gap-10">
             {/* Photo with holographic border */}
             <div className="relative shrink-0">
-              <div className="absolute -inset-4 rounded-[1.8rem] bg-gradient-to-br from-secondary/25 via-transparent to-primary/15 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 animate-[creditsSpin_8s_linear_infinite]" style={{ animationTimingFunction: "linear" }} />
-              
-              {/* Scan line over photo */}
-              <div className="absolute inset-0 z-10 rounded-[1.5rem] overflow-hidden pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                <div className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-secondary/50 to-transparent animate-[creditsPhotoScan_3s_ease-in-out_infinite]" />
-              </div>
+              <div className="absolute -inset-4 rounded-[1.8rem] bg-gradient-to-br from-secondary/10 via-transparent to-primary/5 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
               <div className="relative group/photo">
                 <div className="w-48 h-48 sm:w-56 sm:h-56 rounded-[1.5rem] overflow-hidden border-2 border-secondary/15 shadow-2xl group-hover:border-secondary/40 group-hover/photo:shadow-[0_20px_60px_-15px_hsl(var(--secondary)/0.35)] transition-all duration-700">
@@ -61,9 +52,9 @@ export function DeveloperShowcase() {
                   {/* Holographic overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-secondary/15 via-transparent to-primary/5 opacity-0 group-hover/photo:opacity-100 transition-opacity duration-500 mix-blend-overlay" />
                 </div>
-                {/* Badge with neon glow */}
-                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-secondary text-secondary-foreground px-5 py-2 rounded-full text-xs font-bold shadow-[0_4px_20px_hsl(var(--secondary)/0.3)] whitespace-nowrap border border-secondary/50 group-hover:-translate-y-1 group-hover:shadow-[0_8px_30px_hsl(var(--secondary)/0.5)] transition-all duration-500">
-                  <Code2 className="w-3.5 h-3.5 group-hover:rotate-12 transition-transform duration-500" />
+                {/* Badge */}
+                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-secondary text-secondary-foreground px-5 py-2 rounded-full text-xs font-bold shadow-lg whitespace-nowrap border border-secondary/20 transition-all duration-500">
+                  <Code2 className="w-3.5 h-3.5" />
                   Full-Stack Developer
                 </div>
               </div>
@@ -73,7 +64,7 @@ export function DeveloperShowcase() {
             <div className="flex-1 text-center lg:text-left space-y-5">
               <div>
                 <div className="flex items-center justify-center lg:justify-start gap-2 mb-2">
-                  <Award className="w-5 h-5 text-secondary animate-[creditsPulseGlow_3s_ease-in-out_infinite]" />
+                  <Award className="w-5 h-5 text-secondary" />
                   <span className="font-mono text-[10px] text-secondary font-semibold tracking-[0.3em] uppercase">// Lead Developer</span>
                 </div>
                 <h2 className="font-display text-4xl sm:text-5xl font-bold text-foreground tracking-tight group-hover:tracking-wide transition-all duration-700">
@@ -84,7 +75,7 @@ export function DeveloperShowcase() {
                   <span className="flex items-center gap-1.5 text-muted-foreground font-body text-sm">
                     <GraduationCap className="w-4 h-4 text-secondary/80" /> BCA Department
                   </span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-secondary/30 animate-pulse" />
+                  <span className="w-1 h-1 rounded-full bg-secondary/30" />
                   <span className="flex items-center gap-1.5 text-muted-foreground font-body text-sm">
                     <Globe className="w-4 h-4 text-secondary/80" /> Web Developer
                   </span>
@@ -119,12 +110,11 @@ export function DeveloperShowcase() {
                 href="https://pavan-05.framer.ai/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group/cta relative inline-flex items-center gap-2.5 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-secondary/15 to-secondary/5 hover:from-secondary/25 hover:to-secondary/15 border border-secondary/25 hover:border-secondary/50 text-foreground font-semibold text-sm overflow-hidden transition-all duration-500 shadow-lg shadow-secondary/5 hover:shadow-[0_0_40px_hsl(var(--secondary)/0.25)] hover:-translate-y-1"
+                className="group/cta relative inline-flex items-center gap-2.5 px-7 py-3.5 rounded-2xl bg-secondary/10 hover:bg-secondary/20 border border-secondary/20 hover:border-secondary/40 text-foreground font-semibold text-sm transition-all duration-300"
               >
-                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent -translate-x-full group-hover/cta:translate-x-full transition-transform duration-700" />
-                <Globe className="relative w-4 h-4 text-secondary group-hover/cta:rotate-[360deg] transition-transform duration-700" />
+                <Globe className="relative w-4 h-4 text-secondary" />
                 <span className="relative">View Full Portfolio</span>
-                <ArrowUpRight className="relative w-4 h-4 text-muted-foreground group-hover/cta:text-secondary group-hover/cta:-translate-y-1 group-hover/cta:translate-x-1 transition-all duration-300" />
+                <ArrowUpRight className="relative w-4 h-4 text-muted-foreground group-hover/cta:text-secondary group-hover/cta:-translate-y-0.5 group-hover/cta:translate-x-0.5 transition-all duration-300" />
               </a>
             </div>
           </div>

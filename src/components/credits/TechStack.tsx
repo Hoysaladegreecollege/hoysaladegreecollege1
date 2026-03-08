@@ -43,13 +43,8 @@ export function TechStack() {
             whileInView="visible"
             viewport={{ once: true }}
             variants={techVariants}
-            className="group/tech relative overflow-hidden flex flex-col items-center gap-3 p-5 rounded-2xl bg-card/40 backdrop-blur-sm border border-border/30 cursor-default hover:border-secondary/30 hover:bg-card/60 hover:shadow-[0_0_30px_hsl(var(--secondary)/0.12),inset_0_0_20px_hsl(var(--secondary)/0.03)] hover:-translate-y-2 transition-all duration-500 text-center"
+            className="group/tech relative overflow-hidden flex flex-col items-center gap-3 p-5 rounded-2xl bg-card/40 backdrop-blur-sm border border-border/30 cursor-default hover:border-secondary/30 hover:bg-card/60 transition-all duration-500 text-center"
           >
-            {/* Radial neon glow */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,hsl(var(--secondary)/0.08),transparent_65%)] opacity-0 group-hover/tech:opacity-100 transition-opacity duration-600" />
-            {/* Shimmer sweep */}
-            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent -translate-x-full group-hover/tech:translate-x-full transition-transform duration-[1.2s] ease-in-out" />
-
             {/* Top edge neon line */}
             <div className="absolute top-0 left-1/4 right-1/4 h-[1px] bg-secondary/0 group-hover/tech:bg-secondary/40 group-hover/tech:shadow-[0_0_10px_hsl(var(--secondary)/0.3)] transition-all duration-500" />
 
