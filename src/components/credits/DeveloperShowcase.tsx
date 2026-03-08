@@ -104,11 +104,11 @@ export function DeveloperShowcase() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={social.label}
-                    className="group/s relative flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-muted/20 border border-border/30 text-muted-foreground overflow-hidden hover:bg-secondary/10 hover:border-secondary/30 hover:text-foreground hover:shadow-[0_0_20px_hsl(var(--secondary)/0.12),inset_0_0_10px_hsl(var(--secondary)/0.05)] hover:-translate-y-0.5 transition-all duration-300 backdrop-blur-sm"
+                    className={`group/s relative flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-muted/20 border border-border/30 text-muted-foreground overflow-hidden hover:text-foreground hover:-translate-y-0.5 transition-all duration-300 backdrop-blur-sm ${social.hoverColor}`}
                     style={{ animationDelay: `${i * 80}ms` }}
                   >
                     <span className="absolute inset-0 bg-gradient-to-r from-secondary/0 via-secondary/5 to-secondary/0 opacity-0 group-hover/s:opacity-100 transition-opacity duration-500" />
-                    <social.icon className="relative w-4 h-4 group-hover/s:text-secondary group-hover/s:scale-110 group-hover/s:drop-shadow-[0_0_4px_hsl(var(--secondary)/0.5)] transition-all duration-300" />
+                    <social.icon className="relative w-4 h-4 group-hover/s:scale-110 group-hover/s:drop-shadow-[0_0_4px_hsl(var(--secondary)/0.5)] transition-all duration-300" />
                     <span className="relative font-mono text-[11px] font-medium">{social.label}</span>
                   </a>
                 ))}
