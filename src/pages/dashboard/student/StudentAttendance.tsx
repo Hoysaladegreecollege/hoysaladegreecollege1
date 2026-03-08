@@ -78,18 +78,19 @@ export default function StudentAttendance() {
       </div>
 
       {/* Today's Attendance Status */}
-      <div className={`border rounded-2xl p-4 sm:p-5 flex items-center gap-4 transition-all duration-300 ${
-        todayStatus === "present" ? "bg-emerald-500/5 border-emerald-500/20" : todayStatus === "absent" ? "bg-red-500/5 border-red-500/20" : "bg-card border-border/60"
+      <div className={`relative overflow-hidden border rounded-3xl p-5 sm:p-6 flex items-center gap-4 transition-all duration-500 hover:-translate-y-0.5 ${
+        todayStatus === "present" ? "bg-emerald-500/5 border-emerald-500/20 shadow-[0_8px_30px_-10px_rgba(16,185,129,0.1)]" : todayStatus === "absent" ? "bg-red-500/5 border-red-500/20 shadow-[0_8px_30px_-10px_rgba(239,68,68,0.1)]" : "bg-card border-border/40"
       }`}>
-        <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
-          todayStatus === "present" ? "bg-emerald-500/10" : todayStatus === "absent" ? "bg-red-500/10" : "bg-muted/60"
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/30 to-transparent" />
+        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border ${
+          todayStatus === "present" ? "bg-emerald-500/10 border-emerald-500/15" : todayStatus === "absent" ? "bg-red-500/10 border-red-500/15" : "bg-muted/50 border-border/30"
         }`}>
-          {todayStatus === "present" ? <CheckCircle className="w-6 h-6 text-emerald-500" />
-          : todayStatus === "absent" ? <XCircle className="w-6 h-6 text-red-500" />
-          : <Clock className="w-6 h-6 text-muted-foreground" />}
+          {todayStatus === "present" ? <CheckCircle className="w-7 h-7 text-emerald-500" />
+          : todayStatus === "absent" ? <XCircle className="w-7 h-7 text-red-500" />
+          : <Clock className="w-7 h-7 text-muted-foreground" />}
         </div>
         <div>
-          <p className={`font-body text-base font-semibold ${todayStatus === "present" ? "text-emerald-500" : todayStatus === "absent" ? "text-red-500" : "text-muted-foreground"}`}>
+          <p className={`font-body text-base font-bold ${todayStatus === "present" ? "text-emerald-500" : todayStatus === "absent" ? "text-red-500" : "text-muted-foreground"}`}>
             {todayStatus === "present" ? "You're Present Today ✅" : todayStatus === "absent" ? "You're Marked Absent Today ❌" : "No Attendance Marked Yet"}
           </p>
           <p className="font-body text-xs text-muted-foreground mt-0.5">
@@ -100,18 +101,17 @@ export default function StudentAttendance() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="bg-card border border-border rounded-2xl p-4 text-center hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
-          <p className="font-display text-2xl font-bold text-foreground">{total}</p>
-          <p className="font-body text-xs text-muted-foreground mt-1">Total Classes</p>
-        </div>
-        <div className="bg-gradient-to-br from-primary/8 to-primary/3 border border-border rounded-2xl p-4 text-center hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
-          <p className="font-display text-2xl font-bold text-primary">{present}</p>
-          <p className="font-body text-xs text-muted-foreground mt-1">Present</p>
-        </div>
-        <div className={`border border-border rounded-2xl p-4 text-center hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 ${percentage >= 75 ? "bg-gradient-to-br from-primary/8 to-primary/3" : "bg-gradient-to-br from-destructive/8 to-destructive/3"}`}>
-          <p className={`font-display text-2xl font-bold ${percentage >= 75 ? "text-primary" : "text-destructive"}`}>{percentage}%</p>
-          <p className="font-body text-xs text-muted-foreground mt-1">Attendance</p>
-        </div>
+        {[
+          { value: total, label: "Total Classes", color: "text-foreground", bg: "" },
+          { value: present, label: "Present", color: "text-primary", bg: "from-primary/8 to-primary/3" },
+          { value: `${percentage}%`, label: "Attendance", color: percentage >= 75 ? "text-primary" : "text-destructive", bg: percentage >= 75 ? "from-primary/8 to-primary/3" : "from-destructive/8 to-destructive/3" },
+        ].map((s, i) => (
+          <div key={s.label} className={`relative overflow-hidden bg-card border border-border/40 rounded-3xl p-5 text-center hover:shadow-[0_12px_40px_-10px_hsla(var(--primary),0.08)] hover:-translate-y-1 transition-all duration-500 ${s.bg ? `bg-gradient-to-br ${s.bg}` : ""}`}>
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/30 to-transparent" />
+            <p className={`font-display text-3xl font-bold ${s.color}`}>{s.value}</p>
+            <p className="font-body text-[10px] text-muted-foreground mt-1.5 uppercase tracking-[0.15em]">{s.label}</p>
+          </div>
+        ))}
       </div>
 
       {/* Circular Progress */}
