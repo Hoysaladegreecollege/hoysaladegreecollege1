@@ -200,6 +200,34 @@ export default function DownloadPage() {
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/60" />
                   APK file • Requires Android 6.0+ • Free
                 </p>
+
+                {/* Install Web App Button */}
+                <div className="mt-6">
+                  <button
+                    onClick={handleInstallPWA}
+                    disabled={pwaInstalled}
+                    className="group relative inline-flex items-center gap-3 px-10 sm:px-14 py-4 sm:py-[1.15rem] rounded-[1.25rem] font-body text-sm sm:text-base font-bold transition-all duration-500 hover:scale-105 hover:-translate-y-1 active:scale-[0.97] touch-manipulation disabled:opacity-50 disabled:hover:scale-100 disabled:hover:translate-y-0"
+                    style={{
+                      background: "linear-gradient(135deg, hsla(220,70%,55%,1), hsla(240,60%,50%,1), hsla(260,55%,45%,1))",
+                      color: "white",
+                      boxShadow: "0 12px 40px hsla(230,70%,50%,0.3), inset 0 1px 0 hsla(220,100%,90%,0.2)",
+                    }}
+                  >
+                    <span className="absolute inset-0 overflow-hidden rounded-[1.25rem]">
+                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                    </span>
+                    <span className="absolute inset-0 rounded-[1.25rem] ring-1 ring-inset ring-white/15 pointer-events-none" />
+                    <Globe className="w-5 h-5 relative z-10" />
+                    <span className="relative z-10">
+                      {pwaInstalled ? "Already Installed" : "Install Web App"}
+                    </span>
+                    <MonitorSmartphone className="w-4 h-4 relative z-10 opacity-60" />
+                  </button>
+                  <p className="text-white/20 text-[10px] font-body mt-3 flex items-center justify-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400/60" />
+                    Works on all devices • No download needed • Instant access
+                  </p>
+                </div>
               </div>
             </ScrollReveal>
 
