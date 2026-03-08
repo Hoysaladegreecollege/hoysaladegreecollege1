@@ -226,12 +226,43 @@ function CounterCard({ fact, index }: { fact: typeof quickFacts[0]; index: numbe
 export default function About() {
   const activeSection = useActiveSection(tocSections.map((s) => s.id));
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+
+  // Fetch gallery images from DB
+  const { data: dbGallery = [] } = useQuery({
+    queryKey: ["about-gallery"],
+    queryFn: async () => {
+      const { data } = await supabase.from("gallery_images").select("*").eq("is_active", true).order("sort_order").limit(6);
+      return data || [];
+    },
+  });
+  const galleryImages = dbGallery.length > 0 ? dbGallery : fallbackGallery;
 
   // Auto-rotate testimonials
   useEffect(() => {
     const timer = setInterval(() => setActiveTestimonial((p) => (p + 1) % testimonials.length), 5000);
     return () => clearInterval(timer);
   }, []);
+
+  // Lightbox body scroll lock
+  useEffect(() => {
+    if (lightboxIdx !== null) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = '';
+    return () => { document.body.style.overflow = ''; };
+  }, [lightboxIdx]);
+
+  // Lightbox keyboard nav
+  useEffect(() => {
+    if (lightboxIdx === null) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightboxIdx(null);
+      if (e.key === "ArrowRight") setLightboxIdx((p) => (p! + 1) % galleryImages.length);
+      if (e.key === "ArrowLeft") setLightboxIdx((p) => (p! - 1 + galleryImages.length) % galleryImages.length);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [lightboxIdx, galleryImages.length]);
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
