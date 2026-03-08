@@ -33,7 +33,16 @@ function isLeadership(role: string) {
 
 export default function Faculty() {
   const [selectedFaculty, setSelectedFaculty] = useState<any>(null);
+  const [isClosing, setIsClosing] = useState(false);
   const [selectedDept, setSelectedDept] = useState("All");
+
+  const closeModal = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setSelectedFaculty(null);
+      setIsClosing(false);
+    }, 250);
+  };
 
   useEffect(() => {
     if (selectedFaculty) document.body.style.overflow = 'hidden';
