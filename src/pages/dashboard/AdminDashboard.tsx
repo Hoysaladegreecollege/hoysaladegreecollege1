@@ -808,6 +808,45 @@ export default function AdminDashboard() {
         </div>
       )}
 
+      {/* Recent Fee Transactions */}
+      {recentTransactions.length > 0 && (
+        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                <Wallet className="w-4 h-4 text-emerald-500" />
+              </div>
+              <h3 className="font-body text-[14px] font-semibold text-foreground">Recent Fee Transactions</h3>
+            </div>
+            <Link to="/dashboard/admin/fees" className="font-body text-[11px] text-primary flex items-center gap-0.5 hover:gap-1.5 transition-all duration-200">
+              View all <TrendingUp className="w-3 h-3" />
+            </Link>
+          </div>
+          <div className="space-y-1.5 max-h-[280px] overflow-y-auto">
+            {recentTransactions.map((t: any) => (
+              <div key={t.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors duration-200">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
+                    <IndianRupee className="w-4 h-4 text-emerald-500" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-body text-[12px] font-semibold text-foreground truncate">{t.studentName}</p>
+                    <p className="font-body text-[10px] text-muted-foreground">
+                      {t.rollNumber} · {t.payment_method || "Cash"}
+                      {t.semester && <span className="ml-1 px-1.5 py-0.5 rounded bg-primary/10 text-primary text-[9px]">Sem {t.semester}</span>}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right shrink-0 ml-3">
+                  <p className="font-body text-[13px] font-bold text-emerald-600 tabular-nums">₹{Number(t.amount).toLocaleString()}</p>
+                  <p className="font-body text-[9px] text-muted-foreground">{formatDistanceToNow(new Date(t.created_at), { addSuffix: true })}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Quick Actions */}
       <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
         <h3 className="font-body text-[14px] font-semibold text-foreground mb-4">Quick Actions</h3>
