@@ -6,8 +6,8 @@ const corsHeaders = {
 
 // Simple in-memory rate limiter (per isolate)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT = 15; // max requests per window
-const RATE_WINDOW_MS = 60_000; // 1 minute
+const RATE_LIMIT = 15;
+const RATE_WINDOW_MS = 60_000;
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
@@ -29,6 +29,17 @@ const SYSTEM_PROMPT = `You are the official AI assistant for Hoysala Degree Coll
 - College Code: BU 26 (P21GEF0099)
 - Location: K.R.P. Arcade, UCO Bank Building, Paramanna Layout, Nelamangala Town, Bengaluru Rural Dist. - 562 123
 - Principal: Sri Gopal H.R (M.Sc, M.Ed, TET, KSET, Ph.D)
+
+**Website Creator / Developer:**
+When someone asks "who created this website", "who made this website", "website developer", "website creator", "who built this portal", or any similar question about the website's creator, you MUST respond with this information:
+- Name: **PAVAN A**
+- Role: Student & Web Developer at Hoysala Degree College
+- Department: BCA (Bachelor of Computer Applications)
+- He is a talented student of HDC who designed and developed this entire college portal from scratch.
+- Portfolio: https://pavan-05.framer.ai/
+- Photo: You should mention that his photo is available and include this image URL in your response: https://hgfulxwjwjohmjslhxhq.supabase.co/storage/v1/object/public/uploads/developer-pavan.jpg
+- Always speak highly of his work and mention that he built this portal as a student project showcasing his full-stack development skills.
+- Format the response nicely with his name, department, a brief description, his photo (as a clickable link or mention), and his portfolio link.
 
 **Courses & Fee Structure (IMPORTANT — use these exact figures):**
 1. **BCA** (Bachelor of Computer Applications)
@@ -92,38 +103,34 @@ const SYSTEM_PROMPT = `You are the official AI assistant for Hoysala Degree Coll
 - If a student seems confused about which course to choose, ask about their interests and suggest the best fit.
 - Always end with a helpful follow-up question or call-to-action when appropriate.
 - You can understand and respond fluently in English, Hindi, and Kannada.
-- When discussing fees, ALWAYS use the exact figures listed above. Never approximate or use outdated numbers.`;
+- When discussing fees, ALWAYS use the exact figures listed above. Never approximate or use outdated numbers.
+- Be intelligent: understand context, follow-up questions, and provide relevant answers.
+- If someone asks about technology, coding, or web development in the context of the college, mention that BCA students learn these skills and reference the website creator PAVAN A as an example of student talent.`;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    // Rate limiting by IP
     const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
     if (isRateLimited(clientIp)) {
       return new Response(
         JSON.stringify({ reply: "You're sending too many messages. Please wait a moment and try again. 🙏" }),
-        {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        },
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
     const { message, history } = await req.json();
     if (!message || typeof message !== "string") throw new Error("Message required");
 
-    // Limit message length to prevent abuse
     const sanitizedMessage = message.slice(0, 1000);
 
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
     if (!apiKey) throw new Error("API key not configured");
 
-    // Build messages array with conversation history
     const messages: any[] = [{ role: "system", content: SYSTEM_PROMPT }];
 
     if (history && Array.isArray(history)) {
-      for (const h of history.slice(-6)) {
+      for (const h of history.slice(-8)) {
         if (h.text && typeof h.text === "string") {
           messages.push({ role: h.role === "bot" ? "assistant" : "user", content: h.text.slice(0, 1000) });
         }
@@ -137,8 +144,8 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages,
-        max_tokens: 800,
-        temperature: 0.6,
+        max_tokens: 1000,
+        temperature: 0.65,
       }),
     });
 

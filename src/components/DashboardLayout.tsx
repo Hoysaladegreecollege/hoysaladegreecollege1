@@ -13,7 +13,6 @@ import { useState, useEffect } from "react";
 import PageLoader from "./PageLoader";
 import DarkModeToggle from "./DarkModeToggle";
 import ScrollToTop from "./ScrollToTop";
-import RefreshButton from "./RefreshButton";
 import NotificationBadge from "./NotificationBadge";
 import NotificationCenter from "./NotificationCenter";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
@@ -61,8 +60,7 @@ const adminNav: NavItem[] = [
   { label: "Semester Promotion", path: "/dashboard/admin/semester-promotion", icon: ArrowUpCircle },
   { label: "Academic Years", path: "/dashboard/admin/academic-years", icon: Calendar },
   { label: "Courses", path: "/dashboard/admin/courses", icon: BookOpen },
-  { label: "Departments", path: "/dashboard/admin/departments", icon: Monitor },
-  { label: "Available Seats", path: "/dashboard/admin/seats", icon: Armchair },
+  { label: "Departments & Seats", path: "/dashboard/admin/departments", icon: Monitor },
   { label: "Absent Report", path: "/dashboard/admin/absent-report", icon: Clock },
   { label: "Attendance Overview", path: "/dashboard/admin/attendance-overview", icon: UserCheck },
   { label: "Applications", path: "/dashboard/admin/applications", icon: FileText },
@@ -186,7 +184,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <RefreshButton />
             {isSupported && !isSubscribed && (
               <button
                 onClick={subscribe}

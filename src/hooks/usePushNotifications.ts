@@ -3,7 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
-// VAPID public key (safe to expose - it's a public key)
 const VAPID_PUBLIC_KEY = 'BBjtsezwDm3wYn48U8fqz1ts4hAb-HH6A46aVjxduETo9FZ6h_dPBJGU1NhC7hzBOgj2nSl1b3tiRY08PWwcLKU';
 
 function urlBase64ToUint8Array(base64String: string) {
@@ -26,16 +25,25 @@ export function usePushNotifications() {
   const [isLoading, setIsLoading] = useState(false);
   const [swRegistration, setSwRegistration] = useState<ServiceWorkerRegistration | null>(null);
 
-  // Register service worker and check existing subscription
+  // Check localStorage for persisted subscription state immediately
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const persisted = localStorage.getItem('hdc_push_subscribed');
+      if (persisted === '1' && 'Notification' in window && Notification.permission === 'granted') {
+        setIsSubscribed(true);
+      }
+    }
+  }, []);
+
   useEffect(() => {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').then((reg) => {
         setSwRegistration(reg);
-        // Check if already subscribed via pushManager
-        (reg as any).pushManager.getSubscription().then((sub: any) => {
+        reg.pushManager.getSubscription().then((sub: PushSubscription | null) => {
           if (sub) {
             setIsSubscribed(true);
-            // Also verify the subscription exists in the database for this user
+            localStorage.setItem('hdc_push_subscribed', '1');
+            // Sync to DB if needed
             if (user) {
               supabase.from('push_subscriptions')
                 .select('id')
@@ -43,7 +51,6 @@ export function usePushNotifications() {
                 .eq('endpoint', sub.endpoint)
                 .then(({ data }) => {
                   if (!data || data.length === 0) {
-                    // Re-save subscription to DB (it was lost)
                     const subJson = sub.toJSON();
                     supabase.from('push_subscriptions').insert({
                       user_id: user.id,
@@ -56,8 +63,28 @@ export function usePushNotifications() {
                   }
                 });
             }
+          } else if (Notification.permission === 'granted' && user) {
+            // Permission granted but no subscription — re-subscribe silently
+            reg.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+            }).then((newSub) => {
+              setIsSubscribed(true);
+              localStorage.setItem('hdc_push_subscribed', '1');
+              const subJson = newSub.toJSON();
+              supabase.from('push_subscriptions').insert({
+                user_id: user.id,
+                endpoint: subJson.endpoint as string,
+                p256dh: subJson.keys?.p256dh || '',
+                auth: subJson.keys?.auth || '',
+              });
+            }).catch(() => {
+              setIsSubscribed(false);
+              localStorage.removeItem('hdc_push_subscribed');
+            });
           } else {
             setIsSubscribed(false);
+            localStorage.removeItem('hdc_push_subscribed');
           }
         });
       }).catch((err: any) => {
@@ -71,7 +98,6 @@ export function usePushNotifications() {
 
     setIsLoading(true);
     try {
-      // Request permission
       const perm = await Notification.requestPermission();
       setPermission(perm);
 
@@ -81,14 +107,13 @@ export function usePushNotifications() {
         return;
       }
 
-      const subscription = await (swRegistration as any).pushManager.subscribe({
+      const subscription = await swRegistration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
       });
 
       const subJson = subscription.toJSON();
 
-      // Save to database - delete existing then insert to avoid unique constraint issues
       await supabase.from('push_subscriptions')
         .delete()
         .eq('user_id', user.id)
@@ -104,6 +129,7 @@ export function usePushNotifications() {
       if (error) throw error;
 
       setIsSubscribed(true);
+      localStorage.setItem('hdc_push_subscribed', '1');
       toast.success('🔔 Push notifications enabled! You\'ll receive alerts even when the tab is closed.');
     } catch (err: any) {
       console.error('Push subscription failed:', err);
@@ -117,16 +143,16 @@ export function usePushNotifications() {
     if (!swRegistration || !user) return;
 
     try {
-      const subscription = await (swRegistration as any).pushManager.getSubscription();
+      const subscription = await swRegistration.pushManager.getSubscription();
       if (subscription) {
         await subscription.unsubscribe();
-        // Remove from database
         await supabase.from('push_subscriptions')
           .delete()
           .eq('user_id', user.id)
           .eq('endpoint', subscription.endpoint);
       }
       setIsSubscribed(false);
+      localStorage.removeItem('hdc_push_subscribed');
       toast.success('Push notifications disabled.');
     } catch (err) {
       console.error('Unsubscribe failed:', err);
