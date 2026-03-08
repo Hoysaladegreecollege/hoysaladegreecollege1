@@ -158,12 +158,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   key={item.path}
                   to={item.path}
                   onClick={() => setSidebarOpen(false)}
-                  className={`group relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-body text-[13px] transition-all duration-250 ${
+                  className={`group relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-body text-[13px] transition-all duration-250 opacity-0 animate-fade-in ${
                     active
                       ? "text-white font-medium"
                       : "text-white/45 hover:text-white/80"
                   }`}
-                  style={{ animationDelay: `${index * 20}ms` }}
+                  style={{ animationDelay: `${index * 60}ms`, animationFillMode: 'forwards' }}
                 >
                   {/* Active background with ambient glow */}
                   {active && (
