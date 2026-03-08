@@ -56,6 +56,7 @@ const StudentMaterials = lazy(() => import("./pages/dashboard/student/StudentMat
 const StudentAnnouncements = lazy(() => import("./pages/dashboard/student/StudentAnnouncements"));
 const StudentFees = lazy(() => import("./pages/dashboard/student/StudentFees"));
 const StudentFeedback = lazy(() => import("./pages/dashboard/student/StudentFeedback"));
+const StudentMessages = lazy(() => import("./pages/dashboard/student/StudentMessages"));
 
 // Lazy load teacher dashboard
 const TeacherDashboard = lazy(() => import("./pages/dashboard/TeacherDashboard"));
@@ -68,6 +69,7 @@ const TeacherNotices = lazy(() => import("./pages/dashboard/teacher/TeacherNotic
 const TeacherTimetable = lazy(() => import("./pages/dashboard/teacher/TeacherTimetable"));
 const TeacherAnnouncements = lazy(() => import("./pages/dashboard/teacher/TeacherAnnouncements"));
 const TeacherAttendanceOverview = lazy(() => import("./pages/dashboard/teacher/TeacherAttendanceOverview"));
+const TeacherMessages = lazy(() => import("./pages/dashboard/teacher/TeacherMessages"));
 
 // Lazy load principal dashboard
 const PrincipalDashboard = lazy(() => import("./pages/dashboard/PrincipalDashboard"));
@@ -192,6 +194,7 @@ const App = () => (
             <Route path="/dashboard/student/announcements" element={<StudentRoute><StudentAnnouncements /></StudentRoute>} />
             <Route path="/dashboard/student/fees" element={<StudentRoute><StudentFees /></StudentRoute>} />
             <Route path="/dashboard/student/feedback" element={<StudentRoute><StudentFeedback /></StudentRoute>} />
+            <Route path="/dashboard/student/messages" element={<StudentRoute><StudentMessages /></StudentRoute>} />
 
             {/* Teacher */}
             <Route path="/dashboard/teacher" element={<TeacherRoute><TeacherDashboard /></TeacherRoute>} />
@@ -204,6 +207,7 @@ const App = () => (
             <Route path="/dashboard/teacher/notices" element={<TeacherRoute><TeacherNotices /></TeacherRoute>} />
             <Route path="/dashboard/teacher/timetable" element={<TeacherRoute><TeacherTimetable /></TeacherRoute>} />
             <Route path="/dashboard/teacher/announcements" element={<TeacherRoute><TeacherAnnouncements /></TeacherRoute>} />
+            <Route path="/dashboard/teacher/messages" element={<TeacherRoute><TeacherMessages /></TeacherRoute>} />
 
             {/* Principal */}
             <Route path="/dashboard/principal" element={<PrincipalRoute><PrincipalDashboard /></PrincipalRoute>} />
