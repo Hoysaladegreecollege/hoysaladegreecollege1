@@ -163,6 +163,7 @@ export default function StudentDashboard() {
         present, absent: total - present, total, todayStatus,
         semester: student.semester, rollNumber: student.roll_number,
         courseName: (student as any).courses?.name, courseCode: (student as any).courses?.code,
+        courseId: student.course_id,
         totalSubjects: marksData.length, weeklyTrend, subjectChartData, gpa,
       };
     },
