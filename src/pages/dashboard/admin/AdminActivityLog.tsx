@@ -32,11 +32,19 @@ export default function AdminActivityLog() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("activity_logs")
-        .select("*, profiles:user_id(full_name, email)")
+        .select("*")
         .order("created_at", { ascending: false })
         .limit(200);
       if (error) throw error;
-      return data;
+      if (!data.length) return data;
+      
+      const userIds = [...new Set(data.map((l: any) => l.user_id))];
+      const { data: profilesData } = await supabase
+        .from("profiles")
+        .select("user_id, full_name, email")
+        .in("user_id", userIds);
+      const profileMap = Object.fromEntries((profilesData || []).map((p: any) => [p.user_id, p]));
+      return data.map((l: any) => ({ ...l, profiles: profileMap[l.user_id] || null }));
     },
     refetchInterval: 30000,
   });

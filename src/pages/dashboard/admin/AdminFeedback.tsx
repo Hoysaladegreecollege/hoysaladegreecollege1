@@ -32,12 +32,22 @@ export default function AdminFeedback() {
   const { data: feedbacks = [], isLoading } = useQuery({
     queryKey: ["admin-feedback"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: feedbackData, error } = await supabase
         .from("feedback_complaints")
-        .select("*, profiles:user_id(full_name, email)")
+        .select("*")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data;
+
+      // Fetch profiles for user names
+      const userIds = [...new Set(feedbackData.map((f: any) => f.user_id))];
+      const { data: profilesData } = await supabase
+        .from("profiles")
+        .select("user_id, full_name, email")
+        .in("user_id", userIds);
+      
+      const profileMap = Object.fromEntries((profilesData || []).map((p: any) => [p.user_id, p]));
+      return feedbackData.map((f: any) => ({ ...f, profiles: profileMap[f.user_id] || null }));
+      
     },
     refetchInterval: 30000,
   });
