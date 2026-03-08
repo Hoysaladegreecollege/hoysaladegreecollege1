@@ -46,12 +46,11 @@ export function CreditsHero() {
         <div className="absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2 border-secondary/20 rounded-br-sm opacity-60" />
 
         <motion.div custom={0} variants={heroChild}>
-          <div className="group/pill inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-secondary/5 border border-secondary/15 text-secondary text-xs font-body font-medium mb-6 backdrop-blur-md cursor-default hover:bg-secondary/10 hover:border-secondary/30 hover:shadow-[0_0_30px_hsl(var(--secondary)/0.15),inset_0_0_20px_hsl(var(--secondary)/0.05)] transition-all duration-500">
-            <Cpu className="w-3.5 h-3.5 group-hover/pill:animate-[creditsSpin_2s_linear_infinite]" />
-            <span className="group-hover/pill:tracking-wider transition-all duration-500 font-mono text-[11px]">
-              SYS.CREDITS // INITIALIZED
+          <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-secondary/5 border border-secondary/15 text-secondary text-xs font-body font-medium mb-6 backdrop-blur-md">
+            <Cpu className="w-3.5 h-3.5" />
+            <span className="font-mono text-[11px] uppercase tracking-widest">
+              System Credits
             </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
           </div>
         </motion.div>
 
