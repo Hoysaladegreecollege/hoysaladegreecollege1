@@ -76,6 +76,7 @@ const adminNav: NavItem[] = [
   { label: "Birthday Wishes", path: "/dashboard/admin/birthday-settings", icon: Cake },
   { label: "Roles", path: "/dashboard/admin/roles", icon: Shield },
   { label: "Reports & Export", path: "/dashboard/admin/reports", icon: Download },
+  { label: "Alumni", path: "/dashboard/admin/alumni", icon: GraduationCap },
   { label: "Settings", path: "/dashboard/admin/settings", icon: Settings },
 ];
 
