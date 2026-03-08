@@ -482,6 +482,27 @@ export type Database = {
         }
         Relationships: []
       }
+      fee_management_pin: {
+        Row: {
+          id: string
+          pin_hash: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          id?: string
+          pin_hash: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          id?: string
+          pin_hash?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       fee_payments: {
         Row: {
           amount: number
