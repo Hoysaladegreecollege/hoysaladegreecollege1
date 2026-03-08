@@ -104,36 +104,36 @@ export default function Navbar() {
         style={{ width: `${progress * 100}%`, opacity: progress > 0 ? 1 : 0 }} />
 
       {/* Top bar */}
-      <div className="relative text-white py-3 overflow-hidden" style={{ background: "linear-gradient(100deg, hsl(230,20%,6%) 0%, hsl(228,18%,9%) 40%, hsl(230,16%,7%) 100%)" }}>
+      <div className="relative py-3 overflow-hidden bg-primary dark:bg-[hsl(230,20%,6%)]">
         <div className="absolute inset-0 opacity-[0.015]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }} />
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent animate-[shimmer_8s_linear_infinite]" />
-        <div className="absolute -top-8 left-[8%] w-32 h-32 rounded-full blur-3xl animate-float" style={{ background: "radial-gradient(circle, hsla(42,87%,55%,0.05), transparent 70%)" }} />
-        <div className="absolute -bottom-6 right-[12%] w-28 h-28 rounded-full blur-3xl animate-float" style={{ background: "radial-gradient(circle, hsla(42,60%,45%,0.03), transparent 70%)", animationDelay: "2s" }} />
-        <div className="absolute top-0 left-0 right-0 h-[0.5px]" style={{ background: "linear-gradient(90deg, transparent 5%, hsla(42,87%,55%,0.2) 30%, hsla(42,87%,55%,0.35) 50%, hsla(42,87%,55%,0.2) 70%, transparent 95%)" }} />
-        <div className="absolute bottom-0 left-0 right-0 h-[0.5px]" style={{ background: "linear-gradient(90deg, transparent 10%, hsla(0,0%,100%,0.06) 50%, transparent 90%)" }} />
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary-foreground/[0.02] to-transparent animate-[shimmer_8s_linear_infinite]" />
+        <div className="absolute -top-8 left-[8%] w-32 h-32 rounded-full blur-3xl animate-float bg-secondary/5" />
+        <div className="absolute -bottom-6 right-[12%] w-28 h-28 rounded-full blur-3xl animate-float bg-secondary/[0.03]" style={{ animationDelay: "2s" }} />
+        <div className="absolute top-0 left-0 right-0 h-[0.5px] bg-gradient-to-r from-transparent via-secondary/30 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-[0.5px] bg-gradient-to-r from-transparent via-primary-foreground/[0.06] to-transparent" />
 
         <div className="container px-4 relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-0">
           <div className="flex items-center gap-2 sm:text-left animate-fade-in">
             <img src={saiBabaImg} alt="Shri Shirdi Sai" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-secondary/40 shadow-md" />
-            <p className="font-display text-[11px] sm:text-[13px] font-bold tracking-[0.04em] text-white/90" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>
+            <p className="font-display text-[11px] sm:text-[13px] font-bold tracking-[0.04em] text-primary-foreground/90">
               ಶ್ರೀಶಿರಡಿ ಸಾಯಿ ಎಜುಕೇಷನಲ್ ಟ್ರಸ್ಟ್ (ರಿ.)
             </p>
           </div>
           <div className="flex items-center gap-3 sm:gap-5 flex-wrap justify-center sm:justify-end text-[10px] sm:text-[11px] animate-fade-in" style={{ animationDelay: "0.15s" }}>
-            <span className="flex items-center gap-2 font-medium tracking-wide" style={{ color: "hsl(42,87%,60%)" }}>
+            <span className="flex items-center gap-2 font-medium tracking-wide text-secondary">
               <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-50" style={{ background: "hsl(42,87%,55%)" }} />
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5" style={{ background: "hsl(42,87%,55%)" }} />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-50 bg-secondary" />
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-secondary" />
               </span>
               Recognized by Govt. of Karnataka
             </span>
-            <span className="hidden sm:block w-[0.5px] h-3 bg-white/[0.08]" />
-            <a href="tel:7676272167" className="text-white/40 hover:text-white/80 transition-all duration-400 hidden sm:inline-flex items-center gap-1.5 group hover:-translate-y-[0.5px]">
+            <span className="hidden sm:block w-[0.5px] h-3 bg-primary-foreground/[0.08]" />
+            <a href="tel:7676272167" className="text-primary-foreground/40 hover:text-primary-foreground/80 transition-all duration-400 hidden sm:inline-flex items-center gap-1.5 group hover:-translate-y-[0.5px]">
               <Phone className="w-3 h-3 opacity-50 group-hover:opacity-100 transition-all duration-400" />
               <span className="tracking-wide">7676272167</span>
             </a>
-            <span className="hidden sm:block w-[0.5px] h-3 bg-white/[0.08]" />
-            <a href="mailto:principal.hoysaladegreecollege@gmail.com" className="text-white/40 hover:text-white/80 transition-all duration-400 hidden sm:inline-flex items-center gap-1.5 group hover:-translate-y-[0.5px]">
+            <span className="hidden sm:block w-[0.5px] h-3 bg-primary-foreground/[0.08]" />
+            <a href="mailto:principal.hoysaladegreecollege@gmail.com" className="text-primary-foreground/40 hover:text-primary-foreground/80 transition-all duration-400 hidden sm:inline-flex items-center gap-1.5 group hover:-translate-y-[0.5px]">
               <Mail className="w-3 h-3 opacity-50 group-hover:opacity-100 transition-all duration-400" />
               <span className="tracking-wide">Mail Us</span>
             </a>
