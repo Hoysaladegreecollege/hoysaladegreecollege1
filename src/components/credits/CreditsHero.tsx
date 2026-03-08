@@ -29,52 +29,10 @@ export function CreditsHero() {
         }}
       />
 
-      {/* Animated neon orbs */}
-      <div className="absolute top-16 right-[15%] w-[420px] h-[420px] rounded-full bg-secondary/[0.06] blur-[120px] animate-[pulse_4s_ease-in-out_infinite]" />
-      <div className="absolute bottom-0 left-[10%] w-[350px] h-[350px] rounded-full bg-primary/[0.05] blur-[100px] animate-[pulse_5s_ease-in-out_infinite_1.5s]" />
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full bg-secondary/[0.03] blur-[150px] animate-[creditsFloat_8s_ease-in-out_infinite]" />
-
-      {/* Scan line overlay */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.03]"
-        style={{
-          backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, hsl(var(--secondary)/0.15) 2px, hsl(var(--secondary)/0.15) 4px)",
-          animation: "creditsScanLine 8s linear infinite",
-        }}
-      />
-
-      {/* Floating hex particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(8)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute text-secondary/[0.08]"
-            style={{
-              left: `${8 + i * 12}%`,
-              top: `${15 + (i % 4) * 20}%`,
-              animation: `creditsFloat ${4 + i * 0.6}s ease-in-out infinite ${i * 0.5}s`,
-            }}
-          >
-            <Hexagon className="w-3 h-3" />
-          </div>
-        ))}
-      </div>
-
-      {/* Data stream lines */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(3)].map((_, i) => (
-          <div
-            key={`stream-${i}`}
-            className="absolute h-[1px] bg-gradient-to-r from-transparent via-secondary/20 to-transparent"
-            style={{
-              top: `${30 + i * 20}%`,
-              left: "-100%",
-              right: "-100%",
-              animation: `creditsDataStream ${6 + i * 2}s linear infinite ${i * 1.5}s`,
-            }}
-          />
-        ))}
-      </div>
+      {/* Ambient glow */}
+      <div className="absolute top-16 right-[15%] w-[420px] h-[420px] rounded-full bg-secondary/[0.03] blur-[120px]" />
+      <div className="absolute bottom-0 left-[10%] w-[350px] h-[350px] rounded-full bg-primary/[0.02] blur-[100px]" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full bg-secondary/[0.02] blur-[150px]" />
 
       <motion.div
         className="container relative px-5 text-center"
