@@ -158,12 +158,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   key={item.path}
                   to={item.path}
                   onClick={() => setSidebarOpen(false)}
-                  className={`group relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-body text-[13px] transition-all duration-250 ${
+                  className={`group relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-body text-[13px] transition-all duration-250 opacity-0 animate-fade-in ${
                     active
                       ? "text-white font-medium"
                       : "text-white/45 hover:text-white/80"
                   }`}
-                  style={{ animationDelay: `${index * 20}ms` }}
+                  style={{ animationDelay: `${index * 60}ms`, animationFillMode: 'forwards' }}
                 >
                   {/* Active background with ambient glow */}
                   {active && (
@@ -218,31 +218,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="relative sticky top-0 z-30 px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between bg-card/70 dark:bg-[hsl(225,20%,7%,0.85)] backdrop-blur-2xl border-b border-white/[0.06] shadow-[0_1px_20px_-4px_hsl(42,75%,55%,0.06)]">
-          {/* Top gold accent line */}
-          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[hsl(42,75%,55%,0.3)] to-transparent" />
-          
-          {/* Subtle ambient glow */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[hsl(42,75%,55%,0.02)] via-transparent to-[hsl(42,75%,55%,0.01)] pointer-events-none" />
-
-          <div className="relative flex items-center gap-3">
+        <header className="bg-card/80 dark:bg-card/60 backdrop-blur-lg border-b border-border/60 px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between sticky top-0 z-30">
+          <div className="flex items-center gap-3">
             <button
-              className="lg:hidden p-2 -ml-1 rounded-xl hover:bg-white/[0.06] dark:hover:bg-white/[0.06] transition-all duration-250 group"
+              className="lg:hidden p-2 -ml-1 rounded-lg hover:bg-muted transition-colors duration-200"
               onClick={() => setSidebarOpen(true)}
             >
-              <Menu className="w-5 h-5 text-foreground/50 group-hover:text-[hsl(42,75%,55%)] transition-colors duration-250" />
+              <Menu className="w-5 h-5 text-foreground/70" />
             </button>
             <div>
               <h1 className="font-body text-[15px] sm:text-base font-semibold text-foreground tracking-[-0.01em]">{currentPage}</h1>
-              <p className="font-body text-[10px] text-[hsl(42,75%,55%,0.5)] dark:text-[hsl(42,75%,55%,0.45)] hidden sm:block uppercase tracking-[0.08em] font-medium">Hoysala Degree College</p>
+              <p className="font-body text-[11px] text-muted-foreground hidden sm:block">Hoysala Degree College</p>
             </div>
           </div>
-          <div className="relative flex items-center gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-2">
             {isSupported && !isSubscribed && (
               <button
                 onClick={subscribe}
                 disabled={pushLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[hsl(42,75%,55%,0.08)] text-[hsl(42,75%,55%)] hover:bg-[hsl(42,75%,55%,0.14)] border border-[hsl(42,75%,55%,0.12)] transition-all duration-250 font-body text-[12px] font-semibold"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors font-body text-[12px] font-semibold"
                 title="Enable push notifications"
               >
                 <BellRing className="w-3.5 h-3.5" />
@@ -250,7 +244,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </button>
             )}
             {isSubscribed && (
-              <span className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[hsl(42,75%,55%,0.08)] text-[hsl(42,75%,55%,0.8)] text-[11px] font-body font-semibold border border-[hsl(42,75%,55%,0.1)]" title="Push notifications enabled">
+              <span className="flex items-center gap-1 px-2 py-1 rounded-lg bg-primary/10 text-primary text-[11px] font-body font-semibold" title="Push notifications enabled">
                 <BellRing className="w-3 h-3" /> On
               </span>
             )}
@@ -258,7 +252,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <DarkModeToggle />
             <Link
               to="/"
-              className="font-body text-[12px] text-foreground/40 hover:text-[hsl(42,75%,55%)] transition-all duration-250 px-3 py-1.5 rounded-xl hover:bg-[hsl(42,75%,55%,0.06)] flex items-center gap-1.5 border border-transparent hover:border-[hsl(42,75%,55%,0.1)]"
+              className="font-body text-[12px] text-muted-foreground hover:text-foreground transition-colors duration-200 px-3 py-1.5 rounded-lg hover:bg-muted flex items-center gap-1.5"
             >
               <ExternalLink className="w-3 h-3" />
               <span className="hidden sm:inline">Website</span>
