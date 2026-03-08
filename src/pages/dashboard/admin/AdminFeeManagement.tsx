@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -20,6 +20,10 @@ const CHART_COLORS = ["hsl(142, 70%, 40%)", "hsl(0, 84%, 60%)", "hsl(42, 87%, 55
 export default function AdminFeeManagement() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const [pinUnlocked, setPinUnlocked] = useState(false);
+  const [pinInput, setPinInput] = useState("");
+  const [pinError, setPinError] = useState("");
+  const [pinChecking, setPinChecking] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [paymentForm, setPaymentForm] = useState({ amount: "", payment_method: "Cash", remarks: "", upi_number: "", semester: "" });
   const [courseFilter, setCourseFilter] = useState("all");
@@ -35,6 +39,87 @@ export default function AdminFeeManagement() {
   const [feeEditSemFees, setFeeEditSemFees] = useState<Record<number, string>>({});
   const [receiptStudent, setReceiptStudent] = useState<any>(null);
   const [receiptPayment, setReceiptPayment] = useState<any>(null);
+
+  // Check if PIN exists
+  const { data: pinData, isLoading: pinLoading } = useQuery({
+    queryKey: ["fee-management-pin"],
+    queryFn: async () => {
+      const { data } = await supabase.from("fee_management_pin").select("pin_hash").limit(1);
+      return data && data.length > 0 ? data[0].pin_hash : null;
+    },
+  });
+
+  const handlePinSubmit = () => {
+    setPinChecking(true);
+    setPinError("");
+    if (pinInput === pinData) {
+      setPinUnlocked(true);
+      setPinChecking(false);
+    } else {
+      setPinError("Incorrect PIN. Please try again.");
+      setPinInput("");
+      setPinChecking(false);
+    }
+  };
+
+  // If no PIN is set, auto-unlock
+  useEffect(() => {
+    if (!pinLoading && !pinData) {
+      setPinUnlocked(true);
+    }
+  }, [pinLoading, pinData]);
+
+  // Show PIN gate
+  if (pinLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  if (pinData && !pinUnlocked) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh] animate-fade-in">
+        <div className="bg-card border border-border rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center space-y-6">
+          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+            <DollarSign className="w-7 h-7 text-primary" />
+          </div>
+          <div>
+            <h2 className="font-display text-xl font-bold text-foreground">Fee Management Console</h2>
+            <p className="font-body text-sm text-muted-foreground mt-1">Enter the 6-digit PIN to access</p>
+          </div>
+          <div>
+            <input
+              type="password"
+              inputMode="numeric"
+              maxLength={6}
+              placeholder="••••••"
+              value={pinInput}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, "").slice(0, 6);
+                setPinInput(val);
+                setPinError("");
+              }}
+              onKeyDown={(e) => { if (e.key === "Enter" && pinInput.length === 6) handlePinSubmit(); }}
+              className="w-full text-center text-3xl tracking-[0.6em] font-mono rounded-xl h-16 bg-muted border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+            />
+            {pinError && <p className="text-xs text-destructive font-body mt-2">{pinError}</p>}
+          </div>
+          <button
+            onClick={handlePinSubmit}
+            disabled={pinInput.length !== 6 || pinChecking}
+            className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-body font-semibold text-sm disabled:opacity-50 hover:opacity-90 transition-all"
+          >
+            {pinChecking ? "Verifying..." : "Unlock"}
+          </button>
+          <Link to="/dashboard/admin" className="block">
+            <p className="font-body text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer">← Back to Dashboard</p>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const { data: courses = [] } = useQuery({
     queryKey: ["fee-courses"],

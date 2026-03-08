@@ -1,5 +1,5 @@
-import { Settings, Globe, Calendar, Shield, TrendingUp, Activity, Download, Users, Database, Server, CheckCircle, AlertCircle, Clock, ArrowLeft, Cpu, HardDrive, Wifi, BarChart3, Zap, RefreshCw, ExternalLink } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { Settings, Globe, Calendar, Shield, TrendingUp, Activity, Download, Users, Database, Server, CheckCircle, AlertCircle, Clock, ArrowLeft, Cpu, HardDrive, Wifi, BarChart3, Zap, RefreshCw, ExternalLink, Lock, KeyRound } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -7,6 +7,9 @@ import { ResponsiveContainer, AreaChart, Area, CartesianGrid, XAxis, YAxis, Tool
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { useAuth } from "@/contexts/AuthContext";
 
 function useAnimatedCounter(target: number) {
   const [count, setCount] = useState(0);
@@ -53,12 +56,57 @@ const healthIcons: Record<string, any> = {
 };
 
 export default function AdminSettings() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [liveTime, setLiveTime] = useState(new Date());
+  const [pinDialogOpen, setPinDialogOpen] = useState(false);
+  const [pinValue, setPinValue] = useState("");
+  const [confirmPin, setConfirmPin] = useState("");
+  const [pinSaving, setPinSaving] = useState(false);
   
   useEffect(() => {
     const timer = setInterval(() => setLiveTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  const { data: existingPin } = useQuery({
+    queryKey: ["fee-pin-exists"],
+    queryFn: async () => {
+      const { data } = await supabase.from("fee_management_pin").select("id").limit(1);
+      return data && data.length > 0;
+    },
+  });
+
+  const handleSavePin = async () => {
+    if (pinValue.length !== 6 || !/^\d{6}$/.test(pinValue)) {
+      toast.error("PIN must be exactly 6 digits");
+      return;
+    }
+    if (pinValue !== confirmPin) {
+      toast.error("PINs do not match");
+      return;
+    }
+    setPinSaving(true);
+    try {
+      // Delete existing PIN first
+      await supabase.from("fee_management_pin").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+      // Insert new PIN
+      const { error } = await supabase.from("fee_management_pin").insert({
+        pin_hash: pinValue,
+        updated_by: user?.id,
+      });
+      if (error) throw error;
+      toast.success("Fee Management PIN saved successfully!");
+      setPinDialogOpen(false);
+      setPinValue("");
+      setConfirmPin("");
+      queryClient.invalidateQueries({ queryKey: ["fee-pin-exists"] });
+    } catch (e: any) {
+      toast.error(e.message || "Failed to save PIN");
+    } finally {
+      setPinSaving(false);
+    }
+  };
 
   const settings = [
     { label: "College Name", value: "Hoysala Degree College", icon: Globe },
@@ -475,6 +523,73 @@ export default function AdminSettings() {
           </div>
         )}
       </div>
+
+      {/* Fee Management PIN Security */}
+      <div className="bg-card border border-border rounded-2xl p-5 hover:shadow-lg transition-all duration-300">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
+              <Lock className="w-4 h-4 text-amber-500" />
+            </div>
+            <div>
+              <h3 className="font-body text-sm font-bold text-foreground">Fee Management PIN</h3>
+              <p className="font-body text-xs text-muted-foreground">
+                {existingPin ? "PIN is set — click to change" : "Set a 6-digit PIN to protect fee management access"}
+              </p>
+            </div>
+          </div>
+          <Button variant="outline" onClick={() => setPinDialogOpen(true)} className="rounded-xl font-body text-xs gap-1.5">
+            <KeyRound className="w-3 h-3" /> {existingPin ? "Change PIN" : "Set PIN"}
+          </Button>
+        </div>
+      </div>
+
+      {/* PIN Dialog */}
+      <Dialog open={pinDialogOpen} onOpenChange={setPinDialogOpen}>
+        <DialogContent className="max-w-sm rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="font-display text-lg flex items-center gap-2">
+              <Lock className="w-5 h-5 text-primary" /> {existingPin ? "Change" : "Set"} Fee Management PIN
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-2">
+            <div>
+              <label className="font-body text-sm text-muted-foreground mb-1.5 block">Enter 6-digit PIN</label>
+              <Input
+                type="password"
+                inputMode="numeric"
+                maxLength={6}
+                placeholder="••••••"
+                value={pinValue}
+                onChange={(e) => setPinValue(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                className="text-center text-2xl tracking-[0.5em] font-mono rounded-xl h-14"
+              />
+            </div>
+            <div>
+              <label className="font-body text-sm text-muted-foreground mb-1.5 block">Confirm PIN</label>
+              <Input
+                type="password"
+                inputMode="numeric"
+                maxLength={6}
+                placeholder="••••••"
+                value={confirmPin}
+                onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                className="text-center text-2xl tracking-[0.5em] font-mono rounded-xl h-14"
+              />
+            </div>
+            {pinValue.length === 6 && confirmPin.length === 6 && pinValue !== confirmPin && (
+              <p className="text-xs text-destructive font-body">PINs do not match</p>
+            )}
+            <Button
+              onClick={handleSavePin}
+              disabled={pinSaving || pinValue.length !== 6 || confirmPin.length !== 6 || pinValue !== confirmPin}
+              className="w-full rounded-xl font-body"
+            >
+              {pinSaving ? "Saving..." : "Save PIN"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
