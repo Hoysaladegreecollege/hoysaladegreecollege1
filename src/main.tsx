@@ -6,7 +6,6 @@ import "./index.css";
 // On every page load: unregister stale service workers and clear old caches
 function ensureFreshContent() {
   try {
-    // Clear all browser caches on first visit or version mismatch
     const APP_VERSION_KEY = 'hdc_app_version';
     const currentVersion = import.meta.env.VITE_APP_BUILD_TIME || '__BUILD__';
     const storedVersion = localStorage.getItem(APP_VERSION_KEY);
@@ -21,13 +20,17 @@ function ensureFreshContent() {
         });
       }
 
-      // Force service worker update
+      // Unregister all service workers to prevent stale content
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker.getRegistrations().then((registrations) => {
-          registrations.forEach((reg) => {
-            reg.update();
-          });
+          registrations.forEach((reg) => reg.unregister());
         });
+      }
+
+      // Force hard reload if this isn't the first visit (version changed)
+      if (storedVersion) {
+        window.location.reload();
+        return;
       }
     }
   } catch {
