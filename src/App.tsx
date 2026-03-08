@@ -185,7 +185,7 @@ const App = () => (
             <Route path="/dashboard/teacher/attendance" element={<TeacherRoute><TeacherAttendance /></TeacherRoute>} />
             <Route path="/dashboard/teacher/attendance-overview" element={<TeacherRoute><TeacherAttendanceOverview /></TeacherRoute>} />
             <Route path="/dashboard/teacher/marks" element={<TeacherRoute><TeacherMarks /></TeacherRoute>} />
-            <Route path="/dashboard/teacher/absent" element={<TeacherRoute><TeacherAbsent /></TeacherRoute>} />
+            <Route path="/dashboard/teacher/absent" element={<TeacherRoute><TeacherAttendanceOverview /></TeacherRoute>} />
             <Route path="/dashboard/teacher/materials" element={<TeacherRoute><TeacherMaterials /></TeacherRoute>} />
             <Route path="/dashboard/teacher/notices" element={<TeacherRoute><TeacherNotices /></TeacherRoute>} />
             <Route path="/dashboard/teacher/timetable" element={<TeacherRoute><TeacherTimetable /></TeacherRoute>} />
