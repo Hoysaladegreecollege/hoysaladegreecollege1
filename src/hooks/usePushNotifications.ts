@@ -197,7 +197,7 @@ export function usePushNotifications() {
     permission,
     isSubscribed,
     isLoading,
-    isSupported: 'serviceWorker' in navigator && 'PushManager' in window,
+    isSupported: typeof window !== 'undefined' && window.isSecureContext && 'serviceWorker' in navigator && 'PushManager' in window,
     subscribe,
     unsubscribe,
   };
