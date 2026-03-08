@@ -166,6 +166,51 @@ export type Database = {
         }
         Relationships: []
       }
+      alumni_stories: {
+        Row: {
+          batch_year: string
+          company: string
+          course: string
+          created_at: string
+          id: string
+          image_url: string | null
+          is_featured: boolean | null
+          job_title: string
+          linkedin_url: string | null
+          name: string
+          story: string
+          updated_at: string
+        }
+        Insert: {
+          batch_year: string
+          company: string
+          course: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean | null
+          job_title: string
+          linkedin_url?: string | null
+          name: string
+          story: string
+          updated_at?: string
+        }
+        Update: {
+          batch_year?: string
+          company?: string
+          course?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean | null
+          job_title?: string
+          linkedin_url?: string | null
+          name?: string
+          story?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       announcements: {
         Row: {
           content: string
@@ -583,6 +628,45 @@ export type Database = {
           posted_by?: string | null
           sort_order?: number | null
           title?: string
+        }
+        Relationships: []
+      }
+      library_books: {
+        Row: {
+          author: string
+          available_copies: number
+          category: string
+          cover_url: string | null
+          created_at: string
+          id: string
+          isbn: string | null
+          title: string
+          total_copies: number
+          updated_at: string
+        }
+        Insert: {
+          author: string
+          available_copies?: number
+          category: string
+          cover_url?: string | null
+          created_at?: string
+          id?: string
+          isbn?: string | null
+          title: string
+          total_copies?: number
+          updated_at?: string
+        }
+        Update: {
+          author?: string
+          available_copies?: number
+          category?: string
+          cover_url?: string | null
+          created_at?: string
+          id?: string
+          isbn?: string | null
+          title?: string
+          total_copies?: number
+          updated_at?: string
         }
         Relationships: []
       }

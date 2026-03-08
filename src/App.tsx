@@ -40,6 +40,9 @@ const Credits = lazy(() => import("./pages/Credits"));
 const Offers = lazy(() => import("./pages/Offers"));
 const Placements = lazy(() => import("./pages/Placements"));
 const CampusPage = lazy(() => import("./pages/Campus"));
+const Alumni = lazy(() => import("./pages/Alumni"));
+const Clubs = lazy(() => import("./pages/Clubs"));
+const Library = lazy(() => import("./pages/Library"));
 
 // Lazy load student dashboard
 const StudentDashboard = lazy(() => import("./pages/dashboard/StudentDashboard"));
@@ -155,6 +158,9 @@ const App = () => (
               <Route path="/offers" element={<SuspenseWrap><Offers /></SuspenseWrap>} />
               <Route path="/placements" element={<SuspenseWrap><Placements /></SuspenseWrap>} />
               <Route path="/campus" element={<SuspenseWrap><CampusPage /></SuspenseWrap>} />
+              <Route path="/alumni" element={<SuspenseWrap><Alumni /></SuspenseWrap>} />
+              <Route path="/clubs" element={<SuspenseWrap><Clubs /></SuspenseWrap>} />
+              <Route path="/library" element={<SuspenseWrap><Library /></SuspenseWrap>} />
             </Route>
 
             <Route path="/login" element={<SuspenseWrap><Login /></SuspenseWrap>} />
