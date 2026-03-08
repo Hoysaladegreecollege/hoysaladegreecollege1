@@ -51,13 +51,16 @@ export default function Contact() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name || !form.email || !form.message) {
-      toast.error("Please fill in all required fields");
+    const result = contactSchema.safeParse(form);
+    if (!result.success) {
+      const firstError = result.error.errors[0]?.message || "Invalid input";
+      toast.error(firstError);
       return;
     }
+    const validated = result.data;
     setSubmitting(true);
     const { error } = await supabase.from("contact_submissions").insert({
-      name: form.name, email: form.email, subject: form.subject, message: form.message,
+      name: validated.name, email: validated.email, subject: validated.subject || "", message: validated.message,
     });
     setSubmitting(false);
     if (error) {

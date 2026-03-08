@@ -62,11 +62,11 @@ export default function Apply() {
     }
 
     const { data, error } = await supabase.from("admission_applications").insert({
-      full_name: form.full_name, email: form.email, phone: form.phone,
-      date_of_birth: form.date_of_birth || null, gender: form.gender || null,
-      course: form.course, father_name: form.father_name || null,
-      mother_name: form.mother_name || null, address: form.address || null,
-      previous_school: form.previous_school || null, percentage_12th: form.percentage_12th || null,
+      full_name: validated.full_name, email: validated.email, phone: validated.phone,
+      date_of_birth: validated.date_of_birth || null, gender: validated.gender || null,
+      course: validated.course, father_name: validated.father_name || null,
+      mother_name: validated.mother_name || null, address: validated.address || null,
+      previous_school: validated.previous_school || null, percentage_12th: validated.percentage_12th || null,
       photo_url: photoUrl
     }).select("application_number, id").single();
 
