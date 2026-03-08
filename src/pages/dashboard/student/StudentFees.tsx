@@ -176,7 +176,7 @@ export default function StudentFees() {
         ].map(({ label, value, icon: Icon, color, bg }) => (
           <div key={label} className={`${bg} border border-border/60 rounded-2xl p-4 hover:shadow-md transition-all duration-300`}>
             <Icon className={`w-5 h-5 ${color} mb-2`} />
-            <p className={`font-display text-lg font-bold ${color} tabular-nums`}>{value}</p>
+            <p className={`font-body text-base font-medium ${color} tabular-nums`}>{value}</p>
             <p className="font-body text-[10px] text-muted-foreground mt-0.5 uppercase tracking-wider">{label}</p>
           </div>
         ))}
@@ -184,7 +184,7 @@ export default function StudentFees() {
         {/* Current Semester Remaining Box */}
         <div className={`border rounded-2xl p-4 hover:shadow-md transition-all duration-300 ${currentSemRemaining > 0 ? "bg-amber-500/5 border-amber-500/20" : "bg-emerald-500/5 border-emerald-500/20"}`}>
           <Calendar className={`w-5 h-5 mb-2 ${currentSemRemaining > 0 ? "text-amber-600" : "text-emerald-600"}`} />
-          <p className={`font-display text-lg font-bold tabular-nums ${currentSemRemaining > 0 ? "text-amber-600" : "text-emerald-600"}`}>
+          <p className={`font-body text-base font-medium tabular-nums ${currentSemRemaining > 0 ? "text-amber-600" : "text-emerald-600"}`}>
             {currentSemRemaining > 0 ? `₹${currentSemRemaining.toLocaleString()}` : "✓ Paid"}
           </p>
           <p className="font-body text-[10px] text-muted-foreground mt-0.5 uppercase tracking-wider">Sem {currentSemester} Due</p>
