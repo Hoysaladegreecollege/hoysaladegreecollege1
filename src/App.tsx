@@ -43,6 +43,7 @@ const CampusPage = lazy(() => import("./pages/Campus"));
 const Alumni = lazy(() => import("./pages/Alumni"));
 const Clubs = lazy(() => import("./pages/Clubs"));
 const Library = lazy(() => import("./pages/Library"));
+const InstallApp = lazy(() => import("./pages/Install"));
 
 // Lazy load student dashboard
 const StudentDashboard = lazy(() => import("./pages/dashboard/StudentDashboard"));
