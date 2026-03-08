@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { Shield } from "lucide-react";
+import { Shield, ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function AdminRoles() {
   const { data: roleCounts = [] } = useQuery({
@@ -21,37 +22,54 @@ export default function AdminRoles() {
     admin: "Super admin: manage all users, roles, and system settings.",
   };
 
-  const roleColors: Record<string, string> = {
-    student: "from-primary/5 to-primary/15",
-    teacher: "from-secondary/5 to-secondary/15",
-    principal: "from-primary/5 to-secondary/10",
-    admin: "from-secondary/5 to-primary/10",
+  const roleIcons: Record<string, string> = {
+    student: "bg-blue-500/10",
+    teacher: "bg-emerald-500/10",
+    principal: "bg-amber-500/10",
+    admin: "bg-red-500/10",
   };
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-r from-primary/5 to-secondary/5 border border-border rounded-2xl p-6">
-        <h2 className="font-display text-xl font-bold text-foreground flex items-center gap-2">
-          <Shield className="w-5 h-5 text-primary" /> Roles & Permissions
-        </h2>
-        <p className="font-body text-sm text-muted-foreground mt-1">Overview of user roles and their capabilities</p>
+      {/* Premium Header */}
+      <div className="relative overflow-hidden bg-card border border-border/40 rounded-3xl p-6 sm:p-8">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.06] via-transparent to-secondary/[0.04]" />
+        <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full blur-[80px] bg-primary/[0.08]" />
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+        <div className="relative flex items-center gap-3">
+          <Link to="/dashboard/admin" className="p-2 rounded-xl hover:bg-muted transition-colors shrink-0">
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+          <div className="w-11 h-11 rounded-2xl bg-primary/10 flex items-center justify-center">
+            <Shield className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h2 className="font-display text-xl font-bold text-foreground">Roles & Permissions</h2>
+            <p className="font-body text-sm text-muted-foreground">Overview of user roles and their capabilities</p>
+          </div>
+        </div>
       </div>
 
       <div className="grid sm:grid-cols-2 gap-4">
-        {["student", "teacher", "principal", "admin"].map((role) => {
+        {["student", "teacher", "principal", "admin"].map((role, i) => {
           const count = roleCounts.find((r) => r.role === role)?.count || 0;
           return (
-            <div key={role} className={`bg-gradient-to-br ${roleColors[role]} border border-border rounded-2xl p-6 hover:shadow-lg transition-all duration-300`}>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Shield className="w-6 h-6 text-primary" />
+            <div key={role}
+              className="relative overflow-hidden bg-card border border-border/40 rounded-3xl p-6 hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-300 group animate-fade-in"
+              style={{ animationDelay: `${i * 80}ms`, opacity: 0, animationFillMode: 'forwards' }}>
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-secondary/[0.02]" />
+              <div className="relative">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className={`w-12 h-12 rounded-2xl ${roleIcons[role]} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                    <Shield className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-display text-lg font-bold text-foreground capitalize">{role}</h3>
+                    <p className="font-body text-xs text-muted-foreground">{count} user{count !== 1 ? "s" : ""}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-display text-lg font-bold text-foreground capitalize">{role}</h3>
-                  <p className="font-body text-xs text-muted-foreground">{count} user{count !== 1 ? "s" : ""}</p>
-                </div>
+                <p className="font-body text-sm text-muted-foreground leading-relaxed">{roleDescriptions[role]}</p>
               </div>
-              <p className="font-body text-sm text-muted-foreground leading-relaxed">{roleDescriptions[role]}</p>
             </div>
           );
         })}
