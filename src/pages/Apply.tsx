@@ -6,6 +6,22 @@ import { CheckCircle, Upload, GraduationCap, Phone, Calendar, User, Mail, MapPin
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { z } from "zod";
+
+const applySchema = z.object({
+  full_name: z.string().trim().min(1, "Full name is required").max(200, "Name must be under 200 characters"),
+  email: z.string().trim().email("Invalid email address").max(255, "Email must be under 255 characters"),
+  phone: z.string().trim().min(1, "Phone is required").max(20, "Phone must be under 20 characters")
+    .regex(/^[0-9+\-() ]{7,20}$/, "Invalid phone number format"),
+  date_of_birth: z.string().optional(),
+  gender: z.string().optional(),
+  course: z.string().min(1, "Course is required").max(100, "Course must be under 100 characters"),
+  father_name: z.string().max(200, "Father's name must be under 200 characters").optional().or(z.literal("")),
+  mother_name: z.string().max(200, "Mother's name must be under 200 characters").optional().or(z.literal("")),
+  address: z.string().max(1000, "Address must be under 1000 characters").optional().or(z.literal("")),
+  previous_school: z.string().max(300, "School name must be under 300 characters").optional().or(z.literal("")),
+  percentage_12th: z.string().max(20, "Percentage must be under 20 characters").optional().or(z.literal("")),
+});
 
 const initialForm = {
   full_name: "", email: "", phone: "", date_of_birth: "", gender: "",
@@ -26,10 +42,13 @@ export default function Apply() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.full_name || !form.email || !form.phone || !form.course) {
-      toast.error("Please fill in all required fields");
+    const result = applySchema.safeParse(form);
+    if (!result.success) {
+      const firstError = result.error.errors[0]?.message || "Invalid input";
+      toast.error(firstError);
       return;
     }
+    const validated = result.data;
     setSubmitting(true);
 
     let photoUrl: string | null = null;
@@ -43,11 +62,11 @@ export default function Apply() {
     }
 
     const { data, error } = await supabase.from("admission_applications").insert({
-      full_name: form.full_name, email: form.email, phone: form.phone,
-      date_of_birth: form.date_of_birth || null, gender: form.gender || null,
-      course: form.course, father_name: form.father_name || null,
-      mother_name: form.mother_name || null, address: form.address || null,
-      previous_school: form.previous_school || null, percentage_12th: form.percentage_12th || null,
+      full_name: validated.full_name, email: validated.email, phone: validated.phone,
+      date_of_birth: validated.date_of_birth || null, gender: validated.gender || null,
+      course: validated.course, father_name: validated.father_name || null,
+      mother_name: validated.mother_name || null, address: validated.address || null,
+      previous_school: validated.previous_school || null, percentage_12th: validated.percentage_12th || null,
       photo_url: photoUrl
     }).select("application_number, id").single();
 
