@@ -92,7 +92,8 @@ export default function TeacherMarks() {
         </div>
       </div>
 
-      <div className="bg-card border border-border rounded-2xl p-6">
+      <div className="relative overflow-hidden bg-card border border-border/40 rounded-3xl p-6 sm:p-8">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent" />
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           <div>
             <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Course *</label>

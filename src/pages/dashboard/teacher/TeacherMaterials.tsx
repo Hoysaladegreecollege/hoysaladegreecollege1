@@ -152,7 +152,8 @@ export default function TeacherMaterials() {
         </div>
       </div>
 
-      <div className="bg-card border border-border rounded-2xl p-6">
+      <div className="relative overflow-hidden bg-card border border-border/40 rounded-3xl p-6 sm:p-8">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent" />
         <h3 className="font-body text-sm font-bold text-foreground mb-4">Upload New Material(s)</h3>
         <form onSubmit={(e) => { e.preventDefault(); addMutation.mutate(); }} className="space-y-4">
           <div className="grid sm:grid-cols-2 gap-4">

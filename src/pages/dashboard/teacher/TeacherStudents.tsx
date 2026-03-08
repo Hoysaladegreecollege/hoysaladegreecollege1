@@ -70,7 +70,8 @@ export default function TeacherStudents() {
       </div>
 
       {/* Filters */}
-      <div className="bg-card border border-border rounded-2xl p-4">
+      <div className="relative overflow-hidden bg-card border border-border/40 rounded-3xl p-5">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent" />
         <div className="flex items-center gap-2 mb-3">
           <Filter className="w-4 h-4 text-primary" />
           <h3 className="font-body text-sm font-bold text-foreground">Filter Students</h3>
