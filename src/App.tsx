@@ -56,6 +56,7 @@ const StudentMaterials = lazy(() => import("./pages/dashboard/student/StudentMat
 const StudentAnnouncements = lazy(() => import("./pages/dashboard/student/StudentAnnouncements"));
 const StudentFees = lazy(() => import("./pages/dashboard/student/StudentFees"));
 const StudentFeedback = lazy(() => import("./pages/dashboard/student/StudentFeedback"));
+const StudentMessages = lazy(() => import("./pages/dashboard/student/StudentMessages"));
 
 // Lazy load teacher dashboard
 const TeacherDashboard = lazy(() => import("./pages/dashboard/TeacherDashboard"));
