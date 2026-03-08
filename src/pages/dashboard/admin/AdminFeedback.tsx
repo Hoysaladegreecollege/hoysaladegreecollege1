@@ -47,7 +47,7 @@ export default function AdminFeedback() {
       
       const profileMap = Object.fromEntries((profilesData || []).map((p: any) => [p.user_id, p]));
       return feedbackData.map((f: any) => ({ ...f, profiles: profileMap[f.user_id] || null }));
-      return data;
+      
     },
     refetchInterval: 30000,
   });
