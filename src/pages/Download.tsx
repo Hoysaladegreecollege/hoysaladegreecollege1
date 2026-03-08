@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { toast } from "sonner";
 import SEOHead from "@/components/SEOHead";
 import PageHeader from "@/components/PageHeader";
 import ScrollReveal from "@/components/ScrollReveal";
