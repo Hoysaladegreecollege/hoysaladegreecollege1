@@ -1,17 +1,28 @@
-import { Heart, Star, Coffee } from "lucide-react";
+import { Heart, Star, Coffee, Hexagon } from "lucide-react";
 
 export function CreditsFooter() {
   return (
-    <div className="max-w-lg mx-auto mt-20 text-center space-y-4">
+    <div className="max-w-lg mx-auto mt-20 text-center space-y-5">
+      {/* Decorative divider */}
       <div className="flex items-center justify-center gap-3">
-        <div className="w-16 h-[1px] bg-gradient-to-r from-transparent to-border" />
-        <Coffee className="w-4 h-4 text-muted-foreground/50 animate-[creditsFloat_3s_ease-in-out_infinite]" />
-        <div className="w-16 h-[1px] bg-gradient-to-l from-transparent to-border" />
+        <div className="w-20 h-[1px] bg-gradient-to-r from-transparent to-secondary/30" />
+        <div className="relative">
+          <Hexagon className="w-4 h-4 text-secondary/30 animate-[creditsSpin_10s_linear_infinite]" />
+          <div className="absolute inset-0 blur-sm bg-secondary/10 rounded-full" />
+        </div>
+        <div className="w-20 h-[1px] bg-gradient-to-l from-transparent to-secondary/30" />
       </div>
-      <div className="group/footer inline-flex items-center gap-2 px-6 py-3 rounded-full bg-card/50 backdrop-blur-xl border border-border/30 text-muted-foreground text-xs sm:text-sm font-body shadow-lg cursor-default hover:border-secondary/20 hover:shadow-[0_8px_30px_-10px_hsl(var(--secondary)/0.15)] hover:-translate-y-1 transition-all duration-500">
+
+      {/* Main footer badge */}
+      <div className="group/footer inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-card/50 backdrop-blur-xl border border-border/30 text-muted-foreground text-xs sm:text-sm font-body shadow-lg cursor-default hover:border-secondary/25 hover:shadow-[0_0_30px_hsl(var(--secondary)/0.12),inset_0_0_15px_hsl(var(--secondary)/0.03)] hover:-translate-y-1 transition-all duration-500">
         Made with <Heart className="w-3.5 h-3.5 text-red-500 animate-[creditsPulseGlow_2s_ease-in-out_infinite] group-hover/footer:scale-125 transition-transform duration-300" /> by Pavan A
-        <span className="text-border">•</span>
-        <Star className="w-3.5 h-3.5 text-secondary group-hover/footer:rotate-[72deg] transition-transform duration-500" /> 2024–2025
+        <span className="text-secondary/30">|</span>
+        <Star className="w-3.5 h-3.5 text-secondary group-hover/footer:rotate-[72deg] group-hover/footer:drop-shadow-[0_0_4px_hsl(var(--secondary)/0.5)] transition-all duration-500" /> 2024–2025
+      </div>
+
+      {/* System footer */}
+      <div className="font-mono text-[9px] text-muted-foreground/30 tracking-[0.3em] uppercase">
+        [ END_OF_CREDITS // HOYSALA_SYS v2.5 ]
       </div>
     </div>
   );

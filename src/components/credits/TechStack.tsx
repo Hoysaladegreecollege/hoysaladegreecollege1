@@ -1,4 +1,5 @@
 import { Code2, Cpu, Palette, Database, Shield, Rocket, Zap, Layers } from "lucide-react";
+import { motion } from "framer-motion";
 
 const techStack = [
   { name: "React 18", icon: Code2, desc: "Component Library" },
@@ -11,13 +12,23 @@ const techStack = [
   { name: "Recharts", icon: Layers, desc: "Data Visualization" },
 ];
 
+const techVariants = {
+  hidden: { opacity: 0, y: 20, rotateX: -15 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    rotateX: 0,
+    transition: { delay: i * 0.08, duration: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
+  }),
+};
+
 export function TechStack() {
   return (
     <div className="max-w-4xl mx-auto mt-16">
       <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/5 border border-secondary/10 text-secondary text-xs font-body font-medium mb-3">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/5 border border-secondary/15 text-secondary text-xs font-mono font-medium mb-3 backdrop-blur-sm">
           <Rocket className="w-3.5 h-3.5" />
-          Technology
+          <span className="tracking-[0.2em] uppercase text-[10px]">Tech Stack</span>
         </div>
         <h3 className="font-display text-2xl sm:text-3xl font-bold text-foreground">
           Built With
@@ -25,24 +36,31 @@ export function TechStack() {
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {techStack.map((tech, i) => (
-          <div
+          <motion.div
             key={tech.name}
-            className="group/tech relative overflow-hidden flex flex-col items-center gap-3 p-5 rounded-2xl bg-card/40 backdrop-blur-sm border border-border/30 cursor-default hover:border-secondary/25 hover:bg-card/70 hover:shadow-[0_10px_40px_-10px_hsl(var(--secondary)/0.15)] hover:-translate-y-2 transition-all duration-500 text-center"
-            style={{ transitionDelay: `${i * 60}ms` }}
+            custom={i}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={techVariants}
+            className="group/tech relative overflow-hidden flex flex-col items-center gap-3 p-5 rounded-2xl bg-card/40 backdrop-blur-sm border border-border/30 cursor-default hover:border-secondary/30 hover:bg-card/60 hover:shadow-[0_0_30px_hsl(var(--secondary)/0.12),inset_0_0_20px_hsl(var(--secondary)/0.03)] hover:-translate-y-2 transition-all duration-500 text-center"
           >
-            {/* Background radial glow */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,hsl(var(--secondary)/0.06),transparent_70%)] opacity-0 group-hover/tech:opacity-100 transition-opacity duration-600" />
+            {/* Radial neon glow */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,hsl(var(--secondary)/0.08),transparent_65%)] opacity-0 group-hover/tech:opacity-100 transition-opacity duration-600" />
             {/* Shimmer sweep */}
-            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent -translate-x-full group-hover/tech:translate-x-full transition-transform duration-[1.2s] ease-in-out" />
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent -translate-x-full group-hover/tech:translate-x-full transition-transform duration-[1.2s] ease-in-out" />
 
-            <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-secondary/10 to-secondary/[0.02] border border-secondary/10 flex items-center justify-center group-hover/tech:scale-110 group-hover/tech:border-secondary/25 group-hover/tech:shadow-[0_0_25px_hsl(var(--secondary)/0.2)] group-hover/tech:rotate-3 transition-all duration-500">
-              <tech.icon className="w-7 h-7 text-secondary/80 group-hover/tech:text-secondary group-hover/tech:scale-110 transition-all duration-500" />
+            {/* Top edge neon line */}
+            <div className="absolute top-0 left-1/4 right-1/4 h-[1px] bg-secondary/0 group-hover/tech:bg-secondary/40 group-hover/tech:shadow-[0_0_10px_hsl(var(--secondary)/0.3)] transition-all duration-500" />
+
+            <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-secondary/10 to-secondary/[0.02] border border-secondary/15 flex items-center justify-center group-hover/tech:scale-110 group-hover/tech:border-secondary/30 group-hover/tech:shadow-[0_0_25px_hsl(var(--secondary)/0.25)] transition-all duration-500">
+              <tech.icon className="w-7 h-7 text-secondary/80 group-hover/tech:text-secondary group-hover/tech:drop-shadow-[0_0_8px_hsl(var(--secondary)/0.5)] transition-all duration-500" />
             </div>
             <div className="relative">
               <span className="font-body text-sm font-semibold text-foreground group-hover/tech:text-secondary transition-colors duration-400">{tech.name}</span>
-              <p className="font-body text-[10px] text-muted-foreground mt-0.5 tracking-wide group-hover/tech:tracking-widest transition-all duration-500">{tech.desc}</p>
+              <p className="font-mono text-[9px] text-muted-foreground mt-1 tracking-[0.15em] uppercase group-hover/tech:text-muted-foreground/80 transition-all duration-500">{tech.desc}</p>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>
