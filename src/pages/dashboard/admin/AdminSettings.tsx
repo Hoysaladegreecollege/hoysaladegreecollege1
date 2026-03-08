@@ -523,6 +523,73 @@ export default function AdminSettings() {
           </div>
         )}
       </div>
+
+      {/* Fee Management PIN Security */}
+      <div className="bg-card border border-border rounded-2xl p-5 hover:shadow-lg transition-all duration-300">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
+              <Lock className="w-4 h-4 text-amber-500" />
+            </div>
+            <div>
+              <h3 className="font-body text-sm font-bold text-foreground">Fee Management PIN</h3>
+              <p className="font-body text-xs text-muted-foreground">
+                {existingPin ? "PIN is set — click to change" : "Set a 6-digit PIN to protect fee management access"}
+              </p>
+            </div>
+          </div>
+          <Button variant="outline" onClick={() => setPinDialogOpen(true)} className="rounded-xl font-body text-xs gap-1.5">
+            <KeyRound className="w-3 h-3" /> {existingPin ? "Change PIN" : "Set PIN"}
+          </Button>
+        </div>
+      </div>
+
+      {/* PIN Dialog */}
+      <Dialog open={pinDialogOpen} onOpenChange={setPinDialogOpen}>
+        <DialogContent className="max-w-sm rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="font-display text-lg flex items-center gap-2">
+              <Lock className="w-5 h-5 text-primary" /> {existingPin ? "Change" : "Set"} Fee Management PIN
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-2">
+            <div>
+              <label className="font-body text-sm text-muted-foreground mb-1.5 block">Enter 6-digit PIN</label>
+              <Input
+                type="password"
+                inputMode="numeric"
+                maxLength={6}
+                placeholder="••••••"
+                value={pinValue}
+                onChange={(e) => setPinValue(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                className="text-center text-2xl tracking-[0.5em] font-mono rounded-xl h-14"
+              />
+            </div>
+            <div>
+              <label className="font-body text-sm text-muted-foreground mb-1.5 block">Confirm PIN</label>
+              <Input
+                type="password"
+                inputMode="numeric"
+                maxLength={6}
+                placeholder="••••••"
+                value={confirmPin}
+                onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                className="text-center text-2xl tracking-[0.5em] font-mono rounded-xl h-14"
+              />
+            </div>
+            {pinValue.length === 6 && confirmPin.length === 6 && pinValue !== confirmPin && (
+              <p className="text-xs text-destructive font-body">PINs do not match</p>
+            )}
+            <Button
+              onClick={handleSavePin}
+              disabled={pinSaving || pinValue.length !== 6 || confirmPin.length !== 6 || pinValue !== confirmPin}
+              className="w-full rounded-xl font-body"
+            >
+              {pinSaving ? "Saving..." : "Save PIN"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
