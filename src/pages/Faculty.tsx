@@ -2,7 +2,7 @@ import SEOHead from "@/components/SEOHead";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
 import PageHeader from "@/components/PageHeader";
-import { GraduationCap, Briefcase, Mail, Phone, Award, BookOpen, Star, Sparkles } from "lucide-react";
+import { GraduationCap, Briefcase, Mail, Phone, Award, BookOpen, Star, Sparkles, ChevronRight, Users, X } from "lucide-react";
 import { createPortal } from "react-dom";
 import PremiumStatsStrip from "@/components/PremiumStatsStrip";
 import { useQuery } from "@tanstack/react-query";
@@ -17,27 +17,22 @@ const staticFaculty = [
   { id: "s4", name: "Dr. Priya Nair", role: "HOD & Professor", department: "Business Administration", qualification: "Ph.D. in Management", experience: "20 years", photo_url: "", email: "", phone: "", subjects: [] },
 ];
 
-const deptConfig: Record<string, { grad: string; badge: string; iconColor: string }> = {
-  "Administration":         { grad: "from-purple-500/12 to-purple-500/4", badge: "bg-purple-500/10 text-purple-700 border-purple-200", iconColor: "text-purple-600" },
-  "Computer Applications":  { grad: "from-blue-500/12 to-blue-500/4",   badge: "bg-blue-500/10 text-blue-700 border-blue-200",     iconColor: "text-blue-600" },
-  "Commerce":               { grad: "from-emerald-500/12 to-emerald-500/4", badge: "bg-emerald-500/10 text-emerald-700 border-emerald-200", iconColor: "text-emerald-600" },
-  "Business Administration":{ grad: "from-orange-500/12 to-orange-500/4", badge: "bg-orange-500/10 text-orange-700 border-orange-200", iconColor: "text-orange-600" },
+const deptConfig: Record<string, { accentHsl: string }> = {
+  "Administration":         { accentHsl: "280, 60%, 55%" },
+  "Computer Applications":  { accentHsl: "220, 80%, 55%" },
+  "Commerce":               { accentHsl: "155, 65%, 45%" },
+  "Business Administration":{ accentHsl: "25, 85%, 55%" },
 };
+
+const defaultAccent = "220, 80%, 55%";
 
 export default function Faculty() {
   const [selectedFaculty, setSelectedFaculty] = useState<any>(null);
   const [selectedDept, setSelectedDept] = useState("All");
 
-  const handleFacultyClick = (f: any) => {
-    setSelectedFaculty(f);
-  };
-
   useEffect(() => {
-    if (selectedFaculty) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    if (selectedFaculty) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = '';
     return () => { document.body.style.overflow = ''; };
   }, [selectedFaculty]);
 
@@ -50,12 +45,10 @@ export default function Faculty() {
   });
 
   const faculty = dbFaculty.length > 0 ? dbFaculty : staticFaculty;
-
   const departments = useMemo(() => {
     const depts = Array.from(new Set(faculty.map((f: any) => f.department)));
     return ["All", ...depts];
   }, [faculty]);
-
   const filteredFaculty = selectedDept === "All" ? faculty : faculty.filter((f: any) => f.department === selectedDept);
 
   return (
@@ -71,98 +64,111 @@ export default function Faculty() {
       ]} />
 
       <section className="py-16 sm:py-24 bg-background relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-secondary/4 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/3 rounded-full blur-3xl pointer-events-none" />
+        {/* Ambient glows */}
+        <div className="absolute top-20 right-10 w-[500px] h-[500px] rounded-full blur-[140px] pointer-events-none" style={{ background: "hsla(var(--secondary), 0.03)" }} />
+        <div className="absolute bottom-10 left-10 w-[350px] h-[350px] rounded-full blur-[120px] pointer-events-none" style={{ background: "hsla(var(--primary), 0.04)" }} />
+
         <div className="container px-4 relative">
           <ScrollReveal>
             <SectionHeading title="Meet Our Educators" subtitle="Experienced professors and industry experts shaping the future" />
           </ScrollReveal>
 
-          {/* Department Filter Tabs */}
-          <div className="flex flex-wrap justify-center gap-2 mb-8">
-            {departments.map((dept) => (
-              <button
-                key={dept}
-                onClick={() => setSelectedDept(dept)}
-                className={`px-4 py-2 rounded-full text-xs font-semibold border transition-all duration-300 ${
-                  selectedDept === dept
-                    ? "bg-primary text-primary-foreground border-primary shadow-md"
-                    : "bg-muted/50 text-muted-foreground border-border hover:bg-muted hover:text-foreground"
-                }`}
-              >
-                {dept}
-              </button>
-            ))}
-          </div>
+          {/* Department Filter Tabs — premium pill style */}
+          <ScrollReveal delay={100}>
+            <div className="flex flex-wrap justify-center gap-2 mb-10">
+              {departments.map((dept) => (
+                <button
+                  key={dept}
+                  onClick={() => setSelectedDept(dept)}
+                  className={`relative px-5 py-2.5 rounded-full text-xs font-body font-semibold border transition-all duration-400 overflow-hidden group ${
+                    selectedDept === dept
+                      ? "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground border-primary/50 shadow-[0_4px_20px_-4px_hsla(var(--primary),0.3)]"
+                      : "bg-card text-muted-foreground border-border/40 hover:border-border/70 hover:text-foreground hover:shadow-[0_4px_20px_-8px_hsla(var(--secondary),0.1)]"
+                  }`}
+                >
+                  {/* Shimmer on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-600 pointer-events-none" />
+                  <span className="relative z-10 flex items-center gap-1.5">
+                    {dept === "All" && <Users className="w-3 h-3" />}
+                    {dept}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </ScrollReveal>
+
           {isLoading ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6 max-w-6xl mx-auto">
               {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="bg-card border border-border rounded-2xl p-6 flex flex-col items-center gap-4">
+                <div key={i} className="bg-card border border-border/30 rounded-3xl p-6 flex flex-col items-center gap-4">
                   <Skeleton className="w-24 h-24 rounded-2xl" />
                   <Skeleton className="h-4 w-3/4" />
                   <Skeleton className="h-3 w-1/2" />
                   <Skeleton className="h-3 w-2/3" />
-                  <Skeleton className="h-3 w-1/3" />
                 </div>
               ))}
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6 max-w-6xl mx-auto">
               {filteredFaculty.map((f: any, i: number) => {
-                const cfg = deptConfig[f.department] || { grad: "from-primary/10 to-secondary/5", badge: "bg-muted text-muted-foreground border-border", iconColor: "text-primary" };
+                const accent = deptConfig[f.department]?.accentHsl || defaultAccent;
                 return (
                   <ScrollReveal key={f.id} delay={i * 60}>
                     <div
-                      onClick={() => handleFacultyClick(f)}
-                      className="premium-card p-6 text-center group h-full flex flex-col cursor-pointer relative overflow-hidden card-stack"
+                      onClick={() => setSelectedFaculty(f)}
+                      className="relative bg-card rounded-3xl p-6 text-center group h-full flex flex-col cursor-pointer overflow-hidden border border-border/30 hover:border-border/50 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_20px_60px_-15px_hsla(var(--secondary),0.12)]"
                     >
-                      {/* Hover gradient */}
-                      <div className={`absolute inset-0 bg-gradient-to-br ${cfg.grad} opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl`} />
+                      {/* Ambient glow orb */}
+                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-28 h-28 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-3xl pointer-events-none" style={{ background: `hsla(${accent}, 0.12)` }} />
                       {/* Top accent line */}
-                      <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-secondary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <div className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-0 group-hover:w-2/3 transition-all duration-600 pointer-events-none" style={{ background: `linear-gradient(90deg, transparent, hsla(${accent}, 0.5), transparent)` }} />
+                      {/* Shimmer sweep */}
+                      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.04] to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 pointer-events-none" />
 
-                      {/* Photo */}
-                      <div className={`relative w-24 h-24 mx-auto rounded-2xl bg-gradient-to-br ${cfg.grad} flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-2 transition-all duration-500 overflow-hidden border-2 border-border group-hover:border-primary/25 shadow-md z-10`}>
+                      {/* Photo / Icon */}
+                      <div className="relative w-24 h-24 mx-auto rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-2 transition-all duration-500 overflow-hidden border border-border/20 shadow-md z-10" style={{ background: `linear-gradient(135deg, hsla(${accent}, 0.12), hsla(${accent}, 0.04))` }}>
                         {f.photo_url ? (
                           <img src={f.photo_url} alt={f.name} className="w-full h-full object-cover" />
                         ) : (
-                          <GraduationCap className={`w-10 h-10 ${cfg.iconColor} group-hover:scale-110 transition-transform duration-300`} />
+                          <GraduationCap className="w-10 h-10" style={{ color: `hsla(${accent}, 0.8)` }} />
                         )}
-                        {/* Shimmer */}
-                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/25 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                        {/* Photo shimmer */}
+                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 pointer-events-none" />
                       </div>
 
                       <h3 className="font-display text-base font-bold text-foreground group-hover:text-primary transition-colors duration-300 relative z-10">{f.name}</h3>
-                      <p className="font-body text-xs text-secondary font-semibold mt-1 relative z-10">{f.role}</p>
-                      <span className={`inline-block mt-2 font-body text-[10px] font-semibold px-3 py-1 rounded-full border ${cfg.badge} relative z-10`}>
+                      <p className="font-body text-xs font-semibold mt-1 relative z-10" style={{ color: `hsla(${accent}, 1)` }}>{f.role}</p>
+                      
+                      {/* Department badge */}
+                      <span className="inline-block mt-2.5 mx-auto font-body text-[10px] font-semibold px-3 py-1 rounded-full border border-border/20 relative z-10" style={{ background: `hsla(${accent}, 0.08)`, color: `hsla(${accent}, 1)` }}>
                         {f.department}
                       </span>
 
-                      <div className="mt-4 pt-3 border-t border-border/60 space-y-1.5 flex-1 relative z-10">
+                      <div className="mt-4 pt-3 border-t border-border/30 space-y-1.5 flex-1 relative z-10">
                         <p className="font-body text-[11px] text-muted-foreground leading-relaxed">{f.qualification}</p>
-                        <div className="flex items-center justify-center gap-1 font-body text-[11px] text-muted-foreground">
+                        <div className="flex items-center justify-center gap-1.5 font-body text-[11px] text-muted-foreground">
                           <Briefcase className="w-3 h-3 shrink-0" /> {f.experience} experience
                         </div>
                       </div>
 
                       {(f.email || f.phone) && (
-                        <div className="flex items-center justify-center gap-2 mt-3 pt-3 border-t border-border/40 relative z-10" onClick={e => e.stopPropagation()}>
+                        <div className="flex items-center justify-center gap-2 mt-3 pt-3 border-t border-border/20 relative z-10" onClick={e => e.stopPropagation()}>
                           {f.email && (
                             <a href={`mailto:${f.email}`} className="p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all duration-200 hover:scale-110">
                               <Mail className="w-3.5 h-3.5" />
                             </a>
                           )}
                           {f.phone && (
-                            <a href={`tel:${f.phone}`} className="p-2 rounded-xl hover:bg-emerald-500/10 text-muted-foreground hover:text-emerald-600 transition-all duration-200 hover:scale-110">
+                            <a href={`tel:${f.phone}`} className="p-2 rounded-xl text-muted-foreground transition-all duration-200 hover:scale-110" style={{ color: undefined }} onMouseEnter={e => (e.currentTarget.style.color = `hsla(155, 65%, 45%, 1)`)} onMouseLeave={e => (e.currentTarget.style.color = '')}>
                               <Phone className="w-3.5 h-3.5" />
                             </a>
                           )}
                         </div>
                       )}
 
-                      {/* Click hint */}
-                      <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                        <Sparkles className="w-3.5 h-3.5 text-secondary animate-sparkle" />
+                      {/* View hint */}
+                      <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-60 transition-opacity duration-300 z-10">
+                        <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
                       </div>
                     </div>
                   </ScrollReveal>
@@ -173,78 +179,95 @@ export default function Faculty() {
         </div>
       </section>
 
-      {/* Faculty Detail Modal */}
+      {/* Faculty Detail Modal — Premium */}
       {selectedFaculty && createPortal(
-        <div className="fixed inset-0 bg-black/70 dark:bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-3 sm:p-4 animate-fade-in" onClick={() => setSelectedFaculty(null)}>
-          <div className="w-full max-w-sm sm:max-w-md max-h-[90vh] overflow-y-auto rounded-2xl sm:rounded-3xl" onClick={e => e.stopPropagation()}>
-            <div className="bg-card rounded-2xl sm:rounded-3xl border border-border w-full shadow-2xl animate-scale-bounce overflow-hidden">
-              {/* Header gradient */}
-              <div className={`p-4 sm:p-6 bg-gradient-to-br ${deptConfig[selectedFaculty.department]?.grad || "from-primary/10 to-secondary/5"} relative overflow-hidden`}>
-                <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-full blur-2xl" />
-                <button onClick={() => setSelectedFaculty(null)} className="absolute top-3 right-3 p-1.5 rounded-xl hover:bg-background/50 transition-colors text-foreground/70 text-sm font-bold hover:scale-110 z-20">✕</button>
-                <div className="flex flex-col items-center text-center gap-3 relative z-10">
-                  {selectedFaculty.photo_url ? (
-                    <div className="w-40 h-40 sm:w-52 sm:h-52 rounded-2xl overflow-hidden border-2 border-background shadow-lg shrink-0">
-                      <img src={selectedFaculty.photo_url} alt={selectedFaculty.name} className="w-full h-full object-cover" />
-                    </div>
-                  ) : (
-                    <div className="w-40 h-40 sm:w-52 sm:h-52 rounded-2xl bg-background/80 flex items-center justify-center shrink-0 overflow-hidden border-2 border-background shadow-lg">
-                      <GraduationCap className={`w-14 h-14 sm:w-20 sm:h-20 ${deptConfig[selectedFaculty.department]?.iconColor || "text-primary"}`} />
-                    </div>
-                  )}
-                  <div>
-                    <h3 className="font-display text-lg sm:text-xl font-bold text-foreground leading-tight">{selectedFaculty.name}</h3>
-                    <p className="font-body text-sm text-secondary font-semibold mt-0.5">{selectedFaculty.role}</p>
-                    <span className={`inline-block mt-1.5 font-body text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${deptConfig[selectedFaculty.department]?.badge || "bg-muted text-muted-foreground border-border"}`}>
-                      {selectedFaculty.department}
-                    </span>
-                  </div>
-                </div>
-              </div>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-xl z-[100] flex items-center justify-center p-3 sm:p-4 animate-fade-in" onClick={() => setSelectedFaculty(null)}>
+          <div className="w-full max-w-sm sm:max-w-md max-h-[90vh] overflow-y-auto rounded-3xl animate-scale-in" onClick={e => e.stopPropagation()}>
+            <div className="bg-card rounded-3xl border border-border/30 w-full shadow-[0_30px_80px_-20px_hsla(var(--secondary),0.15)] overflow-hidden">
+              {/* Header */}
+              {(() => {
+                const accent = deptConfig[selectedFaculty.department]?.accentHsl || defaultAccent;
+                return (
+                  <>
+                    <div className="relative p-6 sm:p-8 overflow-hidden">
+                      {/* Background gradient */}
+                      <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, hsla(${accent}, 0.08), hsla(${accent}, 0.02))` }} />
+                      <div className="absolute -top-16 -right-16 w-40 h-40 rounded-full blur-3xl pointer-events-none" style={{ background: `hsla(${accent}, 0.1)` }} />
+                      <div className="absolute top-0 left-8 right-8 h-px" style={{ background: `linear-gradient(90deg, transparent, hsla(${accent}, 0.3), transparent)` }} />
 
-              <div className="p-4 sm:p-6 space-y-2.5">
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50 border border-border/40 hover:bg-muted transition-colors duration-200">
-                  <Award className="w-4 h-4 text-primary shrink-0" />
-                  <div className="min-w-0">
-                    <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Qualification</p>
-                    <p className="font-body text-sm font-semibold text-foreground break-words">{selectedFaculty.qualification}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50 border border-border/40 hover:bg-muted transition-colors duration-200">
-                  <Briefcase className="w-4 h-4 text-primary shrink-0" />
-                  <div>
-                    <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Experience</p>
-                    <p className="font-body text-sm font-semibold text-foreground">{selectedFaculty.experience}</p>
-                  </div>
-                </div>
-                {selectedFaculty.subjects?.length > 0 && (
-                  <div className="p-3 rounded-xl bg-muted/50 border border-border/40">
-                    <div className="flex items-center gap-2 mb-2">
-                      <BookOpen className="w-4 h-4 text-primary" />
-                      <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Subjects</p>
+                      <button onClick={() => setSelectedFaculty(null)} className="absolute top-4 right-4 w-8 h-8 rounded-xl bg-background/50 backdrop-blur-sm border border-border/30 flex items-center justify-center hover:bg-background/80 transition-all duration-200 hover:scale-110 z-20 text-muted-foreground hover:text-foreground">
+                        <X className="w-4 h-4" />
+                      </button>
+
+                      <div className="flex flex-col items-center text-center gap-4 relative z-10">
+                        {selectedFaculty.photo_url ? (
+                          <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-2xl overflow-hidden border border-border/20 shadow-[0_12px_40px_-10px_hsla(var(--secondary),0.2)] shrink-0">
+                            <img src={selectedFaculty.photo_url} alt={selectedFaculty.name} className="w-full h-full object-cover" />
+                          </div>
+                        ) : (
+                          <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-2xl flex items-center justify-center shrink-0 border border-border/20 shadow-lg" style={{ background: `linear-gradient(135deg, hsla(${accent}, 0.1), hsla(${accent}, 0.03))` }}>
+                            <GraduationCap className="w-16 h-16 sm:w-20 sm:h-20" style={{ color: `hsla(${accent}, 0.6)` }} />
+                          </div>
+                        )}
+                        <div>
+                          <h3 className="font-display text-xl sm:text-2xl font-bold text-foreground leading-tight">{selectedFaculty.name}</h3>
+                          <p className="font-body text-sm font-semibold mt-1" style={{ color: `hsla(${accent}, 1)` }}>{selectedFaculty.role}</p>
+                          <span className="inline-block mt-2 font-body text-[11px] font-semibold px-3 py-1 rounded-full border border-border/20" style={{ background: `hsla(${accent}, 0.08)`, color: `hsla(${accent}, 1)` }}>
+                            {selectedFaculty.department}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {selectedFaculty.subjects.map((s: string) => (
-                        <span key={s} className="font-body text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/15">{s}</span>
+
+                    <div className="p-5 sm:p-6 space-y-2.5">
+                      {/* Info rows */}
+                      {[
+                        { icon: Award, label: "Qualification", value: selectedFaculty.qualification },
+                        { icon: Briefcase, label: "Experience", value: selectedFaculty.experience },
+                      ].map((row) => (
+                        <div key={row.label} className="flex items-center gap-3 p-3.5 rounded-2xl bg-muted/30 border border-border/20 group hover:border-border/40 transition-all duration-300">
+                          <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border border-border/20" style={{ background: `linear-gradient(135deg, hsla(${accent}, 0.1), hsla(${accent}, 0.03))` }}>
+                            <row.icon className="w-4 h-4" style={{ color: `hsla(${accent}, 0.8)` }} />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-body text-[10px] text-muted-foreground uppercase tracking-[0.12em]">{row.label}</p>
+                            <p className="font-body text-sm font-semibold text-foreground break-words">{row.value}</p>
+                          </div>
+                        </div>
                       ))}
+
+                      {selectedFaculty.subjects?.length > 0 && (
+                        <div className="p-3.5 rounded-2xl bg-muted/30 border border-border/20">
+                          <div className="flex items-center gap-2 mb-2.5">
+                            <BookOpen className="w-4 h-4" style={{ color: `hsla(${accent}, 0.8)` }} />
+                            <p className="font-body text-[10px] text-muted-foreground uppercase tracking-[0.12em]">Subjects</p>
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {selectedFaculty.subjects.map((s: string) => (
+                              <span key={s} className="font-body text-xs px-3 py-1 rounded-full border border-border/20" style={{ background: `hsla(${accent}, 0.06)`, color: `hsla(${accent}, 1)` }}>{s}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {(selectedFaculty.email || selectedFaculty.phone) && (
+                        <div className="flex gap-2.5 pt-2">
+                          {selectedFaculty.email && (
+                            <a href={`mailto:${selectedFaculty.email}`} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl border border-border/30 hover:border-primary/30 hover:bg-primary/5 font-body text-xs font-semibold transition-all duration-300 group text-muted-foreground hover:text-primary">
+                              <Mail className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" /> Email
+                            </a>
+                          )}
+                          {selectedFaculty.phone && (
+                            <a href={`tel:${selectedFaculty.phone}`} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl border border-border/30 font-body text-xs font-semibold transition-all duration-300 group text-muted-foreground" style={{ ['--hover-color' as any]: `hsla(155, 65%, 45%, 1)` }} onMouseEnter={e => { e.currentTarget.style.borderColor = 'hsla(155, 65%, 45%, 0.3)'; e.currentTarget.style.color = 'hsla(155, 65%, 45%, 1)'; }} onMouseLeave={e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.color = ''; }}>
+                              <Phone className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" /> Call
+                            </a>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                )}
-                {(selectedFaculty.email || selectedFaculty.phone) && (
-                  <div className="flex gap-2 pt-1">
-                    {selectedFaculty.email && (
-                      <a href={`mailto:${selectedFaculty.email}`} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-border hover:bg-primary/5 hover:border-primary/30 font-body text-xs font-semibold transition-all duration-200 group">
-                        <Mail className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" /> Email
-                      </a>
-                    )}
-                    {selectedFaculty.phone && (
-                      <a href={`tel:${selectedFaculty.phone}`} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-border hover:bg-emerald-500/5 hover:border-emerald-300 font-body text-xs font-semibold transition-all duration-200 group">
-                        <Phone className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" /> Call
-                      </a>
-                    )}
-                  </div>
-                )}
-              </div>
+                  </>
+                );
+              })()}
             </div>
           </div>
         </div>,
