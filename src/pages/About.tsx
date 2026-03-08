@@ -589,7 +589,50 @@ export default function About() {
             </div>
           </section>
 
-          {/* Testimonials - NEW */}
+          {/* Campus Gallery - with Lightbox */}
+          <section id="campus-gallery" className="py-16 sm:py-24 bg-background relative overflow-hidden scroll-mt-24">
+            <div className="absolute bottom-20 right-10 w-[400px] h-[400px] rounded-full blur-[150px] pointer-events-none" style={{ background: "hsla(var(--primary), 0.03)" }} />
+            <div className="container max-w-5xl px-4 relative">
+              <ScrollReveal>
+                <SectionHeading title="Campus Highlights" subtitle="A glimpse into our vibrant campus life" />
+              </ScrollReveal>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+                {galleryImages.map((img: any, i: number) => (
+                  <ScrollReveal key={img.id} delay={i * 80}>
+                    <div
+                      onClick={() => setLightboxIdx(i)}
+                      className="relative rounded-2xl overflow-hidden cursor-pointer group aspect-[4/3] border border-border/20 hover:border-border/40 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_16px_50px_-12px_hsla(var(--secondary),0.12)]"
+                    >
+                      <img src={img.image_url} alt={img.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
+                      {/* Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      {/* Shimmer */}
+                      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 pointer-events-none" />
+                      {/* Title + expand */}
+                      <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+                        <div className="flex items-center justify-between">
+                          <p className="font-body text-xs font-semibold text-white drop-shadow-lg">{img.title}</p>
+                          <Expand className="w-3.5 h-3.5 text-white/70" />
+                        </div>
+                      </div>
+                    </div>
+                  </ScrollReveal>
+                ))}
+              </div>
+              {/* View all link */}
+              <ScrollReveal delay={400}>
+                <div className="flex justify-center mt-8">
+                  <a href="/gallery" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-card border border-border/30 hover:border-secondary/30 text-sm font-body font-semibold text-muted-foreground hover:text-foreground transition-all duration-300 hover:shadow-[0_8px_30px_-8px_hsla(var(--secondary),0.1)] group">
+                    <Camera className="w-4 h-4 text-secondary" />
+                    View Full Gallery
+                    <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform duration-300" />
+                  </a>
+                </div>
+              </ScrollReveal>
+            </div>
+          </section>
+
+
           <section id="testimonials" className="py-16 sm:py-24 bg-background relative overflow-hidden scroll-mt-24">
             <div className="absolute top-10 right-10 w-[400px] h-[400px] rounded-full blur-[150px] pointer-events-none" style={{ background: "hsla(var(--secondary), 0.03)" }} />
             <div className="container max-w-3xl px-4 relative">
