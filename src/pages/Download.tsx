@@ -45,6 +45,41 @@ export default function DownloadPage() {
   const [showThankYou, setShowThankYou] = useState(false);
   const [downloadCount] = useState(1247);
 
+  const deferredPromptRef = useRef<any>(null);
+  const [canInstallPWA, setCanInstallPWA] = useState(false);
+  const [pwaInstalled, setPwaInstalled] = useState(false);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault();
+      deferredPromptRef.current = e;
+      setCanInstallPWA(true);
+    };
+    window.addEventListener("beforeinstallprompt", handler);
+
+    // Check if already installed
+    if (window.matchMedia("(display-mode: standalone)").matches) {
+      setPwaInstalled(true);
+    }
+
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
+
+  const handleInstallPWA = async () => {
+    if (deferredPromptRef.current) {
+      deferredPromptRef.current.prompt();
+      const result = await deferredPromptRef.current.userChoice;
+      if (result.outcome === "accepted") {
+        setPwaInstalled(true);
+        setCanInstallPWA(false);
+      }
+      deferredPromptRef.current = null;
+    } else {
+      // Fallback: show instructions
+      toast.info("To install: tap your browser menu (⋮ or Share) → 'Add to Home Screen' or 'Install App'");
+    }
+  };
+
   const handleDownload = () => {
     setShowThankYou(true);
     const link = document.createElement("a");
