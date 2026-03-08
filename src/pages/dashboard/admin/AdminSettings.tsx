@@ -56,12 +56,57 @@ const healthIcons: Record<string, any> = {
 };
 
 export default function AdminSettings() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [liveTime, setLiveTime] = useState(new Date());
+  const [pinDialogOpen, setPinDialogOpen] = useState(false);
+  const [pinValue, setPinValue] = useState("");
+  const [confirmPin, setConfirmPin] = useState("");
+  const [pinSaving, setPinSaving] = useState(false);
   
   useEffect(() => {
     const timer = setInterval(() => setLiveTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  const { data: existingPin } = useQuery({
+    queryKey: ["fee-pin-exists"],
+    queryFn: async () => {
+      const { data } = await supabase.from("fee_management_pin").select("id").limit(1);
+      return data && data.length > 0;
+    },
+  });
+
+  const handleSavePin = async () => {
+    if (pinValue.length !== 6 || !/^\d{6}$/.test(pinValue)) {
+      toast.error("PIN must be exactly 6 digits");
+      return;
+    }
+    if (pinValue !== confirmPin) {
+      toast.error("PINs do not match");
+      return;
+    }
+    setPinSaving(true);
+    try {
+      // Delete existing PIN first
+      await supabase.from("fee_management_pin").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+      // Insert new PIN
+      const { error } = await supabase.from("fee_management_pin").insert({
+        pin_hash: pinValue,
+        updated_by: user?.id,
+      });
+      if (error) throw error;
+      toast.success("Fee Management PIN saved successfully!");
+      setPinDialogOpen(false);
+      setPinValue("");
+      setConfirmPin("");
+      queryClient.invalidateQueries({ queryKey: ["fee-pin-exists"] });
+    } catch (e: any) {
+      toast.error(e.message || "Failed to save PIN");
+    } finally {
+      setPinSaving(false);
+    }
+  };
 
   const settings = [
     { label: "College Name", value: "Hoysala Degree College", icon: Globe },
