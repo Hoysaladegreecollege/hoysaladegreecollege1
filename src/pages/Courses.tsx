@@ -4,7 +4,7 @@ import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
-import { Clock, CheckCircle, IndianRupee, ArrowRight, GraduationCap, Sparkles, Users, BookOpen } from "lucide-react";
+import { Clock, CheckCircle, IndianRupee, ArrowRight, GraduationCap, Sparkles, Users, BookOpen, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import PremiumStatsStrip from "@/components/PremiumStatsStrip";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -18,42 +18,42 @@ const staticCourses = [
     duration: "3 Years (6 Semesters)", eligibility: "10+2 with Mathematics/Computer Science from a recognized board with minimum 45% marks.",
     fee: "₹80,000 / Year", overview: "The BCA program provides students with a strong foundation in computer science, programming, database management, networking, and software development.",
     highlights: ["C, C++, Java, Python Programming", "Database Management Systems", "Web Technologies & Development", "Data Structures & Algorithms", "Software Engineering", "Computer Networks"],
-    color: "from-blue-500/10 to-cyan-500/5", accent: "text-blue-600",
+    color: "from-blue-500/10 to-cyan-500/5", accent: "text-blue-600", accentHsl: "217 72% 50%",
   },
   {
     name: "B.Com Regular", full: "Bachelor of Commerce (Regular)", icon: "📊",
     duration: "3 Years (6 Semesters)", eligibility: "10+2 in any stream from a recognized board with minimum 40% marks.",
     fee: "₹60,000 / Year", overview: "The B.Com Regular program equips students with comprehensive knowledge in accounting, finance, taxation, business law, and economics.",
     highlights: ["Financial Accounting", "Business Law & Ethics", "Income Tax & GST", "Cost & Management Accounting", "Business Statistics", "Corporate Finance"],
-    color: "from-emerald-500/10 to-green-500/5", accent: "text-emerald-600",
+    color: "from-emerald-500/10 to-green-500/5", accent: "text-emerald-600", accentHsl: "142 70% 40%",
   },
   {
     name: "B.Com Professional", full: "Bachelor of Commerce (Professional)", icon: "📈",
     duration: "3 Years (6 Semesters)", eligibility: "10+2 in any stream from a recognized board with minimum 40% marks.",
     fee: "₹60,000 / Year", overview: "B.Com Professional is designed for students aspiring for CA, CS, and CMA. It includes exclusive coaching alongside regular degree curriculum.",
     highlights: ["CA Foundation Coaching", "CS Executive Preparation", "CMA Foundation Classes", "Advanced Accounting", "Auditing & Taxation", "Corporate Law"],
-    color: "from-secondary/15 to-amber-500/5", accent: "text-secondary-foreground",
+    color: "from-secondary/15 to-amber-500/5", accent: "text-secondary-foreground", accentHsl: "42 87% 55%",
   },
   {
     name: "BBA", full: "Bachelor of Business Administration", icon: "💼",
     duration: "3 Years (6 Semesters)", eligibility: "10+2 in any stream from a recognized board with minimum 40% marks.",
     fee: "₹70,000 / Year", overview: "The BBA program develops managerial and entrepreneurial skills. The curriculum covers marketing, HR, finance, operations management, and strategic planning.",
     highlights: ["Principles of Management", "Marketing Management", "Human Resource Management", "Financial Management", "Entrepreneurship Development", "Business Communication"],
-    color: "from-purple-500/10 to-violet-500/5", accent: "text-purple-600",
+    color: "from-purple-500/10 to-violet-500/5", accent: "text-purple-600", accentHsl: "280 60% 55%",
   },
   {
     name: "C.A Coaching", full: "Chartered Accountancy Foundation & Intermediate", icon: "⚖️",
     duration: "Integrated with B.Com", eligibility: "Students enrolled in B.Com Professional program.",
     fee: "Included in B.Com Professional fee", overview: "Exclusive coaching for CA Foundation and Intermediate exams conducted alongside the regular B.Com program by experienced CA faculty.",
     highlights: ["CA Foundation Papers 1-4", "Accounting & Auditing", "Business Laws", "Quantitative Aptitude", "Mock Tests & Practice Papers", "One-on-one Mentoring"],
-    color: "from-rose-500/10 to-red-500/5", accent: "text-rose-600",
+    color: "from-rose-500/10 to-red-500/5", accent: "text-rose-600", accentHsl: "0 84% 60%",
   },
   {
     name: "C.S Coaching", full: "Company Secretary Foundation & Executive", icon: "📜",
     duration: "Integrated with B.Com", eligibility: "Students enrolled in B.Com Professional program.",
     fee: "Included in B.Com Professional fee", overview: "Dedicated coaching for CS Foundation and Executive modules with focus on corporate laws, governance, and compliance.",
     highlights: ["Business Environment & Law", "Company Law", "Securities Laws", "Corporate Governance", "Tax Laws", "Mock Exams"],
-    color: "from-indigo-500/10 to-blue-500/5", accent: "text-indigo-600",
+    color: "from-indigo-500/10 to-blue-500/5", accent: "text-indigo-600", accentHsl: "240 60% 55%",
   },
 ];
 
@@ -69,6 +69,10 @@ const COLOR_MAP: Record<string, string> = {
   "C.A Coaching": "from-rose-500/10 to-red-500/5",
   "C.S Coaching": "from-indigo-500/10 to-blue-500/5",
 };
+const ACCENT_MAP: Record<string, string> = {
+  "BCA": "217 72% 50%", "B.Com Regular": "142 70% 40%", "B.Com Professional": "42 87% 55%",
+  "BBA": "280 60% 55%", "C.A Coaching": "0 84% 60%", "C.S Coaching": "240 60% 55%",
+};
 
 export default function Courses() {
   const [selectedCourse, setSelectedCourse] = useState<any>(null);
@@ -81,22 +85,19 @@ export default function Courses() {
     },
   });
 
-  // Use DB courses if available, otherwise static
   const courses = dbCourses.length > 0
     ? dbCourses.map((c: any) => {
         const staticMatch = staticCourses.find(sc => sc.name === c.name || sc.name === c.code);
         const dbHighlights = (c.highlights as string[] | null) || [];
         return {
-          name: c.code || c.name,
-          full: c.name,
+          name: c.code || c.name, full: c.name,
           icon: ICON_MAP[c.code] || ICON_MAP[c.name] || "📚",
-          duration: c.duration || "3 Years",
-          eligibility: c.eligibility || "Contact for details",
-          fee: c.fee || "Contact for details",
-          overview: c.overview || c.name,
+          duration: c.duration || "3 Years", eligibility: c.eligibility || "Contact for details",
+          fee: c.fee || "Contact for details", overview: c.overview || c.name,
           highlights: dbHighlights.length > 0 ? dbHighlights : (staticMatch?.highlights || []),
           color: COLOR_MAP[c.code] || COLOR_MAP[c.name] || "from-primary/10 to-primary/5",
           accent: staticMatch?.accent || "text-primary",
+          accentHsl: ACCENT_MAP[c.code] || ACCENT_MAP[c.name] || "220 55% 48%",
         };
       })
     : staticCourses;
@@ -120,8 +121,12 @@ export default function Courses() {
       />
 
       <section className="py-20 sm:py-28 bg-background relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-secondary/4 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/3 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/[0.03] rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-primary/[0.02] rounded-full blur-[100px] pointer-events-none" />
+        {/* Diagonal pattern */}
+        <div className="absolute inset-0 opacity-[0.015] pointer-events-none"
+          style={{ backgroundImage: "repeating-linear-gradient(45deg, hsl(var(--foreground) / 0.15) 0, hsl(var(--foreground) / 0.15) 1px, transparent 1px, transparent 60px)" }} />
+
         <div className="container px-4 relative">
           <ScrollReveal>
             <SectionHeading
@@ -133,8 +138,8 @@ export default function Courses() {
           {isLoading ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 max-w-5xl mx-auto">
               {[1,2,3,4,5,6].map(i => (
-                <div key={i} className="bg-card border border-border rounded-2xl p-7 space-y-4">
-                  <Skeleton className="w-14 h-14 rounded-xl" />
+                <div key={i} className="bg-card border border-border rounded-3xl p-8 space-y-4">
+                  <Skeleton className="w-16 h-16 rounded-2xl" />
                   <Skeleton className="h-6 w-2/3" />
                   <Skeleton className="h-4 w-1/2" />
                   <Skeleton className="h-16 w-full" />
@@ -142,31 +147,51 @@ export default function Courses() {
               ))}
             </div>
           ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 max-w-5xl mx-auto">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-7 max-w-5xl mx-auto">
               {courses.map((c: any, i: number) => (
                 <ScrollReveal key={c.name} delay={i * 80}>
                   <div
                     onClick={() => setSelectedCourse(c)}
-                    className="premium-card p-7 sm:p-8 cursor-pointer group h-full relative overflow-hidden border-glow"
+                    className="relative p-7 sm:p-8 cursor-pointer group h-full overflow-hidden rounded-3xl border border-border/30 bg-card backdrop-blur-sm active:scale-[0.97] touch-manipulation"
+                    style={{
+                      transition: "all 0.6s cubic-bezier(0.16,1,0.3,1)",
+                      boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
+                    }}
                   >
-                    <div className={`absolute inset-0 bg-gradient-to-br ${c.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl`} />
-                    <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-secondary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-t-2xl" />
+                    {/* Multi-layer hover effects */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${c.color} opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-3xl`} />
+                    <div className="absolute -bottom-16 -right-16 w-48 h-48 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-1000 blur-[70px] pointer-events-none"
+                      style={{ background: `hsla(${c.accentHsl || '220 55% 48%'}, 0.12)` }} />
+                    
+                    {/* Top accent line */}
+                    <div className="absolute top-0 left-0 right-0 h-[1.5px] scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-center"
+                      style={{ background: `linear-gradient(90deg, transparent, hsla(${c.accentHsl || '220 55% 48%'}, 0.5), transparent)` }} />
+                    
+                    {/* Shimmer sweep */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.05] to-transparent translate-x-[-100%] group-hover:translate-x-[100%] rounded-3xl pointer-events-none"
+                      style={{ transition: "transform 1.2s cubic-bezier(0.16,1,0.3,1)" }} />
+
+                    {/* Glass inner border */}
+                    <div className="absolute inset-[1px] rounded-[23px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                      style={{ boxShadow: `inset 0 1px 0 rgba(255,255,255,0.05), inset 0 0 0 1px hsla(${c.accentHsl || '220 55% 48%'}, 0.06)` }} />
+
                     <div className="relative z-10">
-                      <span className="text-5xl sm:text-6xl mb-5 group-hover:scale-110 transition-transform duration-300 inline-block filter group-hover:drop-shadow-lg">
+                      <span className="text-5xl sm:text-6xl mb-5 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 inline-block filter group-hover:drop-shadow-lg">
                         {c.icon}
                       </span>
                       <h3 className="font-display text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">
                         {c.name}
                       </h3>
-                      <p className="font-body text-xs text-muted-foreground mt-1.5 font-medium">{c.full}</p>
+                      <p className="font-body text-[10px] text-muted-foreground mt-1.5 font-semibold tracking-[0.15em] uppercase opacity-50">{c.full}</p>
                       <p className="font-body text-sm text-muted-foreground mt-4 leading-relaxed line-clamp-2">
                         {c.overview}
                       </p>
-                      <div className="mt-6 flex items-center justify-between">
-                        <span className="text-[10px] font-body text-secondary font-bold bg-secondary/10 px-3 py-1.5 rounded-full border border-secondary/20">
+                      <div className="mt-6 pt-4 border-t border-border/30 group-hover:border-border/50 transition-colors duration-500 flex items-center justify-between">
+                        <span className="text-[10px] font-body font-semibold px-3 py-1.5 rounded-full border transition-all duration-500"
+                          style={{ color: `hsl(${c.accentHsl || '220 55% 48%'})`, background: `hsla(${c.accentHsl || '220 55% 48%'}, 0.06)`, borderColor: `hsla(${c.accentHsl || '220 55% 48%'}, 0.12)` }}>
                           {(c.duration || "").split(" (")[0]}
                         </span>
-                        <span className="text-xs font-body font-semibold text-primary flex items-center gap-1 group-hover:gap-2 transition-all duration-300">
+                        <span className="text-xs font-body font-semibold text-primary flex items-center gap-1 group-hover:gap-2 transition-all duration-300 opacity-40 group-hover:opacity-100">
                           View Details <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform duration-300" />
                         </span>
                       </div>
@@ -180,23 +205,29 @@ export default function Courses() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-cream">
-        <div className="container text-center px-4">
+      <section className="py-16 sm:py-20 relative overflow-hidden">
+        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, hsl(230,12%,6%), hsl(228,10%,3%))" }} />
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[200px] bg-[hsl(var(--gold))]/[0.05] rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[hsl(var(--gold))]/20 to-transparent" />
+        
+        <div className="container text-center px-4 relative">
           <ScrollReveal>
             <div className="max-w-xl mx-auto">
-              <h2 className="font-display text-2xl sm:text-3xl font-bold text-foreground mb-3">Ready to Enroll?</h2>
-              <p className="font-body text-muted-foreground mb-8 text-sm">
+              <Sparkles className="w-8 h-8 text-secondary mx-auto mb-4 animate-float" />
+              <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3">Ready to Enroll?</h2>
+              <p className="font-body text-white/40 mb-8 text-sm leading-relaxed">
                 Apply today and secure your seat for the 2026–27 academic year.
               </p>
               <Link to="/admissions">
                 <button
-                  className="relative group overflow-hidden px-10 py-4 rounded-2xl font-body text-base font-bold text-primary-foreground shadow-2xl transition-all duration-500 hover:scale-105 hover:-translate-y-0.5"
+                  className="relative group overflow-hidden px-10 py-4 rounded-2xl font-body text-base font-bold text-foreground shadow-2xl transition-all duration-500 hover:scale-105 hover:-translate-y-0.5 btn-magnetic"
                   style={{
-                    background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--navy-dark)))",
-                    boxShadow: "0 8px 32px hsl(var(--primary) / 0.3)",
+                    background: "linear-gradient(135deg, hsl(42,87%,58%), hsl(38,92%,48%))",
+                    boxShadow: "0 8px 32px hsla(42,87%,52%,0.4)",
                   }}
                 >
-                  <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
+                  <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 rounded-2xl" />
                   <span className="relative flex items-center gap-2">
                     <GraduationCap className="w-5 h-5" /> Apply for Admission <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
                   </span>
@@ -208,15 +239,16 @@ export default function Courses() {
       </section>
 
       <Dialog open={!!selectedCourse} onOpenChange={() => setSelectedCourse(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border-border/50">
           {selectedCourse && (
             <>
               <DialogHeader>
-                <div className={`flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-br ${selectedCourse.color} border border-border/30 mb-2`}>
-                  <div className="w-16 h-16 rounded-2xl bg-background/80 flex items-center justify-center text-4xl shrink-0 shadow-sm">
+                <div className={`flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-br ${selectedCourse.color} border border-border/30 mb-2 relative overflow-hidden`}>
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent" />
+                  <div className="w-16 h-16 rounded-2xl bg-background/80 backdrop-blur-sm flex items-center justify-center text-4xl shrink-0 shadow-lg border border-border/30">
                     {selectedCourse.icon}
                   </div>
-                  <div>
+                  <div className="relative">
                     <DialogTitle className="font-display text-2xl">{selectedCourse.name}</DialogTitle>
                     <DialogDescription className="font-body">{selectedCourse.full}</DialogDescription>
                   </div>
@@ -230,8 +262,8 @@ export default function Courses() {
                     { icon: CheckCircle, label: "Eligibility", value: selectedCourse.eligibility },
                     { icon: IndianRupee, label: "Fee", value: selectedCourse.fee },
                   ].map((item) => (
-                    <div key={item.label} className="flex items-start gap-3 bg-muted/30 rounded-xl p-3 border border-border/50 hover:bg-muted/50 transition-colors duration-200">
-                      <item.icon className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <div key={item.label} className="flex items-start gap-3 bg-muted/30 rounded-xl p-3.5 border border-border/50 hover:bg-muted/50 hover:border-primary/15 transition-all duration-300 group">
+                      <item.icon className="w-4 h-4 text-primary shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
                       <div>
                         <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">{item.label}</p>
                         <p className="font-body text-xs font-medium text-foreground mt-0.5">{item.value}</p>
@@ -242,7 +274,7 @@ export default function Courses() {
                 {selectedCourse.highlights?.length > 0 && (
                   <div>
                     <h4 className="font-display text-base font-semibold text-foreground mb-3 flex items-center gap-2">
-                      <GraduationCap className="w-4 h-4 text-secondary" /> Course Highlights
+                      <Star className="w-4 h-4 text-secondary" /> Course Highlights
                     </h4>
                     <div className="grid sm:grid-cols-2 gap-2">
                       {selectedCourse.highlights.map((h: string) => (
@@ -255,13 +287,13 @@ export default function Courses() {
                 )}
                 <Link to="/apply">
                   <button
-                    className="relative w-full group overflow-hidden px-6 py-3 rounded-xl font-body text-sm font-bold text-primary-foreground transition-all duration-300 hover:scale-[1.02] shadow-lg mt-2"
+                    className="relative w-full group overflow-hidden px-6 py-3.5 rounded-xl font-body text-sm font-bold text-primary-foreground transition-all duration-300 hover:scale-[1.02] shadow-lg mt-2"
                     style={{
                       background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--navy-dark)))",
                       boxShadow: "0 4px 20px hsl(var(--primary) / 0.25)",
                     }}
                   >
-                    <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl" />
+                    <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/12 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 rounded-xl" />
                     <span className="relative flex items-center justify-center gap-2">
                       Apply Now <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
                     </span>
