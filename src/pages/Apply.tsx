@@ -6,6 +6,22 @@ import { CheckCircle, Upload, GraduationCap, Phone, Calendar, User, Mail, MapPin
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { z } from "zod";
+
+const applySchema = z.object({
+  full_name: z.string().trim().min(1, "Full name is required").max(200, "Name must be under 200 characters"),
+  email: z.string().trim().email("Invalid email address").max(255, "Email must be under 255 characters"),
+  phone: z.string().trim().min(1, "Phone is required").max(20, "Phone must be under 20 characters")
+    .regex(/^[0-9+\-() ]{7,20}$/, "Invalid phone number format"),
+  date_of_birth: z.string().optional(),
+  gender: z.string().optional(),
+  course: z.string().min(1, "Course is required").max(100, "Course must be under 100 characters"),
+  father_name: z.string().max(200, "Father's name must be under 200 characters").optional().or(z.literal("")),
+  mother_name: z.string().max(200, "Mother's name must be under 200 characters").optional().or(z.literal("")),
+  address: z.string().max(1000, "Address must be under 1000 characters").optional().or(z.literal("")),
+  previous_school: z.string().max(300, "School name must be under 300 characters").optional().or(z.literal("")),
+  percentage_12th: z.string().max(20, "Percentage must be under 20 characters").optional().or(z.literal("")),
+});
 
 const initialForm = {
   full_name: "", email: "", phone: "", date_of_birth: "", gender: "",
