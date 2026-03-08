@@ -32,7 +32,7 @@ export default function AdminActivityLog() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("activity_logs")
-        .select("*, profiles:user_id(full_name, email)")
+        .select("*")
         .order("created_at", { ascending: false })
         .limit(200);
       if (error) throw error;
