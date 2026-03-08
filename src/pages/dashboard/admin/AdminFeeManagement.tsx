@@ -197,14 +197,41 @@ export default function AdminFeeManagement() {
     onError: () => toast.error("Failed to update fee details"),
   });
 
+  // Lockout countdown timer
+  useEffect(() => {
+    if (!lockoutUntil) return;
+    const interval = setInterval(() => {
+      const remaining = Math.max(0, Math.ceil((lockoutUntil - Date.now()) / 1000));
+      setLockoutRemaining(remaining);
+      if (remaining <= 0) {
+        setLockoutUntil(null);
+        setLockoutRemaining(0);
+        setPinError("");
+      }
+    }, 200);
+    return () => clearInterval(interval);
+  }, [lockoutUntil]);
+
   const handlePinSubmit = () => {
+    if (lockoutUntil && Date.now() < lockoutUntil) return;
     setPinChecking(true);
     setPinError("");
     if (pinInput === pinData) {
       setPinUnlocked(true);
       setPinChecking(false);
+      setFailedAttempts(0);
     } else {
-      setPinError("Incorrect PIN. Please try again.");
+      const newAttempts = failedAttempts + 1;
+      setFailedAttempts(newAttempts);
+      if (newAttempts >= 3) {
+        const unlockTime = Date.now() + 30000;
+        setLockoutUntil(unlockTime);
+        setLockoutRemaining(30);
+        setPinError("Too many failed attempts. Locked for 30 seconds.");
+        setFailedAttempts(0);
+      } else {
+        setPinError(`Incorrect PIN. ${3 - newAttempts} attempt(s) remaining.`);
+      }
       setPinInput("");
       setPinChecking(false);
     }
