@@ -12,6 +12,7 @@ const aboutDropdown = [
   { label: "Campus", path: "/campus", icon: Building, desc: "Virtual campus tour" },
   { label: "Alumni Network", path: "/alumni", icon: Users, desc: "Success stories" },
   { label: "Clubs & Societies", path: "/clubs", icon: Sparkles, desc: "Student life" },
+  { label: "Library", path: "/library", icon: BookOpen, desc: "Book catalog" },
 ];
 
 const facultyDropdown = [
