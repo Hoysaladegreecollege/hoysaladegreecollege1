@@ -28,7 +28,6 @@ export function FeatureHighlights() {
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/5 border border-secondary/15 text-secondary text-xs font-mono font-medium mb-3 backdrop-blur-sm">
           <Sparkles className="w-3.5 h-3.5" />
           <span className="tracking-[0.2em] uppercase text-[10px]">Feature Matrix</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
         </div>
         <h3 className="font-display text-2xl sm:text-3xl font-bold text-foreground">
           What's Inside
