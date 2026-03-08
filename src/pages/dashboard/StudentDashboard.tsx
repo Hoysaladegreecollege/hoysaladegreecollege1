@@ -260,6 +260,7 @@ export default function StudentDashboard() {
   return (
     <div className="space-y-5 sm:space-y-6 animate-fade-in">
       <BirthdayPopup />
+      <AttendanceSummaryPopup />
 
       {/* Welcome Banner */}
       <div className="bg-card border border-border/60 rounded-2xl p-6 md:p-8">
