@@ -2,237 +2,48 @@ import SEOHead from "@/components/SEOHead";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
 import PageHeader from "@/components/PageHeader";
-import { MapPin, Phone, Mail, Clock, Send, CheckCircle, Sparkles, ArrowUpRight } from "lucide-react";
-import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { z } from "zod";
-
-const contactSchema = z.object({
-  name: z.string().trim().min(1, "Name is required").max(200, "Name must be under 200 characters"),
-  email: z.string().trim().email("Invalid email address").max(255, "Email must be under 255 characters"),
-  subject: z.string().max(300, "Subject must be under 300 characters").optional().or(z.literal("")),
-  message: z.string().trim().min(1, "Message is required").max(5000, "Message must be under 5000 characters"),
-});
-
-const MAPS_LINK = "https://maps.app.goo.gl/TrQbMQQB5kqVueQAA";
-
-const contactInfo = [
-  {
-    icon: MapPin, label: "Address",
-    value: "K.R.P. Arcade, UCO Bank Building, Paramanna Layout, Nelamangala Town, Bengaluru Rural Dist. - 562 123",
-    link: MAPS_LINK, external: true,
-    accentHsl: "217 72% 50%", iconBg: "bg-blue-500/10", iconColor: "text-blue-500",
-  },
-  {
-    icon: Phone, label: "Phone Numbers",
-    value: "7676272167 • 7975344252 • 8618181383 • 7892508243",
-    link: "tel:7676272167",
-    accentHsl: "142 70% 40%", iconBg: "bg-emerald-500/10", iconColor: "text-emerald-500",
-  },
-  {
-    icon: Mail, label: "Email",
-    value: "principal.hoysaladegreecollege@gmail.com",
-    link: "mailto:principal.hoysaladegreecollege@gmail.com",
-    accentHsl: "220 55% 48%", iconBg: "bg-primary/10", iconColor: "text-primary",
-  },
-  {
-    icon: Clock, label: "Office Hours",
-    value: "Mon – Sat: 9:00 AM – 5:00 PM",
-    link: undefined,
-    accentHsl: "42 87% 55%", iconBg: "bg-secondary/15", iconColor: "text-secondary",
-  },
-];
+import ContactInfoCards from "@/components/contact/ContactInfoCards";
+import ContactForm from "@/components/contact/ContactForm";
+import ContactMap from "@/components/contact/ContactMap";
+import { Sparkles } from "lucide-react";
 
 export default function Contact() {
-  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
-  const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const result = contactSchema.safeParse(form);
-    if (!result.success) {
-      const firstError = result.error.errors[0]?.message || "Invalid input";
-      toast.error(firstError);
-      return;
-    }
-    const validated = result.data;
-    setSubmitting(true);
-    const { error } = await supabase.from("contact_submissions").insert({
-      name: validated.name, email: validated.email, subject: validated.subject || "", message: validated.message,
-    });
-    setSubmitting(false);
-    if (error) {
-      toast.error("Failed to send message. Please try again.");
-    } else {
-      setSubmitted(true);
-      setTimeout(() => { setSubmitted(false); setForm({ name: "", email: "", subject: "", message: "" }); }, 4000);
-    }
-  };
-
-  const inputClass =
-    "w-full border border-border rounded-xl px-4 py-3.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/15 focus:border-primary/40 transition-all duration-300 placeholder:text-muted-foreground/30 hover:border-primary/20 hover:shadow-sm";
-
   return (
     <div className="page-enter">
       <SEOHead title="Contact Us" description="Contact Hoysala Degree College Nelamangala. Phone: 7676272167, Email: principal.hoysaladegreecollege@gmail.com." canonical="/contact" />
       <PageHeader title="Contact Us" subtitle="We'd love to hear from you" />
 
-      <section className="py-16 sm:py-24 bg-background relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/[0.03] rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-primary/[0.02] rounded-full blur-[100px] pointer-events-none" />
+      <section className="py-16 sm:py-28 bg-background relative overflow-hidden">
+        {/* Multi-layer ambient lighting */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-secondary/[0.03] rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-primary/[0.02] rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-secondary/[0.015] rounded-full blur-[120px] pointer-events-none" />
 
-        <div className="container max-w-5xl px-4 relative">
+        <div className="container max-w-6xl px-4 relative">
           <ScrollReveal>
-            <SectionHeading title="Get in Touch" subtitle="Reach out for admissions, queries, or campus visits." />
+            <div className="text-center mb-14">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary/10 border border-secondary/15 mb-5">
+                <Sparkles className="w-3.5 h-3.5 text-secondary" />
+                <span className="font-body text-[11px] font-bold text-secondary uppercase tracking-[0.15em]">Get in Touch</span>
+              </div>
+              <h2 className="font-display text-3xl sm:text-4xl font-bold text-foreground mb-3">
+                We're Here to Help
+              </h2>
+              <p className="font-body text-sm sm:text-base text-muted-foreground/60 max-w-md mx-auto leading-relaxed">
+                Reach out for admissions, queries, or campus visits. Our team is ready to assist you.
+              </p>
+              <div className="mt-6 w-20 h-[2px] bg-gradient-to-r from-transparent via-secondary/40 to-transparent mx-auto rounded-full" />
+            </div>
           </ScrollReveal>
 
-          <div className="grid md:grid-cols-2 gap-10 sm:gap-12 mt-10">
-            {/* Contact Info */}
-            <ScrollReveal>
-              <div className="space-y-3.5">
-                {contactInfo.map((item, i) => (
-                  <div
-                    key={item.label}
-                    className="relative flex gap-4 items-start p-5 rounded-2xl border border-border/40 bg-card group overflow-hidden active:scale-[0.98] touch-manipulation"
-                    style={{
-                      transition: "all 0.5s cubic-bezier(0.16,1,0.3,1)",
-                      animationDelay: `${i * 80}ms`,
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLElement).style.transform = "translateY(-4px)";
-                      (e.currentTarget as HTMLElement).style.boxShadow = `0 16px 48px -12px hsla(${item.accentHsl}, 0.12)`;
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLElement).style.transform = "";
-                      (e.currentTarget as HTMLElement).style.boxShadow = "";
-                    }}
-                  >
-                    {/* Hover gradient */}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none"
-                      style={{ background: `linear-gradient(135deg, hsla(${item.accentHsl}, 0.04), transparent)` }} />
-                    {/* Top accent line */}
-                    <div className="absolute top-0 left-0 right-0 h-[1px] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center"
-                      style={{ background: `linear-gradient(90deg, transparent, hsla(${item.accentHsl}, 0.4), transparent)` }} />
-                    
-                    <div className={`w-12 h-12 rounded-xl ${item.iconBg} flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-400 shadow-sm border border-border/30 relative z-10`}>
-                      <item.icon className={`w-5 h-5 ${item.iconColor}`} />
-                    </div>
-                    <div className="min-w-0 relative z-10">
-                      <p className="font-body text-[10px] font-bold text-foreground uppercase tracking-[0.15em] mb-1">{item.label}</p>
-                      {item.link ? (
-                        <a href={item.link} target={item.external ? "_blank" : undefined} rel={item.external ? "noopener noreferrer" : undefined}
-                          className="font-body text-sm text-muted-foreground hover:text-primary transition-colors duration-200 break-words inline-flex items-start gap-1 group/link">
-                          {item.value}
-                          {item.external && <ArrowUpRight className="w-3 h-3 shrink-0 mt-1 opacity-0 group-hover/link:opacity-100 transition-opacity" />}
-                        </a>
-                      ) : (
-                        <p className="font-body text-sm text-muted-foreground">{item.value}</p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-
-                {/* Quick dial */}
-                <div className="pt-3">
-                  <p className="font-body text-[10px] font-bold text-muted-foreground uppercase tracking-[0.15em] mb-3">Quick Dial</p>
-                  <div className="flex flex-wrap gap-2">
-                    {["7676272167", "7975344252", "8618181383", "7892508243"].map((num) => (
-                      <a key={num} href={`tel:${num}`}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-card border border-border font-body text-xs text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-105 hover:shadow-lg transition-all duration-300 active:scale-95 touch-manipulation">
-                        <Phone className="w-3 h-3" /> {num}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </ScrollReveal>
-
-            {/* Message Form */}
-            <ScrollReveal delay={200}>
-              <div className="relative p-6 sm:p-8 rounded-3xl border border-border/40 bg-card overflow-hidden"
-                style={{ boxShadow: "0 4px 24px rgba(0,0,0,0.04)" }}>
-                {/* Ambient glow */}
-                <div className="absolute -top-20 -right-20 w-56 h-56 bg-secondary/[0.04] rounded-full blur-[60px] pointer-events-none" />
-                <div className="absolute top-0 left-6 right-6 h-[1.5px] bg-gradient-to-r from-transparent via-secondary/30 to-transparent" />
-
-                {submitted ? (
-                  <div className="flex flex-col items-center justify-center h-72 animate-scale-bounce text-center">
-                    <div className="relative w-20 h-20 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-5 shadow-lg border border-emerald-500/20">
-                      <CheckCircle className="w-10 h-10 text-emerald-500" />
-                      <Sparkles className="absolute -top-2 -right-2 w-5 h-5 text-secondary animate-sparkle" />
-                    </div>
-                    <h3 className="font-display text-2xl font-bold text-foreground mb-2">Message Sent! 🎉</h3>
-                    <p className="font-body text-sm text-muted-foreground max-w-xs">We'll get back to you soon.</p>
-                  </div>
-                ) : (
-                  <>
-                    <h3 className="font-display text-xl font-bold text-foreground mb-6 flex items-center gap-2 relative z-10">
-                      <Send className="w-5 h-5 text-primary" /> Send us a Message
-                    </h3>
-                    <form className="space-y-4 relative z-10" onSubmit={handleSubmit}>
-                      <div className="grid sm:grid-cols-2 gap-4">
-                        <div>
-                          <label className="font-body text-[10px] font-bold text-foreground block mb-1.5 uppercase tracking-wider">Full Name *</label>
-                          <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputClass} placeholder="Your name" />
-                        </div>
-                        <div>
-                          <label className="font-body text-[10px] font-bold text-foreground block mb-1.5 uppercase tracking-wider">Email *</label>
-                          <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={inputClass} placeholder="your@email.com" />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="font-body text-[10px] font-bold text-foreground block mb-1.5 uppercase tracking-wider">Subject</label>
-                        <input value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} className={inputClass} placeholder="How can we help?" />
-                      </div>
-                      <div>
-                        <label className="font-body text-[10px] font-bold text-foreground block mb-1.5 uppercase tracking-wider">Message *</label>
-                        <textarea rows={4} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className={`${inputClass} resize-none`} placeholder="Write your message here..." />
-                      </div>
-                      <button type="submit" disabled={submitting}
-                        className="relative w-full group overflow-hidden px-6 py-4 rounded-xl font-body text-sm font-bold text-primary-foreground transition-all duration-300 hover:scale-[1.02] hover:-translate-y-0.5 disabled:opacity-60 shadow-lg btn-magnetic"
-                        style={{
-                          background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--navy-dark)))",
-                          boxShadow: "0 4px 20px hsl(var(--primary) / 0.3)",
-                        }}>
-                        <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/12 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                        <span className="relative flex items-center justify-center gap-2">
-                          {submitting ? (
-                            <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Sending...</>
-                          ) : (
-                            <><Send className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" /> Send Message</>
-                          )}
-                        </span>
-                      </button>
-                    </form>
-                  </>
-                )}
-              </div>
-            </ScrollReveal>
+          <div className="grid lg:grid-cols-2 gap-10 sm:gap-14 items-start">
+            <ContactInfoCards />
+            <ContactForm />
           </div>
         </div>
       </section>
 
-      {/* Map */}
-      <section className="relative overflow-hidden">
-        <div className="h-[1.5px] bg-gradient-to-r from-transparent via-secondary/25 to-transparent" />
-        <div className="relative overflow-hidden">
-          <iframe
-            src="https://maps.google.com/maps?q=Hoysala+Degree+College+Nelamangala&t=&z=17&ie=UTF8&iwloc=&output=embed"
-            width="100%" height="400" style={{ border: 0, display: "block" }} allowFullScreen loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            className="w-full opacity-90 hover:opacity-100 transition-opacity duration-500" />
-          <div className="absolute top-0 left-0 right-0 h-6 bg-gradient-to-b from-background to-transparent pointer-events-none" />
-        </div>
-        <div className="flex justify-center py-5 bg-background">
-          <a href={MAPS_LINK} target="_blank" rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-primary text-primary-foreground font-body font-bold text-sm hover:scale-105 hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-xl"
-            style={{ boxShadow: "0 4px 20px hsl(var(--primary) / 0.25)" }}>
-            <MapPin className="w-4 h-4" /> Get Directions
-          </a>
-        </div>
-      </section>
+      <ContactMap />
     </div>
   );
 }
