@@ -6,7 +6,7 @@ import PageHeader from "@/components/PageHeader";
 import { Trophy, Medal, Star, Award, Sparkles, TrendingUp } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const defaultAchievers = [
