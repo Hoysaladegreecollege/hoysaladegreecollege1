@@ -116,8 +116,8 @@ export default function Navbar() {
         <div className="absolute top-0 left-0 right-0 h-[0.5px] bg-gradient-to-r from-transparent via-secondary/30 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 h-[0.5px] bg-gradient-to-r from-transparent via-primary-foreground/[0.06] to-transparent" />
 
-        <div className="container px-4 relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-0">
-          <div className="flex items-center gap-2 sm:text-left animate-fade-in">
+        <div className="container px-4 relative flex flex-col sm:flex-row items-center sm:justify-between gap-1.5 sm:gap-0">
+          <div className="flex items-center gap-2 justify-center sm:justify-start animate-fade-in">
             <img src={saiBabaImg} alt="Shri Shirdi Sai" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-secondary/40 shadow-md" />
             <p className="font-display text-[11px] sm:text-[13px] font-bold tracking-[0.04em] text-primary-foreground/90">
               ಶ್ರೀಶಿರಡಿ ಸಾಯಿ ಎಜುಕೇಷನಲ್ ಟ್ರಸ್ಟ್ (ರಿ.)
