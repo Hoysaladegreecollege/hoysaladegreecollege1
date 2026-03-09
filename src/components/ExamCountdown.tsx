@@ -10,7 +10,7 @@ function getUrgency(daysLeft: number) {
     border: "border-red-500/20",
     text: "text-red-400",
     badge: "bg-gradient-to-r from-red-500 to-rose-500",
-    glow: "shadow-[0_0_24px_-4px_rgba(239,68,68,0.3)]",
+    glow: "shadow-[0_0_30px_-4px_rgba(239,68,68,0.35),inset_0_1px_0_rgba(255,255,255,0.04)]",
     counterBg: "bg-gradient-to-br from-red-500 to-rose-600",
     label: "Critical",
     icon: "🔥",
