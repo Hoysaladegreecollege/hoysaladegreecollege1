@@ -15,7 +15,7 @@ const contactSchema = z.object({
   message: z.string().trim().min(1, "Message is required").max(5000, "Message must be under 5000 characters"),
 });
 
-const MAPS_LINK = "https://maps.app.goo.gl/vf43fz7ZhJ8PZAUD9";
+const MAPS_LINK = "https://maps.app.goo.gl/TrQbMQQB5kqVueQAA";
 
 const contactInfo = [
   {
