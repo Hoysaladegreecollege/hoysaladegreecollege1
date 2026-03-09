@@ -111,6 +111,9 @@ export default function PageLoader() {
                 src={collegeLogo}
                 alt="Hoysala Degree College"
                 className="w-full h-full object-contain p-1"
+                loading="eager"
+                fetchPriority="high"
+                decoding="sync"
                 style={{ animation: "splash-logo-breathe 3s ease-in-out 1s infinite" }}
               />
             </div>
