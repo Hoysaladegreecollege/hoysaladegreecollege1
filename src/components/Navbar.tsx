@@ -13,6 +13,7 @@ const aboutDropdown = [
   { label: "Alumni Network", path: "/alumni", icon: Users, desc: "Success stories" },
   { label: "Clubs & Societies", path: "/clubs", icon: Sparkles, desc: "Student life" },
   { label: "Library", path: "/library", icon: BookOpen, desc: "Book catalog" },
+  { label: "Question Bank", path: "/question-bank", icon: FileText, desc: "Previous year papers" },
 ];
 
 const facultyDropdown = [
