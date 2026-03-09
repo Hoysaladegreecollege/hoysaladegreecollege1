@@ -10,7 +10,7 @@ function getUrgency(daysLeft: number) {
     border: "border-red-500/20",
     text: "text-red-400",
     badge: "bg-gradient-to-r from-red-500 to-rose-500",
-    glow: "shadow-[0_0_24px_-4px_rgba(239,68,68,0.3)]",
+    glow: "shadow-[0_0_30px_-4px_rgba(239,68,68,0.35),inset_0_1px_0_rgba(255,255,255,0.04)]",
     counterBg: "bg-gradient-to-br from-red-500 to-rose-600",
     label: "Critical",
     icon: "🔥",
@@ -21,7 +21,7 @@ function getUrgency(daysLeft: number) {
     border: "border-amber-500/20",
     text: "text-amber-400",
     badge: "bg-gradient-to-r from-amber-500 to-orange-500",
-    glow: "shadow-[0_0_20px_-4px_rgba(245,158,11,0.22)]",
+    glow: "shadow-[0_0_26px_-4px_rgba(245,158,11,0.28),inset_0_1px_0_rgba(255,255,255,0.04)]",
     counterBg: "bg-gradient-to-br from-amber-500 to-orange-600",
     label: "Soon",
     icon: "⚡",
@@ -32,7 +32,7 @@ function getUrgency(daysLeft: number) {
     border: "border-sky-500/15",
     text: "text-sky-400",
     badge: "bg-gradient-to-r from-sky-500 to-blue-500",
-    glow: "",
+    glow: "shadow-[0_0_20px_-4px_rgba(56,189,248,0.18),inset_0_1px_0_rgba(255,255,255,0.04)]",
     counterBg: "bg-gradient-to-br from-sky-500 to-blue-600",
     label: "Upcoming",
     icon: "📅",
@@ -43,7 +43,7 @@ function getUrgency(daysLeft: number) {
     border: "border-emerald-500/15",
     text: "text-emerald-400",
     badge: "bg-gradient-to-r from-emerald-500 to-teal-500",
-    glow: "",
+    glow: "shadow-[0_0_18px_-4px_rgba(52,211,153,0.16),inset_0_1px_0_rgba(255,255,255,0.04)]",
     counterBg: "bg-gradient-to-br from-emerald-500 to-teal-600",
     label: "Planned",
     icon: "✅",
@@ -70,10 +70,11 @@ export default function ExamCountdown({ courseId, semester }: { courseId?: strin
   if (exams.length === 0) return null;
 
   return (
-    <div className="relative bg-card/80 backdrop-blur-xl border border-border/30 rounded-[2rem] p-6 sm:p-7 overflow-hidden group hover:shadow-[0_12px_48px_-12px_rgba(0,0,0,0.35)] transition-all duration-500">
+    <div className="relative bg-card/50 backdrop-blur-2xl border border-white/[0.06] rounded-[2rem] p-6 sm:p-7 overflow-hidden group hover:shadow-[0_16px_64px_-16px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.04)] transition-all duration-500 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.3)]">
       {/* Ambient glow orbs */}
-      <div className="absolute -top-20 -right-20 w-48 h-48 rounded-full bg-red-500/[0.03] blur-[60px] pointer-events-none group-hover:bg-red-500/[0.06] transition-colors duration-700" />
-      <div className="absolute -bottom-12 -left-12 w-32 h-32 rounded-full bg-amber-500/[0.03] blur-[50px] pointer-events-none" />
+      <div className="absolute -top-24 -right-24 w-56 h-56 rounded-full bg-red-500/[0.06] blur-[80px] pointer-events-none group-hover:bg-red-500/[0.1] transition-colors duration-700" />
+      <div className="absolute -bottom-16 -left-16 w-44 h-44 rounded-full bg-amber-500/[0.04] blur-[70px] pointer-events-none group-hover:bg-amber-500/[0.07] transition-colors duration-700" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-32 rounded-full bg-primary/[0.02] blur-[60px] pointer-events-none" />
 
       {/* Header */}
       <div className="relative flex items-center gap-3 mb-6">
@@ -99,7 +100,7 @@ export default function ExamCountdown({ courseId, semester }: { courseId?: strin
           return (
             <div
               key={exam.id}
-              className={`relative flex items-center gap-4 p-4 rounded-[1.25rem] border transition-all duration-400 hover:-translate-y-0.5 ${urgency.bg} ${urgency.border} ${urgency.glow} group/card overflow-hidden`}
+              className={`relative flex items-center gap-4 p-4 rounded-[1.25rem] border backdrop-blur-xl transition-all duration-400 hover:-translate-y-1 hover:backdrop-blur-2xl ${urgency.bg} ${urgency.border} ${urgency.glow} group/card overflow-hidden`}
               style={{ animationDelay: `${index * 60}ms` }}
             >
               {/* Shimmer overlay */}
