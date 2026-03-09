@@ -1,14 +1,54 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { differenceInDays, format } from "date-fns";
-import { Timer, AlertTriangle, Clock, CheckCircle } from "lucide-react";
+import { Timer, Clock, Flame, CalendarDays } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 function getUrgency(daysLeft: number) {
-  if (daysLeft <= 3) return { color: "bg-red-500/10 border-red-500/20", text: "text-red-500", badge: "bg-red-500", label: "🔥 Critical" };
-  if (daysLeft <= 7) return { color: "bg-amber-500/10 border-amber-500/20", text: "text-amber-500", badge: "bg-amber-500", label: "⚠️ Soon" };
-  if (daysLeft <= 14) return { color: "bg-blue-500/10 border-blue-500/20", text: "text-blue-500", badge: "bg-blue-500", label: "📅 Upcoming" };
-  return { color: "bg-emerald-500/10 border-emerald-500/20", text: "text-emerald-500", badge: "bg-emerald-500", label: "✅ Planned" };
+  if (daysLeft <= 3) return {
+    bg: "bg-gradient-to-br from-red-500/12 to-red-600/6",
+    border: "border-red-500/20",
+    text: "text-red-400",
+    badge: "bg-gradient-to-r from-red-500 to-rose-500",
+    glow: "shadow-[0_0_20px_-4px_rgba(239,68,68,0.25)]",
+    counterBg: "bg-gradient-to-br from-red-500 to-rose-600",
+    label: "Critical",
+    icon: "🔥",
+    pulse: true,
+  };
+  if (daysLeft <= 7) return {
+    bg: "bg-gradient-to-br from-amber-500/10 to-amber-600/5",
+    border: "border-amber-500/20",
+    text: "text-amber-400",
+    badge: "bg-gradient-to-r from-amber-500 to-orange-500",
+    glow: "shadow-[0_0_16px_-4px_rgba(245,158,11,0.2)]",
+    counterBg: "bg-gradient-to-br from-amber-500 to-orange-600",
+    label: "Soon",
+    icon: "⚡",
+    pulse: false,
+  };
+  if (daysLeft <= 14) return {
+    bg: "bg-gradient-to-br from-sky-500/8 to-blue-500/4",
+    border: "border-sky-500/15",
+    text: "text-sky-400",
+    badge: "bg-gradient-to-r from-sky-500 to-blue-500",
+    glow: "",
+    counterBg: "bg-gradient-to-br from-sky-500 to-blue-600",
+    label: "Upcoming",
+    icon: "📅",
+    pulse: false,
+  };
+  return {
+    bg: "bg-gradient-to-br from-emerald-500/8 to-teal-500/4",
+    border: "border-emerald-500/15",
+    text: "text-emerald-400",
+    badge: "bg-gradient-to-r from-emerald-500 to-teal-500",
+    glow: "",
+    counterBg: "bg-gradient-to-br from-emerald-500 to-teal-600",
+    label: "Planned",
+    icon: "✅",
+    pulse: false,
+  };
 }
 
 export default function ExamCountdown({ courseId, semester }: { courseId?: string; semester?: number }) {
@@ -18,7 +58,6 @@ export default function ExamCountdown({ courseId, semester }: { courseId?: strin
       const today = new Date().toISOString().split("T")[0];
       let query = supabase.from("exams").select("*").eq("is_active", true).gte("exam_date", today).order("exam_date").limit(6);
       if (courseId) {
-        // Show exams for this course OR exams with no course (all-course exams)
         query = query.or(`course_id.eq.${courseId},course_id.is.null`);
       }
       if (semester) query = query.eq("semester", semester);
@@ -27,47 +66,79 @@ export default function ExamCountdown({ courseId, semester }: { courseId?: strin
     },
   });
 
-  if (isLoading) return <Skeleton className="h-48 rounded-2xl" />;
+  if (isLoading) return <Skeleton className="h-48 rounded-3xl" />;
   if (exams.length === 0) return null;
 
   return (
-    <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6 hover:shadow-lg transition-shadow duration-300">
-      <div className="flex items-center gap-2 mb-4">
-        <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center">
-          <Timer className="w-4 h-4 text-red-500" />
+    <div className="relative bg-card/80 backdrop-blur-xl border border-border/40 rounded-3xl p-5 sm:p-6 overflow-hidden group hover:shadow-[0_8px_40px_-12px_rgba(0,0,0,0.3)] transition-all duration-500">
+      {/* Ambient glow orb */}
+      <div className="absolute -top-16 -right-16 w-40 h-40 rounded-full bg-red-500/[0.04] blur-3xl pointer-events-none group-hover:bg-red-500/[0.07] transition-colors duration-700" />
+      
+      {/* Header */}
+      <div className="relative flex items-center gap-3 mb-5">
+        <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-red-500/15 to-rose-500/10 flex items-center justify-center border border-red-500/10">
+          <Timer className="w-4 h-4 text-red-400" />
+          <div className="absolute inset-0 rounded-xl bg-red-500/5 animate-pulse" />
         </div>
-        <h3 className="font-body text-[14px] font-semibold text-foreground">Exam Countdown</h3>
-        <span className="ml-auto font-body text-[10px] text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full">{exams.length} upcoming</span>
+        <div>
+          <h3 className="font-body text-[14px] font-semibold text-foreground tracking-tight">Exam Countdown</h3>
+          <p className="font-body text-[10px] text-muted-foreground/70 -mt-0.5">Upcoming assessments</p>
+        </div>
+        <div className="ml-auto flex items-center gap-1.5 bg-muted/40 backdrop-blur-sm border border-border/30 px-2.5 py-1 rounded-full">
+          <Flame className="w-3 h-3 text-red-400" />
+          <span className="font-body text-[10px] font-medium text-muted-foreground">{exams.length} upcoming</span>
+        </div>
       </div>
+
+      {/* Exam cards */}
       <div className="space-y-2.5">
-        {exams.map((exam: any) => {
+        {exams.map((exam: any, index: number) => {
           const daysLeft = differenceInDays(new Date(exam.exam_date), new Date());
           const urgency = getUrgency(daysLeft);
           return (
-            <div key={exam.id} className={`relative flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${urgency.color}`}>
-              {/* Days counter */}
-              <div className={`w-14 h-14 rounded-xl flex flex-col items-center justify-center shrink-0 ${urgency.badge} text-white shadow-sm`}>
-                <span className="font-body text-lg font-bold leading-none tabular-nums">{daysLeft}</span>
-                <span className="font-body text-[8px] uppercase tracking-wider leading-none mt-0.5">{daysLeft === 1 ? "day" : "days"}</span>
+            <div
+              key={exam.id}
+              className={`relative flex items-center gap-3.5 p-3.5 rounded-2xl border transition-all duration-400 hover:-translate-y-0.5 ${urgency.bg} ${urgency.border} ${urgency.glow} group/card overflow-hidden`}
+              style={{ animationDelay: `${index * 60}ms` }}
+            >
+              {/* Shimmer overlay */}
+              <div className="absolute inset-0 -translate-x-full group-hover/card:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent pointer-events-none" />
+
+              {/* Days counter - premium pill */}
+              <div className={`relative w-14 h-14 rounded-2xl flex flex-col items-center justify-center shrink-0 ${urgency.counterBg} text-white shadow-lg`}>
+                <span className="font-body text-xl font-bold leading-none tabular-nums drop-shadow-sm">{daysLeft}</span>
+                <span className="font-body text-[7px] uppercase tracking-[0.15em] leading-none mt-0.5 opacity-80">{daysLeft === 1 ? "day" : "days"}</span>
+                {urgency.pulse && (
+                  <div className="absolute inset-0 rounded-2xl border-2 border-red-400/40 animate-ping opacity-30" />
+                )}
               </div>
+
               {/* Details */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5 mb-0.5">
+              <div className="relative flex-1 min-w-0 z-10">
+                <div className="flex items-center gap-1.5 mb-1">
                   <p className="font-body text-[12px] font-semibold text-foreground truncate">{exam.title}</p>
-                  <span className={`font-body text-[9px] font-bold px-1.5 py-0.5 rounded-full ${urgency.badge} text-white shrink-0`}>{urgency.label}</span>
-                </div>
-                <p className="font-body text-[11px] text-muted-foreground truncate">{exam.subject}</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="font-body text-[10px] text-muted-foreground flex items-center gap-1">
-                    <Clock className="w-3 h-3" /> {format(new Date(exam.exam_date), "EEE, MMM d, yyyy")}
+                  <span className={`inline-flex items-center gap-0.5 font-body text-[8px] font-bold px-2 py-0.5 rounded-full ${urgency.badge} text-white shrink-0 shadow-sm`}>
+                    <span>{urgency.icon}</span>
+                    <span className="tracking-wide">{urgency.label}</span>
                   </span>
-                  <span className="font-body text-[9px] px-1.5 py-0.5 rounded bg-muted/60 text-muted-foreground capitalize">{exam.exam_type}</span>
+                </div>
+                <p className="font-body text-[11px] text-foreground/70 truncate font-medium">{exam.subject}</p>
+                <div className="flex items-center gap-2.5 mt-1.5">
+                  <span className="font-body text-[10px] text-muted-foreground/80 flex items-center gap-1">
+                    <CalendarDays className="w-3 h-3 opacity-60" />
+                    {format(new Date(exam.exam_date), "EEE, MMM d, yyyy")}
+                  </span>
+                  <span className="font-body text-[9px] px-2 py-0.5 rounded-md bg-muted/50 backdrop-blur-sm border border-border/20 text-muted-foreground capitalize tracking-wide">{exam.exam_type}</span>
                 </div>
               </div>
-              {/* Progress bar */}
+
+              {/* Urgency progress bar */}
               {daysLeft <= 14 && (
-                <div className="absolute bottom-0 left-0 right-0 h-[2px] rounded-b-xl overflow-hidden">
-                  <div className={`h-full ${urgency.badge} transition-all duration-1000`} style={{ width: `${Math.max(5, 100 - (daysLeft / 14) * 100)}%` }} />
+                <div className="absolute bottom-0 left-4 right-4 h-[2px] rounded-full overflow-hidden bg-border/10">
+                  <div
+                    className={`h-full rounded-full ${urgency.counterBg} transition-all duration-1000 ease-out`}
+                    style={{ width: `${Math.max(5, 100 - (daysLeft / 14) * 100)}%` }}
+                  />
                 </div>
               )}
             </div>
