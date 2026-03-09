@@ -100,7 +100,7 @@ export default function ExamCountdown({ courseId, semester }: { courseId?: strin
           return (
             <div
               key={exam.id}
-              className={`relative flex items-center gap-4 p-4 rounded-[1.25rem] border transition-all duration-400 hover:-translate-y-0.5 ${urgency.bg} ${urgency.border} ${urgency.glow} group/card overflow-hidden`}
+              className={`relative flex items-center gap-4 p-4 rounded-[1.25rem] border backdrop-blur-xl transition-all duration-400 hover:-translate-y-1 hover:backdrop-blur-2xl ${urgency.bg} ${urgency.border} ${urgency.glow} group/card overflow-hidden`}
               style={{ animationDelay: `${index * 60}ms` }}
             >
               {/* Shimmer overlay */}
