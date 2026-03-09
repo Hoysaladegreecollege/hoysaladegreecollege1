@@ -129,7 +129,7 @@ export default function StudentAttendance() {
                 className="transition-all duration-1000" />
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className={`font-display text-lg font-bold ${percentage >= 75 ? "text-primary" : "text-destructive"}`}>{percentage}%</span>
+              <span className={`font-body text-lg font-semibold ${percentage >= 75 ? "text-primary" : "text-destructive"}`}>{percentage}%</span>
             </div>
           </div>
           <div className="flex-1">
