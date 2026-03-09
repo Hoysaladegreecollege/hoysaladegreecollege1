@@ -22,7 +22,16 @@ export default function AdminFeeManagement() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [pinUnlocked, setPinUnlocked] = useState(() => {
-    return sessionStorage.getItem("fee-pin-unlocked") === "true";
+    // Only persist across in-app navigation, not page reloads
+    const isUnlocked = sessionStorage.getItem("fee-pin-unlocked") === "true";
+    const wasNavigated = sessionStorage.getItem("fee-pin-nav") === "true";
+    if (isUnlocked && wasNavigated) {
+      return true;
+    }
+    // Clear on fresh page load / reload
+    sessionStorage.removeItem("fee-pin-unlocked");
+    sessionStorage.removeItem("fee-pin-nav");
+    return false;
   });
   const [pinInput, setPinInput] = useState("");
   const [pinError, setPinError] = useState("");
