@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import collegeLogo from "@/assets/college-logo.png";
+// Use the lightweight uploaded logo (same as HTML splash) for instant loading
+const collegeLogo = "/lovable-uploads/bacc5b2d-3f25-473a-a2ee-a0d75a0cb7e3.png";
 
 const SPLASH_DURATION = 3800;
 
@@ -110,6 +111,9 @@ export default function PageLoader() {
                 src={collegeLogo}
                 alt="Hoysala Degree College"
                 className="w-full h-full object-contain p-1"
+                loading="eager"
+                fetchPriority="high"
+                decoding="sync"
                 style={{ animation: "splash-logo-breathe 3s ease-in-out 1s infinite" }}
               />
             </div>
