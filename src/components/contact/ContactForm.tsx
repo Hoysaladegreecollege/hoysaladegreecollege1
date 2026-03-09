@@ -153,26 +153,27 @@ export default function ContactForm() {
 
                 {/* Submit button */}
                 <button type="submit" disabled={submitting}
-                  className="relative w-full group overflow-hidden px-6 py-4.5 rounded-2xl font-body text-sm font-bold text-primary-foreground transition-all duration-400 hover:scale-[1.02] hover:-translate-y-1 disabled:opacity-50 disabled:hover:scale-100 disabled:hover:translate-y-0"
+                  className="relative w-full group overflow-hidden px-8 py-5 rounded-full font-body text-sm font-bold tracking-wide uppercase text-primary-foreground transition-all duration-500 hover:scale-[1.03] hover:-translate-y-1.5 disabled:opacity-50 disabled:hover:scale-100 disabled:hover:translate-y-0"
                   style={{
-                    background: "linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--gold)))",
-                    boxShadow: "0 8px 32px -8px hsl(var(--secondary) / 0.35), 0 2px 8px -2px hsl(var(--secondary) / 0.2)",
+                    background: "linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--gold)), hsl(var(--secondary)))",
+                    backgroundSize: "200% 200%",
+                    boxShadow: "0 12px 40px -10px hsl(var(--secondary) / 0.4), 0 4px 12px -4px hsl(var(--secondary) / 0.25), inset 0 1px 0 rgba(255,255,255,0.12)",
                   }}>
                   {/* Shimmer sweep */}
-                  <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/15 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                  {/* Edge glow */}
-                  <span className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                    style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -1px 0 rgba(0,0,0,0.1)" }} />
-                  <span className="relative flex items-center justify-center gap-2.5">
+                  <span className="absolute inset-0 rounded-full bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-out" />
+                  {/* Outer glow ring */}
+                  <span className="absolute -inset-[1px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-600 pointer-events-none"
+                    style={{ boxShadow: "0 0 20px 2px hsl(var(--secondary) / 0.2), inset 0 1px 0 rgba(255,255,255,0.2)" }} />
+                  <span className="relative flex items-center justify-center gap-3">
                     {submitting ? (
                       <>
                         <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        <span>Sending Message...</span>
+                        <span className="text-[13px]">Sending...</span>
                       </>
                     ) : (
                       <>
-                        <Send className="w-4.5 h-4.5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
-                        <span>Send Message</span>
+                        <Send className="w-[18px] h-[18px] group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-400" />
+                        <span className="text-[13px]">Send Message</span>
                       </>
                     )}
                   </span>
