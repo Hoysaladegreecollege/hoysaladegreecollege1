@@ -375,7 +375,7 @@ export default function About() {
               <ScrollReveal>
                 <SectionHeading title="Quick Facts" subtitle="Numbers that define our institution" />
               </ScrollReveal>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5 max-w-5xl mx-auto">
+              <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 md:gap-5 max-w-6xl mx-auto px-2 sm:px-0">
                 {quickFacts.map((f, i) => <CounterCard key={f.label} fact={f} index={i} />)}
               </div>
             </div>
