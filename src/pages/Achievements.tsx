@@ -6,7 +6,7 @@ import PageHeader from "@/components/PageHeader";
 import { Trophy, Medal, Star, Award, Sparkles, TrendingUp } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const defaultAchievers = [
@@ -160,38 +160,49 @@ export default function Achievements() {
         </div>
       </section>
 
-      {/* Dynamic top students from DB */}
-      {(isLoading || topStudents.length > 0) && (
-        <section className="py-16 sm:py-20 bg-background relative overflow-hidden">
-          <div className="absolute inset-0 opacity-[0.02]"
-            style={{ backgroundImage: "radial-gradient(hsl(var(--secondary)) 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
-          <div className="container px-4 relative">
-            <ScrollReveal>
-              <SectionHeading title="🌟 More Top Achievers" subtitle="Hall of fame — students recognized by administration" />
-            </ScrollReveal>
-            {isLoading ? (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="rounded-3xl border border-border p-8 text-center space-y-4 bg-card">
-                    <Skeleton className="w-28 h-28 rounded-2xl mx-auto" />
-                    <Skeleton className="h-5 w-2/3 mx-auto" />
-                    <Skeleton className="h-3 w-1/2 mx-auto" />
-                    <Skeleton className="h-8 w-full rounded-xl" />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto">
-                {topStudents.map((s: any, i: number) => (
-                  <ScrollReveal key={s.id} delay={i * 100}>
-                    <RankCard a={s} />
-                  </ScrollReveal>
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
-      )}
+      {/* Dynamic top students from DB — grouped by year, latest first */}
+      {(isLoading || topStudents.length > 0) && (() => {
+        const grouped = topStudents.reduce<Record<string, any[]>>((acc, s: any) => {
+          const year = s.year || "Other";
+          if (!acc[year]) acc[year] = [];
+          acc[year].push(s);
+          return acc;
+        }, {});
+        // Sort years descending (latest first)
+        const sortedYears = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
+
+        return sortedYears.map((year) => (
+          <section key={year} className="py-16 sm:py-20 bg-background relative overflow-hidden">
+            <div className="absolute inset-0 opacity-[0.02]"
+              style={{ backgroundImage: "radial-gradient(hsl(var(--secondary)) 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
+            <div className="container px-4 relative">
+              <ScrollReveal>
+                <SectionHeading title={`🌟 Top Achievers — ${year}`} subtitle={`Students who excelled during the academic year ${year}`} />
+              </ScrollReveal>
+              {isLoading ? (
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="rounded-3xl border border-border p-8 text-center space-y-4 bg-card">
+                      <Skeleton className="w-28 h-28 rounded-2xl mx-auto" />
+                      <Skeleton className="h-5 w-2/3 mx-auto" />
+                      <Skeleton className="h-3 w-1/2 mx-auto" />
+                      <Skeleton className="h-8 w-full rounded-xl" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto">
+                  {grouped[year].sort((a: any, b: any) => a.rank - b.rank).map((s: any, i: number) => (
+                    <ScrollReveal key={s.id} delay={i * 100}>
+                      <RankCard a={s} />
+                    </ScrollReveal>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        ));
+      })()}
 
       {/* Inspiration CTA */}
       <section className="py-16 sm:py-20 bg-background">
