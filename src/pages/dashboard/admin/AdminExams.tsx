@@ -169,10 +169,10 @@ export default function AdminExams() {
               </div>
               <div>
                 <Label>Course</Label>
-                <Select value={form.course_id} onValueChange={v => setForm(f => ({ ...f, course_id: v }))}>
+                <Select value={form.course_id || "all"} onValueChange={v => setForm(f => ({ ...f, course_id: v === "all" ? "" : v }))}>
                   <SelectTrigger><SelectValue placeholder="All courses" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Courses</SelectItem>
+                    <SelectItem value="all">All Courses</SelectItem>
                     {courses.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.name} ({c.code})</SelectItem>)}
                   </SelectContent>
                 </Select>
