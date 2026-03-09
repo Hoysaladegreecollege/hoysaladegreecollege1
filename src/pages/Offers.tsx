@@ -1,5 +1,4 @@
 import { FileText, Download, Eye, GraduationCap, BookOpen, Briefcase } from "lucide-react";
-import { useState } from "react";
 import SEOHead from "@/components/SEOHead";
 
 const offers = [
@@ -36,29 +35,9 @@ const offers = [
 ];
 
 export default function Offers() {
-  const [previewPdf, setPreviewPdf] = useState<string | null>(null);
-
   return (
     <>
       <SEOHead title="Offers | Hoysala Degree College" description="Explore industry-aligned course offerings at Hoysala Degree College – BCA, BBA, B.Com with placement support." />
-
-      {/* PDF Preview Modal */}
-      {previewPdf && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8 animate-in fade-in duration-300">
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={() => setPreviewPdf(null)} />
-          <div className="relative w-full max-w-5xl h-[85vh] rounded-3xl overflow-hidden border border-border/40 shadow-2xl bg-card animate-in zoom-in-95 duration-300">
-            <div className="absolute top-4 right-4 z-10 flex gap-2">
-              <a href={previewPdf} download className="px-4 py-2 rounded-xl bg-primary/20 text-primary text-sm font-medium hover:bg-primary/30 transition-all duration-300 flex items-center gap-2 backdrop-blur-sm border border-primary/20">
-                <Download className="w-4 h-4" /> Download
-              </a>
-              <button onClick={() => setPreviewPdf(null)} className="w-10 h-10 rounded-xl bg-card/80 backdrop-blur-sm border border-border/40 text-foreground/70 hover:text-foreground hover:bg-card transition-all duration-300 flex items-center justify-center text-lg font-medium">
-                ✕
-              </button>
-            </div>
-            <iframe src={previewPdf} className="w-full h-full" title="PDF Preview" />
-          </div>
-        </div>
-      )}
 
       <div className="min-h-screen py-16 sm:py-24">
         <div className="container px-4 max-w-6xl mx-auto">
@@ -112,12 +91,14 @@ export default function Offers() {
 
                     {/* Actions */}
                     <div className="flex gap-3">
-                      <button
-                        onClick={() => setPreviewPdf(offer.pdf)}
+                      <a
+                        href={offer.pdf}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-primary/10 hover:bg-primary/20 text-primary text-sm font-semibold transition-all duration-300 border border-primary/20 hover:border-primary/30 active:scale-[0.97]"
                       >
                         <Eye className="w-4 h-4" /> View
-                      </button>
+                      </a>
                       <a
                         href={offer.pdf}
                         download
