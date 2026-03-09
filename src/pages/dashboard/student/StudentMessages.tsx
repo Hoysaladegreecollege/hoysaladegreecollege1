@@ -32,7 +32,6 @@ export default function StudentMessages() {
   // Fetch conversations
   const { data: conversations = [], isLoading } = useQuery({
     queryKey: ["student-messages", user?.id],
-    refetchInterval: 15000,
     queryFn: async () => {
       if (!user) return [];
       const { data } = await supabase
@@ -45,6 +44,23 @@ export default function StudentMessages() {
     },
     enabled: !!user,
   });
+
+  // Realtime subscription for instant updates
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel('student-messages-realtime')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'direct_messages',
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ["student-messages"] });
+        queryClient.invalidateQueries({ queryKey: ["msg-thread"] });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user, queryClient]);
 
   // Fetch replies for active thread
   const { data: threadReplies = [] } = useQuery({

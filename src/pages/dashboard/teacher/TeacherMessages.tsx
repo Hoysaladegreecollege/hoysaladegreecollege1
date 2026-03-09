@@ -16,7 +16,6 @@ export default function TeacherMessages() {
 
   const { data: conversations = [], isLoading } = useQuery({
     queryKey: ["teacher-messages", user?.id],
-    refetchInterval: 15000,
     queryFn: async () => {
       if (!user) return [];
       const { data } = await supabase
@@ -29,6 +28,23 @@ export default function TeacherMessages() {
     },
     enabled: !!user,
   });
+
+  // Realtime subscription for instant updates
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel('teacher-messages-realtime')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'direct_messages',
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ["teacher-messages"] });
+        queryClient.invalidateQueries({ queryKey: ["msg-thread-teacher"] });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user, queryClient]);
 
   const { data: threadReplies = [] } = useQuery({
     queryKey: ["msg-thread-teacher", activeThread],
