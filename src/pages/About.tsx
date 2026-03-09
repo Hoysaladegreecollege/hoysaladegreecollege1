@@ -201,22 +201,22 @@ function CounterCard({ fact, index }: { fact: typeof quickFacts[0]; index: numbe
   const { count, ref } = useCountUp(fact.numericValue, 1800);
   const Icon = fact.icon;
   return (
-    <ScrollReveal delay={index * 100}>
-      <div ref={ref} className="relative bg-card rounded-3xl p-5 sm:p-6 text-center group overflow-hidden border border-border/40 hover:border-secondary/30 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_60px_-15px_hsla(var(--secondary),0.15)]">
+    <ScrollReveal delay={index * 80}>
+      <div ref={ref} className="relative bg-card rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 text-center group overflow-hidden border border-border/40 hover:border-secondary/30 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_60px_-15px_hsla(var(--secondary),0.15)] h-full min-h-[140px] sm:min-h-[160px] flex flex-col justify-center">
         {/* Ambient orb */}
         <div className="absolute -top-8 -right-8 w-24 h-24 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-2xl" style={{ background: `hsla(var(--secondary), 0.12)` }} />
         {/* Top accent */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-0 group-hover:w-3/4 bg-gradient-to-r from-transparent via-secondary to-transparent transition-all duration-600" />
         {/* Shimmer */}
         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.04] to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 pointer-events-none" />
-        <div className="relative z-10">
-          <div className="w-10 h-10 mx-auto mb-3 rounded-xl bg-gradient-to-br from-secondary/15 to-secondary/5 border border-secondary/10 flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
-            <Icon className="w-4.5 h-4.5 text-secondary" />
+        <div className="relative z-10 flex flex-col items-center justify-center">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 mx-auto mb-2 sm:mb-3 rounded-xl bg-gradient-to-br from-secondary/15 to-secondary/5 border border-secondary/10 flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+            <Icon className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-secondary" />
           </div>
-          <p className="font-display text-2xl sm:text-3xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">
+          <p className="font-display text-lg sm:text-2xl md:text-3xl font-bold text-foreground group-hover:text-primary transition-colors duration-300 leading-tight">
             {fact.numericValue !== null ? `${count}${fact.suffix}` : fact.value}
           </p>
-          <p className="font-body text-[10px] sm:text-xs text-muted-foreground mt-1.5 uppercase tracking-[0.15em] font-semibold">{fact.label}</p>
+          <p className="font-body text-[9px] sm:text-[10px] md:text-xs text-muted-foreground mt-1 sm:mt-1.5 uppercase tracking-[0.1em] sm:tracking-[0.15em] font-semibold leading-tight">{fact.label}</p>
         </div>
       </div>
     </ScrollReveal>
