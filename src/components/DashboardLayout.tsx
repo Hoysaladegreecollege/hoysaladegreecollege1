@@ -8,7 +8,7 @@ import {
   DollarSign, Book, ArrowUpCircle, Cake, ImagePlus, ChevronLeft, ExternalLink,
   BellRing, Monitor, Armchair, Download, MessageSquare, Activity, ClipboardList
 } from "lucide-react";
-import collegeLogo from "@/assets/college-logo.png";
+import collegeLogo from "@/assets/college-logo-optimized.webp";
 import { useState, useEffect } from "react";
 import PageLoader from "./PageLoader";
 import DarkModeToggle from "./DarkModeToggle";
