@@ -220,6 +220,7 @@ export default function AdminFeeManagement() {
     setPinError("");
     if (pinInput === pinData) {
       setPinUnlocked(true);
+      sessionStorage.setItem("fee-pin-unlocked", "true");
       setPinChecking(false);
       setFailedAttempts(0);
     } else {
