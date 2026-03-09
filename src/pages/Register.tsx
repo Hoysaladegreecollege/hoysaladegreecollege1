@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import SEOHead from "@/components/SEOHead";
 import { Eye, EyeOff, Lock, Mail, User, ArrowLeft, Phone, MapPin, Calendar, Users, GraduationCap, Sparkles, CheckCircle, ExternalLink } from "lucide-react";
-import collegeLogo from "@/assets/college-logo.png";
+import collegeLogo from "@/assets/college-logo-optimized.webp";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
