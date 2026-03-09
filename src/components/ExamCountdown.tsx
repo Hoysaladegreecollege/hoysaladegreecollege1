@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { differenceInDays, format } from "date-fns";
-import { Timer, Clock, Flame, CalendarDays } from "lucide-react";
+import { Timer, Flame, CalendarDays } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { motion } from "framer-motion";
 
 function getUrgency(daysLeft: number) {
   if (daysLeft <= 3) return {
@@ -51,6 +52,40 @@ function getUrgency(daysLeft: number) {
   };
 }
 
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.15,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: {
+    opacity: 0,
+    y: 24,
+    scale: 0.96,
+    filter: "blur(6px)",
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    filter: "blur(0px)",
+    transition: {
+      duration: 0.45,
+      ease: [0.22, 1, 0.36, 1] as const,
+    },
+  },
+};
+
+const headerVariants = {
+  hidden: { opacity: 0, y: -12 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as const } },
+};
+
 export default function ExamCountdown({ courseId, semester }: { courseId?: string; semester?: number }) {
   const { data: exams = [], isLoading } = useQuery({
     queryKey: ["student-exam-countdown", courseId, semester],
@@ -77,7 +112,12 @@ export default function ExamCountdown({ courseId, semester }: { courseId?: strin
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-32 rounded-full bg-primary/[0.02] blur-[60px] pointer-events-none" />
 
       {/* Header */}
-      <div className="relative flex items-center gap-3 mb-6">
+      <motion.div
+        className="relative flex items-center gap-3 mb-6"
+        variants={headerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         <div className="relative w-10 h-10 rounded-2xl bg-gradient-to-br from-red-500/15 to-rose-500/8 flex items-center justify-center border border-red-500/10 shadow-sm">
           <Timer className="w-[18px] h-[18px] text-red-400" />
           <div className="absolute inset-0 rounded-2xl bg-red-500/5 animate-pulse pointer-events-none" />
@@ -90,18 +130,23 @@ export default function ExamCountdown({ courseId, semester }: { courseId?: strin
           <Flame className="w-3 h-3 text-red-400 opacity-80" />
           <span className="font-body text-[10px] font-medium text-muted-foreground">{exams.length} upcoming</span>
         </div>
-      </div>
+      </motion.div>
 
       {/* Exam cards */}
-      <div className="space-y-3">
-        {exams.map((exam: any, index: number) => {
+      <motion.div
+        className="space-y-3"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {exams.map((exam: any) => {
           const daysLeft = differenceInDays(new Date(exam.exam_date), new Date());
           const urgency = getUrgency(daysLeft);
           return (
-            <div
+            <motion.div
               key={exam.id}
+              variants={cardVariants}
               className={`relative flex items-center gap-4 p-4 rounded-[1.25rem] border backdrop-blur-xl transition-all duration-400 hover:-translate-y-1 hover:backdrop-blur-2xl ${urgency.bg} ${urgency.border} ${urgency.glow} group/card overflow-hidden`}
-              style={{ animationDelay: `${index * 60}ms` }}
             >
               {/* Shimmer overlay */}
               <div className="absolute inset-0 -translate-x-full group-hover/card:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent pointer-events-none" />
@@ -137,16 +182,18 @@ export default function ExamCountdown({ courseId, semester }: { courseId?: strin
               {/* Progress bar */}
               {daysLeft <= 14 && (
                 <div className="absolute bottom-0 left-6 right-6 h-[2px] rounded-full overflow-hidden bg-border/10">
-                  <div
-                    className={`h-full rounded-full ${urgency.counterBg} transition-all duration-1000 ease-out`}
-                    style={{ width: `${Math.max(5, 100 - (daysLeft / 14) * 100)}%` }}
+                  <motion.div
+                    className={`h-full rounded-full ${urgency.counterBg}`}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${Math.max(5, 100 - (daysLeft / 14) * 100)}%` }}
+                    transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
                   />
                 </div>
               )}
-            </div>
+            </motion.div>
           );
         })}
-      </div>
+      </motion.div>
     </div>
   );
 }
