@@ -32,7 +32,7 @@ function getUrgency(daysLeft: number) {
     border: "border-sky-500/15",
     text: "text-sky-400",
     badge: "bg-gradient-to-r from-sky-500 to-blue-500",
-    glow: "",
+    glow: "shadow-[0_0_20px_-4px_rgba(56,189,248,0.18),inset_0_1px_0_rgba(255,255,255,0.04)]",
     counterBg: "bg-gradient-to-br from-sky-500 to-blue-600",
     label: "Upcoming",
     icon: "📅",
