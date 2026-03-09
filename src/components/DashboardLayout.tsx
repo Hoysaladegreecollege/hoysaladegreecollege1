@@ -71,6 +71,7 @@ const adminNav: NavItem[] = [
   { label: "Fee Management", path: "/dashboard/admin/fees", icon: DollarSign },
   { label: "Top Rankers", path: "/dashboard/admin/top-rankers", icon: Trophy },
   { label: "Timetable", path: "/dashboard/admin/timetable", icon: Calendar },
+  { label: "Exams", path: "/dashboard/admin/exams", icon: ClipboardList },
   { label: "Events", path: "/dashboard/admin/events", icon: Image },
   { label: "Banners & Papers", path: "/dashboard/admin/banners", icon: Book },
   { label: "Gallery", path: "/dashboard/admin/gallery", icon: ImagePlus },
