@@ -17,7 +17,10 @@ export default function ExamCountdown({ courseId, semester }: { courseId?: strin
     queryFn: async () => {
       const today = new Date().toISOString().split("T")[0];
       let query = supabase.from("exams").select("*").eq("is_active", true).gte("exam_date", today).order("exam_date").limit(6);
-      if (courseId) query = query.eq("course_id", courseId);
+      if (courseId) {
+        // Show exams for this course OR exams with no course (all-course exams)
+        query = query.or(`course_id.eq.${courseId},course_id.is.null`);
+      }
       if (semester) query = query.eq("semester", semester);
       const { data } = await query;
       return data || [];
