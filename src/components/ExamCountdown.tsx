@@ -21,7 +21,7 @@ function getUrgency(daysLeft: number) {
     border: "border-amber-500/20",
     text: "text-amber-400",
     badge: "bg-gradient-to-r from-amber-500 to-orange-500",
-    glow: "shadow-[0_0_20px_-4px_rgba(245,158,11,0.22)]",
+    glow: "shadow-[0_0_26px_-4px_rgba(245,158,11,0.28),inset_0_1px_0_rgba(255,255,255,0.04)]",
     counterBg: "bg-gradient-to-br from-amber-500 to-orange-600",
     label: "Soon",
     icon: "⚡",
