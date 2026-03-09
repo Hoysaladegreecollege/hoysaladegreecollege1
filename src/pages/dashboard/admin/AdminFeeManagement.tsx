@@ -208,7 +208,17 @@ export default function AdminFeeManagement() {
     onError: () => toast.error("Failed to update fee details"),
   });
 
-  // Lockout countdown timer
+  // Clear PIN unlock on page reload/close (beforeunload fires on reload & tab close)
+  useEffect(() => {
+    const handleUnload = () => {
+      sessionStorage.removeItem("fee-pin-unlocked");
+      sessionStorage.removeItem("fee-pin-nav");
+    };
+    window.addEventListener("beforeunload", handleUnload);
+    return () => window.removeEventListener("beforeunload", handleUnload);
+  }, []);
+
+
   useEffect(() => {
     if (!lockoutUntil) return;
     const interval = setInterval(() => {
