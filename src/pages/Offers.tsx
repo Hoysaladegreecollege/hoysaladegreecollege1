@@ -1,5 +1,4 @@
 import { FileText, Download, Eye, GraduationCap, BookOpen, Briefcase } from "lucide-react";
-import { useState } from "react";
 import SEOHead from "@/components/SEOHead";
 
 const offers = [
