@@ -70,10 +70,11 @@ export default function ExamCountdown({ courseId, semester }: { courseId?: strin
   if (exams.length === 0) return null;
 
   return (
-    <div className="relative bg-card/80 backdrop-blur-xl border border-border/30 rounded-[2rem] p-6 sm:p-7 overflow-hidden group hover:shadow-[0_12px_48px_-12px_rgba(0,0,0,0.35)] transition-all duration-500">
+    <div className="relative bg-card/50 backdrop-blur-2xl border border-white/[0.06] rounded-[2rem] p-6 sm:p-7 overflow-hidden group hover:shadow-[0_16px_64px_-16px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.04)] transition-all duration-500 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.3)]">
       {/* Ambient glow orbs */}
-      <div className="absolute -top-20 -right-20 w-48 h-48 rounded-full bg-red-500/[0.03] blur-[60px] pointer-events-none group-hover:bg-red-500/[0.06] transition-colors duration-700" />
-      <div className="absolute -bottom-12 -left-12 w-32 h-32 rounded-full bg-amber-500/[0.03] blur-[50px] pointer-events-none" />
+      <div className="absolute -top-24 -right-24 w-56 h-56 rounded-full bg-red-500/[0.06] blur-[80px] pointer-events-none group-hover:bg-red-500/[0.1] transition-colors duration-700" />
+      <div className="absolute -bottom-16 -left-16 w-44 h-44 rounded-full bg-amber-500/[0.04] blur-[70px] pointer-events-none group-hover:bg-amber-500/[0.07] transition-colors duration-700" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-32 rounded-full bg-primary/[0.02] blur-[60px] pointer-events-none" />
 
       {/* Header */}
       <div className="relative flex items-center gap-3 mb-6">
