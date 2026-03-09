@@ -110,6 +110,7 @@ const AdminReports = lazy(() => import("./pages/dashboard/admin/AdminReports"));
 const AdminAlumni = lazy(() => import("./pages/dashboard/admin/AdminAlumni"));
 const AdminFeedback = lazy(() => import("./pages/dashboard/admin/AdminFeedback"));
 const AdminActivityLog = lazy(() => import("./pages/dashboard/admin/AdminActivityLog"));
+const AdminExams = lazy(() => import("./pages/dashboard/admin/AdminExams"));
 
 const queryClient = new QueryClient();
 
@@ -249,6 +250,7 @@ const App = () => (
             <Route path="/dashboard/admin/alumni" element={<AdminRoute><AdminAlumni /></AdminRoute>} />
             <Route path="/dashboard/admin/feedback" element={<AdminRoute><AdminFeedback /></AdminRoute>} />
             <Route path="/dashboard/admin/activity-log" element={<AdminRoute><AdminActivityLog /></AdminRoute>} />
+            <Route path="/dashboard/admin/exams" element={<AdminRoute><AdminExams /></AdminRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
