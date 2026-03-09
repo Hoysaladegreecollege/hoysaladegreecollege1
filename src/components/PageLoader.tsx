@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import collegeLogo from "@/assets/college-logo.png";
+// Use the lightweight uploaded logo (same as HTML splash) for instant loading
+const collegeLogo = "/lovable-uploads/bacc5b2d-3f25-473a-a2ee-a0d75a0cb7e3.png";
 
 const SPLASH_DURATION = 3800;
 
