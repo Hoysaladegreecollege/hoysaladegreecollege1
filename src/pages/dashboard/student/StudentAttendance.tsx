@@ -108,7 +108,7 @@ export default function StudentAttendance() {
         ].map((s, i) => (
           <div key={s.label} className={`relative overflow-hidden bg-card border border-border/40 rounded-3xl p-5 text-center hover:shadow-[0_12px_40px_-10px_hsla(var(--primary),0.08)] hover:-translate-y-1 transition-all duration-500 ${s.bg ? `bg-gradient-to-br ${s.bg}` : ""}`}>
             <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/30 to-transparent" />
-            <p className={`font-display text-3xl font-bold ${s.color}`}>{s.value}</p>
+            <p className={`font-body text-3xl font-semibold ${s.color}`}>{s.value}</p>
             <p className="font-body text-[10px] text-muted-foreground mt-1.5 uppercase tracking-[0.15em]">{s.label}</p>
           </div>
         ))}
