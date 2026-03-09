@@ -219,8 +219,8 @@ export default function Contact() {
         <div className="h-[1.5px] bg-gradient-to-r from-transparent via-secondary/25 to-transparent" />
         <div className="relative overflow-hidden">
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3885.5!2d77.3892!3d13.0965!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae23a3a58ed6f1%3A0x8b0e1e6e2b3e1a0!2sHoysala%20Degree%20College!5e0!3m2!1sen!2sin!4v1"
-            width="100%" height="340" style={{ border: 0, display: "block" }} allowFullScreen loading="lazy"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1942.6!2d77.3889!3d13.0967!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae23a3a58ed6f1%3A0x8b0e1e6e2b3e1a0!2sHoysala%20Degree%20College%20Nelamangala!5e0!3m2!1sen!2sin!4v1"
+            width="100%" height="400" style={{ border: 0, display: "block" }} allowFullScreen loading="lazy"
             className="w-full opacity-90 hover:opacity-100 transition-opacity duration-500" />
           <div className="absolute top-0 left-0 right-0 h-6 bg-gradient-to-b from-background to-transparent pointer-events-none" />
         </div>
