@@ -43,7 +43,7 @@ function getUrgency(daysLeft: number) {
     border: "border-emerald-500/15",
     text: "text-emerald-400",
     badge: "bg-gradient-to-r from-emerald-500 to-teal-500",
-    glow: "",
+    glow: "shadow-[0_0_18px_-4px_rgba(52,211,153,0.16),inset_0_1px_0_rgba(255,255,255,0.04)]",
     counterBg: "bg-gradient-to-br from-emerald-500 to-teal-600",
     label: "Planned",
     icon: "✅",
