@@ -106,8 +106,6 @@ const AdminStudentFeeDetail = lazy(() => import("./pages/dashboard/admin/AdminSt
 const AdminDepartmentsAndSeats = lazy(() => import("./pages/dashboard/admin/AdminDepartmentsAndSeats"));
 const AdminReports = lazy(() => import("./pages/dashboard/admin/AdminReports"));
 const AdminAlumni = lazy(() => import("./pages/dashboard/admin/AdminAlumni"));
-const AdminFeedback = lazy(() => import("./pages/dashboard/admin/AdminFeedback"));
-const AdminActivityLog = lazy(() => import("./pages/dashboard/admin/AdminActivityLog"));
 const AdminExams = lazy(() => import("./pages/dashboard/admin/AdminExams"));
 
 const queryClient = new QueryClient();
