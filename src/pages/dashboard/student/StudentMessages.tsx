@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, forwardRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,7 +8,7 @@ import { format, isToday, isYesterday } from "date-fns";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
-const StudentMessages = forwardRef<HTMLDivElement>((_, ref) => {
+export default function StudentMessages() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [composing, setComposing] = useState(false);
@@ -176,7 +176,7 @@ const StudentMessages = forwardRef<HTMLDivElement>((_, ref) => {
   const getInitials = (name: string) => name?.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2) || "?";
 
   return (
-    <div ref={ref} className="space-y-4 animate-fade-in max-w-3xl mx-auto">
+    <div className="space-y-4 animate-fade-in max-w-3xl mx-auto">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
@@ -462,7 +462,4 @@ const StudentMessages = forwardRef<HTMLDivElement>((_, ref) => {
       </AnimatePresence>
     </div>
   );
-});
-
-StudentMessages.displayName = "StudentMessages";
-export default StudentMessages;
+}
