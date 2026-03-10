@@ -10,8 +10,6 @@ const quickLinks = [
   { label: "Courses", path: "/courses" },
   { label: "Admissions", path: "/admissions" },
   { label: "Alumni Network", path: "/alumni" },
-  { label: "Clubs & Societies", path: "/clubs" },
-  { label: "Library", path: "/library" },
   { label: "Committees", path: "/committees" },
   { label: "Management", path: "/management" },
   { label: "Contact", path: "/contact" },

@@ -3,7 +3,7 @@ import { Users, GraduationCap, BookOpen, Calendar, FileText, Settings, Mail, Tre
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RePieChart, Pie, Cell, AreaChart, Area, LineChart, Line, RadialBarChart, RadialBar, Legend } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, LineChart, Line, RadialBarChart, RadialBar, Legend, Cell } from "recharts";
 import { useState, useEffect, useRef } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,7 @@ const CHART_COLORS = [
   "hsl(0, 70%, 58%)", "hsl(180, 60%, 45%)", "hsl(330, 60%, 55%)", "hsl(60, 70%, 50%)"
 ];
 
-const PIE_COLORS = ["hsl(215, 90%, 55%)", "hsl(145, 65%, 42%)", "hsl(42, 70%, 52%)", "hsl(280, 60%, 55%)"];
+
 
 function useAnimatedCounter(target: number, duration = 1200) {
   const [count, setCount] = useState(0);
@@ -136,16 +136,6 @@ export default function AdminDashboard() {
     },
   });
 
-  const { data: roleDistribution = [] } = useQuery({
-    queryKey: ["admin-role-distribution"],
-    queryFn: async () => {
-      const { data } = await supabase.from("user_roles").select("role");
-      if (!data) return [];
-      const counts: Record<string, number> = {};
-      data.forEach(r => { counts[r.role] = (counts[r.role] || 0) + 1; });
-      return Object.entries(counts).map(([name, value]) => ({ name: name.charAt(0).toUpperCase() + name.slice(1), value }));
-    },
-  });
 
   const { data: attendanceStats } = useQuery({
     queryKey: ["admin-attendance-stats", attDate],
@@ -595,27 +585,6 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* User Roles - Pie */}
-        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
-          <div className="flex items-center gap-2 mb-5">
-            <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
-              <PieChart className="w-4 h-4 text-purple-500" />
-            </div>
-            <h3 className="font-body text-[14px] font-semibold text-foreground">User Roles Distribution</h3>
-          </div>
-          <div className="h-52 flex items-center justify-center">
-            {roleDistribution.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <RePieChart>
-                  <Pie data={roleDistribution} cx="50%" cy="50%" innerRadius={45} outerRadius={72} paddingAngle={4} dataKey="value" label={({ name, value }) => `${name}: ${value}`} style={{ fontSize: 11, fontFamily: "Inter" }}>
-                    {roleDistribution.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
-                  </Pie>
-                  <Tooltip contentStyle={{ borderRadius: 16, fontFamily: "Inter", fontSize: 12, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }} />
-                </RePieChart>
-              </ResponsiveContainer>
-            ) : <Skeleton className="w-40 h-40 rounded-full" />}
-          </div>
-        </div>
       </div>
 
       {/* Semester + Attendance Circular */}
@@ -729,23 +698,6 @@ export default function AdminDashboard() {
           )}
         </div>
 
-        {/* Semester Grid */}
-        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
-              <GraduationCap className="w-4 h-4 text-purple-500" />
-            </div>
-            <h3 className="font-body text-[14px] font-semibold text-foreground">Semester Breakdown</h3>
-          </div>
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-            {[1,2,3,4,5,6].map((sem, i) => (
-              <div key={sem} className="text-center p-3 rounded-xl border border-border/40 hover:border-border hover:shadow-md transition-all duration-300" style={{ background: `${CHART_COLORS[i % CHART_COLORS.length]}10` }}>
-                <p className="font-body text-xl font-bold text-foreground tabular-nums">{counts?.semesterBreakdown?.[sem] || 0}</p>
-                <p className="font-body text-[10px] text-muted-foreground mt-0.5 font-medium">Sem {sem}</p>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
       {/* Semester-wise Fee Collection Chart */}
