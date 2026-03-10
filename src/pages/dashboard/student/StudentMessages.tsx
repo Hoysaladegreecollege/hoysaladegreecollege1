@@ -462,7 +462,4 @@ export default function StudentMessages() {
       </AnimatePresence>
     </div>
   );
-});
-
-StudentMessages.displayName = "StudentMessages";
-export default StudentMessages;
+}
