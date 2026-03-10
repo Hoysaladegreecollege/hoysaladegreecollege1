@@ -164,8 +164,6 @@ const App = () => (
               <Route path="/placements" element={<SuspenseWrap><Placements /></SuspenseWrap>} />
               <Route path="/campus" element={<SuspenseWrap><CampusPage /></SuspenseWrap>} />
               <Route path="/alumni" element={<SuspenseWrap><Alumni /></SuspenseWrap>} />
-              <Route path="/clubs" element={<SuspenseWrap><Clubs /></SuspenseWrap>} />
-              <Route path="/library" element={<SuspenseWrap><Library /></SuspenseWrap>} />
               <Route path="/install" element={<SuspenseWrap><InstallApp /></SuspenseWrap>} />
             </Route>
 
