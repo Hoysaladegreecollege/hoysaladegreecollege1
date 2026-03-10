@@ -41,8 +41,6 @@ const Offers = lazy(() => import("./pages/Offers"));
 const Placements = lazy(() => import("./pages/Placements"));
 const CampusPage = lazy(() => import("./pages/Campus"));
 const Alumni = lazy(() => import("./pages/Alumni"));
-const Clubs = lazy(() => import("./pages/Clubs"));
-const Library = lazy(() => import("./pages/Library"));
 const InstallApp = lazy(() => import("./pages/Install"));
 
 // Lazy load student dashboard
