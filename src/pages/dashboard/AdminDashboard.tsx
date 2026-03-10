@@ -18,7 +18,7 @@ const CHART_COLORS = [
   "hsl(0, 70%, 58%)", "hsl(180, 60%, 45%)", "hsl(330, 60%, 55%)", "hsl(60, 70%, 50%)"
 ];
 
-const PIE_COLORS = ["hsl(215, 90%, 55%)", "hsl(145, 65%, 42%)", "hsl(42, 70%, 52%)", "hsl(280, 60%, 55%)"];
+
 
 function useAnimatedCounter(target: number, duration = 1200) {
   const [count, setCount] = useState(0);
