@@ -585,27 +585,6 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* User Roles - Pie */}
-        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
-          <div className="flex items-center gap-2 mb-5">
-            <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
-              <PieChart className="w-4 h-4 text-purple-500" />
-            </div>
-            <h3 className="font-body text-[14px] font-semibold text-foreground">User Roles Distribution</h3>
-          </div>
-          <div className="h-52 flex items-center justify-center">
-            {roleDistribution.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <RePieChart>
-                  <Pie data={roleDistribution} cx="50%" cy="50%" innerRadius={45} outerRadius={72} paddingAngle={4} dataKey="value" label={({ name, value }) => `${name}: ${value}`} style={{ fontSize: 11, fontFamily: "Inter" }}>
-                    {roleDistribution.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
-                  </Pie>
-                  <Tooltip contentStyle={{ borderRadius: 16, fontFamily: "Inter", fontSize: 12, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }} />
-                </RePieChart>
-              </ResponsiveContainer>
-            ) : <Skeleton className="w-40 h-40 rounded-full" />}
-          </div>
-        </div>
       </div>
 
       {/* Semester + Attendance Circular */}
