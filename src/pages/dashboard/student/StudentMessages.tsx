@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, forwardRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,7 +8,7 @@ import { format, isToday, isYesterday } from "date-fns";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
-const StudentMessages = forwardRef<HTMLDivElement>((_, ref) => {
+export default function StudentMessages() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [composing, setComposing] = useState(false);
