@@ -707,6 +707,7 @@ export default function Index() {
                   className="relative group cursor-pointer overflow-hidden rounded-xl sm:rounded-2xl border border-border aspect-[4/3] hover:shadow-2xl active:scale-[0.97] transition-all duration-500 touch-manipulation"
                   onClick={() => {
                     setLightboxIdx(i);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
                     document.body.style.overflow = "hidden";
                     document.documentElement.style.overflow = "hidden";
                   }}

@@ -470,47 +470,6 @@ export type Database = {
         }
         Relationships: []
       }
-      direct_messages: {
-        Row: {
-          created_at: string
-          id: string
-          is_read: boolean
-          message: string
-          parent_message_id: string | null
-          receiver_id: string
-          sender_id: string
-          subject: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          is_read?: boolean
-          message: string
-          parent_message_id?: string | null
-          receiver_id: string
-          sender_id: string
-          subject?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          is_read?: boolean
-          message?: string
-          parent_message_id?: string | null
-          receiver_id?: string
-          sender_id?: string
-          subject?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "direct_messages_parent_message_id_fkey"
-            columns: ["parent_message_id"]
-            isOneToOne: false
-            referencedRelation: "direct_messages"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       events: {
         Row: {
           category: string | null
@@ -546,53 +505,6 @@ export type Database = {
           title?: string
         }
         Relationships: []
-      }
-      exams: {
-        Row: {
-          course_id: string | null
-          created_at: string
-          created_by: string | null
-          exam_date: string
-          exam_type: string
-          id: string
-          is_active: boolean | null
-          semester: number | null
-          subject: string
-          title: string
-        }
-        Insert: {
-          course_id?: string | null
-          created_at?: string
-          created_by?: string | null
-          exam_date: string
-          exam_type?: string
-          id?: string
-          is_active?: boolean | null
-          semester?: number | null
-          subject: string
-          title: string
-        }
-        Update: {
-          course_id?: string | null
-          created_at?: string
-          created_by?: string | null
-          exam_date?: string
-          exam_type?: string
-          id?: string
-          is_active?: boolean | null
-          semester?: number | null
-          subject?: string
-          title?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "exams_course_id_fkey"
-            columns: ["course_id"]
-            isOneToOne: false
-            referencedRelation: "courses"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       faculty_members: {
         Row: {

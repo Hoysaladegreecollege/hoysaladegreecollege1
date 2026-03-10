@@ -36,99 +36,65 @@ export function usePushNotifications() {
   }, []);
 
   useEffect(() => {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !window.isSecureContext) {
-      return;
-    }
-
-    let isCancelled = false;
-
-    const setupServiceWorker = async () => {
-      try {
-        const existingRegistration = await navigator.serviceWorker.getRegistration();
-        const registration = existingRegistration ?? await (async () => {
-          const swResponse = await fetch('/sw.js', { cache: 'no-store' });
-          const contentType = swResponse.headers.get('content-type') ?? '';
-
-          if (!swResponse.ok || !contentType.includes('javascript')) {
-            return null;
-          }
-
-          return navigator.serviceWorker.register('/sw.js');
-        })();
-
-        if (isCancelled || !registration) return;
-
-        setSwRegistration(registration);
-
-        const sub = await registration.pushManager.getSubscription();
-
-        if (isCancelled) return;
-
-        if (sub) {
-          setIsSubscribed(true);
-          localStorage.setItem('hdc_push_subscribed', '1');
-
-          if (user) {
-            const { data } = await supabase
-              .from('push_subscriptions')
-              .select('id')
-              .eq('user_id', user.id)
-              .eq('endpoint', sub.endpoint);
-
-            if (!data || data.length === 0) {
-              const subJson = sub.toJSON();
-              await supabase.from('push_subscriptions').insert({
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').then((reg) => {
+        setSwRegistration(reg);
+        reg.pushManager.getSubscription().then((sub: PushSubscription | null) => {
+          if (sub) {
+            setIsSubscribed(true);
+            localStorage.setItem('hdc_push_subscribed', '1');
+            // Sync to DB if needed
+            if (user) {
+              supabase.from('push_subscriptions')
+                .select('id')
+                .eq('user_id', user.id)
+                .eq('endpoint', sub.endpoint)
+                .then(({ data }) => {
+                  if (!data || data.length === 0) {
+                    const subJson = sub.toJSON();
+                    supabase.from('push_subscriptions').insert({
+                      user_id: user.id,
+                      endpoint: subJson.endpoint as string,
+                      p256dh: subJson.keys?.p256dh || '',
+                      auth: subJson.keys?.auth || '',
+                    }).then(() => {
+                      console.log('Push subscription re-saved to DB');
+                    });
+                  }
+                });
+            }
+          } else if (Notification.permission === 'granted' && user) {
+            // Permission granted but no subscription — re-subscribe silently
+            reg.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+            }).then((newSub) => {
+              setIsSubscribed(true);
+              localStorage.setItem('hdc_push_subscribed', '1');
+              const subJson = newSub.toJSON();
+              supabase.from('push_subscriptions').insert({
                 user_id: user.id,
                 endpoint: subJson.endpoint as string,
                 p256dh: subJson.keys?.p256dh || '',
                 auth: subJson.keys?.auth || '',
               });
-              console.log('Push subscription re-saved to DB');
-            }
-          }
-        } else if (Notification.permission === 'granted' && user) {
-          try {
-            const newSub = await registration.pushManager.subscribe({
-              userVisibleOnly: true,
-              applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+            }).catch(() => {
+              setIsSubscribed(false);
+              localStorage.removeItem('hdc_push_subscribed');
             });
-
-            if (isCancelled) return;
-
-            setIsSubscribed(true);
-            localStorage.setItem('hdc_push_subscribed', '1');
-            const subJson = newSub.toJSON();
-            await supabase.from('push_subscriptions').insert({
-              user_id: user.id,
-              endpoint: subJson.endpoint as string,
-              p256dh: subJson.keys?.p256dh || '',
-              auth: subJson.keys?.auth || '',
-            });
-          } catch {
+          } else {
             setIsSubscribed(false);
             localStorage.removeItem('hdc_push_subscribed');
           }
-        } else {
-          setIsSubscribed(false);
-          localStorage.removeItem('hdc_push_subscribed');
-        }
-      } catch (err) {
-        console.warn('Service worker unavailable for push notifications:', err);
-      }
-    };
-
-    setupServiceWorker();
-
-    return () => {
-      isCancelled = true;
-    };
+        });
+      }).catch((err: any) => {
+        console.error('SW registration failed:', err);
+      });
+    }
   }, [user]);
 
   const subscribe = useCallback(async () => {
-    if (!user || !swRegistration || !VAPID_PUBLIC_KEY) {
-      toast.error('Push notifications are not available in this environment yet.');
-      return;
-    }
+    if (!user || !swRegistration || !VAPID_PUBLIC_KEY) return;
 
     setIsLoading(true);
     try {
@@ -197,7 +163,7 @@ export function usePushNotifications() {
     permission,
     isSubscribed,
     isLoading,
-    isSupported: typeof window !== 'undefined' && window.isSecureContext && 'serviceWorker' in navigator && 'PushManager' in window,
+    isSupported: 'serviceWorker' in navigator && 'PushManager' in window,
     subscribe,
     unsubscribe,
   };

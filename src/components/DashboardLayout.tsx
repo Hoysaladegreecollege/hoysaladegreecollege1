@@ -6,9 +6,9 @@ import {
   BarChart3, Settings, Award, Image, Megaphone, Shield,
   UserCog, Menu, X, Mail, Trophy, UserCheck,
   DollarSign, Book, ArrowUpCircle, Cake, ImagePlus, ChevronLeft, ExternalLink,
-  BellRing, Monitor, Armchair, Download, MessageSquare, Activity, ClipboardList
+  BellRing, Monitor, Armchair, Download, MessageSquare, Activity
 } from "lucide-react";
-import collegeLogo from "@/assets/college-logo-optimized.webp";
+import collegeLogo from "@/assets/college-logo.png";
 import { useState, useEffect } from "react";
 import PageLoader from "./PageLoader";
 import DarkModeToggle from "./DarkModeToggle";
@@ -29,7 +29,7 @@ const studentNav: NavItem[] = [
   { label: "Notices", path: "/dashboard/student/notices", icon: Bell },
   { label: "Announcements", path: "/dashboard/student/announcements", icon: Megaphone },
   { label: "Materials", path: "/dashboard/student/materials", icon: BookOpen },
-  
+  { label: "Feedback", path: "/dashboard/student/feedback", icon: MessageSquare },
 ];
 
 const teacherNav: NavItem[] = [
@@ -71,7 +71,6 @@ const adminNav: NavItem[] = [
   { label: "Fee Management", path: "/dashboard/admin/fees", icon: DollarSign },
   { label: "Top Rankers", path: "/dashboard/admin/top-rankers", icon: Trophy },
   { label: "Timetable", path: "/dashboard/admin/timetable", icon: Calendar },
-  { label: "Exams", path: "/dashboard/admin/exams", icon: ClipboardList },
   { label: "Events", path: "/dashboard/admin/events", icon: Image },
   { label: "Banners & Papers", path: "/dashboard/admin/banners", icon: Book },
   { label: "Gallery", path: "/dashboard/admin/gallery", icon: ImagePlus },
@@ -79,6 +78,8 @@ const adminNav: NavItem[] = [
   { label: "Roles", path: "/dashboard/admin/roles", icon: Shield },
   { label: "Reports & Export", path: "/dashboard/admin/reports", icon: Download },
   { label: "Alumni", path: "/dashboard/admin/alumni", icon: GraduationCap },
+  { label: "Feedback", path: "/dashboard/admin/feedback", icon: MessageSquare },
+  { label: "Activity Log", path: "/dashboard/admin/activity-log", icon: Activity },
   { label: "Settings", path: "/dashboard/admin/settings", icon: Settings },
 ];
 
@@ -115,103 +116,60 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         />
       )}
 
-      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-[260px] transform transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col`}>
-        {/* Layered premium background */}
-        <div className="absolute inset-0 bg-[hsl(228,18%,6%)] dark:bg-[hsl(228,14%,4.5%)]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[hsl(42,60%,55%,0.03)] via-transparent to-[hsl(42,60%,55%,0.02)]" />
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[hsl(42,75%,55%,0.3)] to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-        <div className="absolute top-0 right-0 bottom-0 w-px bg-white/[0.04]" />
-
-        {/* Logo & branding */}
-        <div className="relative px-5 pt-6 pb-5 shrink-0">
+      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-[240px] bg-[hsl(220,20%,10%)] dark:bg-[hsl(0,0%,7%)] text-white/90 transform transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col`}>
+        <div className="px-5 pt-5 pb-4 shrink-0">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="w-9 h-9 rounded-xl overflow-hidden ring-1 ring-[hsl(42,75%,55%,0.2)] shadow-[0_0_15px_hsl(42,75%,55%,0.1)]">
-                  <img src={collegeLogo} alt="Logo" className="w-full h-full object-contain bg-white/95" />
-                </div>
-                <div className="absolute -inset-1 rounded-xl bg-[hsl(42,75%,55%,0.08)] blur-md -z-10" />
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg overflow-hidden">
+                <img src={collegeLogo} alt="Logo" className="w-full h-full object-contain" />
               </div>
               <div>
-                <p className="font-body text-[13px] font-semibold text-white/95 leading-tight tracking-[-0.01em]">Hoysala College</p>
-                <p className="font-body text-[10px] text-[hsl(42,75%,55%,0.6)] mt-0.5 uppercase tracking-[0.1em] font-medium">{roleLabel} Portal</p>
+                <p className="font-body text-[13px] font-semibold text-white/90 leading-tight">Hoysala College</p>
+                <p className="font-body text-[10px] text-white/35 mt-0.5">{roleLabel} Portal</p>
               </div>
             </div>
             <button className="lg:hidden p-1.5 rounded-lg hover:bg-white/10 transition-colors" onClick={() => setSidebarOpen(false)}>
               <X className="w-4 h-4 text-white/60" />
             </button>
           </div>
-
-          {/* Separator with gold accent */}
-          <div className="mt-5 h-px bg-gradient-to-r from-[hsl(42,75%,55%,0.15)] via-white/[0.06] to-transparent" />
         </div>
 
-        {/* Navigation */}
-        <nav className="relative flex-1 overflow-y-auto px-3 pb-3 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10">
-          <div className="space-y-0.5">
-            {navItems.map((item, index) => {
-              const active = location.pathname === item.path;
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => setSidebarOpen(false)}
-                  className={`group relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-body text-[13px] transition-all duration-250 opacity-0 animate-fade-in ${
-                    active
-                      ? "text-white font-medium"
-                      : "text-white/45 hover:text-white/80"
-                  }`}
-                  style={{ animationDelay: `${index * 60}ms`, animationFillMode: 'forwards' }}
-                >
-                  {/* Active background with ambient glow */}
-                  {active && (
-                    <>
-                      <div className="absolute inset-0 rounded-xl bg-white/[0.07] border border-white/[0.06]" />
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-[hsl(42,75%,55%)] shadow-[0_0_8px_hsl(42,75%,55%,0.5)]" />
-                      <div className="absolute inset-0 rounded-xl bg-[hsl(42,75%,55%,0.03)]" />
-                    </>
-                  )}
-
-                  {/* Hover background */}
-                  {!active && (
-                    <div className="absolute inset-0 rounded-xl bg-white/0 group-hover:bg-white/[0.04] transition-colors duration-250" />
-                  )}
-
-                  <item.icon className={`relative w-4 h-4 shrink-0 transition-all duration-250 ${
-                    active
-                      ? "text-[hsl(42,75%,55%)] drop-shadow-[0_0_6px_hsl(42,75%,55%,0.4)]"
-                      : "text-white/30 group-hover:text-white/60"
-                  }`} />
-                  <span className="relative truncate">{item.label}</span>
-                </Link>
-              );
-            })}
-          </div>
+        <nav className="flex-1 overflow-y-auto px-3 pb-3 space-y-0.5">
+          {navItems.map((item) => {
+            const active = location.pathname === item.path;
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                onClick={() => setSidebarOpen(false)}
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg font-body text-[13px] transition-all duration-200 ${
+                  active
+                    ? "bg-white/12 text-white font-medium"
+                    : "text-white/50 hover:bg-white/6 hover:text-white/80"
+                }`}
+              >
+                <item.icon className={`w-[16px] h-[16px] shrink-0 ${active ? "text-white/90" : "text-white/40"}`} />
+                <span className="truncate">{item.label}</span>
+              </Link>
+            );
+          })}
         </nav>
 
-        {/* Footer: user info + sign out */}
-        <div className="relative px-3 py-4 shrink-0">
-          <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent mb-4" />
-
-          <div className="flex items-center gap-3 px-3 mb-3">
-            <div className="relative">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[hsl(42,75%,55%,0.2)] to-[hsl(42,75%,55%,0.05)] flex items-center justify-center ring-1 ring-white/[0.08]">
-                <User className="w-3.5 h-3.5 text-[hsl(42,75%,55%,0.7)]" />
-              </div>
+        <div className="px-3 py-4 border-t border-white/8 shrink-0">
+          <div className="flex items-center gap-2.5 px-3 mb-3">
+            <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center shrink-0">
+              <User className="w-3.5 h-3.5 text-white/60" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="font-body text-[12px] font-medium text-white/85 truncate">{profile?.full_name || "User"}</p>
+              <p className="font-body text-[12px] font-medium text-white/80 truncate">{profile?.full_name || "User"}</p>
               <p className="font-body text-[10px] text-white/30 truncate">{profile?.email}</p>
             </div>
           </div>
-
           <button
             onClick={handleLogout}
-            className="group flex items-center gap-2.5 w-full px-3.5 py-2.5 rounded-xl font-body text-[12px] text-white/35 hover:bg-[hsl(0,60%,50%,0.08)] hover:text-[hsl(0,70%,70%)] transition-all duration-250"
+            className="flex items-center gap-2 w-full px-3 py-2 rounded-lg font-body text-[12px] text-white/40 hover:bg-white/6 hover:text-white/70 transition-all duration-200"
           >
-            <LogOut className="w-3.5 h-3.5 group-hover:text-[hsl(0,70%,65%)] transition-colors duration-250" />
-            <span>Sign Out</span>
+            <LogOut className="w-3.5 h-3.5" /> Sign Out
           </button>
         </div>
       </aside>

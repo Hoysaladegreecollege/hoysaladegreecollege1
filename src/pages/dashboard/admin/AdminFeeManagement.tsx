@@ -21,18 +21,7 @@ const CHART_COLORS = ["hsl(142, 70%, 45%)", "hsl(0, 84%, 60%)", "hsl(42, 87%, 55
 export default function AdminFeeManagement() {
   const { user } = useAuth();
   const qc = useQueryClient();
-  const [pinUnlocked, setPinUnlocked] = useState(() => {
-    // Only persist across in-app navigation, not page reloads
-    const isUnlocked = sessionStorage.getItem("fee-pin-unlocked") === "true";
-    const wasNavigated = sessionStorage.getItem("fee-pin-nav") === "true";
-    if (isUnlocked && wasNavigated) {
-      return true;
-    }
-    // Clear on fresh page load / reload
-    sessionStorage.removeItem("fee-pin-unlocked");
-    sessionStorage.removeItem("fee-pin-nav");
-    return false;
-  });
+  const [pinUnlocked, setPinUnlocked] = useState(false);
   const [pinInput, setPinInput] = useState("");
   const [pinError, setPinError] = useState("");
   const [pinChecking, setPinChecking] = useState(false);
@@ -208,17 +197,7 @@ export default function AdminFeeManagement() {
     onError: () => toast.error("Failed to update fee details"),
   });
 
-  // Clear PIN unlock on page reload/close (beforeunload fires on reload & tab close)
-  useEffect(() => {
-    const handleUnload = () => {
-      sessionStorage.removeItem("fee-pin-unlocked");
-      sessionStorage.removeItem("fee-pin-nav");
-    };
-    window.addEventListener("beforeunload", handleUnload);
-    return () => window.removeEventListener("beforeunload", handleUnload);
-  }, []);
-
-
+  // Lockout countdown timer
   useEffect(() => {
     if (!lockoutUntil) return;
     const interval = setInterval(() => {
@@ -239,8 +218,6 @@ export default function AdminFeeManagement() {
     setPinError("");
     if (pinInput === pinData) {
       setPinUnlocked(true);
-      sessionStorage.setItem("fee-pin-unlocked", "true");
-      sessionStorage.setItem("fee-pin-nav", "true");
       setPinChecking(false);
       setFailedAttempts(0);
     } else {

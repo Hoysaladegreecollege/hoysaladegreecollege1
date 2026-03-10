@@ -3,8 +3,7 @@ import SEOHead from "@/components/SEOHead";
 import { useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { FileText, CheckCircle, XCircle, Clock, Search, Download, ArrowLeft, Sparkles, PartyPopper, GraduationCap, Shield, Lock, Eye, Link2, Copy } from "lucide-react";
-import { toast } from "sonner";
+import { FileText, CheckCircle, XCircle, Clock, Search, Download, ArrowLeft, Sparkles, PartyPopper, GraduationCap, Shield, Lock, Eye } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -392,7 +391,7 @@ ${application.photo_url ? `<div class="photo-section"><img src="${application.ph
                 ))}
               </div>
 
-          {/* Actions */}
+              {/* Actions */}
               <div className="border-t border-border/5 p-5 sm:p-6 flex flex-wrap gap-3">
                 <Button onClick={handleDownloadPDF}
                   className="flex-1 rounded-2xl font-body gap-2 shadow-lg border-0 text-background"
@@ -405,37 +404,6 @@ ${application.photo_url ? `<div class="photo-section"><img src="${application.ph
                     <ArrowLeft className="w-4 h-4 mr-1" /> Search Again
                   </Button>
                 )}
-              </div>
-
-              {/* Quick Access Tracking Link */}
-              <div className="border-t border-border/5 p-5 sm:p-6">
-                <div className="rounded-2xl p-5 border border-[hsl(45_80%_55%_/_0.15)]"
-                  style={{ background: "linear-gradient(135deg, rgba(198,167,94,0.04), rgba(198,167,94,0.01))" }}>
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "rgba(198,167,94,0.1)" }}>
-                      <Link2 className="w-3.5 h-3.5" style={{ color: "hsl(45, 80%, 55%)" }} />
-                    </div>
-                    <h4 className="font-display text-xs font-bold text-foreground uppercase tracking-wider">Your Quick Access Link</h4>
-                  </div>
-                  <p className="font-body text-[11px] text-muted-foreground/50 mb-3">Bookmark or save this link to track your application anytime without filling the form again.</p>
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 rounded-xl px-4 py-2.5 border border-border/10 font-body text-xs text-muted-foreground/70 truncate select-all"
-                      style={{ background: "rgba(0,0,0,0.2)" }}>
-                      {window.location.origin}/application-status?app={application.application_number}&email={encodeURIComponent(application.email)}
-                    </div>
-                    <button
-                      onClick={() => {
-                        const url = `${window.location.origin}/application-status?app=${application.application_number}&email=${encodeURIComponent(application.email)}`;
-                        navigator.clipboard.writeText(url).then(() => toast.success("Tracking link copied!"));
-                      }}
-                      className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center border border-[hsl(45_80%_55%_/_0.2)] hover:border-[hsl(45_80%_55%_/_0.4)] transition-colors"
-                      style={{ background: "rgba(198,167,94,0.08)" }}
-                      title="Copy link"
-                    >
-                      <Copy className="w-4 h-4" style={{ color: "hsl(45, 80%, 55%)" }} />
-                    </button>
-                  </div>
-                </div>
               </div>
             </div>
           )}

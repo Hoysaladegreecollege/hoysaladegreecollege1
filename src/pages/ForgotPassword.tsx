@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Mail, ArrowLeft, CheckCircle } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
-import collegeLogo from "@/assets/college-logo-optimized.webp";
+import collegeLogo from "@/assets/college-logo.png";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");

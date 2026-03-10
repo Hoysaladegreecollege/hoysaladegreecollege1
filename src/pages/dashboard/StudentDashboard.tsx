@@ -1,8 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { BookOpen, Clock, BarChart3, Bell, Calendar, TrendingUp, CheckCircle, XCircle, Megaphone, ArrowRight, Sparkles, Upload, User, GraduationCap, FileText, Award, IndianRupee, Wallet, AlertTriangle, Target, Flame, Calculator, Timer, Star, Zap, Trophy, MessageCircle } from "lucide-react";
+import { BookOpen, Clock, BarChart3, Bell, Calendar, TrendingUp, CheckCircle, XCircle, Megaphone, ArrowRight, Sparkles, Upload, User, GraduationCap, FileText, Award, IndianRupee, Wallet, AlertTriangle, Target, Flame, Calculator, Timer, Star, Zap, Trophy } from "lucide-react";
 import BirthdayPopup from "@/components/BirthdayPopup";
-import AttendanceSummaryPopup from "@/components/AttendanceSummaryPopup";
-import ExamCountdown from "@/components/ExamCountdown";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
@@ -163,7 +161,6 @@ export default function StudentDashboard() {
         present, absent: total - present, total, todayStatus,
         semester: student.semester, rollNumber: student.roll_number,
         courseName: (student as any).courses?.name, courseCode: (student as any).courses?.code,
-        courseId: student.course_id,
         totalSubjects: marksData.length, weeklyTrend, subjectChartData, gpa,
       };
     },
@@ -252,7 +249,6 @@ export default function StudentDashboard() {
     { icon: BookOpen, label: "Materials", desc: "Study resources", path: "/dashboard/student/materials", color: "bg-amber-500/10", iconColor: "text-amber-500" },
     { icon: Bell, label: "Notices", desc: "Updates", path: "/dashboard/student/notices", color: "bg-cyan-500/10", iconColor: "text-cyan-500" },
     { icon: Megaphone, label: "Announcements", desc: "Messages", path: "/dashboard/student/announcements", color: "bg-rose-500/10", iconColor: "text-rose-500" },
-    { icon: MessageCircle, label: "Messages", desc: "Ask teachers", path: "/dashboard/student/messages", color: "bg-teal-500/10", iconColor: "text-teal-500" },
     { icon: User, label: "My Profile", desc: "View details", path: "/dashboard/student/profile", color: "bg-indigo-500/10", iconColor: "text-indigo-500" },
   ];
 
@@ -261,7 +257,6 @@ export default function StudentDashboard() {
   return (
     <div className="space-y-5 sm:space-y-6 animate-fade-in">
       <BirthdayPopup />
-      <AttendanceSummaryPopup />
 
       {/* Welcome Banner */}
       <div className="bg-card border border-border/60 rounded-2xl p-6 md:p-8">
@@ -511,8 +506,36 @@ export default function StudentDashboard() {
         </div>
       </div>
 
-      {/* Subject-wise Marks Chart */}
-      <div className="grid md:grid-cols-1 gap-4">
+      {/* ═══ NEW: Weekly Attendance Trend + Subject Marks Chart ═══ */}
+      <div className="grid md:grid-cols-2 gap-4">
+        {/* Weekly Attendance Trend */}
+        {data?.weeklyTrend && (
+          <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 text-cyan-500" />
+              </div>
+              <h3 className="font-body text-[14px] font-semibold text-foreground">Weekly Attendance Trend</h3>
+            </div>
+            <div className="h-44">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={data.weeklyTrend}>
+                  <defs>
+                    <linearGradient id="attGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(145, 65%, 42%)" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(145, 65%, 42%)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                  <XAxis dataKey="day" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} />
+                  <Tooltip contentStyle={{ borderRadius: 12, fontSize: 12, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }} />
+                  <Area type="monotone" dataKey="pct" stroke="hsl(145, 65%, 42%)" fill="url(#attGrad)" strokeWidth={2.5} dot={{ r: 4, fill: "hsl(145, 65%, 42%)", strokeWidth: 2, stroke: "hsl(var(--card))" }} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        )}
 
         {/* Subject-wise Marks Chart */}
         {data?.subjectChartData && data.subjectChartData.length > 0 && (
@@ -539,9 +562,6 @@ export default function StudentDashboard() {
           </div>
         )}
       </div>
-
-      {/* Exam Countdown */}
-      <ExamCountdown courseId={data?.courseId} semester={data?.semester} />
 
       {/* Quick Actions */}
       <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Lock, Eye, EyeOff, CheckCircle, ArrowLeft } from "lucide-react";
 import { validatePassword } from "@/lib/password-validation";
 import SEOHead from "@/components/SEOHead";
-import collegeLogo from "@/assets/college-logo-optimized.webp";
+import collegeLogo from "@/assets/college-logo.png";
 
 export default function ResetPassword() {
   const [password, setPassword] = useState("");

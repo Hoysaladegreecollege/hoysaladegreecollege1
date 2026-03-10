@@ -21,9 +21,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://hgfulxwjwjohmjslhxhq.supabase.co" crossorigin />
 
-    <!-- Preload splash logo for instant display -->
-    <link rel="preload" as="image" href="/lovable-uploads/bacc5b2d-3f25-473a-a2ee-a0d75a0cb7e3.png" fetchpriority="high" />
-
     <!-- Preload critical fonts to avoid FOUT on slow connections -->
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'" />
@@ -32,138 +29,37 @@
     <style>
       #root-loader {
         position: fixed; inset: 0; z-index: 9999;
-        display: flex; align-items: center; justify-content: center; flex-direction: column;
+        display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 20px;
         background: #070810;
-        transition: opacity 0.5s ease, transform 0.5s ease;
-        overflow: hidden;
+        transition: opacity 0.4s ease, transform 0.4s ease;
       }
-      #root-loader.hide { opacity: 0; pointer-events: none; transform: scale(1.02); }
-
-      /* Ambient background glow */
-      .rl-bg-glow {
-        position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none;
-      }
-      .rl-bg-glow-1 {
-        width: 400px; height: 400px; top: -10%; left: -5%;
-        background: radial-gradient(circle, hsla(40,70%,50%,0.06), transparent 70%);
-        animation: rl-float 8s ease-in-out infinite;
-      }
-      .rl-bg-glow-2 {
-        width: 350px; height: 350px; bottom: -8%; right: -3%;
-        background: radial-gradient(circle, hsla(40,60%,55%,0.04), transparent 70%);
-        animation: rl-float 10s ease-in-out infinite reverse;
-      }
-
-      /* Logo container */
-      .rl-logo-wrap {
-        position: relative;
-        animation: rl-logo-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        opacity: 0;
-      }
-      .rl-logo-glow {
-        position: absolute; inset: -20px; border-radius: 28px;
-        background: radial-gradient(circle, hsla(40,80%,55%,0.25), transparent 70%);
-        filter: blur(20px); opacity: 0;
-        animation: rl-glow-pulse 2.5s ease-in-out 0.6s infinite;
-      }
-      .rl-logo-ring {
-        position: absolute; inset: -4px; border-radius: 22px;
-        border: 1px solid transparent;
-        background: linear-gradient(135deg, hsla(40,80%,60%,0.3), transparent, hsla(40,80%,60%,0.15)) border-box;
-        -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-        -webkit-mask-composite: xor; mask-composite: exclude;
-        animation: rl-ring-spin 4s linear infinite;
-      }
+      #root-loader.hide { opacity: 0; pointer-events: none; }
       .rl-logo-img-wrap {
-        position: relative;
-        width: 80px; height: 80px; border-radius: 18px; overflow: hidden;
-        background: linear-gradient(145deg, rgba(255,255,255,0.97), rgba(248,243,233,0.95));
-        box-shadow: 0 20px 60px -12px rgba(198,167,94,0.25), 0 8px 24px -8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.6);
+        width: 72px; height: 72px; border-radius: 16px; overflow: hidden;
+        background: rgba(255,255,255,0.95);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.3);
       }
-      .rl-logo-img-wrap img {
-        width: 100%; height: 100%; object-fit: contain; padding: 3px;
-        animation: rl-logo-breathe 3s ease-in-out 1s infinite;
-      }
-
-      /* Title section */
-      .rl-text {
-        text-align: center; margin-top: 24px; position: relative; z-index: 1;
-      }
+      .rl-logo-img-wrap img { width: 100%; height: 100%; object-fit: contain; }
       .rl-title {
         font-family: 'Playfair Display', Georgia, serif;
-        font-size: 22px; font-weight: 700; margin: 0;
-        background: linear-gradient(135deg, #F5E6C8, #C6A75E 40%, #E8D5A3 70%, #C6A75E);
-        background-size: 200% auto;
-        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        opacity: 0; animation: rl-text-in 0.7s cubic-bezier(0.16,1,0.3,1) 0.25s forwards, rl-shimmer 4s linear 1.5s infinite;
+        font-size: 20px; font-weight: 700; color: rgba(255,255,255,0.9);
+        margin: 0;
       }
       .rl-subtitle {
         font-family: 'Inter', system-ui, sans-serif;
-        font-size: 10px; color: rgba(198,167,94,0.4);
-        letter-spacing: 0.3em; text-transform: uppercase; margin-top: 6px;
-        opacity: 0; animation: rl-text-in 0.7s cubic-bezier(0.16,1,0.3,1) 0.45s forwards;
+        font-size: 10px; color: rgba(255,255,255,0.4);
+        letter-spacing: 0.2em; text-transform: uppercase; margin-top: 4px;
       }
-      .rl-divider {
-        width: 40px; height: 1px; margin: 12px auto 0;
-        background: linear-gradient(90deg, transparent, rgba(198,167,94,0.3), transparent);
-        opacity: 0; animation: rl-text-in 0.5s ease-out 0.6s forwards;
-      }
-
-      /* Progress bar */
       .rl-progress {
-        width: 140px; height: 2px; border-radius: 99px; margin-top: 28px;
-        background: rgba(255,255,255,0.04); overflow: hidden; position: relative;
-        opacity: 0; animation: rl-text-in 0.5s ease-out 0.7s forwards;
+        width: 160px; height: 3px; border-radius: 99px;
+        background: rgba(255,255,255,0.08); overflow: hidden;
       }
       .rl-progress-bar {
         height: 100%; border-radius: 99px; width: 0%;
-        background: linear-gradient(90deg, hsl(40,75%,50%), hsl(38,85%,60%), hsl(40,75%,50%));
-        background-size: 200% 100%;
-        animation: rl-fill 2.5s cubic-bezier(0.4,0,0.2,1) 0.9s forwards, rl-bar-shimmer 1.5s linear infinite;
-        box-shadow: 0 0 10px hsla(40,80%,55%,0.4);
-      }
-
-      /* Bottom branding */
-      .rl-bottom {
-        position: absolute; bottom: 24px;
-        font-family: 'Inter', system-ui, sans-serif;
-        font-size: 8px; letter-spacing: 0.25em; text-transform: uppercase;
-        color: rgba(255,255,255,0.06);
-        opacity: 0; animation: rl-text-in 0.5s ease-out 1s forwards;
-      }
-
-      @keyframes rl-float {
-        0%, 100% { transform: translate(0, 0) scale(1); }
-        50% { transform: translate(20px, -15px) scale(1.1); }
-      }
-      @keyframes rl-logo-in {
-        from { opacity: 0; transform: scale(0.5) translateY(20px); }
-        to { opacity: 1; transform: scale(1) translateY(0); }
-      }
-      @keyframes rl-logo-breathe {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.02); }
-      }
-      @keyframes rl-glow-pulse {
-        0%, 100% { opacity: 0; }
-        50% { opacity: 1; }
-      }
-      @keyframes rl-ring-spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-      }
-      @keyframes rl-text-in {
-        from { opacity: 0; transform: translateY(12px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      @keyframes rl-shimmer {
-        to { background-position: 200% center; }
+        background: linear-gradient(90deg, hsl(42,75%,55%), hsl(42,75%,65%));
+        animation: rl-fill 2.5s ease-out forwards;
       }
       @keyframes rl-fill { to { width: 100%; } }
-      @keyframes rl-bar-shimmer {
-        from { background-position: 0% 0; }
-        to { background-position: 200% 0; }
-      }
     </style>
 
     <meta property="og:title" content="Hoysala Degree College">
@@ -177,28 +73,16 @@
   <meta property="og:type" content="website">
 </head>
   <body>
-    <!-- Ultra-premium splash loader -->
+    <!-- Ultra-premium loader -->
     <div id="root-loader">
-      <div class="rl-bg-glow rl-bg-glow-1"></div>
-      <div class="rl-bg-glow rl-bg-glow-2"></div>
-
-      <div class="rl-logo-wrap">
-        <div class="rl-logo-glow"></div>
-        <div class="rl-logo-ring"></div>
-        <div class="rl-logo-img-wrap">
-          <img src="/lovable-uploads/bacc5b2d-3f25-473a-a2ee-a0d75a0cb7e3.png" alt="HDC" />
-        </div>
+      <div class="rl-logo-img-wrap">
+        <img src="/lovable-uploads/bacc5b2d-3f25-473a-a2ee-a0d75a0cb7e3.png" alt="HDC" />
       </div>
-
-      <div class="rl-text">
+      <div style="text-align:center;">
         <p class="rl-title">Hoysala Degree College</p>
         <p class="rl-subtitle">Right Choice For Better Future</p>
-        <div class="rl-divider"></div>
       </div>
-
       <div class="rl-progress"><div class="rl-progress-bar"></div></div>
-
-      <p class="rl-bottom">Est. Since 2004</p>
     </div>
 
     <div id="root"></div>

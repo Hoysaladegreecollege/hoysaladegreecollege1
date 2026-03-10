@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { MapPin, Phone, Mail, Facebook, Twitter, Instagram, Youtube, ArrowUpRight, Heart, ArrowUp, Sparkles, GraduationCap } from "lucide-react";
-import collegeLogo from "@/assets/college-logo-optimized.webp";
+import collegeLogo from "@/assets/college-logo.png";
 import { useState, useEffect } from "react";
 
 const MAPS_LINK = "https://maps.app.goo.gl/nqvvEX7kgB7wQVKb7";
@@ -10,6 +10,8 @@ const quickLinks = [
   { label: "Courses", path: "/courses" },
   { label: "Admissions", path: "/admissions" },
   { label: "Alumni Network", path: "/alumni" },
+  { label: "Clubs & Societies", path: "/clubs" },
+  { label: "Library", path: "/library" },
   { label: "Committees", path: "/committees" },
   { label: "Management", path: "/management" },
   { label: "Contact", path: "/contact" },
@@ -52,41 +54,23 @@ export default function Footer() {
       <div className="absolute inset-0 opacity-[0.015] pointer-events-none" style={{ backgroundImage: "radial-gradient(hsl(var(--foreground) / 0.5) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
 
       {/* Newsletter / CTA strip */}
-      <div className="relative border-b border-border/50 overflow-hidden">
-        {/* Ambient glow behind CTA */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[200px] rounded-full blur-[120px] bg-secondary/[0.06]" />
-        </div>
-        <div className="container py-10 sm:py-14 px-5 sm:px-4 relative">
-          <div className="relative flex flex-col sm:flex-row items-center justify-between gap-6 p-6 sm:p-8 rounded-3xl border border-border/40 bg-card/50 backdrop-blur-xl overflow-hidden"
-            style={{ boxShadow: "0 8px 40px -12px hsl(var(--secondary) / 0.1), inset 0 1px 0 hsl(var(--secondary) / 0.06)" }}>
-            {/* Top accent line */}
-            <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-secondary/40 to-transparent" />
-            {/* Shimmer sweep */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-secondary/[0.03] to-transparent pointer-events-none animate-pulse" style={{ animationDuration: "4s" }} />
-
-            <div className="flex items-center gap-4 text-center sm:text-left">
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border border-secondary/20 relative group"
-                style={{ background: "linear-gradient(135deg, hsl(var(--secondary) / 0.12), hsl(var(--secondary) / 0.04))", boxShadow: "0 4px 20px -4px hsl(var(--secondary) / 0.15)" }}>
-                <GraduationCap className="w-6 h-6 text-secondary" />
-                <div className="absolute inset-0 rounded-2xl border border-secondary/10" />
+      <div className="relative border-b border-border/50">
+        <div className="container py-8 sm:py-10 px-5 sm:px-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-5">
+            <div className="flex items-center gap-3 text-center sm:text-left">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-secondary/10 border border-secondary/15">
+                <GraduationCap className="w-5 h-5 text-secondary" />
               </div>
               <div>
-                <p className="font-display text-lg sm:text-xl font-bold text-foreground tracking-tight">Start Your Journey Today</p>
-                <p className="font-body text-sm text-muted-foreground mt-0.5">Admissions open for 2026–27 academic year</p>
+                <p className="font-display text-base sm:text-lg font-bold text-foreground/90">Start Your Journey Today</p>
+                <p className="font-body text-xs text-muted-foreground">Admissions open for 2026–27 academic year</p>
               </div>
             </div>
             <Link
               to="/admissions"
-              className="group relative inline-flex items-center gap-2.5 px-8 py-4 rounded-2xl font-body text-sm font-bold transition-all duration-400 overflow-hidden border shrink-0 hover:scale-[1.03] hover:-translate-y-0.5 active:scale-[0.98]"
-              style={{
-                background: "linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--secondary) / 0.85))",
-                color: "hsl(var(--secondary-foreground))",
-                borderColor: "hsl(var(--secondary) / 0.3)",
-                boxShadow: "0 6px 24px -4px hsl(var(--secondary) / 0.3), inset 0 1px 0 hsl(0 0% 100% / 0.1)",
-              }}
+              className="group relative inline-flex items-center gap-2 px-6 py-3 rounded-full font-body text-sm font-semibold transition-all duration-400 overflow-hidden border bg-secondary text-secondary-foreground border-secondary/30 hover:shadow-lg hover:shadow-secondary/20"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-600 pointer-events-none" />
               <span className="relative z-10">Apply Now</span>
               <ArrowUpRight className="w-4 h-4 relative z-10 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
             </Link>
