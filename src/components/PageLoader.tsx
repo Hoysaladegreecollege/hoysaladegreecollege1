@@ -58,8 +58,11 @@ export default function PageLoader() {
     const t4 = setTimeout(() => setProgress(100), 420);
     const t5 = setTimeout(() => setLoading(false), 550);
     return () => {
-      clearTimeout(t1); clearTimeout(t2); clearTimeout(t3);
-      clearTimeout(t4); clearTimeout(t5);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      clearTimeout(t4);
+      clearTimeout(t5);
     };
   }, [location.pathname]);
 
@@ -99,7 +102,8 @@ export default function PageLoader() {
               className="absolute w-[450px] h-[450px] rounded-full"
               style={{
                 background: "radial-gradient(circle, hsla(40,80%,55%,0.07), transparent 70%)",
-                top: "5%", left: "10%",
+                top: "5%",
+                left: "10%",
                 animation: "splash-orb-float 7s ease-in-out infinite",
               }}
             />
@@ -107,7 +111,8 @@ export default function PageLoader() {
               className="absolute w-[380px] h-[380px] rounded-full"
               style={{
                 background: "radial-gradient(circle, hsla(40,65%,60%,0.05), transparent 70%)",
-                bottom: "10%", right: "5%",
+                bottom: "10%",
+                right: "5%",
                 animation: "splash-orb-float 9s ease-in-out infinite reverse",
               }}
             />
@@ -115,7 +120,8 @@ export default function PageLoader() {
               className="absolute w-[280px] h-[280px] rounded-full"
               style={{
                 background: "radial-gradient(circle, hsla(220,40%,45%,0.04), transparent 70%)",
-                top: "50%", left: "50%",
+                top: "50%",
+                left: "50%",
                 transform: "translate(-50%, -50%)",
                 animation: "splash-core-pulse 3.5s ease-in-out infinite",
               }}
@@ -185,7 +191,8 @@ export default function PageLoader() {
             <div
               className="absolute -inset-1 rounded-[22px] overflow-hidden"
               style={{
-                background: "conic-gradient(from 0deg, transparent, hsla(40,80%,60%,0.25), transparent, hsla(40,80%,60%,0.15), transparent)",
+                background:
+                  "conic-gradient(from 0deg, transparent, hsla(40,80%,60%,0.25), transparent, hsla(40,80%,60%,0.15), transparent)",
                 animation: "splash-ring-spin 6s linear infinite",
                 opacity: 0,
                 animationDelay: "0.8s",
@@ -239,7 +246,8 @@ export default function PageLoader() {
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 opacity: 0,
-                animation: "splash-title-entrance 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s forwards, splash-text-shimmer 4s linear 2s infinite",
+                animation:
+                  "splash-title-entrance 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s forwards, splash-text-shimmer 4s linear 2s infinite",
               }}
             >
               Hoysala Degree College
@@ -270,7 +278,8 @@ export default function PageLoader() {
                 style={{
                   background: "rgba(198,167,94,0.3)",
                   opacity: 0,
-                  animation: "splash-subtitle-entrance 0.5s ease-out 0.75s forwards, splash-particle-glow 2s ease-in-out 1.5s infinite",
+                  animation:
+                    "splash-subtitle-entrance 0.5s ease-out 0.75s forwards, splash-particle-glow 2s ease-in-out 1.5s infinite",
                 }}
               />
               <div
@@ -326,7 +335,7 @@ export default function PageLoader() {
               animation: "splash-subtitle-entrance 0.6s ease-out 1.1s forwards",
             }}
           >
-            Est. Since 2004
+            Est. Since 2019
           </p>
         </div>
       )}
