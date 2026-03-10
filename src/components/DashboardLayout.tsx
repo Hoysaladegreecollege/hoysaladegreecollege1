@@ -29,7 +29,7 @@ const studentNav: NavItem[] = [
   { label: "Notices", path: "/dashboard/student/notices", icon: Bell },
   { label: "Announcements", path: "/dashboard/student/announcements", icon: Megaphone },
   { label: "Materials", path: "/dashboard/student/materials", icon: BookOpen },
-  { label: "Feedback", path: "/dashboard/student/feedback", icon: MessageSquare },
+  
 ];
 
 const teacherNav: NavItem[] = [
