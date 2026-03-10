@@ -176,7 +176,7 @@ export default function StudentMessages() {
   const getInitials = (name: string) => name?.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2) || "?";
 
   return (
-    <div ref={ref} className="space-y-4 animate-fade-in max-w-3xl mx-auto">
+    <div className="space-y-4 animate-fade-in max-w-3xl mx-auto">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
