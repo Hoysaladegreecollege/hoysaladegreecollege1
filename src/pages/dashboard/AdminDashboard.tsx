@@ -136,16 +136,6 @@ export default function AdminDashboard() {
     },
   });
 
-  const { data: roleDistribution = [] } = useQuery({
-    queryKey: ["admin-role-distribution"],
-    queryFn: async () => {
-      const { data } = await supabase.from("user_roles").select("role");
-      if (!data) return [];
-      const counts: Record<string, number> = {};
-      data.forEach(r => { counts[r.role] = (counts[r.role] || 0) + 1; });
-      return Object.entries(counts).map(([name, value]) => ({ name: name.charAt(0).toUpperCase() + name.slice(1), value }));
-    },
-  });
 
   const { data: attendanceStats } = useQuery({
     queryKey: ["admin-attendance-stats", attDate],
