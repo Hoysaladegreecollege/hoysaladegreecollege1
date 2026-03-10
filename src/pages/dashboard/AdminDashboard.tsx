@@ -698,23 +698,6 @@ export default function AdminDashboard() {
           )}
         </div>
 
-        {/* Semester Grid */}
-        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
-              <GraduationCap className="w-4 h-4 text-purple-500" />
-            </div>
-            <h3 className="font-body text-[14px] font-semibold text-foreground">Semester Breakdown</h3>
-          </div>
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-            {[1,2,3,4,5,6].map((sem, i) => (
-              <div key={sem} className="text-center p-3 rounded-xl border border-border/40 hover:border-border hover:shadow-md transition-all duration-300" style={{ background: `${CHART_COLORS[i % CHART_COLORS.length]}10` }}>
-                <p className="font-body text-xl font-bold text-foreground tabular-nums">{counts?.semesterBreakdown?.[sem] || 0}</p>
-                <p className="font-body text-[10px] text-muted-foreground mt-0.5 font-medium">Sem {sem}</p>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
       {/* Semester-wise Fee Collection Chart */}
