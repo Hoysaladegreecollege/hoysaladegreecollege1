@@ -180,12 +180,12 @@ export default function Contact() {
                         <textarea rows={4} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className={`${inputClass} resize-none`} placeholder="Write your message here..." />
                       </div>
                       <button type="submit" disabled={submitting}
-                        className="relative w-full group overflow-hidden px-6 py-4 rounded-xl font-body text-sm font-bold text-primary-foreground transition-all duration-300 hover:scale-[1.02] hover:-translate-y-0.5 disabled:opacity-60 shadow-lg btn-magnetic"
+                        className="relative w-full group overflow-hidden px-6 py-4 rounded-full font-body text-sm font-bold text-primary-foreground transition-all duration-300 hover:scale-[1.02] hover:-translate-y-0.5 disabled:opacity-60 shadow-lg btn-magnetic"
                         style={{
                           background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--navy-dark)))",
                           boxShadow: "0 4px 20px hsl(var(--primary) / 0.3)",
                         }}>
-                        <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/12 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                        <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/12 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 rounded-full" />
                         <span className="relative flex items-center justify-center gap-2">
                           {submitting ? (
                             <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Sending...</>
