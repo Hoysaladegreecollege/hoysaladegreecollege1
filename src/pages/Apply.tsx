@@ -1,11 +1,12 @@
 import SEOHead from "@/components/SEOHead";
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import { CheckCircle, Upload, GraduationCap, Phone, Calendar, User, Mail, MapPin, School, Percent, Users, X } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import { CheckCircle, Upload, GraduationCap, Phone, Calendar, User, Mail, MapPin, School, Percent, Users, X, Sparkles, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const initialForm = {
   full_name: "", email: "", phone: "", date_of_birth: "", gender: "",
@@ -17,6 +18,7 @@ export default function Apply() {
   const [form, setForm] = useState(initialForm);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [thankYouData, setThankYouData] = useState<{ appNumber: string; email: string } | null>(null);
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -71,18 +73,49 @@ export default function Apply() {
     }
 
     setSubmitting(false);
+    setThankYouData({ appNumber: data.application_number, email: form.email });
     setForm(initialForm);
     setPhotoFile(null);
-    navigate(`/application-status?app=${data.application_number}&email=${encodeURIComponent(form.email)}`);
   };
 
   const inputClass = "w-full border border-border rounded-xl px-4 py-3 font-body text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all duration-300 placeholder:text-muted-foreground/40 hover:border-primary/30";
   const selectClass = `${inputClass} appearance-none cursor-pointer`;
 
+  const trackingUrl = thankYouData ? `/application-status?app=${thankYouData.appNumber}&email=${encodeURIComponent(thankYouData.email)}` : "";
+
   return (
     <div className="page-enter">
       <SEOHead title="Apply Online - Admissions 2026-27" description="Submit your online application for admission to Hoysala Degree College." canonical="/apply" />
       <PageHeader title="Online Application" subtitle="Academic Year 2026–27" />
+
+      {/* Thank You Dialog */}
+      <Dialog open={!!thankYouData} onOpenChange={(open) => { if (!open) { setThankYouData(null); navigate(trackingUrl); } }}>
+        <DialogContent className="sm:max-w-lg text-center p-8">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-20 h-20 rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+              <CheckCircle className="w-10 h-10 text-emerald-500" />
+            </div>
+            <Sparkles className="w-6 h-6 text-secondary animate-pulse" />
+            <h2 className="font-display text-2xl font-bold text-foreground">Thank You for Applying! 🎉</h2>
+            <p className="font-body text-sm text-muted-foreground leading-relaxed max-w-sm">
+              Thank you for applying to our college. Please wait for some time — our office management will review your profile and contact you shortly.
+            </p>
+            <p className="font-body text-sm text-muted-foreground">
+              For more updates, you can track your application on the tracking page.
+            </p>
+            {thankYouData && (
+              <div className="w-full bg-muted/30 rounded-xl p-4 border border-border/40 text-left">
+                <p className="font-body text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Your Application</p>
+                <p className="font-body text-sm text-foreground"><span className="font-semibold">Application No:</span> {thankYouData.appNumber}</p>
+                <p className="font-body text-sm text-foreground"><span className="font-semibold">Email:</span> {thankYouData.email}</p>
+              </div>
+            )}
+            <Link to={trackingUrl} className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-primary text-primary-foreground font-body font-bold text-sm hover:scale-[1.02] transition-all duration-300 shadow-lg" style={{ boxShadow: "0 4px 20px hsl(var(--primary) / 0.3)" }}>
+              <ExternalLink className="w-4 h-4" /> Track Your Application
+            </Link>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <section className="py-12 sm:py-20 bg-background">
         <div className="container max-w-4xl px-4">

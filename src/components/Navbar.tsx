@@ -11,8 +11,6 @@ const aboutDropdown = [
   { label: "Placements", path: "/placements", icon: TrendingUp, desc: "Career support & stats" },
   { label: "Campus", path: "/campus", icon: Building, desc: "Virtual campus tour" },
   { label: "Alumni Network", path: "/alumni", icon: Users, desc: "Success stories" },
-  { label: "Clubs & Societies", path: "/clubs", icon: Sparkles, desc: "Student life" },
-  { label: "Library", path: "/library", icon: BookOpen, desc: "Book catalog" },
 ];
 
 const facultyDropdown = [
@@ -37,6 +35,7 @@ const navLinks = [
   { label: "Notices", path: "/notices" },
   { label: "Gallery", path: "/gallery" },
   { label: "Achievements", path: "/achievements" },
+  { label: "Question Bank", path: "/previous-year-papers" },
   { label: "Committees", path: "/committees" },
   { label: "Contact", path: "/contact" },
 ];

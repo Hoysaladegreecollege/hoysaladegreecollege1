@@ -594,27 +594,28 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* User Roles - Pie */}
-        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
-          <div className="flex items-center gap-2 mb-5">
-            <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
-              <PieChart className="w-4 h-4 text-purple-500" />
+        {/* Enrollment Trend Chart */}
+        {enrollmentData.length > 1 && (
+          <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+            <div className="flex items-center gap-2 mb-5">
+              <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 text-amber-500" />
+              </div>
+              <h3 className="font-body text-[14px] font-semibold text-foreground">Enrollment Trend</h3>
             </div>
-            <h3 className="font-body text-[14px] font-semibold text-foreground">User Roles Distribution</h3>
-          </div>
-          <div className="h-52 flex items-center justify-center">
-            {roleDistribution.length > 0 ? (
+            <div className="h-52">
               <ResponsiveContainer width="100%" height="100%">
-                <RePieChart>
-                  <Pie data={roleDistribution} cx="50%" cy="50%" innerRadius={45} outerRadius={72} paddingAngle={4} dataKey="value" label={({ name, value }) => `${name}: ${value}`} style={{ fontSize: 11, fontFamily: "Inter" }}>
-                    {roleDistribution.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
-                  </Pie>
+                <LineChart data={enrollmentData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                  <XAxis dataKey="year" tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
                   <Tooltip contentStyle={{ borderRadius: 16, fontFamily: "Inter", fontSize: 12, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }} />
-                </RePieChart>
+                  <Line type="monotone" dataKey="students" stroke="hsl(42, 70%, 52%)" strokeWidth={3} dot={{ r: 5, fill: "hsl(42, 70%, 52%)", strokeWidth: 2, stroke: "hsl(var(--card))" }} activeDot={{ r: 7, fill: "hsl(42, 70%, 52%)" }} />
+                </LineChart>
               </ResponsiveContainer>
-            ) : <Skeleton className="w-40 h-40 rounded-full" />}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Semester + Attendance Circular */}
@@ -678,28 +679,6 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Enrollment Trend */}
-      {enrollmentData.length > 1 && (
-        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
-          <div className="flex items-center gap-2 mb-5">
-            <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
-              <TrendingUp className="w-4 h-4 text-amber-500" />
-            </div>
-            <h3 className="font-body text-[14px] font-semibold text-foreground">Enrollment Trend</h3>
-          </div>
-          <div className="h-48">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={enrollmentData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                <XAxis dataKey="year" tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ borderRadius: 16, fontFamily: "Inter", fontSize: 12, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }} />
-                <Line type="monotone" dataKey="students" stroke="hsl(42, 70%, 52%)" strokeWidth={3} dot={{ r: 5, fill: "hsl(42, 70%, 52%)", strokeWidth: 2, stroke: "hsl(var(--card))" }} activeDot={{ r: 7, fill: "hsl(42, 70%, 52%)" }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      )}
 
       {/* Fee Defaulters + Semester Grid */}
       <div className="grid md:grid-cols-2 gap-4">
@@ -728,23 +707,6 @@ export default function AdminDashboard() {
           )}
         </div>
 
-        {/* Semester Grid */}
-        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
-              <GraduationCap className="w-4 h-4 text-purple-500" />
-            </div>
-            <h3 className="font-body text-[14px] font-semibold text-foreground">Semester Breakdown</h3>
-          </div>
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-            {[1,2,3,4,5,6].map((sem, i) => (
-              <div key={sem} className="text-center p-3 rounded-xl border border-border/40 hover:border-border hover:shadow-md transition-all duration-300" style={{ background: `${CHART_COLORS[i % CHART_COLORS.length]}10` }}>
-                <p className="font-body text-xl font-bold text-foreground tabular-nums">{counts?.semesterBreakdown?.[sem] || 0}</p>
-                <p className="font-body text-[10px] text-muted-foreground mt-0.5 font-medium">Sem {sem}</p>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
       {/* Semester-wise Fee Collection Chart */}

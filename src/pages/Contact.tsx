@@ -7,7 +7,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const MAPS_LINK = "https://maps.app.goo.gl/vf43fz7ZhJ8PZAUD9";
+const MAPS_LINK = "https://maps.app.goo.gl/TrQbMQQB5kqVueQAA";
 
 const contactInfo = [
   {
@@ -180,12 +180,12 @@ export default function Contact() {
                         <textarea rows={4} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className={`${inputClass} resize-none`} placeholder="Write your message here..." />
                       </div>
                       <button type="submit" disabled={submitting}
-                        className="relative w-full group overflow-hidden px-6 py-4 rounded-xl font-body text-sm font-bold text-primary-foreground transition-all duration-300 hover:scale-[1.02] hover:-translate-y-0.5 disabled:opacity-60 shadow-lg btn-magnetic"
+                        className="relative w-full group overflow-hidden px-6 py-4 rounded-full font-body text-sm font-bold text-primary-foreground transition-all duration-300 hover:scale-[1.02] hover:-translate-y-0.5 disabled:opacity-60 shadow-lg btn-magnetic"
                         style={{
                           background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--navy-dark)))",
                           boxShadow: "0 4px 20px hsl(var(--primary) / 0.3)",
                         }}>
-                        <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/12 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                        <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/12 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 rounded-full" />
                         <span className="relative flex items-center justify-center gap-2">
                           {submitting ? (
                             <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Sending...</>
@@ -208,7 +208,7 @@ export default function Contact() {
         <div className="h-[1.5px] bg-gradient-to-r from-transparent via-secondary/25 to-transparent" />
         <div className="relative overflow-hidden">
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3885.5!2d77.3892!3d13.0965!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae23a3a58ed6f1%3A0x8b0e1e6e2b3e1a0!2sHoysala%20Degree%20College!5e0!3m2!1sen!2sin!4v1"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3885.5!2d77.3892!3d13.0965!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae23a3a58ed6f1%3A0x8b0e1e6e2b3e1a0!2sHoysala%20Degree%20College%20Nelamangala!5e0!3m2!1sen!2sin!4v1"
             width="100%" height="340" style={{ border: 0, display: "block" }} allowFullScreen loading="lazy"
             className="w-full opacity-90 hover:opacity-100 transition-opacity duration-500" />
           <div className="absolute top-0 left-0 right-0 h-6 bg-gradient-to-b from-background to-transparent pointer-events-none" />
