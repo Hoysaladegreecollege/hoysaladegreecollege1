@@ -1,11 +1,12 @@
 import SEOHead from "@/components/SEOHead";
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import { CheckCircle, Upload, GraduationCap, Phone, Calendar, User, Mail, MapPin, School, Percent, Users, X } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import { CheckCircle, Upload, GraduationCap, Phone, Calendar, User, Mail, MapPin, School, Percent, Users, X, Sparkles, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const initialForm = {
   full_name: "", email: "", phone: "", date_of_birth: "", gender: "",
