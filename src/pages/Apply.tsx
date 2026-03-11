@@ -18,6 +18,7 @@ export default function Apply() {
   const [form, setForm] = useState(initialForm);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [thankYouData, setThankYouData] = useState<{ appNumber: string; email: string } | null>(null);
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
