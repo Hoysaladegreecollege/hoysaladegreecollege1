@@ -7,7 +7,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const MAPS_LINK = "https://maps.app.goo.gl/vf43fz7ZhJ8PZAUD9";
+const MAPS_LINK = "https://maps.app.goo.gl/TrQbMQQB5kqVueQAA";
 
 const contactInfo = [
   {
