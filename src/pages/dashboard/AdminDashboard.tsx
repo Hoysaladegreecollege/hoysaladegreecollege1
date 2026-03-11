@@ -679,28 +679,6 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Enrollment Trend */}
-      {enrollmentData.length > 1 && (
-        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
-          <div className="flex items-center gap-2 mb-5">
-            <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
-              <TrendingUp className="w-4 h-4 text-amber-500" />
-            </div>
-            <h3 className="font-body text-[14px] font-semibold text-foreground">Enrollment Trend</h3>
-          </div>
-          <div className="h-48">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={enrollmentData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                <XAxis dataKey="year" tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ borderRadius: 16, fontFamily: "Inter", fontSize: 12, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }} />
-                <Line type="monotone" dataKey="students" stroke="hsl(42, 70%, 52%)" strokeWidth={3} dot={{ r: 5, fill: "hsl(42, 70%, 52%)", strokeWidth: 2, stroke: "hsl(var(--card))" }} activeDot={{ r: 7, fill: "hsl(42, 70%, 52%)" }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      )}
 
       {/* Fee Defaulters + Semester Grid */}
       <div className="grid md:grid-cols-2 gap-4">
