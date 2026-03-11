@@ -113,6 +113,17 @@ export default function Achievements() {
     },
   });
 
+  // Group by year, sorted latest first
+  const yearGroups = (() => {
+    const groups: Record<string, any[]> = {};
+    topStudents.forEach((s: any) => {
+      const year = s.year || "Unknown";
+      if (!groups[year]) groups[year] = [];
+      groups[year].push(s);
+    });
+    return Object.entries(groups).sort(([a], [b]) => b.localeCompare(a));
+  })();
+
   return (
     <div className="page-enter">
       <SEOHead title="Student Achievements" description="Celebrating top rank holders and academic excellence at Hoysala Degree College." canonical="/achievements" />
@@ -136,7 +147,7 @@ export default function Achievements() {
         </div>
       </section>
 
-      {/* Stats strip — themed */}
+      {/* Stats strip */}
       <section className="py-12 sm:py-16 relative overflow-hidden bg-muted/50">
         <div className="absolute inset-0 opacity-[0.03]"
           style={{ backgroundImage: "linear-gradient(hsl(var(--secondary) / 0.3) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--secondary) / 0.3) 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
@@ -160,35 +171,39 @@ export default function Achievements() {
         </div>
       </section>
 
-      {/* Dynamic top students from DB */}
-      {(isLoading || topStudents.length > 0) && (
-        <section className="py-16 sm:py-20 bg-background relative overflow-hidden">
+      {/* Dynamic top students grouped by year */}
+      {(isLoading || yearGroups.length > 0) && yearGroups.map(([year, students]) => (
+        <section key={year} className="py-16 sm:py-20 bg-background relative overflow-hidden">
           <div className="absolute inset-0 opacity-[0.02]"
             style={{ backgroundImage: "radial-gradient(hsl(var(--secondary)) 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
           <div className="container px-4 relative">
             <ScrollReveal>
-              <SectionHeading title="🌟 More Top Achievers" subtitle="Hall of fame — students recognized by administration" />
+              <SectionHeading title={`🌟 Top Rankers ${year}`} subtitle={`Academic year ${year} — Students recognized by administration`} />
             </ScrollReveal>
-            {isLoading ? (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="rounded-3xl border border-border p-8 text-center space-y-4 bg-card">
-                    <Skeleton className="w-28 h-28 rounded-2xl mx-auto" />
-                    <Skeleton className="h-5 w-2/3 mx-auto" />
-                    <Skeleton className="h-3 w-1/2 mx-auto" />
-                    <Skeleton className="h-8 w-full rounded-xl" />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto">
-                {topStudents.map((s: any, i: number) => (
-                  <ScrollReveal key={s.id} delay={i * 100}>
-                    <RankCard a={s} />
-                  </ScrollReveal>
-                ))}
-              </div>
-            )}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto">
+              {students.map((s: any, i: number) => (
+                <ScrollReveal key={s.id} delay={i * 100}>
+                  <RankCard a={s} />
+                </ScrollReveal>
+              ))}
+            </div>
+          </div>
+        </section>
+      ))}
+
+      {isLoading && (
+        <section className="py-16 sm:py-20 bg-background">
+          <div className="container px-4">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="rounded-3xl border border-border p-8 text-center space-y-4 bg-card">
+                  <Skeleton className="w-28 h-28 rounded-2xl mx-auto" />
+                  <Skeleton className="h-5 w-2/3 mx-auto" />
+                  <Skeleton className="h-3 w-1/2 mx-auto" />
+                  <Skeleton className="h-8 w-full rounded-xl" />
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       )}

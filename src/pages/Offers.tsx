@@ -113,7 +113,7 @@ export default function Offers() {
                     {/* Actions */}
                     <div className="flex gap-3">
                       <button
-                        onClick={() => setPreviewPdf(offer.pdf)}
+                        onClick={() => window.open(offer.pdf, '_blank', 'noopener,noreferrer')}
                         className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-primary/10 hover:bg-primary/20 text-primary text-sm font-semibold transition-all duration-300 border border-primary/20 hover:border-primary/30 active:scale-[0.97]"
                       >
                         <Eye className="w-4 h-4" /> View
