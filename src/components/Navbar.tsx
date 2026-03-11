@@ -35,6 +35,7 @@ const navLinks = [
   { label: "Notices", path: "/notices" },
   { label: "Gallery", path: "/gallery" },
   { label: "Achievements", path: "/achievements" },
+  { label: "Question Bank", path: "/previous-year-papers" },
   { label: "Committees", path: "/committees" },
   { label: "Contact", path: "/contact" },
 ];
