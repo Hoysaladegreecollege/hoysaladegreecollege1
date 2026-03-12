@@ -275,17 +275,17 @@ export default function Apply() {
               </div>
 
               {/* Submit */}
-              <div className="flex gap-3 pt-3 border-t border-border/50">
+              <div className="flex flex-col sm:flex-row gap-3 pt-3 border-t border-border/50">
                 <Button type="button" variant="outline" onClick={() => navigate("/admissions")}
-                  className="font-body rounded-xl flex-1 h-12 hover:bg-muted transition-colors text-sm">Cancel</Button>
+                  className="font-body rounded-full flex-1 h-12 hover:bg-muted transition-colors text-sm order-2 sm:order-1">Cancel</Button>
                 <button type="submit" disabled={submitting}
-                  className="relative flex-1 group overflow-hidden h-12 rounded-xl font-body text-sm font-bold text-primary-foreground transition-all duration-300 hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100 bg-primary"
-                  style={{ boxShadow: "0 4px 24px hsl(var(--primary) / 0.3)" }}>
-                  <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl" />
-                  <span className="relative flex items-center justify-center gap-2">
+                  className="relative flex-1 group overflow-hidden h-14 sm:h-12 rounded-full font-body text-sm font-bold text-primary-foreground transition-all duration-500 hover:scale-[1.03] hover:-translate-y-0.5 disabled:opacity-60 disabled:hover:scale-100 order-1 sm:order-2"
+                  style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.85))", boxShadow: "0 6px 30px hsl(var(--primary) / 0.35)" }}>
+                  <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/15 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 rounded-full" />
+                  <span className="relative flex items-center justify-center gap-2.5">
                     {submitting ?
                       <><span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> Submitting...</> :
-                      <><CheckCircle className="w-4 h-4" /> Submit Application</>
+                      <><CheckCircle className="w-5 h-5" /> Submit Application</>
                     }
                   </span>
                 </button>
