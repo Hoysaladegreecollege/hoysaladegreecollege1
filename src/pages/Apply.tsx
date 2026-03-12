@@ -51,7 +51,7 @@ export default function Apply() {
       mother_name: form.mother_name || null, address: form.address || null,
       previous_school: form.previous_school || null, percentage_12th: form.percentage_12th || null,
       photo_url: photoUrl
-    }).select("application_number, id").single();
+    }).select("application_number").maybeSingle();
 
     if (error) {
       setSubmitting(false);
