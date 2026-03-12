@@ -77,12 +77,49 @@ export default function AdminStudentFeeDetail() {
       const upiInfo = (payForm.payment_method === "Online" || payForm.payment_method === "UPI") && payForm.upi_number
         ? `[UPI: ${payForm.upi_number}] ` : "";
       const remarks = `${upiInfo}${payForm.remarks || ""}`.trim();
+      const paymentSemester = payForm.semester ? parseInt(payForm.semester) : (student.semester || 1);
+
       await supabase.from("fee_payments").insert({
         student_id: student.id, amount, payment_method: payForm.payment_method,
         remarks, receipt_number, recorded_by: user?.id,
-        semester: payForm.semester ? parseInt(payForm.semester) : (student.semester || null),
+        semester: paymentSemester,
       });
       await supabase.from("students").update({ fee_paid: newPaid }).eq("id", student.id);
+
+      // Overpayment carry-forward logic
+      const { data: semFeesData } = await supabase.from("semester_fees").select("semester, fee_amount").eq("student_id", student.id).order("semester");
+      const { data: allSemPayments } = await supabase.from("fee_payments").select("semester, amount").eq("student_id", student.id);
+      
+      if (semFeesData && semFeesData.length > 0 && allSemPayments) {
+        const semPaidMap: Record<number, number> = {};
+        allSemPayments.forEach((p: any) => { const s = p.semester || 0; semPaidMap[s] = (semPaidMap[s] || 0) + Number(p.amount); });
+        
+        const semFee = semFeesData.find((sf: any) => sf.semester === paymentSemester);
+        if (semFee) {
+          const semFeeAmount = Number(semFee.fee_amount);
+          const totalSemPaid = semPaidMap[paymentSemester] || 0;
+          const excess = totalSemPaid - semFeeAmount;
+          
+          if (excess > 0) {
+            // Find next semester that has unpaid balance
+            const nextSem = semFeesData.find((sf: any) => {
+              if (sf.semester <= paymentSemester) return false;
+              const nextPaid = semPaidMap[sf.semester] || 0;
+              return nextPaid < Number(sf.fee_amount);
+            });
+            
+            if (nextSem) {
+              await supabase.from("fee_payments").insert({
+                student_id: student.id, amount: excess, payment_method: payForm.payment_method,
+                remarks: `Auto carry-forward from Semester ${paymentSemester}`,
+                receipt_number: `CF-${Date.now().toString().slice(-6)}`,
+                recorded_by: user?.id, semester: nextSem.semester,
+              });
+            }
+          }
+        }
+      }
+
       const studentEmail = student.profile?.email;
       if (studentEmail) {
         try {
@@ -330,12 +367,20 @@ export default function AdminStudentFeeDetail() {
               <Download className="w-3.5 h-3.5" /> CSV
             </Button>
             <Button size="sm" variant="outline" className="gap-1.5 text-xs rounded-xl border-border/60 hover:bg-muted/50" asChild>
-              <a
-                href={`https://wa.me/${(student.parent_phone || student.phone || student.profile?.phone || "").replace(/\D/g, "").replace(/^0/, "91")}?text=${encodeURIComponent(`Dear ${student.profile?.full_name || "Student"},\n\nThis is a reminder from Hoysala Degree College regarding your pending fee of ₹${totalDue.toLocaleString()}.\n\nPlease clear your dues at the earliest.\n\nRoll No: ${student.roll_number}\nCourse: ${student.courses?.name || ""}\n${student.fee_due_date ? `Due Date: ${new Date(student.fee_due_date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}` : ""}\n\nThank you,\nHoysala Degree College`)}`}
-                target="_blank" rel="noopener noreferrer"
-              >
-                <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
-              </a>
+              {(() => {
+                const currentSemFeeObj = existingSemFees.find((sf: any) => sf.semester === currentSemester);
+                const currentSemFeeAmount = currentSemFeeObj ? Number(currentSemFeeObj.fee_amount) : perSemFee;
+                const currentSemPaid = semPayments[currentSemester] || 0;
+                const currentSemBalance = Math.max(0, currentSemFeeAmount - currentSemPaid);
+                return (
+                  <a
+                    href={`https://wa.me/${(student.parent_phone || student.phone || student.profile?.phone || "").replace(/\D/g, "").replace(/^0/, "91")}?text=${encodeURIComponent(`Dear ${student.profile?.full_name || "Student"},\n\nThis is a reminder from Hoysala Degree College regarding your pending fee of ₹${currentSemBalance.toLocaleString()} for Semester ${currentSemester}.\n\nPlease clear your dues at the earliest.\n\nRoll No: ${student.roll_number}\nCourse: ${student.courses?.name || ""}\nSemester: ${currentSemester}\n${student.fee_due_date ? `Due Date: ${new Date(student.fee_due_date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}` : ""}\n\nThank you,\nHoysala Degree College`)}`}
+                    target="_blank" rel="noopener noreferrer"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
+                  </a>
+                );
+              })()}
             </Button>
           </div>
         </div>
@@ -705,6 +750,9 @@ export default function AdminStudentFeeDetail() {
               </div>
               <button onClick={printReport} className="w-full py-3 rounded-xl bg-primary/10 border border-primary/20 text-primary font-body font-semibold text-sm hover:bg-primary/15 transition-colors flex items-center justify-center gap-2">
                 <Printer className="w-4 h-4" /> Print / Download Receipt
+              </button>
+              <button onClick={() => setShowReceipt(false)} className="w-full py-3 rounded-xl border border-border/40 text-muted-foreground font-body font-semibold text-sm hover:bg-muted/30 transition-colors flex items-center justify-center gap-2">
+                Close
               </button>
             </div>
           )}
