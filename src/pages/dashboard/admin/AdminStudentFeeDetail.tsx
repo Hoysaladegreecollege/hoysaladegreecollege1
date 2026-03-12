@@ -330,12 +330,20 @@ export default function AdminStudentFeeDetail() {
               <Download className="w-3.5 h-3.5" /> CSV
             </Button>
             <Button size="sm" variant="outline" className="gap-1.5 text-xs rounded-xl border-border/60 hover:bg-muted/50" asChild>
-              <a
-                href={`https://wa.me/${(student.parent_phone || student.phone || student.profile?.phone || "").replace(/\D/g, "").replace(/^0/, "91")}?text=${encodeURIComponent(`Dear ${student.profile?.full_name || "Student"},\n\nThis is a reminder from Hoysala Degree College regarding your pending fee of ₹${totalDue.toLocaleString()}.\n\nPlease clear your dues at the earliest.\n\nRoll No: ${student.roll_number}\nCourse: ${student.courses?.name || ""}\n${student.fee_due_date ? `Due Date: ${new Date(student.fee_due_date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}` : ""}\n\nThank you,\nHoysala Degree College`)}`}
-                target="_blank" rel="noopener noreferrer"
-              >
-                <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
-              </a>
+              {(() => {
+                const currentSemFeeObj = existingSemFees.find((sf: any) => sf.semester === currentSemester);
+                const currentSemFeeAmount = currentSemFeeObj ? Number(currentSemFeeObj.fee_amount) : perSemFee;
+                const currentSemPaid = semPayments[currentSemester] || 0;
+                const currentSemBalance = Math.max(0, currentSemFeeAmount - currentSemPaid);
+                return (
+                  <a
+                    href={`https://wa.me/${(student.parent_phone || student.phone || student.profile?.phone || "").replace(/\D/g, "").replace(/^0/, "91")}?text=${encodeURIComponent(`Dear ${student.profile?.full_name || "Student"},\n\nThis is a reminder from Hoysala Degree College regarding your pending fee of ₹${currentSemBalance.toLocaleString()} for Semester ${currentSemester}.\n\nPlease clear your dues at the earliest.\n\nRoll No: ${student.roll_number}\nCourse: ${student.courses?.name || ""}\nSemester: ${currentSemester}\n${student.fee_due_date ? `Due Date: ${new Date(student.fee_due_date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}` : ""}\n\nThank you,\nHoysala Degree College`)}`}
+                    target="_blank" rel="noopener noreferrer"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
+                  </a>
+                );
+              })()}
             </Button>
           </div>
         </div>
