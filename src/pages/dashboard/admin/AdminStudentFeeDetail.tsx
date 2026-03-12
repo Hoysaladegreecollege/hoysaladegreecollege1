@@ -714,6 +714,9 @@ export default function AdminStudentFeeDetail() {
               <button onClick={printReport} className="w-full py-3 rounded-xl bg-primary/10 border border-primary/20 text-primary font-body font-semibold text-sm hover:bg-primary/15 transition-colors flex items-center justify-center gap-2">
                 <Printer className="w-4 h-4" /> Print / Download Receipt
               </button>
+              <button onClick={() => setShowReceipt(false)} className="w-full py-3 rounded-xl border border-border/40 text-muted-foreground font-body font-semibold text-sm hover:bg-muted/30 transition-colors flex items-center justify-center gap-2">
+                Close
+              </button>
             </div>
           )}
         </DialogContent>

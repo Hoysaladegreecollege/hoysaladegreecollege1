@@ -1135,6 +1135,9 @@ export default function AdminFeeManagement() {
               <Button onClick={printReceipt} className="w-full rounded-xl font-body bg-gradient-to-r from-primary to-primary/90 hover:opacity-90 shadow-lg shadow-primary/20">
                 <Printer className="w-4 h-4 mr-2" /> Print / Download Receipt
               </Button>
+              <Button variant="outline" onClick={() => setReceiptPayment(null)} className="w-full rounded-xl font-body border-border/40">
+                Close
+              </Button>
             </div>
           )}
         </DialogContent>

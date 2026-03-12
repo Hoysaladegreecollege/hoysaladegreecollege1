@@ -133,25 +133,35 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3 pb-3 space-y-0.5">
-          {navItems.map((item) => {
+          {navItems.map((item, i) => {
             const active = location.pathname === item.path;
             return (
               <Link
                 key={item.path}
                 to={item.path}
                 onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg font-body text-[13px] transition-all duration-200 ${
+                className={`relative flex items-center gap-2.5 px-3 py-2 rounded-lg font-body text-[13px] transition-all duration-300 group/nav ${
                   active
                     ? "bg-white/12 text-white font-medium"
                     : "text-white/50 hover:bg-white/6 hover:text-white/80"
                 }`}
+                style={{ animation: `sidebar-item-in 0.4s cubic-bezier(0.16,1,0.3,1) ${i * 60}ms both` }}
               >
-                <item.icon className={`w-[16px] h-[16px] shrink-0 ${active ? "text-white/90" : "text-white/40"}`} />
+                {active && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-4 rounded-full" style={{ background: "linear-gradient(180deg, hsl(42,75%,55%), hsl(42,75%,65%))", boxShadow: "0 0 8px hsla(42,75%,55%,0.4)" }} />}
+                <item.icon className={`w-[16px] h-[16px] shrink-0 transition-all duration-300 ${active ? "text-[hsl(42,75%,60%)]" : "text-white/40 group-hover/nav:text-white/60"}`} />
                 <span className="truncate">{item.label}</span>
+                {active && <div className="absolute right-2 w-1 h-1 rounded-full bg-[hsl(42,75%,55%)] animate-pulse" />}
               </Link>
             );
           })}
         </nav>
+
+        <style>{`
+          @keyframes sidebar-item-in {
+            0% { opacity: 0; transform: translateX(-8px); }
+            100% { opacity: 1; transform: translateX(0); }
+          }
+        `}</style>
 
         <div className="px-3 py-4 border-t border-white/8 shrink-0">
           <div className="flex items-center gap-2.5 px-3 mb-3">

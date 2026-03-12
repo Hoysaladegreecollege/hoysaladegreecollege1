@@ -48,6 +48,7 @@ const dropdownMap: Record<string, typeof aboutDropdown> = {
   about: aboutDropdown,
   faculty: facultyDropdown,
   admissions: admissionsDropdown,
+  other: otherDropdown,
 };
 
 export default function Navbar() {

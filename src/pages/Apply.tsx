@@ -53,8 +53,9 @@ export default function Apply() {
       photo_url: photoUrl
     }).select("application_number").maybeSingle();
 
-    if (error) {
+    if (error || !data) {
       setSubmitting(false);
+      console.error("Application submission error:", error);
       toast.error("Failed to submit application. Please try again.");
       return;
     }
