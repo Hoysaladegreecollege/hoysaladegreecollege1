@@ -218,6 +218,7 @@ export default function AdminFeeManagement() {
     setPinError("");
     if (pinInput === pinData) {
       setPinUnlocked(true);
+      sessionStorage.setItem("hdc-fee-pin-unlocked", "1");
       setPinChecking(false);
       setFailedAttempts(0);
     } else {
