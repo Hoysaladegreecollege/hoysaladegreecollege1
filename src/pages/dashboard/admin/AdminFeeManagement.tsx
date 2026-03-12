@@ -241,8 +241,16 @@ export default function AdminFeeManagement() {
   useEffect(() => {
     if (!pinLoading && !pinData) {
       setPinUnlocked(true);
+      sessionStorage.setItem("hdc-fee-pin-unlocked", "1");
     }
   }, [pinLoading, pinData]);
+
+  // Clear PIN on page unload (reload/close)
+  useEffect(() => {
+    const handleUnload = () => sessionStorage.removeItem("hdc-fee-pin-unlocked");
+    window.addEventListener("beforeunload", handleUnload);
+    return () => window.removeEventListener("beforeunload", handleUnload);
+  }, []);
 
   // Loading state
   if (pinLoading) {
