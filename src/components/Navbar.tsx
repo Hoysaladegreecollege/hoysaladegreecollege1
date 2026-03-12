@@ -25,6 +25,13 @@ const admissionsDropdown = [
   { label: "Track Application", path: "/application-status", icon: FileText, desc: "Check your status" },
 ];
 
+const otherDropdown = [
+  { label: "Committees", path: "/committees", icon: Users, desc: "College committees" },
+  { label: "Question Bank", path: "/previous-year-papers", icon: BookOpen, desc: "Previous year papers" },
+  { label: "Achievements", path: "/achievements", icon: TrendingUp, desc: "Top rankers & awards" },
+  { label: "Notices", path: "/notices", icon: FileText, desc: "Important announcements" },
+];
+
 const navLinks = [
   { label: "Home", path: "/" },
   { label: "About", path: "/about", hasDropdown: true, dropdownKey: "about" },
@@ -32,11 +39,8 @@ const navLinks = [
   { label: "Admissions", path: "/admissions", hasDropdown: true, dropdownKey: "admissions" },
   { label: "Faculty", path: "/faculty", hasDropdown: true, dropdownKey: "faculty" },
   { label: "Events", path: "/events" },
-  { label: "Notices", path: "/notices" },
   { label: "Gallery", path: "/gallery" },
-  { label: "Achievements", path: "/achievements" },
-  { label: "Question Bank", path: "/previous-year-papers" },
-  { label: "Committees", path: "/committees" },
+  { label: "Other", path: "#", hasDropdown: true, dropdownKey: "other" },
   { label: "Contact", path: "/contact" },
 ];
 
