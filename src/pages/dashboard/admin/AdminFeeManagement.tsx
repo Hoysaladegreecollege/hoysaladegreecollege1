@@ -85,6 +85,15 @@ export default function AdminFeeManagement() {
     enabled: !!selectedStudent,
   });
 
+  // Fetch all semester fees for defaulters calculation
+  const { data: allSemesterFees = [] } = useQuery({
+    queryKey: ["all-semester-fees"],
+    queryFn: async () => {
+      const { data } = await supabase.from("semester_fees").select("student_id, semester, fee_amount").order("semester");
+      return data || [];
+    },
+  });
+
   const { data: allPayments = [] } = useQuery({
     queryKey: ["all-fee-payments"],
     queryFn: async () => {
