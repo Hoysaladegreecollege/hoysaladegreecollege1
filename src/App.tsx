@@ -224,7 +224,8 @@ const App = () => (
             <Route path="/dashboard/admin/post-notice" element={<AdminRoute><AdminPostNotice /></AdminRoute>} />
             <Route path="/dashboard/admin/semester-promotion" element={<AdminRoute><AdminSemesterPromotion /></AdminRoute>} />
             <Route path="/dashboard/admin/academic-years" element={<AdminRoute><AdminAcademicYear /></AdminRoute>} />
-            <Route path="/dashboard/admin/absent-report" element={<AdminRoute><AdminAbsentReport /></AdminRoute>} />
+            <Route path="/dashboard/admin/absent-report" element={<AdminRoute><AdminAttendanceHub /></AdminRoute>} />
+            <Route path="/dashboard/admin/attendance" element={<AdminRoute><AdminAttendanceHub /></AdminRoute>} />
             <Route path="/dashboard/admin/gallery" element={<AdminRoute><AdminGallery /></AdminRoute>} />
             <Route path="/dashboard/admin/birthday-settings" element={<AdminRoute><AdminBirthdaySettings /></AdminRoute>} />
             <Route path="/dashboard/admin/add-staff" element={<AdminRoute><AdminAddStaff /></AdminRoute>} />
