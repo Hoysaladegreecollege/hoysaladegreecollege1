@@ -594,29 +594,55 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Enrollment Trend Chart */}
-        {enrollmentData.length > 1 && (
-          <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
-            <div className="flex items-center gap-2 mb-5">
-              <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 text-amber-500" />
-              </div>
-              <h3 className="font-body text-[14px] font-semibold text-foreground">Enrollment Trend</h3>
+        {/* Fee Defaulters — fills right side */}
+        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center">
+              <AlertTriangle className="w-4 h-4 text-red-500" />
             </div>
-            <div className="h-52">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={enrollmentData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                  <XAxis dataKey="year" tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={{ borderRadius: 16, fontFamily: "Inter", fontSize: 12, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }} />
-                  <Line type="monotone" dataKey="students" stroke="hsl(42, 70%, 52%)" strokeWidth={3} dot={{ r: 5, fill: "hsl(42, 70%, 52%)", strokeWidth: 2, stroke: "hsl(var(--card))" }} activeDot={{ r: 7, fill: "hsl(42, 70%, 52%)" }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+            <h3 className="font-body text-[14px] font-semibold text-foreground">Fee Defaulters</h3>
+            {feeDefaulters.length > 0 && <span className="font-body text-[11px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-500 font-medium">{feeDefaulters.length}</span>}
           </div>
-        )}
+          {feeDefaulters.length === 0 ? (
+            <p className="font-body text-[13px] text-muted-foreground text-center py-8">No fee defaulters found</p>
+          ) : (
+            <div className="space-y-1.5 max-h-[260px] overflow-y-auto">
+              {feeDefaulters.map((s: any) => (
+                <div key={s.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors duration-200">
+                  <div className="min-w-0">
+                    <p className="font-body text-[13px] font-medium text-foreground truncate">{s.name}</p>
+                    <p className="font-body text-[11px] text-muted-foreground">{s.roll_number} · {s.courses?.code || "—"}</p>
+                  </div>
+                  <p className="font-body text-[13px] font-semibold text-red-500 shrink-0 ml-3 tabular-nums">₹{s.due.toLocaleString()}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Enrollment Trend — full width when present */}
+      {enrollmentData.length > 1 && (
+        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
+          <div className="flex items-center gap-2 mb-5">
+            <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
+              <TrendingUp className="w-4 h-4 text-amber-500" />
+            </div>
+            <h3 className="font-body text-[14px] font-semibold text-foreground">Enrollment Trend</h3>
+          </div>
+          <div className="h-52">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={enrollmentData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                <XAxis dataKey="year" tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fontFamily: "Inter", fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{ borderRadius: 16, fontFamily: "Inter", fontSize: 12, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }} />
+                <Line type="monotone" dataKey="students" stroke="hsl(42, 70%, 52%)" strokeWidth={3} dot={{ r: 5, fill: "hsl(42, 70%, 52%)", strokeWidth: 2, stroke: "hsl(var(--card))" }} activeDot={{ r: 7, fill: "hsl(42, 70%, 52%)" }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )
 
       {/* Semester + Attendance Circular */}
       <div className="grid md:grid-cols-2 gap-4">
