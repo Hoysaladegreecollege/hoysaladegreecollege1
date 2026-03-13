@@ -53,24 +53,34 @@ export default function Footer() {
       {/* Dot pattern */}
       <div className="absolute inset-0 opacity-[0.015] pointer-events-none" style={{ backgroundImage: "radial-gradient(hsl(var(--foreground) / 0.5) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
 
-      {/* Newsletter / CTA strip */}
-      <div className="relative border-b border-border/50">
-        <div className="container py-8 sm:py-10 px-5 sm:px-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-5">
-            <div className="flex items-center gap-3 text-center sm:text-left">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-secondary/10 border border-secondary/15">
-                <GraduationCap className="w-5 h-5 text-secondary" />
+      {/* Ultra-premium CTA strip */}
+      <div className="relative border-b border-border/50 overflow-hidden">
+        {/* Animated ambient orbs */}
+        <div className="absolute top-1/2 left-[15%] -translate-y-1/2 w-[250px] h-[250px] rounded-full blur-[120px] pointer-events-none bg-secondary/[0.06] animate-pulse" />
+        <div className="absolute top-1/2 right-[10%] -translate-y-1/2 w-[200px] h-[200px] rounded-full blur-[100px] pointer-events-none bg-primary/[0.04]" />
+        
+        <div className="container py-10 sm:py-14 px-5 sm:px-4 relative">
+          <div className="relative flex flex-col sm:flex-row items-center justify-between gap-6 p-6 sm:p-8 rounded-3xl border border-secondary/15 bg-gradient-to-br from-secondary/[0.04] via-card to-secondary/[0.02] backdrop-blur-xl overflow-hidden">
+            {/* Shimmer sweep */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-secondary/[0.04] to-transparent animate-[shimmer_4s_ease-in-out_infinite] pointer-events-none" />
+            {/* Decorative corner accents */}
+            <div className="absolute top-0 left-0 w-20 h-20 border-t border-l border-secondary/15 rounded-tl-3xl pointer-events-none" />
+            <div className="absolute bottom-0 right-0 w-20 h-20 border-b border-r border-secondary/15 rounded-br-3xl pointer-events-none" />
+            
+            <div className="flex items-center gap-4 text-center sm:text-left relative z-10">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 bg-secondary/10 border border-secondary/20 shadow-lg shadow-secondary/10">
+                <GraduationCap className="w-7 h-7 text-secondary" />
               </div>
               <div>
-                <p className="font-display text-base sm:text-lg font-bold text-foreground/90">Start Your Journey Today</p>
-                <p className="font-body text-xs text-muted-foreground">Admissions open for 2026–27 academic year</p>
+                <p className="font-display text-lg sm:text-xl font-bold text-foreground tracking-[-0.01em]">Start Your Journey Today</p>
+                <p className="font-body text-xs sm:text-sm text-muted-foreground mt-0.5">Admissions open for 2026–27 academic year</p>
               </div>
             </div>
             <Link
               to="/admissions"
-              className="group relative inline-flex items-center gap-2 px-6 py-3 rounded-full font-body text-sm font-semibold transition-all duration-400 overflow-hidden border bg-secondary text-secondary-foreground border-secondary/30 hover:shadow-lg hover:shadow-secondary/20"
+              className="group relative inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full font-body text-sm font-semibold transition-all duration-500 overflow-hidden border bg-secondary text-secondary-foreground border-secondary/30 hover:shadow-[0_8px_30px_-5px_hsl(var(--secondary)/0.35)] hover:scale-[1.03] active:scale-[0.98] z-10"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-600 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 pointer-events-none" />
               <span className="relative z-10">Apply Now</span>
               <ArrowUpRight className="w-4 h-4 relative z-10 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
             </Link>
