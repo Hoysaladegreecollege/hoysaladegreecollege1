@@ -93,6 +93,7 @@ const AdminPostNotice = lazy(() => import("./pages/dashboard/admin/AdminPostNoti
 const AdminSemesterPromotion = lazy(() => import("./pages/dashboard/admin/AdminSemesterPromotion"));
 const AdminAcademicYear = lazy(() => import("./pages/dashboard/admin/AdminAcademicYear"));
 const AdminAbsentReport = lazy(() => import("./pages/dashboard/admin/AdminAbsentReport"));
+const AdminAttendanceHub = lazy(() => import("./pages/dashboard/admin/AdminAttendanceHub"));
 const AdminGallery = lazy(() => import("./pages/dashboard/admin/AdminGallery"));
 const AdminBirthdaySettings = lazy(() => import("./pages/dashboard/admin/AdminBirthdaySettings"));
 const AdminAddStaff = lazy(() => import("./pages/dashboard/admin/AdminAddStaff"));
