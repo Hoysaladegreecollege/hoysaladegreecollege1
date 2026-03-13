@@ -915,7 +915,7 @@ export default function AdminFeeManagement() {
               <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-3">
                 <CheckCircle className="w-7 h-7 text-emerald-400" />
               </div>
-              <p className="font-body text-sm text-muted-foreground">All current semester fees are cleared! 🎉</p>
+              <p className="font-body text-sm text-muted-foreground">All current & previous semester fees are cleared! 🎉</p>
             </div>
           );
           const bySemester: Record<number, any[]> = {};
