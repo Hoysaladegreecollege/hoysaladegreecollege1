@@ -896,7 +896,13 @@ export default function AdminFeeManagement() {
             const curSem = s.semester || 1;
             const curSemFee = semFeeMap[s.id]?.[curSem] || ((s.total_fee || 0) / 6);
             const curSemPaid = semPayMap[s.id]?.[curSem] || 0;
-            return curSemFee > 0 && curSemPaid < curSemFee;
+            const curDue = curSemFee > 0 && curSemPaid < curSemFee;
+            // Also check previous semester
+            const prevSem = curSem - 1;
+            const prevSemFee = prevSem >= 1 ? (semFeeMap[s.id]?.[prevSem] || ((s.total_fee || 0) / 6)) : 0;
+            const prevSemPaid = prevSem >= 1 ? (semPayMap[s.id]?.[prevSem] || 0) : 0;
+            const prevDue = prevSem >= 1 && prevSemFee > 0 && prevSemPaid < prevSemFee;
+            return curDue || prevDue;
           });
 
           if (defaulters.length === 0) return (
