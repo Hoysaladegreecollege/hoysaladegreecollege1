@@ -31,37 +31,124 @@
     <style>
       #root-loader {
         position: fixed; inset: 0; z-index: 9999;
-        display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 20px;
-        background: #070810;
-        transition: opacity 0.4s ease, transform 0.4s ease;
+        display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 24px;
+        background: #050608;
+        overflow: hidden;
+        transition: opacity 0.6s cubic-bezier(0.4,0,0.2,1), transform 0.6s cubic-bezier(0.4,0,0.2,1);
       }
-      #root-loader.hide { opacity: 0; pointer-events: none; }
-      .rl-logo-img-wrap {
-        width: 72px; height: 72px; border-radius: 16px; overflow: hidden;
-        background: rgba(255,255,255,0.95);
-        box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+      #root-loader.hide { opacity: 0; transform: scale(1.02); pointer-events: none; }
+
+      /* Ambient background glow */
+      .rl-bg-glow {
+        position: absolute; border-radius: 50%; pointer-events: none; filter: blur(60px);
       }
-      .rl-logo-img-wrap img { width: 100%; height: 100%; object-fit: contain; }
+      .rl-bg-glow-1 {
+        width: 400px; height: 400px; top: 30%; left: 50%; transform: translate(-50%, -50%);
+        background: radial-gradient(circle, hsla(42,80%,50%,0.08), transparent 70%);
+        animation: rl-glow-pulse 3s ease-in-out infinite alternate;
+      }
+      .rl-bg-glow-2 {
+        width: 250px; height: 250px; bottom: 20%; right: 25%;
+        background: radial-gradient(circle, hsla(220,80%,55%,0.05), transparent 70%);
+        animation: rl-glow-pulse 4s ease-in-out 1s infinite alternate;
+      }
+      .rl-bg-glow-3 {
+        width: 180px; height: 180px; top: 15%; left: 20%;
+        background: radial-gradient(circle, hsla(42,80%,50%,0.04), transparent 70%);
+        animation: rl-glow-pulse 3.5s ease-in-out 0.5s infinite alternate;
+      }
+
+      /* Orbital ring */
+      .rl-orbit {
+        position: absolute; top: 50%; left: 50%; width: 200px; height: 200px;
+        transform: translate(-50%, -50%);
+        animation: rl-orbit-spin 12s linear infinite;
+        pointer-events: none;
+      }
+      .rl-orbit-dot {
+        position: absolute; width: 3px; height: 3px; border-radius: 50%;
+        top: 50%; left: 50%;
+        box-shadow: 0 0 8px hsla(42,75%,55%,0.4);
+      }
+
+      /* Logo container */
+      .rl-logo-container {
+        position: relative; z-index: 2;
+        animation: rl-logo-entrance 1s cubic-bezier(0.16,1,0.3,1) forwards;
+        opacity: 0;
+      }
+      .rl-logo-ring {
+        width: 100px; height: 100px; border-radius: 24px; padding: 3px;
+        background: linear-gradient(135deg, hsla(42,80%,55%,0.6), hsla(42,80%,55%,0.1), hsla(220,80%,60%,0.3));
+        box-shadow: 0 12px 50px rgba(0,0,0,0.4), 0 0 40px hsla(42,75%,55%,0.08);
+        animation: rl-ring-glow 2s ease-in-out infinite alternate;
+      }
+      .rl-logo-inner {
+        width: 100%; height: 100%; border-radius: 21px; overflow: hidden;
+        background: rgba(255,255,255,0.97);
+        display: flex; align-items: center; justify-content: center;
+      }
+      .rl-logo-inner img { width: 85%; height: 85%; object-fit: contain; }
+
+      /* Text */
+      .rl-text-wrap {
+        position: relative; z-index: 2; text-align: center;
+        animation: rl-text-entrance 0.7s cubic-bezier(0.16,1,0.3,1) 0.35s both;
+      }
       .rl-title {
         font-family: 'Playfair Display', Georgia, serif;
-        font-size: 20px; font-weight: 700; color: rgba(255,255,255,0.9);
-        margin: 0;
+        font-size: 24px; font-weight: 700;
+        background: linear-gradient(135deg, rgba(255,255,255,0.95), hsla(42,75%,65%,0.9));
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin: 0; letter-spacing: 0.02em;
       }
       .rl-subtitle {
         font-family: 'Inter', system-ui, sans-serif;
-        font-size: 10px; color: rgba(255,255,255,0.4);
-        letter-spacing: 0.2em; text-transform: uppercase; margin-top: 4px;
+        font-size: 10px; color: rgba(255,255,255,0.35);
+        letter-spacing: 0.25em; text-transform: uppercase; margin-top: 8px;
+      }
+      .rl-divider {
+        width: 40px; height: 1px; margin: 12px auto 0;
+        background: linear-gradient(90deg, transparent, hsla(42,75%,55%,0.3), transparent);
+      }
+
+      /* Progress bar */
+      .rl-progress-wrap {
+        position: relative; z-index: 2;
+        animation: rl-text-entrance 0.5s cubic-bezier(0.16,1,0.3,1) 0.6s both;
       }
       .rl-progress {
-        width: 160px; height: 3px; border-radius: 99px;
-        background: rgba(255,255,255,0.08); overflow: hidden;
+        width: 180px; height: 2px; border-radius: 99px;
+        background: rgba(255,255,255,0.06); overflow: hidden;
+        position: relative;
       }
       .rl-progress-bar {
         height: 100%; border-radius: 99px; width: 0%;
-        background: linear-gradient(90deg, hsl(42,75%,55%), hsl(42,75%,65%));
+        background: linear-gradient(90deg, hsla(42,75%,55%,0.9), hsla(42,75%,65%,1));
+        animation: rl-fill 2.5s ease-out forwards;
+        box-shadow: 0 0 16px hsla(42,75%,55%,0.5);
+      }
+      .rl-progress-glow {
+        position: absolute; top: -4px; right: 0; width: 20px; height: 10px;
+        background: hsla(42,75%,55%,0.6); border-radius: 50%; filter: blur(4px);
         animation: rl-fill 2.5s ease-out forwards;
       }
+
+      /* Floating particles */
+      .rl-particle {
+        position: absolute; border-radius: 50%; pointer-events: none;
+        background: hsla(42,75%,55%,0.15);
+      }
+
+      @keyframes rl-glow-pulse { 0% { opacity: 0.4; transform: translate(-50%,-50%) scale(1); } 100% { opacity: 1; transform: translate(-50%,-50%) scale(1.15); } }
+      @keyframes rl-orbit-spin { 0% { transform: translate(-50%,-50%) rotate(0deg); } 100% { transform: translate(-50%,-50%) rotate(360deg); } }
+      @keyframes rl-logo-entrance { 0% { opacity: 0; transform: scale(0.6) translateY(10px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+      @keyframes rl-text-entrance { 0% { opacity: 0; transform: translateY(12px); } 100% { opacity: 1; transform: translateY(0); } }
+      @keyframes rl-ring-glow { 0% { box-shadow: 0 12px 50px rgba(0,0,0,0.4), 0 0 30px hsla(42,75%,55%,0.06); } 100% { box-shadow: 0 12px 50px rgba(0,0,0,0.4), 0 0 50px hsla(42,75%,55%,0.12); } }
       @keyframes rl-fill { to { width: 100%; } }
+      @keyframes rl-float-1 { 0% { transform: translateY(0) translateX(0); opacity: 0.1; } 50% { opacity: 0.4; } 100% { transform: translateY(-30px) translateX(15px); opacity: 0.05; } }
+      @keyframes rl-float-2 { 0% { transform: translateY(0) translateX(0); opacity: 0.15; } 50% { opacity: 0.35; } 100% { transform: translateY(-25px) translateX(-10px); opacity: 0.05; } }
     </style>
 
     
@@ -91,16 +178,57 @@
   <meta name="twitter:description" content="Hoysala Degree College is a Bangalore University–affiliated institution committed to delivering quality higher education . visit the website for more details.">
 </head>
   <body>
-    <!-- Ultra-premium loader -->
+    <!-- Ultra-premium cinematic loader -->
     <div id="root-loader">
-      <div class="rl-logo-img-wrap">
-        <img src="/lovable-uploads/bacc5b2d-3f25-473a-a2ee-a0d75a0cb7e3.png" alt="HDC" />
+      <!-- Ambient glows -->
+      <div class="rl-bg-glow rl-bg-glow-1"></div>
+      <div class="rl-bg-glow rl-bg-glow-2"></div>
+      <div class="rl-bg-glow rl-bg-glow-3"></div>
+
+      <!-- Orbital particles -->
+      <div class="rl-orbit">
+        <div class="rl-orbit-dot" style="background:hsla(42,75%,55%,0.25); transform:rotate(0deg) translateX(96px);"></div>
+        <div class="rl-orbit-dot" style="background:hsla(42,75%,55%,0.18); transform:rotate(45deg) translateX(96px);"></div>
+        <div class="rl-orbit-dot" style="background:hsla(42,75%,55%,0.12); transform:rotate(90deg) translateX(96px);"></div>
+        <div class="rl-orbit-dot" style="background:hsla(42,75%,55%,0.20); transform:rotate(135deg) translateX(96px);"></div>
+        <div class="rl-orbit-dot" style="background:hsla(42,75%,55%,0.15); transform:rotate(180deg) translateX(96px);"></div>
+        <div class="rl-orbit-dot" style="background:hsla(42,75%,55%,0.10); transform:rotate(225deg) translateX(96px);"></div>
+        <div class="rl-orbit-dot" style="background:hsla(42,75%,55%,0.22); transform:rotate(270deg) translateX(96px);"></div>
+        <div class="rl-orbit-dot" style="background:hsla(42,75%,55%,0.13); transform:rotate(315deg) translateX(96px);"></div>
       </div>
-      <div style="text-align:center;">
+
+      <!-- Floating particles -->
+      <div class="rl-particle" style="width:2px;height:2px;top:18%;left:22%;animation:rl-float-1 4s ease-in-out infinite alternate;"></div>
+      <div class="rl-particle" style="width:1.5px;height:1.5px;top:35%;left:72%;animation:rl-float-2 3.5s ease-in-out 0.5s infinite alternate;"></div>
+      <div class="rl-particle" style="width:2.5px;height:2.5px;top:65%;left:28%;animation:rl-float-1 5s ease-in-out 1s infinite alternate;"></div>
+      <div class="rl-particle" style="width:1px;height:1px;top:75%;left:68%;animation:rl-float-2 4.5s ease-in-out 0.3s infinite alternate;"></div>
+      <div class="rl-particle" style="width:2px;height:2px;top:25%;left:55%;animation:rl-float-1 3s ease-in-out 0.8s infinite alternate;"></div>
+      <div class="rl-particle" style="width:1.5px;height:1.5px;top:55%;left:80%;animation:rl-float-2 4s ease-in-out 1.2s infinite alternate;"></div>
+      <div class="rl-particle" style="width:1px;height:1px;top:45%;left:15%;animation:rl-float-1 3.8s ease-in-out 0.6s infinite alternate;"></div>
+      <div class="rl-particle" style="width:2px;height:2px;top:82%;left:45%;animation:rl-float-2 4.2s ease-in-out 0.9s infinite alternate;"></div>
+
+      <!-- Logo with gradient ring -->
+      <div class="rl-logo-container">
+        <div class="rl-logo-ring">
+          <div class="rl-logo-inner">
+            <img src="/lovable-uploads/bacc5b2d-3f25-473a-a2ee-a0d75a0cb7e3.png" alt="HDC" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Text -->
+      <div class="rl-text-wrap">
         <p class="rl-title">Hoysala Degree College</p>
         <p class="rl-subtitle">Right Choice For Better Future</p>
+        <div class="rl-divider"></div>
       </div>
-      <div class="rl-progress"><div class="rl-progress-bar"></div></div>
+
+      <!-- Progress -->
+      <div class="rl-progress-wrap">
+        <div class="rl-progress">
+          <div class="rl-progress-bar"></div>
+        </div>
+      </div>
     </div>
 
     <div id="root"></div>
