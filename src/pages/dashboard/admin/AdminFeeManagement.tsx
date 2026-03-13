@@ -1004,7 +1004,7 @@ export default function AdminFeeManagement() {
       {/* ─── Payment Modal ─── */}
       {selectedStudent && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-xl z-50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="relative bg-card/95 backdrop-blur-2xl rounded-3xl border border-border/50 w-full max-w-md shadow-[0_30px_100px_-20px_rgba(0,0,0,0.5)] animate-scale-in">
+          <div className="relative bg-card/95 backdrop-blur-2xl rounded-3xl border border-border/50 w-full max-w-md shadow-[0_30px_100px_-20px_rgba(0,0,0,0.5)] animate-scale-in max-h-[85vh] overflow-y-auto">
             <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-[hsl(var(--gold))]/15 to-transparent" />
             <div className="p-6 border-b border-border/30 flex items-center justify-between">
               <div>

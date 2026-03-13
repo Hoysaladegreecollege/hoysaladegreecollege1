@@ -198,7 +198,7 @@ export default function AdminStudentFeeDetail() {
       if (studentEmail) {
         try {
           await supabase.functions.invoke("send-fee-reminder", {
-            body: { studentEmail, studentName: student.profile?.full_name || "", rollNumber: student.roll_number || "", courseName: student.courses?.name || "", dueAmount: due, dueDate: student.fee_due_date ? new Date(student.fee_due_date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : null, message: msg },
+            body: { studentEmail, studentName: student.profile?.full_name || "", rollNumber: student.roll_number || "", courseName: student.courses?.name || "", dueAmount: curSemBalance, dueDate: student.fee_due_date ? new Date(student.fee_due_date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : null, message: msg },
           });
         } catch (emailErr) { console.error("Email failed:", emailErr); }
       }
