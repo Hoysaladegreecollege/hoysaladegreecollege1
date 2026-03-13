@@ -706,34 +706,6 @@ export default function AdminDashboard() {
       </div>
 
 
-      {/* Fee Defaulters + Semester Grid */}
-      <div className="grid md:grid-cols-2 gap-4">
-        <div className="bg-card border border-border/60 rounded-2xl p-5 sm:p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center">
-              <AlertTriangle className="w-4 h-4 text-red-500" />
-            </div>
-            <h3 className="font-body text-[14px] font-semibold text-foreground">Fee Defaulters</h3>
-            {feeDefaulters.length > 0 && <span className="font-body text-[11px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-500 font-medium">{feeDefaulters.length}</span>}
-          </div>
-          {feeDefaulters.length === 0 ? (
-            <p className="font-body text-[13px] text-muted-foreground text-center py-8">No fee defaulters found</p>
-          ) : (
-            <div className="space-y-1.5 max-h-[260px] overflow-y-auto">
-              {feeDefaulters.map((s: any) => (
-                <div key={s.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors duration-200">
-                  <div className="min-w-0">
-                    <p className="font-body text-[13px] font-medium text-foreground truncate">{s.name}</p>
-                    <p className="font-body text-[11px] text-muted-foreground">{s.roll_number} · {s.courses?.code || "—"}</p>
-                  </div>
-                  <p className="font-body text-[13px] font-semibold text-red-500 shrink-0 ml-3 tabular-nums">₹{s.due.toLocaleString()}</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-      </div>
 
       {/* Semester-wise Fee Collection Chart */}
       {(semFeeData.length > 0) && (
