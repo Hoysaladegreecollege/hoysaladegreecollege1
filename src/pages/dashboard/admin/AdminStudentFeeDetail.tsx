@@ -180,8 +180,12 @@ export default function AdminStudentFeeDetail() {
   const sendReminder = useMutation({
     mutationFn: async () => {
       if (!student) return;
-      const due = (student.total_fee || 0) - (student.fee_paid || 0);
-      const msg = reminderMsg || `Dear ${student.profile?.full_name}, you have a pending fee of ₹${due.toLocaleString()}. Please clear your dues at the earliest. - Hoysala Degree College`;
+      const curSem = student.semester || 1;
+      const curSemFeeObj = existingSemFees.find((sf: any) => sf.semester === curSem);
+      const curSemFeeAmount = curSemFeeObj ? Number(curSemFeeObj.fee_amount) : ((student.total_fee || 0) / 6);
+      const curSemPaid = payments.filter((p: any) => p.semester === curSem).reduce((s: number, p: any) => s + Number(p.amount), 0);
+      const curSemBalance = Math.max(0, curSemFeeAmount - curSemPaid);
+      const msg = reminderMsg || `Dear ${student.profile?.full_name}, you have a pending fee of ₹${curSemBalance.toLocaleString()} for Semester ${curSem}. Please clear your dues at the earliest. - Hoysala Degree College`;
       await supabase.from("notifications").insert({
         user_id: student.user_id, title: "⚠️ Important: Fee Payment Reminder", message: msg, type: "fee_reminder", link: "/dashboard/student/fees",
       });
