@@ -180,8 +180,12 @@ export default function AdminStudentFeeDetail() {
   const sendReminder = useMutation({
     mutationFn: async () => {
       if (!student) return;
-      const due = (student.total_fee || 0) - (student.fee_paid || 0);
-      const msg = reminderMsg || `Dear ${student.profile?.full_name}, you have a pending fee of ₹${due.toLocaleString()}. Please clear your dues at the earliest. - Hoysala Degree College`;
+      const curSem = student.semester || 1;
+      const curSemFeeObj = existingSemFees.find((sf: any) => sf.semester === curSem);
+      const curSemFeeAmount = curSemFeeObj ? Number(curSemFeeObj.fee_amount) : ((student.total_fee || 0) / 6);
+      const curSemPaid = payments.filter((p: any) => p.semester === curSem).reduce((s: number, p: any) => s + Number(p.amount), 0);
+      const curSemBalance = Math.max(0, curSemFeeAmount - curSemPaid);
+      const msg = reminderMsg || `Dear ${student.profile?.full_name}, you have a pending fee of ₹${curSemBalance.toLocaleString()} for Semester ${curSem}. Please clear your dues at the earliest. - Hoysala Degree College`;
       await supabase.from("notifications").insert({
         user_id: student.user_id, title: "⚠️ Important: Fee Payment Reminder", message: msg, type: "fee_reminder", link: "/dashboard/student/fees",
       });
@@ -194,7 +198,7 @@ export default function AdminStudentFeeDetail() {
       if (studentEmail) {
         try {
           await supabase.functions.invoke("send-fee-reminder", {
-            body: { studentEmail, studentName: student.profile?.full_name || "", rollNumber: student.roll_number || "", courseName: student.courses?.name || "", dueAmount: due, dueDate: student.fee_due_date ? new Date(student.fee_due_date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : null, message: msg },
+            body: { studentEmail, studentName: student.profile?.full_name || "", rollNumber: student.roll_number || "", courseName: student.courses?.name || "", dueAmount: curSemBalance, dueDate: student.fee_due_date ? new Date(student.fee_due_date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : null, message: msg },
           });
         } catch (emailErr) { console.error("Email failed:", emailErr); }
       }
@@ -357,7 +361,7 @@ export default function AdminStudentFeeDetail() {
             <Button size="sm" variant="outline" onClick={() => { setShowEditModal(true); setEditForm({ total_fee: String(student.total_fee || ""), fee_due_date: student.fee_due_date || "", fee_remarks: student.fee_remarks || "" }); setEditMode("total"); const semMap: Record<number, string> = {}; existingSemFees.forEach((sf: any) => { semMap[sf.semester] = String(sf.fee_amount); }); setSemesterFees(semMap); }} className="gap-1.5 text-xs rounded-xl border-border/60 hover:bg-muted/50">
               <FileText className="w-3.5 h-3.5" /> Edit Fee
             </Button>
-            <Button size="sm" variant="outline" onClick={() => { setShowReminderModal(true); setReminderMsg(`Dear ${student.profile?.full_name}, you have a pending fee of ₹${totalDue.toLocaleString()}. Please clear your dues at the earliest. - Hoysala Degree College`); }} className="gap-1.5 text-xs rounded-xl border-border/60 hover:bg-muted/50">
+            <Button size="sm" variant="outline" onClick={() => { const cs = student.semester || 1; const csFeeObj = existingSemFees.find((sf: any) => sf.semester === cs); const csFee = csFeeObj ? Number(csFeeObj.fee_amount) : perSemFee; const csPaid = semPayments[cs] || 0; const csBal = Math.max(0, csFee - csPaid); setShowReminderModal(true); setReminderMsg(`Dear ${student.profile?.full_name}, you have a pending fee of ₹${csBal.toLocaleString()} for Semester ${cs}. Please clear your dues at the earliest. - Hoysala Degree College`); }} className="gap-1.5 text-xs rounded-xl border-border/60 hover:bg-muted/50">
               <Bell className="w-3.5 h-3.5" /> Remind
             </Button>
             <Button size="sm" variant="outline" onClick={printReport} className="gap-1.5 text-xs rounded-xl border-border/60 hover:bg-muted/50">
@@ -651,7 +655,7 @@ export default function AdminStudentFeeDetail() {
 
       {/* Record Payment Modal */}
       <Dialog open={showPayModal} onOpenChange={setShowPayModal}>
-        <DialogContent className="sm:max-w-md rounded-3xl border-border/60 bg-card/95 backdrop-blur-2xl shadow-[0_20px_80px_-20px_hsl(var(--primary)/0.15)]">
+        <DialogContent className="sm:max-w-md rounded-3xl border-border/60 bg-card/95 backdrop-blur-2xl shadow-[0_20px_80px_-20px_hsl(var(--primary)/0.15)] max-h-[85vh] overflow-y-auto">
           <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-[hsl(var(--gold))]/20 to-transparent" />
           <DialogHeader>
             <DialogTitle className="font-display text-lg font-bold flex items-center gap-2">

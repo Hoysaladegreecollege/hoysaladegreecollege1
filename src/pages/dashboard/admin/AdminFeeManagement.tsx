@@ -873,7 +873,12 @@ export default function AdminFeeManagement() {
                 const curSem = s.semester || 1;
                 const curSemFee = semFeeMap[s.id]?.[curSem] || ((s.total_fee || 0) / 6);
                 const curSemPaid = semPayMap[s.id]?.[curSem] || 0;
-                return curSemFee > 0 && curSemPaid < curSemFee;
+                const curDue = curSemFee > 0 && curSemPaid < curSemFee;
+                const prevSem = curSem - 1;
+                const prevSemFee = prevSem >= 1 ? (semFeeMap[s.id]?.[prevSem] || ((s.total_fee || 0) / 6)) : 0;
+                const prevSemPaid = prevSem >= 1 ? (semPayMap[s.id]?.[prevSem] || 0) : 0;
+                const prevDue = prevSem >= 1 && prevSemFee > 0 && prevSemPaid < prevSemFee;
+                return curDue || prevDue;
               }).length;
             })()} student(s)
           </span>
@@ -896,7 +901,13 @@ export default function AdminFeeManagement() {
             const curSem = s.semester || 1;
             const curSemFee = semFeeMap[s.id]?.[curSem] || ((s.total_fee || 0) / 6);
             const curSemPaid = semPayMap[s.id]?.[curSem] || 0;
-            return curSemFee > 0 && curSemPaid < curSemFee;
+            const curDue = curSemFee > 0 && curSemPaid < curSemFee;
+            // Also check previous semester
+            const prevSem = curSem - 1;
+            const prevSemFee = prevSem >= 1 ? (semFeeMap[s.id]?.[prevSem] || ((s.total_fee || 0) / 6)) : 0;
+            const prevSemPaid = prevSem >= 1 ? (semPayMap[s.id]?.[prevSem] || 0) : 0;
+            const prevDue = prevSem >= 1 && prevSemFee > 0 && prevSemPaid < prevSemFee;
+            return curDue || prevDue;
           });
 
           if (defaulters.length === 0) return (
@@ -904,7 +915,7 @@ export default function AdminFeeManagement() {
               <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-3">
                 <CheckCircle className="w-7 h-7 text-emerald-400" />
               </div>
-              <p className="font-body text-sm text-muted-foreground">All current semester fees are cleared! 🎉</p>
+              <p className="font-body text-sm text-muted-foreground">All current & previous semester fees are cleared! 🎉</p>
             </div>
           );
           const bySemester: Record<number, any[]> = {};
@@ -998,7 +1009,7 @@ export default function AdminFeeManagement() {
       {/* ─── Payment Modal ─── */}
       {selectedStudent && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-xl z-50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="relative bg-card/95 backdrop-blur-2xl rounded-3xl border border-border/50 w-full max-w-md shadow-[0_30px_100px_-20px_rgba(0,0,0,0.5)] animate-scale-in">
+          <div className="relative bg-card/95 backdrop-blur-2xl rounded-3xl border border-border/50 w-full max-w-md shadow-[0_30px_100px_-20px_rgba(0,0,0,0.5)] animate-scale-in max-h-[85vh] overflow-y-auto">
             <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-[hsl(var(--gold))]/15 to-transparent" />
             <div className="p-6 border-b border-border/30 flex items-center justify-between">
               <div>
