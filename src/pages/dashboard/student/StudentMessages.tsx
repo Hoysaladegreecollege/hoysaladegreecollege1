@@ -5,8 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import {
   Send, MessageSquare, Search, ChevronLeft, CheckCheck, Check,
   Paperclip, FileText, Image as ImageIcon, Film, Archive, X, Download,
-  GraduationCap, BookOpen, Trash2, Smile
-} from "lucide-react";
+  GraduationCap, BookOpen, Trash2, Smile } from
+"lucide-react";
 import { format, isToday, isYesterday } from "date-fns";
 import { toast } from "sonner";
 
@@ -31,7 +31,7 @@ function isImageType(type: string | null) {
 }
 
 function getInitials(name: string) {
-  return name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+  return name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
 }
 
 const QUICK_EMOJIS = ["👍", "❤️", "😊", "🎉", "👏", "🔥", "💯", "✅"];
@@ -47,7 +47,7 @@ export default function StudentMessages() {
   const [searchQuery, setSearchQuery] = useState("");
   const [contactTab, setContactTab] = useState<ContactTab>("teachers");
   const [uploadingFile, setUploadingFile] = useState(false);
-  const [pendingFile, setPendingFile] = useState<{ file: File; url: string; name: string; type: string } | null>(null);
+  const [pendingFile, setPendingFile] = useState<{file: File;url: string;name: string;type: string;} | null>(null);
   const [showEmoji, setShowEmoji] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -60,16 +60,16 @@ export default function StudentMessages() {
     queryFn: async () => {
       const { data: teacherRows } = await supabase.from("teachers").select("id, user_id, employee_id, subjects").eq("is_active", true);
       if (!teacherRows?.length) return [];
-      const userIds = teacherRows.map(t => t.user_id);
+      const userIds = teacherRows.map((t) => t.user_id);
       const { data: profiles } = await supabase.from("profiles").select("user_id, full_name, email").in("user_id", userIds);
-      const profileMap = Object.fromEntries((profiles || []).map(p => [p.user_id, p]));
-      return teacherRows.map(t => ({
+      const profileMap = Object.fromEntries((profiles || []).map((p) => [p.user_id, p]));
+      return teacherRows.map((t) => ({
         ...t,
         name: profileMap[t.user_id]?.full_name || t.employee_id,
         email: profileMap[t.user_id]?.email || "",
-        role: "teacher" as const,
+        role: "teacher" as const
       }));
-    },
+    }
   });
 
   // Fetch students (peers)
@@ -79,17 +79,17 @@ export default function StudentMessages() {
       if (!user) return [];
       const { data: studentRows } = await supabase.from("students").select("id, user_id, roll_number, course_id").eq("is_active", true).neq("user_id", user.id);
       if (!studentRows?.length) return [];
-      const userIds = studentRows.map(s => s.user_id);
+      const userIds = studentRows.map((s) => s.user_id);
       const { data: profiles } = await supabase.from("profiles").select("user_id, full_name, email").in("user_id", userIds);
-      const profileMap = Object.fromEntries((profiles || []).map(p => [p.user_id, p]));
-      return studentRows.map(s => ({
+      const profileMap = Object.fromEntries((profiles || []).map((p) => [p.user_id, p]));
+      return studentRows.map((s) => ({
         ...s,
         name: profileMap[s.user_id]?.full_name || s.roll_number,
         email: profileMap[s.user_id]?.email || "",
-        role: "student" as const,
+        role: "student" as const
       }));
     },
-    enabled: !!user,
+    enabled: !!user
   });
 
   // Fetch conversations
@@ -97,31 +97,31 @@ export default function StudentMessages() {
     queryKey: ["student-conversations", user?.id],
     queryFn: async () => {
       if (!user) return [];
-      const { data } = await supabase.from("direct_messages")
-        .select("*")
-        .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
-        .is("parent_message_id", null)
-        .order("created_at", { ascending: false });
+      const { data } = await supabase.from("direct_messages").
+      select("*").
+      or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`).
+      is("parent_message_id", null).
+      order("created_at", { ascending: false });
       if (!data?.length) return [];
-      const otherIds = [...new Set(data.map(m => m.sender_id === user.id ? m.receiver_id : m.sender_id))];
+      const otherIds = [...new Set(data.map((m) => m.sender_id === user.id ? m.receiver_id : m.sender_id))];
       const { data: profiles } = await supabase.from("profiles").select("user_id, full_name").in("user_id", otherIds);
-      const profileMap = Object.fromEntries((profiles || []).map(p => [p.user_id, p]));
+      const profileMap = Object.fromEntries((profiles || []).map((p) => [p.user_id, p]));
       const grouped: Record<string, any> = {};
-      data.forEach(m => {
+      data.forEach((m) => {
         const otherId = m.sender_id === user.id ? m.receiver_id : m.sender_id;
         if (!grouped[otherId]) {
           grouped[otherId] = {
             userId: otherId,
             name: profileMap[otherId]?.full_name || "Unknown",
             lastMessage: m,
-            unread: 0,
+            unread: 0
           };
         }
         if (m.receiver_id === user.id && !m.is_read) grouped[otherId].unread++;
       });
       return Object.values(grouped);
     },
-    enabled: !!user,
+    enabled: !!user
   });
 
   // Fetch thread messages
@@ -129,30 +129,30 @@ export default function StudentMessages() {
     queryKey: ["student-thread", user?.id, selectedContactId],
     queryFn: async () => {
       if (!user || !selectedContactId) return [];
-      const { data } = await supabase.from("direct_messages")
-        .select("*")
-        .or(`and(sender_id.eq.${user.id},receiver_id.eq.${selectedContactId}),and(sender_id.eq.${selectedContactId},receiver_id.eq.${user.id})`)
-        .order("created_at", { ascending: true });
-      const unreadIds = (data || []).filter(m => m.receiver_id === user.id && !m.is_read).map(m => m.id);
+      const { data } = await supabase.from("direct_messages").
+      select("*").
+      or(`and(sender_id.eq.${user.id},receiver_id.eq.${selectedContactId}),and(sender_id.eq.${selectedContactId},receiver_id.eq.${user.id})`).
+      order("created_at", { ascending: true });
+      const unreadIds = (data || []).filter((m) => m.receiver_id === user.id && !m.is_read).map((m) => m.id);
       if (unreadIds.length > 0) {
         await supabase.from("direct_messages").update({ is_read: true }).in("id", unreadIds);
       }
       return data || [];
     },
-    enabled: !!user && !!selectedContactId,
+    enabled: !!user && !!selectedContactId
   });
 
   // Realtime
   useEffect(() => {
     if (!user) return;
-    const channel = supabase
-      .channel("student-messages-realtime")
-      .on("postgres_changes", { event: "*", schema: "public", table: "direct_messages" }, () => {
-        refetchConversations();
-        if (selectedContactId) refetchThread();
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    const channel = supabase.
+    channel("student-messages-realtime").
+    on("postgres_changes", { event: "*", schema: "public", table: "direct_messages" }, () => {
+      refetchConversations();
+      if (selectedContactId) refetchThread();
+    }).
+    subscribe();
+    return () => {supabase.removeChannel(channel);};
   }, [user, selectedContactId]);
 
   useEffect(() => {
@@ -168,12 +168,12 @@ export default function StudentMessages() {
     }
   }, []);
 
-  useEffect(() => { autoResize(); }, [message, autoResize]);
+  useEffect(() => {autoResize();}, [message, autoResize]);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
-    if (file.size > 20 * 1024 * 1024) { toast.error("File size must be under 20MB"); return; }
+    if (file.size > 20 * 1024 * 1024) {toast.error("File size must be under 20MB");return;}
     setUploadingFile(true);
     try {
       const ext = file.name.split(".").pop();
@@ -191,13 +191,13 @@ export default function StudentMessages() {
   };
 
   const handleSend = async () => {
-    if ((!message.trim() && !pendingFile) || !user || !selectedContactId) return;
+    if (!message.trim() && !pendingFile || !user || !selectedContactId) return;
     setSending(true);
     const insertData: any = {
       sender_id: user.id,
       receiver_id: selectedContactId,
       message: message.trim() || (pendingFile ? `📎 ${pendingFile.name}` : ""),
-      subject: subject.trim() || "Message",
+      subject: subject.trim() || "Message"
     };
     if (pendingFile) {
       insertData.file_url = pendingFile.url;
@@ -216,19 +216,19 @@ export default function StudentMessages() {
   const handleDelete = async (msgId: string) => {
     setDeletingId(msgId);
     const { error } = await supabase.from("direct_messages").delete().eq("id", msgId);
-    if (error) toast.error("Failed to delete");
-    else { refetchThread(); refetchConversations(); }
+    if (error) toast.error("Failed to delete");else
+    {refetchThread();refetchConversations();}
     setDeletingId(null);
   };
 
   const contactList = contactTab === "teachers" ? teachers : students;
   const filteredContacts = contactList.filter((c: any) =>
-    c.name.toLowerCase().includes(searchQuery.toLowerCase())
+  c.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const selectedName = conversations.find((c: any) => c.userId === selectedContactId)?.name
-    || contactList.find((c: any) => c.user_id === selectedContactId)?.name
-    || "Select a contact";
+  const selectedName = conversations.find((c: any) => c.userId === selectedContactId)?.name ||
+  contactList.find((c: any) => c.user_id === selectedContactId)?.name ||
+  "Select a contact";
 
   const selectedRole = teachers.find((t: any) => t.user_id === selectedContactId) ? "Teacher" : "Student";
 
@@ -236,53 +236,53 @@ export default function StudentMessages() {
     <div className="h-[calc(100vh-12rem)] flex rounded-2xl border border-border/30 overflow-hidden bg-card/50 backdrop-blur-sm shadow-2xl">
       {/* ─── SIDEBAR ─── */}
       <div className={`w-full sm:w-[340px] shrink-0 border-r border-border/20 flex flex-col ${selectedContactId ? "hidden sm:flex" : "flex"}`}
-        style={{ background: "linear-gradient(180deg, hsl(var(--card)), hsl(var(--card) / 0.85))", backdropFilter: "blur(20px)" }}>
+      style={{ background: "linear-gradient(180deg, hsl(var(--card)), hsl(var(--card) / 0.85))", backdropFilter: "blur(20px)" }}>
         
         {/* Sidebar Header */}
         <div className="p-4 border-b border-border/20 space-y-3 relative overflow-hidden">
           {/* Shimmer */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <div className="absolute inset-0 -translate-x-full animate-[shimmer_3s_ease-in-out_infinite]"
-              style={{ background: "linear-gradient(90deg, transparent, hsl(var(--primary) / 0.03), transparent)" }} />
+            style={{ background: "linear-gradient(90deg, transparent, hsl(var(--primary) / 0.03), transparent)" }} />
           </div>
 
           <div className="flex items-center justify-between relative">
             <h2 className="font-body text-lg font-bold text-foreground flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg"
-                style={{ boxShadow: "0 4px 20px hsl(var(--primary) / 0.3)" }}>
+              style={{ boxShadow: "0 4px 20px hsl(var(--primary) / 0.3)" }}>
                 <MessageSquare className="w-4.5 h-4.5 text-primary-foreground" />
               </div>
               Messages
             </h2>
-            {threadMessages.length > 0 && selectedContactId && (
-              <span className="px-2.5 py-1 rounded-lg bg-primary/10 text-primary text-[10px] font-bold">
-                {threadMessages.length} msgs
-              </span>
-            )}
+            {threadMessages.length > 0 && selectedContactId
+
+
+
+            }
           </div>
 
           {/* Tab Switcher */}
           <div className="flex rounded-xl bg-muted/30 p-1 gap-1 backdrop-blur-sm border border-border/20">
             <button
-              onClick={() => { setContactTab("teachers"); setSearchQuery(""); }}
+              onClick={() => {setContactTab("teachers");setSearchQuery("");}}
               className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs font-bold transition-all duration-300 ${
-                contactTab === "teachers"
-                  ? "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-lg"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
-              }`}
-              style={contactTab === "teachers" ? { boxShadow: "0 4px 16px hsl(var(--primary) / 0.3)" } : {}}
-            >
+              contactTab === "teachers" ?
+              "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-lg" :
+              "text-muted-foreground hover:text-foreground hover:bg-muted/30"}`
+              }
+              style={contactTab === "teachers" ? { boxShadow: "0 4px 16px hsl(var(--primary) / 0.3)" } : {}}>
+              
               <BookOpen className="w-3.5 h-3.5" /> Teachers
             </button>
             <button
-              onClick={() => { setContactTab("students"); setSearchQuery(""); }}
+              onClick={() => {setContactTab("students");setSearchQuery("");}}
               className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs font-bold transition-all duration-300 ${
-                contactTab === "students"
-                  ? "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-lg"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
-              }`}
-              style={contactTab === "students" ? { boxShadow: "0 4px 16px hsl(var(--primary) / 0.3)" } : {}}
-            >
+              contactTab === "students" ?
+              "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-lg" :
+              "text-muted-foreground hover:text-foreground hover:bg-muted/30"}`
+              }
+              style={contactTab === "students" ? { boxShadow: "0 4px 16px hsl(var(--primary) / 0.3)" } : {}}>
+              
               <GraduationCap className="w-3.5 h-3.5" /> Students
             </button>
           </div>
@@ -291,35 +291,35 @@ export default function StudentMessages() {
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40" />
             <input
               value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={`Search ${contactTab}...`}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-muted/20 border border-border/30 font-body text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 transition-all"
-            />
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-muted/20 border border-border/30 font-body text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 transition-all" />
+            
           </div>
         </div>
 
         {/* Contact List */}
         <div className="flex-1 overflow-y-auto">
-          {conversations.length > 0 && (
-            <div className="p-2">
+          {conversations.length > 0 &&
+          <div className="p-2">
               <p className="px-3 py-2 font-body text-[10px] font-extrabold text-muted-foreground/60 uppercase tracking-[0.15em]">Recent Chats</p>
-              {conversations.map((conv: any, i: number) => (
-                <button
-                  key={conv.userId}
-                  onClick={() => setSelectedContactId(conv.userId)}
-                  className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-300 text-left group mb-0.5 ${
-                    selectedContactId === conv.userId
-                      ? "bg-primary/10 border border-primary/20 shadow-sm"
-                      : "hover:bg-muted/30 border border-transparent"
-                  }`}
-                  style={{ animation: `fade-in 0.3s ease-out ${i * 50}ms both` }}
-                >
+              {conversations.map((conv: any, i: number) =>
+            <button
+              key={conv.userId}
+              onClick={() => setSelectedContactId(conv.userId)}
+              className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-300 text-left group mb-0.5 ${
+              selectedContactId === conv.userId ?
+              "bg-primary/10 border border-primary/20 shadow-sm" :
+              "hover:bg-muted/30 border border-transparent"}`
+              }
+              style={{ animation: `fade-in 0.3s ease-out ${i * 50}ms both` }}>
+              
                   <div className="relative shrink-0">
                     <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-sm font-bold transition-all duration-300 ${
-                      selectedContactId === conv.userId
-                        ? "bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-lg"
-                        : "bg-gradient-to-br from-muted to-muted/60 text-muted-foreground group-hover:from-primary/20 group-hover:to-primary/10 group-hover:text-primary"
-                    }`} style={selectedContactId === conv.userId ? { boxShadow: "0 4px 16px hsl(var(--primary) / 0.25)" } : {}}>
+                selectedContactId === conv.userId ?
+                "bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-lg" :
+                "bg-gradient-to-br from-muted to-muted/60 text-muted-foreground group-hover:from-primary/20 group-hover:to-primary/10 group-hover:text-primary"}`
+                } style={selectedContactId === conv.userId ? { boxShadow: "0 4px 16px hsl(var(--primary) / 0.25)" } : {}}>
                       {getInitials(conv.name)}
                     </div>
                     <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-card" />
@@ -333,46 +333,46 @@ export default function StudentMessages() {
                       {conv.lastMessage.file_name ? `📎 ${conv.lastMessage.file_name}` : conv.lastMessage.message}
                     </p>
                   </div>
-                  {conv.unread > 0 && (
-                    <span className="w-5.5 h-5.5 rounded-full bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-[10px] font-bold flex items-center justify-center shrink-0 shadow-lg animate-pulse"
-                      style={{ boxShadow: "0 2px 12px hsl(var(--primary) / 0.4)" }}>
+                  {conv.unread > 0 &&
+              <span className="w-5.5 h-5.5 rounded-full bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-[10px] font-bold flex items-center justify-center shrink-0 shadow-lg animate-pulse"
+              style={{ boxShadow: "0 2px 12px hsl(var(--primary) / 0.4)" }}>
                       {conv.unread}
                     </span>
-                  )}
+              }
                 </button>
-              ))}
+            )}
             </div>
-          )}
+          }
 
           <div className="p-2">
             <p className="px-3 py-2 font-body text-[10px] font-extrabold text-muted-foreground/60 uppercase tracking-[0.15em]">
               All {contactTab === "teachers" ? "Teachers" : "Students"}
             </p>
-            {filteredContacts.length === 0 ? (
-              <div className="px-3 py-8 text-center">
+            {filteredContacts.length === 0 ?
+            <div className="px-3 py-8 text-center">
                 <div className="w-12 h-12 rounded-2xl bg-muted/30 flex items-center justify-center mx-auto mb-3">
                   {contactTab === "teachers" ? <BookOpen className="w-5 h-5 text-muted-foreground/40" /> : <GraduationCap className="w-5 h-5 text-muted-foreground/40" />}
                 </div>
                 <p className="font-body text-sm text-muted-foreground/50">No {contactTab} found</p>
-              </div>
-            ) : (
-              filteredContacts.map((c: any, i: number) => (
-                <button
-                  key={c.user_id}
-                  onClick={() => setSelectedContactId(c.user_id)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 text-left group mb-0.5 ${
-                    selectedContactId === c.user_id
-                      ? "bg-primary/10 border border-primary/20"
-                      : "hover:bg-muted/30 border border-transparent"
-                  }`}
-                  style={{ animation: `fade-in 0.3s ease-out ${i * 30}ms both` }}
-                >
+              </div> :
+
+            filteredContacts.map((c: any, i: number) =>
+            <button
+              key={c.user_id}
+              onClick={() => setSelectedContactId(c.user_id)}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 text-left group mb-0.5 ${
+              selectedContactId === c.user_id ?
+              "bg-primary/10 border border-primary/20" :
+              "hover:bg-muted/30 border border-transparent"}`
+              }
+              style={{ animation: `fade-in 0.3s ease-out ${i * 30}ms both` }}>
+              
                   <div className="relative shrink-0">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold transition-all ${
-                      selectedContactId === c.user_id
-                        ? "bg-gradient-to-br from-primary/30 to-primary/10 text-primary"
-                        : "bg-muted/40 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
-                    }`}>
+                selectedContactId === c.user_id ?
+                "bg-gradient-to-br from-primary/30 to-primary/10 text-primary" :
+                "bg-muted/40 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"}`
+                }>
                       {getInitials(c.name)}
                     </div>
                     <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500/70 border-2 border-card" />
@@ -380,49 +380,49 @@ export default function StudentMessages() {
                   <div className="min-w-0">
                     <p className="font-body text-[13px] font-medium text-foreground truncate">{c.name}</p>
                     <p className="font-body text-[10px] text-muted-foreground/50 truncate">
-                      {contactTab === "teachers" ? (c.subjects?.join(", ") || "Teacher") : (c.roll_number || "Student")}
+                      {contactTab === "teachers" ? c.subjects?.join(", ") || "Teacher" : c.roll_number || "Student"}
                     </p>
                   </div>
                 </button>
-              ))
-            )}
+            )
+            }
           </div>
         </div>
       </div>
 
       {/* ─── CHAT AREA ─── */}
       <div className={`flex-1 flex flex-col min-w-0 ${!selectedContactId ? "hidden sm:flex" : "flex"}`}>
-        {!selectedContactId ? (
-          <div className="flex-1 flex items-center justify-center relative overflow-hidden">
+        {!selectedContactId ?
+        <div className="flex-1 flex items-center justify-center relative overflow-hidden">
             {/* Ambient orbs */}
             <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full opacity-[0.04] animate-pulse"
-              style={{ background: "radial-gradient(circle, hsl(var(--primary)), transparent)" }} />
+          style={{ background: "radial-gradient(circle, hsl(var(--primary)), transparent)" }} />
             <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full opacity-[0.03] animate-pulse"
-              style={{ background: "radial-gradient(circle, hsl(var(--primary)), transparent)", animationDelay: "1s" }} />
+          style={{ background: "radial-gradient(circle, hsl(var(--primary)), transparent)", animationDelay: "1s" }} />
             <div className="text-center relative z-10">
               <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center mx-auto mb-5 border border-primary/10"
-                style={{ boxShadow: "0 8px 32px hsl(var(--primary) / 0.1)" }}>
+            style={{ boxShadow: "0 8px 32px hsl(var(--primary) / 0.1)" }}>
                 <MessageSquare className="w-10 h-10 text-primary/30" />
               </div>
               <p className="font-body text-xl font-bold text-foreground">Start a Conversation</p>
               <p className="font-body text-sm text-muted-foreground/60 mt-2 max-w-xs mx-auto">Choose a teacher or student from the list to begin messaging</p>
             </div>
-          </div>
-        ) : (
-          <>
+          </div> :
+
+        <>
             {/* Chat Header */}
             <div className="px-4 py-3 border-b border-border/20 flex items-center gap-3 relative overflow-hidden"
-              style={{ background: "linear-gradient(135deg, hsl(var(--card)), hsl(var(--card) / 0.9))", backdropFilter: "blur(20px)" }}>
+          style={{ background: "linear-gradient(135deg, hsl(var(--card)), hsl(var(--card) / 0.9))", backdropFilter: "blur(20px)" }}>
               <div className="absolute inset-0 pointer-events-none overflow-hidden">
                 <div className="absolute inset-0 -translate-x-full animate-[shimmer_4s_ease-in-out_infinite]"
-                  style={{ background: "linear-gradient(90deg, transparent, hsl(var(--primary) / 0.02), transparent)" }} />
+              style={{ background: "linear-gradient(90deg, transparent, hsl(var(--primary) / 0.02), transparent)" }} />
               </div>
               <button onClick={() => setSelectedContactId(null)} className="sm:hidden p-2 rounded-xl hover:bg-muted/30 transition-colors">
                 <ChevronLeft className="w-5 h-5 text-foreground" />
               </button>
               <div className="relative">
                 <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-sm font-bold text-primary-foreground shadow-lg"
-                  style={{ boxShadow: "0 4px 20px hsl(var(--primary) / 0.25)" }}>
+              style={{ boxShadow: "0 4px 20px hsl(var(--primary) / 0.25)" }}>
                   {getInitials(selectedName)}
                 </div>
                 <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-card" />
@@ -433,93 +433,93 @@ export default function StudentMessages() {
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" /> Online • {selectedRole}
                 </p>
               </div>
-              {threadMessages.length > 0 && (
-                <span className="px-3 py-1.5 rounded-xl bg-muted/30 text-muted-foreground text-[10px] font-bold border border-border/20">
+              {threadMessages.length > 0 &&
+            <span className="px-3 py-1.5 rounded-xl bg-muted/30 text-muted-foreground text-[10px] font-bold border border-border/20">
                   {threadMessages.length} messages
                 </span>
-              )}
+            }
             </div>
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-2" style={{
-              background: "linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted) / 0.08))"
-            }}>
-              {threadMessages.length === 0 ? (
-                <div className="flex items-center justify-center h-full">
+            background: "linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted) / 0.08))"
+          }}>
+              {threadMessages.length === 0 ?
+            <div className="flex items-center justify-center h-full">
                   <div className="text-center">
                     <div className="w-16 h-16 rounded-2xl bg-muted/20 flex items-center justify-center mx-auto mb-3">
                       <Send className="w-7 h-7 text-muted-foreground/20" />
                     </div>
                     <p className="font-body text-sm text-muted-foreground/50">No messages yet. Start the conversation!</p>
                   </div>
-                </div>
-              ) : (
-                threadMessages.map((msg: any, i: number) => {
-                  const isMe = msg.sender_id === user?.id;
-                  return (
-                    <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"} group`}
-                      style={{ animation: `fade-in 0.3s ease-out ${Math.min(i * 20, 150)}ms both` }}>
-                      <div className={`relative max-w-[75%] px-4 py-3 rounded-2xl transition-all duration-200 ${
-                        isMe
-                          ? "bg-gradient-to-br from-primary to-primary/85 text-primary-foreground rounded-br-md"
-                          : "bg-card border border-border/30 text-foreground rounded-bl-md backdrop-blur-sm"
-                      }`} style={isMe ? { boxShadow: "0 4px 20px hsl(var(--primary) / 0.2)" } : { boxShadow: "0 2px 8px hsl(var(--foreground) / 0.03)" }}>
-                        {msg.subject && msg.subject !== "Message" && (
-                          <p className={`text-[10px] font-bold mb-1.5 ${isMe ? "text-primary-foreground/60" : "text-primary/70"}`}>{msg.subject}</p>
-                        )}
+                </div> :
 
-                        {msg.file_url && (
-                          <div className="mb-2">
-                            {isImageType(msg.file_type) ? (
-                              <a href={msg.file_url} target="_blank" rel="noopener noreferrer">
+            threadMessages.map((msg: any, i: number) => {
+              const isMe = msg.sender_id === user?.id;
+              return (
+                <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"} group`}
+                style={{ animation: `fade-in 0.3s ease-out ${Math.min(i * 20, 150)}ms both` }}>
+                      <div className={`relative max-w-[75%] px-4 py-3 rounded-2xl transition-all duration-200 ${
+                  isMe ?
+                  "bg-gradient-to-br from-primary to-primary/85 text-primary-foreground rounded-br-md" :
+                  "bg-card border border-border/30 text-foreground rounded-bl-md backdrop-blur-sm"}`
+                  } style={isMe ? { boxShadow: "0 4px 20px hsl(var(--primary) / 0.2)" } : { boxShadow: "0 2px 8px hsl(var(--foreground) / 0.03)" }}>
+                        {msg.subject && msg.subject !== "Message" &&
+                    <p className={`text-[10px] font-bold mb-1.5 ${isMe ? "text-primary-foreground/60" : "text-primary/70"}`}>{msg.subject}</p>
+                    }
+
+                        {msg.file_url &&
+                    <div className="mb-2">
+                            {isImageType(msg.file_type) ?
+                      <a href={msg.file_url} target="_blank" rel="noopener noreferrer">
                                 <img src={msg.file_url} alt={msg.file_name || "Image"} className="max-w-full max-h-48 rounded-xl object-cover cursor-pointer hover:opacity-90 transition-opacity shadow-sm" />
-                              </a>
-                            ) : (
-                              <a href={msg.file_url} target="_blank" rel="noopener noreferrer"
-                                className={`flex items-center gap-2 px-3 py-2.5 rounded-xl transition-colors ${isMe ? "bg-primary-foreground/10 hover:bg-primary-foreground/20" : "bg-muted/30 hover:bg-muted/50"}`}>
+                              </a> :
+
+                      <a href={msg.file_url} target="_blank" rel="noopener noreferrer"
+                      className={`flex items-center gap-2 px-3 py-2.5 rounded-xl transition-colors ${isMe ? "bg-primary-foreground/10 hover:bg-primary-foreground/20" : "bg-muted/30 hover:bg-muted/50"}`}>
                                 {getFileIcon(msg.file_type)}
                                 <span className="text-xs font-medium truncate flex-1">{msg.file_name || "File"}</span>
                                 <Download className="w-3.5 h-3.5 shrink-0 opacity-60" />
                               </a>
-                            )}
+                      }
                           </div>
-                        )}
+                    }
 
-                        {msg.message && !(msg.file_url && msg.message.startsWith("📎")) && (
-                          <p className="font-body text-[13px] whitespace-pre-line leading-relaxed">{msg.message}</p>
-                        )}
+                        {msg.message && !(msg.file_url && msg.message.startsWith("📎")) &&
+                    <p className="font-body text-[13px] whitespace-pre-line leading-relaxed">{msg.message}</p>
+                    }
                         <div className={`flex items-center gap-1.5 mt-1.5 ${isMe ? "justify-end" : ""}`}>
                           <span className={`font-body text-[9px] ${isMe ? "text-primary-foreground/40" : "text-muted-foreground/40"}`}>
                             {formatMsgDate(msg.created_at)}
                           </span>
-                          {isMe && (msg.is_read
-                            ? <CheckCheck className="w-3 h-3 text-primary-foreground/50" />
-                            : <Check className="w-3 h-3 text-primary-foreground/30" />
-                          )}
+                          {isMe && (msg.is_read ?
+                      <CheckCheck className="w-3 h-3 text-primary-foreground/50" /> :
+                      <Check className="w-3 h-3 text-primary-foreground/30" />)
+                      }
                         </div>
 
                         {/* Delete button on hover */}
-                        {isMe && (
-                          <button
-                            onClick={() => handleDelete(msg.id)}
-                            disabled={deletingId === msg.id}
-                            className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110 shadow-lg"
-                            title="Delete message"
-                          >
+                        {isMe &&
+                    <button
+                      onClick={() => handleDelete(msg.id)}
+                      disabled={deletingId === msg.id}
+                      className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110 shadow-lg"
+                      title="Delete message">
+                      
                             <Trash2 className="w-3 h-3" />
                           </button>
-                        )}
+                    }
                       </div>
-                    </div>
-                  );
-                })
-              )}
+                    </div>);
+
+            })
+            }
               <div ref={messagesEndRef} />
             </div>
 
             {/* Pending file */}
-            {pendingFile && (
-              <div className="px-4 pt-2 border-t border-border/20 bg-card/80 backdrop-blur-sm flex items-center gap-2">
+            {pendingFile &&
+          <div className="px-4 pt-2 border-t border-border/20 bg-card/80 backdrop-blur-sm flex items-center gap-2">
                 <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-primary/5 border border-primary/10 flex-1 min-w-0">
                   {getFileIcon(pendingFile.type)}
                   <span className="text-xs font-medium text-foreground truncate">{pendingFile.name}</span>
@@ -528,71 +528,71 @@ export default function StudentMessages() {
                   <X className="w-4 h-4" />
                 </button>
               </div>
-            )}
+          }
 
             {/* Emoji picker */}
-            {showEmoji && (
-              <div className="px-4 py-2 border-t border-border/20 bg-card/80 backdrop-blur-sm">
+            {showEmoji &&
+          <div className="px-4 py-2 border-t border-border/20 bg-card/80 backdrop-blur-sm">
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  {QUICK_EMOJIS.map(emoji => (
-                    <button key={emoji} onClick={() => { setMessage(prev => prev + emoji); setShowEmoji(false); }}
-                      className="w-9 h-9 rounded-xl hover:bg-muted/40 flex items-center justify-center text-lg transition-all hover:scale-110">
+                  {QUICK_EMOJIS.map((emoji) =>
+              <button key={emoji} onClick={() => {setMessage((prev) => prev + emoji);setShowEmoji(false);}}
+              className="w-9 h-9 rounded-xl hover:bg-muted/40 flex items-center justify-center text-lg transition-all hover:scale-110">
                       {emoji}
                     </button>
-                  ))}
+              )}
                 </div>
               </div>
-            )}
+          }
 
             {/* Input area */}
             <div className="p-3 border-t border-border/20 bg-card/80 backdrop-blur-sm">
-              {threadMessages.length === 0 && (
-                <input
-                  value={subject}
-                  onChange={e => setSubject(e.target.value)}
-                  placeholder="Subject (optional)"
-                  className="w-full mb-2 px-4 py-2 rounded-xl bg-muted/20 border border-border/30 font-body text-xs text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                />
-              )}
+              {threadMessages.length === 0 &&
+            <input
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="Subject (optional)"
+              className="w-full mb-2 px-4 py-2 rounded-xl bg-muted/20 border border-border/30 font-body text-xs text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+
+            }
               <div className="flex items-end gap-2">
                 <input ref={fileInputRef} type="file" className="hidden"
-                  accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.7z,.txt"
-                  onChange={handleFileSelect} />
+              accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.7z,.txt"
+              onChange={handleFileSelect} />
                 <button onClick={() => fileInputRef.current?.click()} disabled={uploadingFile || sending}
-                  className="w-10 h-10 rounded-xl bg-muted/20 border border-border/30 flex items-center justify-center shrink-0 hover:bg-muted/40 disabled:opacity-30 transition-all hover:border-primary/30" title="Attach file">
+              className="w-10 h-10 rounded-xl bg-muted/20 border border-border/30 flex items-center justify-center shrink-0 hover:bg-muted/40 disabled:opacity-30 transition-all hover:border-primary/30" title="Attach file">
                   <Paperclip className={`w-4 h-4 text-muted-foreground ${uploadingFile ? "animate-spin" : ""}`} />
                 </button>
                 <button onClick={() => setShowEmoji(!showEmoji)}
-                  className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 transition-all ${showEmoji ? "bg-primary/10 border-primary/30 text-primary" : "bg-muted/20 border-border/30 text-muted-foreground hover:bg-muted/40 hover:border-primary/30"}`} title="Emoji">
+              className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 transition-all ${showEmoji ? "bg-primary/10 border-primary/30 text-primary" : "bg-muted/20 border-border/30 text-muted-foreground hover:bg-muted/40 hover:border-primary/30"}`} title="Emoji">
                   <Smile className="w-4 h-4" />
                 </button>
                 <div className="flex-1 relative">
                   <textarea
-                    ref={textareaRef}
-                    value={message}
-                    onChange={e => setMessage(e.target.value)}
-                    onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-                    placeholder="Type a message..."
-                    disabled={sending}
-                    rows={1}
-                    className="w-full px-4 py-2.5 rounded-xl bg-muted/20 border border-border/30 font-body text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 disabled:opacity-50 transition-all resize-none overflow-hidden"
-                    style={{ minHeight: "42px", maxHeight: "120px" }}
-                  />
-                  {message.length > 200 && (
-                    <span className={`absolute bottom-1 right-3 text-[9px] font-medium ${message.length > 500 ? "text-destructive" : "text-muted-foreground/40"}`}>
+                  ref={textareaRef}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyDown={(e) => {if (e.key === "Enter" && !e.shiftKey) {e.preventDefault();handleSend();}}}
+                  placeholder="Type a message..."
+                  disabled={sending}
+                  rows={1}
+                  className="w-full px-4 py-2.5 rounded-xl bg-muted/20 border border-border/30 font-body text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 disabled:opacity-50 transition-all resize-none overflow-hidden"
+                  style={{ minHeight: "42px", maxHeight: "120px" }} />
+                
+                  {message.length > 200 &&
+                <span className={`absolute bottom-1 right-3 text-[9px] font-medium ${message.length > 500 ? "text-destructive" : "text-muted-foreground/40"}`}>
                       {message.length}
                     </span>
-                  )}
+                }
                 </div>
-                <button onClick={handleSend} disabled={(!message.trim() && !pendingFile) || sending}
-                  className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground flex items-center justify-center shrink-0 disabled:opacity-30 hover:scale-105 active:scale-95 transition-all duration-200 shadow-lg"
-                  style={{ boxShadow: (message.trim() || pendingFile) ? "0 4px 20px hsl(var(--primary) / 0.35)" : "none" }}>
+                <button onClick={handleSend} disabled={!message.trim() && !pendingFile || sending}
+              className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground flex items-center justify-center shrink-0 disabled:opacity-30 hover:scale-105 active:scale-95 transition-all duration-200 shadow-lg"
+              style={{ boxShadow: message.trim() || pendingFile ? "0 4px 20px hsl(var(--primary) / 0.35)" : "none" }}>
                   <Send className="w-4 h-4" />
                 </button>
               </div>
             </div>
           </>
-        )}
+        }
       </div>
 
       <style>{`
@@ -605,6 +605,6 @@ export default function StudentMessages() {
           to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
-    </div>
-  );
+    </div>);
+
 }
