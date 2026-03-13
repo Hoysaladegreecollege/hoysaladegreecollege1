@@ -65,6 +65,7 @@ const TeacherNotices = lazy(() => import("./pages/dashboard/teacher/TeacherNotic
 const TeacherTimetable = lazy(() => import("./pages/dashboard/teacher/TeacherTimetable"));
 const TeacherAnnouncements = lazy(() => import("./pages/dashboard/teacher/TeacherAnnouncements"));
 const TeacherAttendanceOverview = lazy(() => import("./pages/dashboard/teacher/TeacherAttendanceOverview"));
+const TeacherMessages = lazy(() => import("./pages/dashboard/teacher/TeacherMessages"));
 
 // Lazy load principal dashboard
 const PrincipalDashboard = lazy(() => import("./pages/dashboard/PrincipalDashboard"));
@@ -197,6 +198,7 @@ const App = () => (
             <Route path="/dashboard/teacher/notices" element={<TeacherRoute><TeacherNotices /></TeacherRoute>} />
             <Route path="/dashboard/teacher/timetable" element={<TeacherRoute><TeacherTimetable /></TeacherRoute>} />
             <Route path="/dashboard/teacher/announcements" element={<TeacherRoute><TeacherAnnouncements /></TeacherRoute>} />
+            <Route path="/dashboard/teacher/messages" element={<TeacherRoute><TeacherMessages /></TeacherRoute>} />
 
             {/* Principal */}
             <Route path="/dashboard/principal" element={<PrincipalRoute><PrincipalDashboard /></PrincipalRoute>} />

@@ -42,6 +42,7 @@ const teacherNav: NavItem[] = [
   { label: "Materials", path: "/dashboard/teacher/materials", icon: Upload },
   { label: "Announcements", path: "/dashboard/teacher/announcements", icon: Megaphone },
   { label: "Notices", path: "/dashboard/teacher/notices", icon: Bell },
+  { label: "Messages", path: "/dashboard/teacher/messages", icon: MessageSquare },
 ];
 
 const principalNav: NavItem[] = [
