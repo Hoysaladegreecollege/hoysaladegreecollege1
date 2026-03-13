@@ -651,7 +651,7 @@ export default function AdminStudentFeeDetail() {
 
       {/* Record Payment Modal */}
       <Dialog open={showPayModal} onOpenChange={setShowPayModal}>
-        <DialogContent className="sm:max-w-md rounded-3xl border-border/60 bg-card/95 backdrop-blur-2xl shadow-[0_20px_80px_-20px_hsl(var(--primary)/0.15)]">
+        <DialogContent className="sm:max-w-md rounded-3xl border-border/60 bg-card/95 backdrop-blur-2xl shadow-[0_20px_80px_-20px_hsl(var(--primary)/0.15)] max-h-[85vh] overflow-y-auto">
           <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-[hsl(var(--gold))]/20 to-transparent" />
           <DialogHeader>
             <DialogTitle className="font-display text-lg font-bold flex items-center gap-2">
