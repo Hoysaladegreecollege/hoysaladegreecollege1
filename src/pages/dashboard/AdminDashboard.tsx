@@ -642,7 +642,7 @@ export default function AdminDashboard() {
             </ResponsiveContainer>
           </div>
         </div>
-      )
+      )}
 
       {/* Semester + Attendance Circular */}
       <div className="grid md:grid-cols-2 gap-4">
