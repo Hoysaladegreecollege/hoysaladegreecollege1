@@ -65,6 +65,7 @@ const TeacherNotices = lazy(() => import("./pages/dashboard/teacher/TeacherNotic
 const TeacherTimetable = lazy(() => import("./pages/dashboard/teacher/TeacherTimetable"));
 const TeacherAnnouncements = lazy(() => import("./pages/dashboard/teacher/TeacherAnnouncements"));
 const TeacherAttendanceOverview = lazy(() => import("./pages/dashboard/teacher/TeacherAttendanceOverview"));
+const TeacherMessages = lazy(() => import("./pages/dashboard/teacher/TeacherMessages"));
 
 // Lazy load principal dashboard
 const PrincipalDashboard = lazy(() => import("./pages/dashboard/PrincipalDashboard"));
