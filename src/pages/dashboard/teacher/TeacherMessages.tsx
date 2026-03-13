@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import {
-  Send, MessageSquare, User, Search, ChevronLeft, CheckCheck, Check,
-  Paperclip, FileText, Image as ImageIcon, Film, Archive, X, Download, GraduationCap, Users
+  Send, MessageSquare, Search, ChevronLeft, CheckCheck, Check,
+  Paperclip, FileText, Image as ImageIcon, Film, Archive, X, Download,
+  GraduationCap, Users, Trash2, Smile
 } from "lucide-react";
 import { format, isToday, isYesterday } from "date-fns";
 import { toast } from "sonner";
@@ -29,6 +30,12 @@ function isImageType(type: string | null) {
   return type?.startsWith("image/");
 }
 
+function getInitials(name: string) {
+  return name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+}
+
+const QUICK_EMOJIS = ["👍", "❤️", "😊", "🎉", "👏", "🔥", "💯", "✅"];
+
 type ContactTab = "students" | "teachers";
 
 export default function TeacherMessages() {
@@ -41,8 +48,11 @@ export default function TeacherMessages() {
   const [contactTab, setContactTab] = useState<ContactTab>("students");
   const [uploadingFile, setUploadingFile] = useState(false);
   const [pendingFile, setPendingFile] = useState<{ file: File; url: string; name: string; type: string } | null>(null);
+  const [showEmoji, setShowEmoji] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Fetch students
   const { data: studentContacts = [] } = useQuery({
@@ -149,6 +159,17 @@ export default function TeacherMessages() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [threadMessages]);
 
+  // Auto-resize textarea
+  const autoResize = useCallback(() => {
+    const el = textareaRef.current;
+    if (el) {
+      el.style.height = "auto";
+      el.style.height = Math.min(el.scrollHeight, 120) + "px";
+    }
+  }, []);
+
+  useEffect(() => { autoResize(); }, [message, autoResize]);
+
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
@@ -186,9 +207,18 @@ export default function TeacherMessages() {
     await supabase.from("direct_messages").insert(insertData);
     setMessage("");
     setPendingFile(null);
+    setShowEmoji(false);
     setSending(false);
     refetchThread();
     refetchConversations();
+  };
+
+  const handleDelete = async (msgId: string) => {
+    setDeletingId(msgId);
+    const { error } = await supabase.from("direct_messages").delete().eq("id", msgId);
+    if (error) toast.error("Failed to delete");
+    else { refetchThread(); refetchConversations(); }
+    setDeletingId(null);
   };
 
   const contactList = contactTab === "students" ? studentContacts : teacherContacts;
@@ -203,75 +233,111 @@ export default function TeacherMessages() {
   const selectedRole = studentContacts.find((s: any) => s.user_id === selectedContactId) ? "Student" : "Teacher";
 
   return (
-    <div className="h-[calc(100vh-12rem)] flex rounded-2xl border border-border/60 overflow-hidden bg-card">
-      {/* Sidebar */}
-      <div className={`w-full sm:w-80 shrink-0 border-r border-border/40 flex flex-col bg-card ${selectedContactId ? "hidden sm:flex" : "flex"}`}>
-        <div className="p-4 border-b border-border/40 space-y-3">
-          <h2 className="font-body text-base font-semibold text-foreground flex items-center gap-2">
-            <MessageSquare className="w-4 h-4 text-primary" /> Messages
-          </h2>
+    <div className="h-[calc(100vh-12rem)] flex rounded-2xl border border-border/30 overflow-hidden bg-card/50 backdrop-blur-sm shadow-2xl">
+      {/* ─── SIDEBAR ─── */}
+      <div className={`w-full sm:w-[340px] shrink-0 border-r border-border/20 flex flex-col ${selectedContactId ? "hidden sm:flex" : "flex"}`}
+        style={{ background: "linear-gradient(180deg, hsl(var(--card)), hsl(var(--card) / 0.85))", backdropFilter: "blur(20px)" }}>
+        
+        {/* Sidebar Header */}
+        <div className="p-4 border-b border-border/20 space-y-3 relative overflow-hidden">
+          {/* Shimmer */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute inset-0 -translate-x-full animate-[shimmer_3s_ease-in-out_infinite]"
+              style={{ background: "linear-gradient(90deg, transparent, hsl(var(--primary) / 0.03), transparent)" }} />
+          </div>
+
+          <div className="flex items-center justify-between relative">
+            <h2 className="font-body text-lg font-bold text-foreground flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg"
+                style={{ boxShadow: "0 4px 20px hsl(var(--primary) / 0.3)" }}>
+                <MessageSquare className="w-4.5 h-4.5 text-primary-foreground" />
+              </div>
+              Messages
+            </h2>
+            {threadMessages.length > 0 && selectedContactId && (
+              <span className="px-2.5 py-1 rounded-lg bg-primary/10 text-primary text-[10px] font-bold">
+                {threadMessages.length} msgs
+              </span>
+            )}
+          </div>
 
           {/* Tab Switcher */}
-          <div className="flex rounded-xl bg-muted/40 p-1 gap-1">
+          <div className="flex rounded-xl bg-muted/30 p-1 gap-1 backdrop-blur-sm border border-border/20">
             <button
               onClick={() => { setContactTab("students"); setSearchQuery(""); }}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-all duration-200 ${
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs font-bold transition-all duration-300 ${
                 contactTab === "students"
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-lg"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
               }`}
+              style={contactTab === "students" ? { boxShadow: "0 4px 16px hsl(var(--primary) / 0.3)" } : {}}
             >
               <GraduationCap className="w-3.5 h-3.5" /> Students
             </button>
             <button
               onClick={() => { setContactTab("teachers"); setSearchQuery(""); }}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-all duration-200 ${
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs font-bold transition-all duration-300 ${
                 contactTab === "teachers"
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-lg"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
               }`}
+              style={contactTab === "teachers" ? { boxShadow: "0 4px 16px hsl(var(--primary) / 0.3)" } : {}}
             >
               <Users className="w-3.5 h-3.5" /> Teachers
             </button>
           </div>
 
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40" />
             <input
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder={`Search ${contactTab}...`}
-              className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-muted/30 border border-border/40 font-body text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-muted/20 border border-border/30 font-body text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 transition-all"
             />
           </div>
         </div>
 
+        {/* Contact List */}
         <div className="flex-1 overflow-y-auto">
           {conversations.length > 0 && (
             <div className="p-2">
-              <p className="px-3 py-1.5 font-body text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Recent</p>
-              {conversations.map((conv: any) => (
+              <p className="px-3 py-2 font-body text-[10px] font-extrabold text-muted-foreground/60 uppercase tracking-[0.15em]">Recent Chats</p>
+              {conversations.map((conv: any, i: number) => (
                 <button
                   key={conv.userId}
                   onClick={() => setSelectedContactId(conv.userId)}
-                  className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 text-left ${
-                    selectedContactId === conv.userId ? "bg-primary/10 border border-primary/20" : "hover:bg-muted/40"
+                  className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-300 text-left group mb-0.5 ${
+                    selectedContactId === conv.userId
+                      ? "bg-primary/10 border border-primary/20 shadow-sm"
+                      : "hover:bg-muted/30 border border-transparent"
                   }`}
+                  style={{ animation: `fade-in 0.3s ease-out ${i * 50}ms both` }}
                 >
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                    <User className="w-5 h-5 text-primary" />
+                  <div className="relative shrink-0">
+                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-sm font-bold transition-all duration-300 ${
+                      selectedContactId === conv.userId
+                        ? "bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-lg"
+                        : "bg-gradient-to-br from-muted to-muted/60 text-muted-foreground group-hover:from-primary/20 group-hover:to-primary/10 group-hover:text-primary"
+                    }`} style={selectedContactId === conv.userId ? { boxShadow: "0 4px 16px hsl(var(--primary) / 0.25)" } : {}}>
+                      {getInitials(conv.name)}
+                    </div>
+                    <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-card" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between">
-                      <p className="font-body text-sm font-medium text-foreground truncate">{conv.name}</p>
-                      <span className="font-body text-[10px] text-muted-foreground shrink-0">{formatMsgDate(conv.lastMessage.created_at)}</span>
+                      <p className="font-body text-[13px] font-semibold text-foreground truncate">{conv.name}</p>
+                      <span className="font-body text-[9px] text-muted-foreground/50 shrink-0 ml-2">{formatMsgDate(conv.lastMessage.created_at)}</span>
                     </div>
-                    <p className="font-body text-[11px] text-muted-foreground truncate">
+                    <p className="font-body text-[11px] text-muted-foreground/60 truncate mt-0.5">
                       {conv.lastMessage.file_name ? `📎 ${conv.lastMessage.file_name}` : conv.lastMessage.message}
                     </p>
                   </div>
                   {conv.unread > 0 && (
-                    <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center shrink-0">{conv.unread}</span>
+                    <span className="w-5.5 h-5.5 rounded-full bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-[10px] font-bold flex items-center justify-center shrink-0 shadow-lg animate-pulse"
+                      style={{ boxShadow: "0 2px 12px hsl(var(--primary) / 0.4)" }}>
+                      {conv.unread}
+                    </span>
                   )}
                 </button>
               ))}
@@ -279,29 +345,41 @@ export default function TeacherMessages() {
           )}
 
           <div className="p-2">
-            <p className="px-3 py-1.5 font-body text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+            <p className="px-3 py-2 font-body text-[10px] font-extrabold text-muted-foreground/60 uppercase tracking-[0.15em]">
               All {contactTab === "students" ? "Students" : "Teachers"}
             </p>
             {filteredContacts.length === 0 ? (
-              <p className="px-3 py-4 font-body text-sm text-muted-foreground text-center">No {contactTab} found</p>
+              <div className="px-3 py-8 text-center">
+                <div className="w-12 h-12 rounded-2xl bg-muted/30 flex items-center justify-center mx-auto mb-3">
+                  {contactTab === "students" ? <GraduationCap className="w-5 h-5 text-muted-foreground/40" /> : <Users className="w-5 h-5 text-muted-foreground/40" />}
+                </div>
+                <p className="font-body text-sm text-muted-foreground/50">No {contactTab} found</p>
+              </div>
             ) : (
-              filteredContacts.map((c: any) => (
+              filteredContacts.map((c: any, i: number) => (
                 <button
                   key={c.user_id}
                   onClick={() => setSelectedContactId(c.user_id)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-left ${
-                    selectedContactId === c.user_id ? "bg-primary/10 border border-primary/20" : "hover:bg-muted/40"
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 text-left group mb-0.5 ${
+                    selectedContactId === c.user_id
+                      ? "bg-primary/10 border border-primary/20"
+                      : "hover:bg-muted/30 border border-transparent"
                   }`}
+                  style={{ animation: `fade-in 0.3s ease-out ${i * 30}ms both` }}
                 >
-                  <div className="w-9 h-9 rounded-xl bg-muted/60 flex items-center justify-center shrink-0">
-                    {contactTab === "students"
-                      ? <GraduationCap className="w-4 h-4 text-muted-foreground" />
-                      : <Users className="w-4 h-4 text-muted-foreground" />
-                    }
+                  <div className="relative shrink-0">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold transition-all ${
+                      selectedContactId === c.user_id
+                        ? "bg-gradient-to-br from-primary/30 to-primary/10 text-primary"
+                        : "bg-muted/40 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                    }`}>
+                      {getInitials(c.name)}
+                    </div>
+                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500/70 border-2 border-card" />
                   </div>
                   <div className="min-w-0">
                     <p className="font-body text-[13px] font-medium text-foreground truncate">{c.name}</p>
-                    <p className="font-body text-[10px] text-muted-foreground truncate">
+                    <p className="font-body text-[10px] text-muted-foreground/50 truncate">
                       {contactTab === "students" ? (c.roll_number || "Student") : (c.subjects?.join(", ") || "Teacher")}
                     </p>
                   </div>
@@ -312,65 +390,96 @@ export default function TeacherMessages() {
         </div>
       </div>
 
-      {/* Chat area */}
+      {/* ─── CHAT AREA ─── */}
       <div className={`flex-1 flex flex-col min-w-0 ${!selectedContactId ? "hidden sm:flex" : "flex"}`}>
         {!selectedContactId ? (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center">
-              <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                <MessageSquare className="w-10 h-10 text-primary/40" />
+          <div className="flex-1 flex items-center justify-center relative overflow-hidden">
+            {/* Ambient orbs */}
+            <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full opacity-[0.04] animate-pulse"
+              style={{ background: "radial-gradient(circle, hsl(var(--primary)), transparent)" }} />
+            <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full opacity-[0.03] animate-pulse"
+              style={{ background: "radial-gradient(circle, hsl(var(--primary)), transparent)", animationDelay: "1s" }} />
+            <div className="text-center relative z-10">
+              <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center mx-auto mb-5 border border-primary/10"
+                style={{ boxShadow: "0 8px 32px hsl(var(--primary) / 0.1)" }}>
+                <MessageSquare className="w-10 h-10 text-primary/30" />
               </div>
-              <p className="font-body text-lg font-semibold text-foreground">Select a contact to start chatting</p>
-              <p className="font-body text-sm text-muted-foreground mt-1">Choose a student or teacher from the list</p>
+              <p className="font-body text-xl font-bold text-foreground">Start a Conversation</p>
+              <p className="font-body text-sm text-muted-foreground/60 mt-2 max-w-xs mx-auto">Choose a student or teacher from the list to begin messaging</p>
             </div>
           </div>
         ) : (
           <>
-            <div className="px-4 py-3 border-b border-border/40 flex items-center gap-3 bg-card/80 backdrop-blur-sm">
-              <button onClick={() => setSelectedContactId(null)} className="sm:hidden p-1.5 rounded-lg hover:bg-muted transition-colors">
+            {/* Chat Header */}
+            <div className="px-4 py-3 border-b border-border/20 flex items-center gap-3 relative overflow-hidden"
+              style={{ background: "linear-gradient(135deg, hsl(var(--card)), hsl(var(--card) / 0.9))", backdropFilter: "blur(20px)" }}>
+              <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                <div className="absolute inset-0 -translate-x-full animate-[shimmer_4s_ease-in-out_infinite]"
+                  style={{ background: "linear-gradient(90deg, transparent, hsl(var(--primary) / 0.02), transparent)" }} />
+              </div>
+              <button onClick={() => setSelectedContactId(null)} className="sm:hidden p-2 rounded-xl hover:bg-muted/30 transition-colors">
                 <ChevronLeft className="w-5 h-5 text-foreground" />
               </button>
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                <User className="w-5 h-5 text-primary" />
+              <div className="relative">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-sm font-bold text-primary-foreground shadow-lg"
+                  style={{ boxShadow: "0 4px 20px hsl(var(--primary) / 0.25)" }}>
+                  {getInitials(selectedName)}
+                </div>
+                <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-card" />
               </div>
-              <div>
-                <p className="font-body text-sm font-semibold text-foreground">{selectedName}</p>
-                <p className="font-body text-[10px] text-muted-foreground">{selectedRole}</p>
+              <div className="flex-1 min-w-0">
+                <p className="font-body text-sm font-bold text-foreground truncate">{selectedName}</p>
+                <p className="font-body text-[10px] text-emerald-500 font-medium flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" /> Online • {selectedRole}
+                </p>
               </div>
+              {threadMessages.length > 0 && (
+                <span className="px-3 py-1.5 rounded-xl bg-muted/30 text-muted-foreground text-[10px] font-bold border border-border/20">
+                  {threadMessages.length} messages
+                </span>
+              )}
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ background: "linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted) / 0.1))" }}>
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-2" style={{
+              background: "linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted) / 0.08))"
+            }}>
               {threadMessages.length === 0 ? (
                 <div className="flex items-center justify-center h-full">
-                  <p className="font-body text-sm text-muted-foreground">No messages yet. Start the conversation!</p>
+                  <div className="text-center">
+                    <div className="w-16 h-16 rounded-2xl bg-muted/20 flex items-center justify-center mx-auto mb-3">
+                      <Send className="w-7 h-7 text-muted-foreground/20" />
+                    </div>
+                    <p className="font-body text-sm text-muted-foreground/50">No messages yet. Start the conversation!</p>
+                  </div>
                 </div>
               ) : (
                 threadMessages.map((msg: any, i: number) => {
                   const isMe = msg.sender_id === user?.id;
                   return (
-                    <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}
-                      style={{ animation: `fade-in 0.3s ease-out ${Math.min(i * 30, 200)}ms both` }}>
-                      <div className={`max-w-[80%] px-4 py-3 rounded-2xl ${
+                    <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"} group`}
+                      style={{ animation: `fade-in 0.3s ease-out ${Math.min(i * 20, 150)}ms both` }}>
+                      <div className={`relative max-w-[75%] px-4 py-3 rounded-2xl transition-all duration-200 ${
                         isMe
-                          ? "bg-primary text-primary-foreground rounded-br-md"
-                          : "bg-card border border-border/40 text-foreground rounded-bl-md"
-                      }`} style={isMe ? { boxShadow: "0 4px 16px hsl(var(--primary) / 0.2)" } : {}}>
+                          ? "bg-gradient-to-br from-primary to-primary/85 text-primary-foreground rounded-br-md"
+                          : "bg-card border border-border/30 text-foreground rounded-bl-md backdrop-blur-sm"
+                      }`} style={isMe ? { boxShadow: "0 4px 20px hsl(var(--primary) / 0.2)" } : { boxShadow: "0 2px 8px hsl(var(--foreground) / 0.03)" }}>
                         {msg.subject && msg.subject !== "Message" && (
-                          <p className={`text-[10px] font-bold mb-1 ${isMe ? "text-primary-foreground/70" : "text-primary"}`}>{msg.subject}</p>
+                          <p className={`text-[10px] font-bold mb-1.5 ${isMe ? "text-primary-foreground/60" : "text-primary/70"}`}>{msg.subject}</p>
                         )}
 
                         {msg.file_url && (
                           <div className="mb-2">
                             {isImageType(msg.file_type) ? (
                               <a href={msg.file_url} target="_blank" rel="noopener noreferrer">
-                                <img src={msg.file_url} alt={msg.file_name || "Image"} className="max-w-full max-h-48 rounded-lg object-cover cursor-pointer hover:opacity-90 transition-opacity" />
+                                <img src={msg.file_url} alt={msg.file_name || "Image"} className="max-w-full max-h-48 rounded-xl object-cover cursor-pointer hover:opacity-90 transition-opacity shadow-sm" />
                               </a>
                             ) : (
                               <a href={msg.file_url} target="_blank" rel="noopener noreferrer"
-                                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${isMe ? "bg-primary-foreground/10 hover:bg-primary-foreground/20" : "bg-muted/40 hover:bg-muted/60"}`}>
+                                className={`flex items-center gap-2 px-3 py-2.5 rounded-xl transition-colors ${isMe ? "bg-primary-foreground/10 hover:bg-primary-foreground/20" : "bg-muted/30 hover:bg-muted/50"}`}>
                                 {getFileIcon(msg.file_type)}
                                 <span className="text-xs font-medium truncate flex-1">{msg.file_name || "File"}</span>
-                                <Download className="w-3.5 h-3.5 shrink-0" />
+                                <Download className="w-3.5 h-3.5 shrink-0 opacity-60" />
                               </a>
                             )}
                           </div>
@@ -379,15 +488,27 @@ export default function TeacherMessages() {
                         {msg.message && !(msg.file_url && msg.message.startsWith("📎")) && (
                           <p className="font-body text-[13px] whitespace-pre-line leading-relaxed">{msg.message}</p>
                         )}
-                        <div className={`flex items-center gap-1 mt-1.5 ${isMe ? "justify-end" : ""}`}>
-                          <span className={`font-body text-[9px] ${isMe ? "text-primary-foreground/50" : "text-muted-foreground/60"}`}>
+                        <div className={`flex items-center gap-1.5 mt-1.5 ${isMe ? "justify-end" : ""}`}>
+                          <span className={`font-body text-[9px] ${isMe ? "text-primary-foreground/40" : "text-muted-foreground/40"}`}>
                             {formatMsgDate(msg.created_at)}
                           </span>
                           {isMe && (msg.is_read
-                            ? <CheckCheck className="w-3 h-3 text-primary-foreground/60" />
-                            : <Check className="w-3 h-3 text-primary-foreground/40" />
+                            ? <CheckCheck className="w-3 h-3 text-primary-foreground/50" />
+                            : <Check className="w-3 h-3 text-primary-foreground/30" />
                           )}
                         </div>
+
+                        {/* Delete button on hover */}
+                        {isMe && (
+                          <button
+                            onClick={() => handleDelete(msg.id)}
+                            disabled={deletingId === msg.id}
+                            className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110 shadow-lg"
+                            title="Delete message"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        )}
                       </div>
                     </div>
                   );
@@ -396,9 +517,10 @@ export default function TeacherMessages() {
               <div ref={messagesEndRef} />
             </div>
 
+            {/* Pending file */}
             {pendingFile && (
-              <div className="px-3 pt-2 border-t border-border/30 bg-card flex items-center gap-2">
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/40 flex-1 min-w-0">
+              <div className="px-4 pt-2 border-t border-border/20 bg-card/80 backdrop-blur-sm flex items-center gap-2">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-primary/5 border border-primary/10 flex-1 min-w-0">
                   {getFileIcon(pendingFile.type)}
                   <span className="text-xs font-medium text-foreground truncate">{pendingFile.name}</span>
                 </div>
@@ -408,30 +530,63 @@ export default function TeacherMessages() {
               </div>
             )}
 
-            <div className="p-3 border-t border-border/40 bg-card">
+            {/* Emoji picker */}
+            {showEmoji && (
+              <div className="px-4 py-2 border-t border-border/20 bg-card/80 backdrop-blur-sm">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {QUICK_EMOJIS.map(emoji => (
+                    <button key={emoji} onClick={() => { setMessage(prev => prev + emoji); setShowEmoji(false); }}
+                      className="w-9 h-9 rounded-xl hover:bg-muted/40 flex items-center justify-center text-lg transition-all hover:scale-110">
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Input area */}
+            <div className="p-3 border-t border-border/20 bg-card/80 backdrop-blur-sm">
               {threadMessages.length === 0 && (
                 <input
                   value={subject}
                   onChange={e => setSubject(e.target.value)}
                   placeholder="Subject (optional)"
-                  className="w-full mb-2 px-4 py-2 rounded-xl bg-muted/30 border border-border/40 font-body text-xs text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="w-full mb-2 px-4 py-2 rounded-xl bg-muted/20 border border-border/30 font-body text-xs text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                 />
               )}
-              <div className="flex items-center gap-2">
+              <div className="flex items-end gap-2">
                 <input ref={fileInputRef} type="file" className="hidden"
                   accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.7z,.txt"
                   onChange={handleFileSelect} />
                 <button onClick={() => fileInputRef.current?.click()} disabled={uploadingFile || sending}
-                  className="w-11 h-11 rounded-xl bg-muted/40 border border-border/40 flex items-center justify-center shrink-0 hover:bg-muted/60 disabled:opacity-30 transition-colors" title="Attach file">
+                  className="w-10 h-10 rounded-xl bg-muted/20 border border-border/30 flex items-center justify-center shrink-0 hover:bg-muted/40 disabled:opacity-30 transition-all hover:border-primary/30" title="Attach file">
                   <Paperclip className={`w-4 h-4 text-muted-foreground ${uploadingFile ? "animate-spin" : ""}`} />
                 </button>
-                <input value={message} onChange={e => setMessage(e.target.value)}
-                  onKeyDown={e => e.key === "Enter" && !e.shiftKey && handleSend()}
-                  placeholder="Type a message..." disabled={sending}
-                  className="flex-1 px-4 py-3 rounded-xl bg-muted/30 border border-border/40 font-body text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50" />
+                <button onClick={() => setShowEmoji(!showEmoji)}
+                  className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 transition-all ${showEmoji ? "bg-primary/10 border-primary/30 text-primary" : "bg-muted/20 border-border/30 text-muted-foreground hover:bg-muted/40 hover:border-primary/30"}`} title="Emoji">
+                  <Smile className="w-4 h-4" />
+                </button>
+                <div className="flex-1 relative">
+                  <textarea
+                    ref={textareaRef}
+                    value={message}
+                    onChange={e => setMessage(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+                    placeholder="Type a message..."
+                    disabled={sending}
+                    rows={1}
+                    className="w-full px-4 py-2.5 rounded-xl bg-muted/20 border border-border/30 font-body text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 disabled:opacity-50 transition-all resize-none overflow-hidden"
+                    style={{ minHeight: "42px", maxHeight: "120px" }}
+                  />
+                  {message.length > 200 && (
+                    <span className={`absolute bottom-1 right-3 text-[9px] font-medium ${message.length > 500 ? "text-destructive" : "text-muted-foreground/40"}`}>
+                      {message.length}
+                    </span>
+                  )}
+                </div>
                 <button onClick={handleSend} disabled={(!message.trim() && !pendingFile) || sending}
-                  className="w-11 h-11 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0 disabled:opacity-30 hover:scale-105 active:scale-95 transition-all duration-200"
-                  style={{ boxShadow: (message.trim() || pendingFile) ? "0 4px 16px hsl(var(--primary) / 0.3)" : "none" }}>
+                  className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground flex items-center justify-center shrink-0 disabled:opacity-30 hover:scale-105 active:scale-95 transition-all duration-200 shadow-lg"
+                  style={{ boxShadow: (message.trim() || pendingFile) ? "0 4px 20px hsl(var(--primary) / 0.35)" : "none" }}>
                   <Send className="w-4 h-4" />
                 </button>
               </div>
@@ -439,6 +594,17 @@ export default function TeacherMessages() {
           </>
         )}
       </div>
+
+      <style>{`
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(200%); }
+        }
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(6px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }
