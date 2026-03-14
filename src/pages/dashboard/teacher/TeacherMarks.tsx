@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { BarChart3 } from "lucide-react";
+import { BarChart3, Pencil, Trash2, Save, X, ChevronDown, ChevronUp } from "lucide-react";
 import { notifyStudents } from "@/hooks/useNotifyStudents";
 
 export default function TeacherMarks() {
@@ -17,6 +17,10 @@ export default function TeacherMarks() {
   const [maxMarks, setMaxMarks] = useState(100);
   const [courseFilter, setCourseFilter] = useState("all");
   const [marksMap, setMarksMap] = useState<Record<string, number>>({});
+  const [showManage, setShowManage] = useState(false);
+  const [editingMark, setEditingMark] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState(0);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const { data: courses = [] } = useQuery({
     queryKey: ["teacher-courses-marks"],
@@ -43,6 +47,34 @@ export default function TeacherMarks() {
     },
   });
 
+  // Fetch uploaded marks for manage section
+  const { data: uploadedMarks = [], refetch: refetchMarks } = useQuery({
+    queryKey: ["teacher-uploaded-marks", user?.id, courseFilter, semester],
+    queryFn: async () => {
+      if (!user) return [];
+      let query = supabase.from("marks")
+        .select("*")
+        .eq("uploaded_by", user.id)
+        .eq("semester", semester)
+        .order("created_at", { ascending: false });
+      if (courseFilter !== "all") query = query.eq("course_id", courseFilter);
+      const { data } = await query;
+      if (!data?.length) return [];
+      const studentIds = [...new Set(data.map(m => m.student_id))];
+      const { data: studentsData } = await supabase.from("students").select("id, roll_number, user_id").in("id", studentIds);
+      const userIds = (studentsData || []).map(s => s.user_id);
+      const { data: profiles } = await supabase.from("profiles").select("user_id, full_name").in("user_id", userIds);
+      const studentMap = Object.fromEntries((studentsData || []).map(s => [s.id, s]));
+      const profileMap = Object.fromEntries((profiles || []).map(p => [p.user_id, p]));
+      return data.map(m => ({
+        ...m,
+        student_name: profileMap[studentMap[m.student_id]?.user_id]?.full_name || studentMap[m.student_id]?.roll_number || "Unknown",
+        roll_number: studentMap[m.student_id]?.roll_number || "",
+      }));
+    },
+    enabled: !!user && showManage,
+  });
+
   const submitMutation = useMutation({
     mutationFn: async () => {
       const records = Object.entries(marksMap)
@@ -56,10 +88,10 @@ export default function TeacherMarks() {
       if (error) throw error;
       return records.length;
     },
-    onSuccess: (count) => {
+    onSuccess: () => {
       toast.success("Marks uploaded!");
       setMarksMap({});
-      // Notify students
+      if (showManage) refetchMarks();
       notifyStudents({
         courseId: courseFilter !== "all" ? courseFilter : null,
         semester,
@@ -71,6 +103,22 @@ export default function TeacherMarks() {
     },
     onError: (e: any) => toast.error(e.message),
   });
+
+  const handleEditSave = async (markId: string) => {
+    const { error } = await supabase.from("marks").update({ obtained_marks: editValue }).eq("id", markId);
+    if (error) { toast.error("Failed to update"); return; }
+    toast.success("Marks updated!");
+    setEditingMark(null);
+    refetchMarks();
+  };
+
+  const handleDeleteMark = async (markId: string) => {
+    setDeletingId(markId);
+    const { error } = await supabase.from("marks").delete().eq("id", markId);
+    if (error) toast.error("Failed to delete");
+    else { toast.success("Marks deleted!"); refetchMarks(); }
+    setDeletingId(null);
+  };
 
   const inputClass = "w-full border border-border rounded-xl px-3 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all";
 
@@ -92,6 +140,7 @@ export default function TeacherMarks() {
         </div>
       </div>
 
+      {/* Upload Form */}
       <div className="relative overflow-hidden bg-card border border-border/40 rounded-3xl p-6 sm:p-8">
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent" />
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
@@ -141,9 +190,114 @@ export default function TeacherMarks() {
           ))}
         </div>
 
-        <Button className="mt-4 w-full rounded-xl font-body" disabled={!subject || Object.keys(marksMap).length === 0 || submitMutation.isPending} onClick={() => submitMutation.mutate()}>
+        <Button className="mt-4 w-full rounded-2xl font-body" disabled={!subject || Object.keys(marksMap).length === 0 || submitMutation.isPending} onClick={() => submitMutation.mutate()}>
           {submitMutation.isPending ? "Uploading..." : "Upload Marks"}
         </Button>
+      </div>
+
+      {/* Manage Uploaded Marks */}
+      <div className="relative overflow-hidden bg-card border border-border/40 rounded-3xl">
+        <button
+          onClick={() => setShowManage(!showManage)}
+          className="w-full p-6 sm:p-8 flex items-center justify-between hover:bg-muted/20 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+              <Pencil className="w-5 h-5 text-primary" />
+            </div>
+            <div className="text-left">
+              <h2 className="font-display text-xl font-bold text-foreground">Manage Marks</h2>
+              <p className="font-body text-xs text-muted-foreground mt-0.5">Edit or delete previously uploaded marks</p>
+            </div>
+          </div>
+          {showManage ? <ChevronUp className="w-5 h-5 text-muted-foreground" /> : <ChevronDown className="w-5 h-5 text-muted-foreground" />}
+        </button>
+
+        {showManage && (
+          <div className="px-6 sm:px-8 pb-6 sm:pb-8 space-y-3">
+            <div className="border-t border-border/30 pt-4" />
+            {uploadedMarks.length === 0 ? (
+              <p className="font-body text-sm text-muted-foreground text-center py-6">No marks uploaded for the selected filters.</p>
+            ) : (
+              <div className="space-y-2 max-h-[450px] overflow-y-auto">
+                {uploadedMarks.map((mark: any) => (
+                  <div key={mark.id} className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors group">
+                    <div className="flex-1 min-w-0 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      <div>
+                        <p className="font-body text-xs text-muted-foreground">Student</p>
+                        <p className="font-body text-sm font-semibold text-foreground truncate">{mark.student_name}</p>
+                      </div>
+                      <div>
+                        <p className="font-body text-xs text-muted-foreground">Subject</p>
+                        <p className="font-body text-sm font-medium text-foreground">{mark.subject}</p>
+                      </div>
+                      <div>
+                        <p className="font-body text-xs text-muted-foreground">Exam</p>
+                        <p className="font-body text-sm font-medium text-foreground capitalize">{mark.exam_type}</p>
+                      </div>
+                      <div>
+                        <p className="font-body text-xs text-muted-foreground">Marks</p>
+                        {editingMark === mark.id ? (
+                          <div className="flex items-center gap-1">
+                            <Input
+                              type="number"
+                              value={editValue}
+                              onChange={(e) => setEditValue(Number(e.target.value))}
+                              className="w-16 h-7 text-sm rounded-lg"
+                              min={0}
+                              max={mark.max_marks}
+                            />
+                            <span className="text-xs text-muted-foreground">/ {mark.max_marks}</span>
+                          </div>
+                        ) : (
+                          <p className="font-body text-sm font-bold text-foreground">{mark.obtained_marks} / {mark.max_marks}</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      {editingMark === mark.id ? (
+                        <>
+                          <button
+                            onClick={() => handleEditSave(mark.id)}
+                            className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center hover:bg-primary/20 transition-all hover:scale-105 active:scale-95"
+                            title="Save"
+                          >
+                            <Save className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => setEditingMark(null)}
+                            className="w-8 h-8 rounded-xl bg-muted text-muted-foreground flex items-center justify-center hover:bg-muted/80 transition-all hover:scale-105 active:scale-95"
+                            title="Cancel"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => { setEditingMark(mark.id); setEditValue(mark.obtained_marks); }}
+                            className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-primary/20 transition-all hover:scale-105 active:scale-95"
+                            title="Edit"
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteMark(mark.id)}
+                            disabled={deletingId === mark.id}
+                            className="w-8 h-8 rounded-xl bg-destructive/10 text-destructive flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-destructive/20 transition-all hover:scale-105 active:scale-95 disabled:opacity-30"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

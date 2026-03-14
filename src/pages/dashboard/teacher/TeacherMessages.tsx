@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   Send, MessageSquare, Search, ChevronLeft, CheckCheck, Check,
   Paperclip, FileText, Image as ImageIcon, Film, Archive, X, Download,
-  GraduationCap, Users, Trash2, Smile
+  GraduationCap, Users, Trash2, Smile, Reply, CornerDownRight
 } from "lucide-react";
 import { format, isToday, isYesterday } from "date-fns";
 import { toast } from "sonner";
@@ -50,6 +50,7 @@ export default function TeacherMessages() {
   const [pendingFile, setPendingFile] = useState<{ file: File; url: string; name: string; type: string } | null>(null);
   const [showEmoji, setShowEmoji] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [replyTo, setReplyTo] = useState<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -204,10 +205,39 @@ export default function TeacherMessages() {
       insertData.file_name = pendingFile.name;
       insertData.file_type = pendingFile.type;
     }
+    if (replyTo) {
+      insertData.parent_message_id = replyTo.id;
+    }
     await supabase.from("direct_messages").insert(insertData);
+
+    // Send notification to receiver
+    try {
+      const senderName = "Teacher";
+      const { data: senderProfile } = await supabase.from("profiles").select("full_name").eq("user_id", user.id).single();
+      const displayName = senderProfile?.full_name || senderName;
+      
+      await supabase.from("notifications").insert({
+        user_id: selectedContactId,
+        title: "💬 New Message",
+        message: `${displayName}: ${(message.trim() || pendingFile?.name || "sent a file").slice(0, 100)}`,
+        type: "message",
+        link: "/dashboard/student/messages",
+      });
+
+      // Push notification
+      supabase.functions.invoke("send-push-notification", {
+        body: {
+          user_id: selectedContactId,
+          title: "💬 New Message",
+          body: `${displayName}: ${(message.trim() || "sent a file").slice(0, 80)}`,
+        },
+      }).catch(() => {});
+    } catch {}
+
     setMessage("");
     setPendingFile(null);
     setShowEmoji(false);
+    setReplyTo(null);
     setSending(false);
     refetchThread();
     refetchConversations();
@@ -219,6 +249,11 @@ export default function TeacherMessages() {
     if (error) toast.error("Failed to delete");
     else { refetchThread(); refetchConversations(); }
     setDeletingId(null);
+  };
+
+  const getParentMessage = (parentId: string | null) => {
+    if (!parentId) return null;
+    return threadMessages.find((m: any) => m.id === parentId);
   };
 
   const contactList = contactTab === "students" ? studentContacts : teacherContacts;
@@ -240,7 +275,6 @@ export default function TeacherMessages() {
         
         {/* Sidebar Header */}
         <div className="p-4 border-b border-border/20 space-y-3 relative overflow-hidden">
-          {/* Shimmer */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <div className="absolute inset-0 -translate-x-full animate-[shimmer_3s_ease-in-out_infinite]"
               style={{ background: "linear-gradient(90deg, transparent, hsl(var(--primary) / 0.03), transparent)" }} />
@@ -248,24 +282,24 @@ export default function TeacherMessages() {
 
           <div className="flex items-center justify-between relative">
             <h2 className="font-body text-lg font-bold text-foreground flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg"
+              <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg"
                 style={{ boxShadow: "0 4px 20px hsl(var(--primary) / 0.3)" }}>
                 <MessageSquare className="w-4.5 h-4.5 text-primary-foreground" />
               </div>
               Messages
             </h2>
             {threadMessages.length > 0 && selectedContactId && (
-              <span className="px-2.5 py-1 rounded-lg bg-primary/10 text-primary text-[10px] font-bold">
+              <span className="px-2.5 py-1 rounded-2xl bg-primary/10 text-primary text-[10px] font-bold">
                 {threadMessages.length} msgs
               </span>
             )}
           </div>
 
           {/* Tab Switcher */}
-          <div className="flex rounded-xl bg-muted/30 p-1 gap-1 backdrop-blur-sm border border-border/20">
+          <div className="flex rounded-2xl bg-muted/30 p-1 gap-1 backdrop-blur-sm border border-border/20">
             <button
               onClick={() => { setContactTab("students"); setSearchQuery(""); }}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs font-bold transition-all duration-300 ${
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 ${
                 contactTab === "students"
                   ? "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-lg"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
@@ -276,7 +310,7 @@ export default function TeacherMessages() {
             </button>
             <button
               onClick={() => { setContactTab("teachers"); setSearchQuery(""); }}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs font-bold transition-all duration-300 ${
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 ${
                 contactTab === "teachers"
                   ? "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-lg"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
@@ -293,7 +327,7 @@ export default function TeacherMessages() {
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder={`Search ${contactTab}...`}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-muted/20 border border-border/30 font-body text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 transition-all"
+              className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-muted/20 border border-border/30 font-body text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 transition-all"
             />
           </div>
         </div>
@@ -307,15 +341,15 @@ export default function TeacherMessages() {
                 <button
                   key={conv.userId}
                   onClick={() => setSelectedContactId(conv.userId)}
-                  className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-300 text-left group mb-0.5 ${
+                  className={`w-full flex items-center gap-3 px-3 py-3 rounded-2xl transition-all duration-300 text-left group mb-0.5 ${
                     selectedContactId === conv.userId
                       ? "bg-primary/10 border border-primary/20 shadow-sm"
                       : "hover:bg-muted/30 border border-transparent"
                   }`}
-                  style={{ animation: `fade-in 0.3s ease-out ${i * 50}ms both` }}
+                  style={{ animation: `spring-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) ${i * 50}ms both` }}
                 >
                   <div className="relative shrink-0">
-                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-sm font-bold transition-all duration-300 ${
+                    <div className={`w-11 h-11 rounded-2xl flex items-center justify-center text-sm font-bold transition-all duration-300 ${
                       selectedContactId === conv.userId
                         ? "bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-lg"
                         : "bg-gradient-to-br from-muted to-muted/60 text-muted-foreground group-hover:from-primary/20 group-hover:to-primary/10 group-hover:text-primary"
@@ -360,15 +394,15 @@ export default function TeacherMessages() {
                 <button
                   key={c.user_id}
                   onClick={() => setSelectedContactId(c.user_id)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 text-left group mb-0.5 ${
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl transition-all duration-300 text-left group mb-0.5 ${
                     selectedContactId === c.user_id
                       ? "bg-primary/10 border border-primary/20"
                       : "hover:bg-muted/30 border border-transparent"
                   }`}
-                  style={{ animation: `fade-in 0.3s ease-out ${i * 30}ms both` }}
+                  style={{ animation: `spring-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) ${i * 30}ms both` }}
                 >
                   <div className="relative shrink-0">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold transition-all ${
+                    <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-xs font-bold transition-all ${
                       selectedContactId === c.user_id
                         ? "bg-gradient-to-br from-primary/30 to-primary/10 text-primary"
                         : "bg-muted/40 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
@@ -394,7 +428,6 @@ export default function TeacherMessages() {
       <div className={`flex-1 flex flex-col min-w-0 ${!selectedContactId ? "hidden sm:flex" : "flex"}`}>
         {!selectedContactId ? (
           <div className="flex-1 flex items-center justify-center relative overflow-hidden">
-            {/* Ambient orbs */}
             <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full opacity-[0.04] animate-pulse"
               style={{ background: "radial-gradient(circle, hsl(var(--primary)), transparent)" }} />
             <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full opacity-[0.03] animate-pulse"
@@ -417,11 +450,11 @@ export default function TeacherMessages() {
                 <div className="absolute inset-0 -translate-x-full animate-[shimmer_4s_ease-in-out_infinite]"
                   style={{ background: "linear-gradient(90deg, transparent, hsl(var(--primary) / 0.02), transparent)" }} />
               </div>
-              <button onClick={() => setSelectedContactId(null)} className="sm:hidden p-2 rounded-xl hover:bg-muted/30 transition-colors">
+              <button onClick={() => setSelectedContactId(null)} className="sm:hidden p-2 rounded-2xl hover:bg-muted/30 transition-colors">
                 <ChevronLeft className="w-5 h-5 text-foreground" />
               </button>
               <div className="relative">
-                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-sm font-bold text-primary-foreground shadow-lg"
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-sm font-bold text-primary-foreground shadow-lg"
                   style={{ boxShadow: "0 4px 20px hsl(var(--primary) / 0.25)" }}>
                   {getInitials(selectedName)}
                 </div>
@@ -434,7 +467,7 @@ export default function TeacherMessages() {
                 </p>
               </div>
               {threadMessages.length > 0 && (
-                <span className="px-3 py-1.5 rounded-xl bg-muted/30 text-muted-foreground text-[10px] font-bold border border-border/20">
+                <span className="px-3 py-1.5 rounded-2xl bg-muted/30 text-muted-foreground text-[10px] font-bold border border-border/20">
                   {threadMessages.length} messages
                 </span>
               )}
@@ -456,14 +489,33 @@ export default function TeacherMessages() {
               ) : (
                 threadMessages.map((msg: any, i: number) => {
                   const isMe = msg.sender_id === user?.id;
+                  const parentMsg = getParentMessage(msg.parent_message_id);
                   return (
                     <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"} group`}
-                      style={{ animation: `fade-in 0.3s ease-out ${Math.min(i * 20, 150)}ms both` }}>
+                      style={{ animation: `scale-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) ${Math.min(i * 20, 150)}ms both` }}>
                       <div className={`relative max-w-[75%] px-4 py-3 rounded-2xl transition-all duration-200 ${
                         isMe
                           ? "bg-gradient-to-br from-primary to-primary/85 text-primary-foreground rounded-br-md"
                           : "bg-card border border-border/30 text-foreground rounded-bl-md backdrop-blur-sm"
                       }`} style={isMe ? { boxShadow: "0 4px 20px hsl(var(--primary) / 0.2)" } : { boxShadow: "0 2px 8px hsl(var(--foreground) / 0.03)" }}>
+                        
+                        {/* Quoted reply */}
+                        {parentMsg && (
+                          <div className={`mb-2 px-3 py-2 rounded-xl border-l-[3px] ${
+                            isMe ? "bg-primary-foreground/10 border-primary-foreground/40" : "bg-muted/30 border-primary/40"
+                          }`} style={{ animation: "slide-in-left 0.2s ease-out" }}>
+                            <div className="flex items-center gap-1 mb-0.5">
+                              <CornerDownRight className="w-3 h-3 opacity-50" />
+                              <span className={`text-[9px] font-bold ${isMe ? "text-primary-foreground/50" : "text-primary/60"}`}>
+                                {parentMsg.sender_id === user?.id ? "You" : selectedName}
+                              </span>
+                            </div>
+                            <p className={`text-[11px] line-clamp-2 ${isMe ? "text-primary-foreground/60" : "text-muted-foreground/70"}`}>
+                              {parentMsg.message}
+                            </p>
+                          </div>
+                        )}
+
                         {msg.subject && msg.subject !== "Message" && (
                           <p className={`text-[10px] font-bold mb-1.5 ${isMe ? "text-primary-foreground/60" : "text-primary/70"}`}>{msg.subject}</p>
                         )}
@@ -498,17 +550,26 @@ export default function TeacherMessages() {
                           )}
                         </div>
 
-                        {/* Delete button on hover */}
-                        {isMe && (
+                        {/* Action buttons on hover */}
+                        <div className={`absolute -top-2 ${isMe ? "-left-2" : "-right-2"} flex gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200`}>
                           <button
-                            onClick={() => handleDelete(msg.id)}
-                            disabled={deletingId === msg.id}
-                            className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110 shadow-lg"
-                            title="Delete message"
+                            onClick={() => { setReplyTo(msg); textareaRef.current?.focus(); }}
+                            className="w-6 h-6 rounded-full bg-muted border border-border/30 text-muted-foreground flex items-center justify-center hover:scale-110 hover:bg-primary/10 hover:text-primary transition-all shadow-lg"
+                            title="Reply"
                           >
-                            <Trash2 className="w-3 h-3" />
+                            <Reply className="w-3 h-3" />
                           </button>
-                        )}
+                          {isMe && (
+                            <button
+                              onClick={() => handleDelete(msg.id)}
+                              disabled={deletingId === msg.id}
+                              className="w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center hover:scale-110 transition-all shadow-lg"
+                              title="Delete message"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
@@ -517,14 +578,31 @@ export default function TeacherMessages() {
               <div ref={messagesEndRef} />
             </div>
 
+            {/* Reply preview bar */}
+            {replyTo && (
+              <div className="px-4 py-2 border-t border-border/20 bg-card/90 backdrop-blur-sm flex items-center gap-3"
+                style={{ animation: "slide-up 0.2s ease-out" }}>
+                <div className="w-1 h-10 rounded-full bg-gradient-to-b from-primary to-primary/50" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-bold text-primary flex items-center gap-1">
+                    <Reply className="w-3 h-3" /> Replying to {replyTo.sender_id === user?.id ? "yourself" : selectedName}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground truncate mt-0.5">{replyTo.message}</p>
+                </div>
+                <button onClick={() => setReplyTo(null)} className="p-1.5 rounded-xl hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-all">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
             {/* Pending file */}
             {pendingFile && (
               <div className="px-4 pt-2 border-t border-border/20 bg-card/80 backdrop-blur-sm flex items-center gap-2">
-                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-primary/5 border border-primary/10 flex-1 min-w-0">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-2xl bg-primary/5 border border-primary/10 flex-1 min-w-0">
                   {getFileIcon(pendingFile.type)}
                   <span className="text-xs font-medium text-foreground truncate">{pendingFile.name}</span>
                 </div>
-                <button onClick={() => setPendingFile(null)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
+                <button onClick={() => setPendingFile(null)} className="p-1.5 rounded-xl hover:bg-destructive/10 text-destructive transition-colors">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -532,11 +610,12 @@ export default function TeacherMessages() {
 
             {/* Emoji picker */}
             {showEmoji && (
-              <div className="px-4 py-2 border-t border-border/20 bg-card/80 backdrop-blur-sm">
+              <div className="px-4 py-2 border-t border-border/20 bg-card/80 backdrop-blur-sm"
+                style={{ animation: "slide-up 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)" }}>
                 <div className="flex items-center gap-1.5 flex-wrap">
                   {QUICK_EMOJIS.map(emoji => (
                     <button key={emoji} onClick={() => { setMessage(prev => prev + emoji); setShowEmoji(false); }}
-                      className="w-9 h-9 rounded-xl hover:bg-muted/40 flex items-center justify-center text-lg transition-all hover:scale-110">
+                      className="w-9 h-9 rounded-2xl hover:bg-muted/40 flex items-center justify-center text-lg transition-all hover:scale-125 active:scale-95">
                       {emoji}
                     </button>
                   ))}
@@ -551,7 +630,7 @@ export default function TeacherMessages() {
                   value={subject}
                   onChange={e => setSubject(e.target.value)}
                   placeholder="Subject (optional)"
-                  className="w-full mb-2 px-4 py-2 rounded-xl bg-muted/20 border border-border/30 font-body text-xs text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                  className="w-full mb-2 px-4 py-2 rounded-2xl bg-muted/20 border border-border/30 font-body text-xs text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                 />
               )}
               <div className="flex items-end gap-2">
@@ -559,11 +638,11 @@ export default function TeacherMessages() {
                   accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.7z,.txt"
                   onChange={handleFileSelect} />
                 <button onClick={() => fileInputRef.current?.click()} disabled={uploadingFile || sending}
-                  className="w-10 h-10 rounded-xl bg-muted/20 border border-border/30 flex items-center justify-center shrink-0 hover:bg-muted/40 disabled:opacity-30 transition-all hover:border-primary/30" title="Attach file">
+                  className="w-10 h-10 rounded-2xl bg-muted/20 border border-border/30 flex items-center justify-center shrink-0 hover:bg-muted/40 disabled:opacity-30 transition-all hover:border-primary/30 active:scale-95" title="Attach file">
                   <Paperclip className={`w-4 h-4 text-muted-foreground ${uploadingFile ? "animate-spin" : ""}`} />
                 </button>
                 <button onClick={() => setShowEmoji(!showEmoji)}
-                  className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 transition-all ${showEmoji ? "bg-primary/10 border-primary/30 text-primary" : "bg-muted/20 border-border/30 text-muted-foreground hover:bg-muted/40 hover:border-primary/30"}`} title="Emoji">
+                  className={`w-10 h-10 rounded-2xl border flex items-center justify-center shrink-0 transition-all active:scale-95 ${showEmoji ? "bg-primary/10 border-primary/30 text-primary" : "bg-muted/20 border-border/30 text-muted-foreground hover:bg-muted/40 hover:border-primary/30"}`} title="Emoji">
                   <Smile className="w-4 h-4" />
                 </button>
                 <div className="flex-1 relative">
@@ -572,10 +651,10 @@ export default function TeacherMessages() {
                     value={message}
                     onChange={e => setMessage(e.target.value)}
                     onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-                    placeholder="Type a message..."
+                    placeholder={replyTo ? "Type your reply..." : "Type a message..."}
                     disabled={sending}
                     rows={1}
-                    className="w-full px-4 py-2.5 rounded-xl bg-muted/20 border border-border/30 font-body text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 disabled:opacity-50 transition-all resize-none overflow-hidden"
+                    className="w-full px-4 py-2.5 rounded-2xl bg-muted/20 border border-border/30 font-body text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 disabled:opacity-50 transition-all resize-none overflow-hidden"
                     style={{ minHeight: "42px", maxHeight: "120px" }}
                   />
                   {message.length > 200 && (
@@ -585,7 +664,7 @@ export default function TeacherMessages() {
                   )}
                 </div>
                 <button onClick={handleSend} disabled={(!message.trim() && !pendingFile) || sending}
-                  className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground flex items-center justify-center shrink-0 disabled:opacity-30 hover:scale-105 active:scale-95 transition-all duration-200 shadow-lg"
+                  className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground flex items-center justify-center shrink-0 disabled:opacity-30 hover:scale-105 active:scale-90 transition-all duration-200 shadow-lg"
                   style={{ boxShadow: (message.trim() || pendingFile) ? "0 4px 20px hsl(var(--primary) / 0.35)" : "none" }}>
                   <Send className="w-4 h-4" />
                 </button>
@@ -599,6 +678,22 @@ export default function TeacherMessages() {
         @keyframes shimmer {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(200%); }
+        }
+        @keyframes spring-in {
+          0% { opacity: 0; transform: translateY(8px) scale(0.96); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes scale-in {
+          0% { opacity: 0; transform: scale(0.92); }
+          100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes slide-up {
+          0% { opacity: 0; transform: translateY(8px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slide-in-left {
+          0% { opacity: 0; transform: translateX(-6px); }
+          100% { opacity: 1; transform: translateX(0); }
         }
         @keyframes fade-in {
           from { opacity: 0; transform: translateY(6px); }
