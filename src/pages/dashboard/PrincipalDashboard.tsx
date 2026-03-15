@@ -162,10 +162,11 @@ export default function PrincipalDashboard() {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      <SEOHead title="Principal Dashboard" description="Principal dashboard" noIndex />
       {/* Welcome */}
       <div>
         <h2 className="font-body text-xl sm:text-2xl font-semibold text-foreground tracking-tight">
-          Welcome back, {profile?.full_name?.split(" ")[0] || "Principal"}
+          {greeting}, {profile?.full_name?.split(" ")[0] || "Principal"}
         </h2>
         <p className="font-body text-[13px] text-muted-foreground mt-1">
           {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
