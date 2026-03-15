@@ -417,11 +417,12 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      <SEOHead title="Admin Dashboard" description="Admin dashboard" noIndex />
       {/* Welcome */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="font-body text-xl sm:text-2xl font-semibold text-foreground tracking-tight">
-            Welcome back, {profile?.full_name?.split(" ")[0] || "Admin"}
+            {greeting}, {profile?.full_name?.split(" ")[0] || "Admin"}
           </h2>
           <p className="font-body text-[13px] text-muted-foreground mt-1">Here's an overview of your institution.</p>
         </div>
