@@ -71,6 +71,8 @@ function StatCard({ label, value, icon: Icon, color }: { label: string; value: s
 
 export default function PrincipalDashboard() {
   const { profile } = useAuth();
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
   const [attDate, setAttDate] = useState(new Date().toISOString().split("T")[0]);
 
   const { data: counts, isLoading } = useQuery({
