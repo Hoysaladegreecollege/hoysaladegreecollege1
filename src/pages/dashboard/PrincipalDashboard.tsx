@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useAuth } from "@/contexts/AuthContext";
 import { Users, GraduationCap, Award, Megaphone, Image, BookOpen, Settings, BarChart3, Activity, TrendingUp, Clock, IndianRupee, UserCheck, FileText, PieChart } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -70,6 +71,8 @@ function StatCard({ label, value, icon: Icon, color }: { label: string; value: s
 
 export default function PrincipalDashboard() {
   const { profile } = useAuth();
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
   const [attDate, setAttDate] = useState(new Date().toISOString().split("T")[0]);
 
   const { data: counts, isLoading } = useQuery({
@@ -159,10 +162,11 @@ export default function PrincipalDashboard() {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      <SEOHead title="Principal Dashboard" description="Principal dashboard" noIndex />
       {/* Welcome */}
       <div>
         <h2 className="font-body text-xl sm:text-2xl font-semibold text-foreground tracking-tight">
-          Welcome back, {profile?.full_name?.split(" ")[0] || "Principal"}
+          {greeting}, {profile?.full_name?.split(" ")[0] || "Principal"}
         </h2>
         <p className="font-body text-[13px] text-muted-foreground mt-1">
           {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}

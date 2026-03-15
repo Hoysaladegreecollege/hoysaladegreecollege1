@@ -1,6 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { BookOpen, Clock, BarChart3, Bell, Calendar, TrendingUp, CheckCircle, XCircle, Megaphone, ArrowRight, Sparkles, Upload, User, GraduationCap, FileText, Award, IndianRupee, Wallet, AlertTriangle, Target, Flame, Calculator, Timer, Star, Zap, Trophy } from "lucide-react";
 import BirthdayPopup from "@/components/BirthdayPopup";
+import SEOHead from "@/components/SEOHead";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
@@ -254,8 +255,12 @@ export default function StudentDashboard() {
 
   const CHART_COLORS = ["hsl(215, 90%, 55%)", "hsl(145, 65%, 42%)", "hsl(42, 70%, 52%)", "hsl(280, 60%, 55%)", "hsl(0, 70%, 58%)", "hsl(180, 60%, 45%)", "hsl(330, 60%, 55%)", "hsl(60, 70%, 50%)"];
 
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
+
   return (
     <div className="space-y-5 sm:space-y-6 animate-fade-in">
+      <SEOHead title="Student Dashboard" description="Student portal dashboard" noIndex />
       <BirthdayPopup />
 
       {/* Welcome Banner */}
@@ -267,7 +272,7 @@ export default function StudentDashboard() {
               <span className="font-body text-[11px] text-primary font-semibold uppercase tracking-wider">Student Portal</span>
             </div>
             <h2 className="font-body text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
-              Welcome, {profile?.full_name?.split(" ")[0] || "Student"}
+              {greeting}, {profile?.full_name?.split(" ")[0] || "Student"}
             </h2>
             <p className="font-body text-sm text-muted-foreground mt-1.5">
               {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}

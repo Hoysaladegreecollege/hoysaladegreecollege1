@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   Users, Clock, BarChart3, Upload, Bell, Megaphone, Calendar, BookOpen, CheckCircle,
@@ -228,7 +229,7 @@ export default function TeacherDashboard() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Welcome */}
+      <SEOHead title="Teacher Dashboard" description="Teacher dashboard" noIndex />
       <div className="bg-card border border-border/60 rounded-2xl p-6 md:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>

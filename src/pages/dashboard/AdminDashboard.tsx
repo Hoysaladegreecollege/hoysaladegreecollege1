@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useAuth } from "@/contexts/AuthContext";
 import { Users, GraduationCap, BookOpen, Calendar, FileText, Settings, Mail, TrendingUp, Trophy, Shield, Image, BarChart3, PieChart, Megaphone, ArrowUpCircle, Download, UserX, CalendarDays, AlertTriangle, IndianRupee, UserPlus, Activity, Clock, Target, Bell, Cake, CreditCard, CheckCircle2, XCircle, UserCheck, FileCheck, Wallet, Star, Zap, Heart } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -87,6 +88,8 @@ function StatCard({ label, value, icon: Icon, color, trend }: { label: string; v
 
 export default function AdminDashboard() {
   const { profile } = useAuth();
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
   const [birthdayDialogOpen, setBirthdayDialogOpen] = useState(false);
   const [attDate, setAttDate] = useState(new Date().toISOString().split("T")[0]);
   const [feeChartCourse, setFeeChartCourse] = useState("all");
@@ -415,11 +418,12 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      <SEOHead title="Admin Dashboard" description="Admin dashboard" noIndex />
       {/* Welcome */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="font-body text-xl sm:text-2xl font-semibold text-foreground tracking-tight">
-            Welcome back, {profile?.full_name?.split(" ")[0] || "Admin"}
+            {greeting}, {profile?.full_name?.split(" ")[0] || "Admin"}
           </h2>
           <p className="font-body text-[13px] text-muted-foreground mt-1">Here's an overview of your institution.</p>
         </div>
