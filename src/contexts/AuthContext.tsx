@@ -51,6 +51,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setRole(userRole);
             const userProfile = await fetchProfile(session.user.id);
             setProfile(userProfile);
+
+            // Consume pending student registration info from localStorage
+            const pendingRaw = localStorage.getItem("hdc_pending_student_info");
+            if (pendingRaw && userRole === "student") {
+              try {
+                const pending = JSON.parse(pendingRaw);
+                // Update student record
+                await supabase.from("students").update({
+                  phone: pending.phone || "",
+                  father_name: pending.fatherName || "",
+                  mother_name: pending.motherName || "",
+                  parent_phone: pending.parentPhone || "",
+                  address: pending.address || "",
+                  date_of_birth: pending.dateOfBirth || null,
+                }).eq("user_id", session.user.id);
+                // Update profile phone
+                if (pending.phone) {
+                  await supabase.from("profiles").update({ phone: pending.phone }).eq("user_id", session.user.id);
+                }
+                localStorage.removeItem("hdc_pending_student_info");
+              } catch (e) {
+                console.warn("Failed to sync pending student info:", e);
+              }
+            }
+
             setLoading(false);
           }, 0);
         } else {

@@ -87,6 +87,8 @@ function StatCard({ label, value, icon: Icon, color, trend }: { label: string; v
 
 export default function AdminDashboard() {
   const { profile } = useAuth();
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
   const [birthdayDialogOpen, setBirthdayDialogOpen] = useState(false);
   const [attDate, setAttDate] = useState(new Date().toISOString().split("T")[0]);
   const [feeChartCourse, setFeeChartCourse] = useState("all");
