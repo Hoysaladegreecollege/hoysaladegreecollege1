@@ -239,7 +239,7 @@ ${application.photo_url ? `<div class="photo-section"><img src="${application.ph
             </div>
           </div>
         </section>
-      )
+      )}
 
       <section className="py-6 sm:py-10 -mt-8">
         <div className="container max-w-2xl px-4">
