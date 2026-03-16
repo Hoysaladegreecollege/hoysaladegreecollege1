@@ -202,6 +202,45 @@ ${application.photo_url ? `<div class="photo-section"><img src="${application.ph
         </div>
       </section>
 
+      {/* Application Timeline */}
+      {application && !isLoading && (
+        <section className="py-4 -mt-8">
+          <div className="container max-w-2xl px-4">
+            <div className="rounded-3xl border border-border/10 p-6 sm:p-8 mb-6" style={{ background: "linear-gradient(135deg, hsl(222 30% 11%), hsl(222 30% 8%))" }}>
+              <h3 className="font-display text-sm font-bold text-foreground mb-6 text-center uppercase tracking-wider">Application Timeline</h3>
+              <div className="flex items-center justify-between max-w-lg mx-auto">
+                {[
+                  { label: "Submitted", done: true },
+                  { label: "Under Review", done: application.status !== "pending" || true },
+                  { label: "Decision", done: application.status === "approved" || application.status === "rejected" },
+                ].map((step, i, arr) => {
+                  const isActive = step.done;
+                  const stepColor = application.status === "rejected" && i === arr.length - 1 ? "rgba(239,68,68,0.8)" : isActive ? "hsl(45, 80%, 55%)" : "rgba(255,255,255,0.1)";
+                  return (
+                    <div key={step.label} className="flex items-center flex-1 last:flex-initial">
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center border transition-all duration-300"
+                          style={{ background: isActive ? `${stepColor}15` : "transparent", borderColor: stepColor }}>
+                          {isActive ? (
+                            <CheckCircle className="w-5 h-5" style={{ color: stepColor }} />
+                          ) : (
+                            <Clock className="w-4 h-4 text-white/20" />
+                          )}
+                        </div>
+                        <span className="font-body text-[10px] font-semibold uppercase tracking-wider" style={{ color: isActive ? stepColor : "rgba(255,255,255,0.25)" }}>{step.label}</span>
+                      </div>
+                      {i < arr.length - 1 && (
+                        <div className="flex-1 h-px mx-3" style={{ background: `linear-gradient(90deg, ${stepColor}, ${arr[i+1].done ? stepColor : "rgba(255,255,255,0.06)"})` }} />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+      )
+
       <section className="py-6 sm:py-10 -mt-8">
         <div className="container max-w-2xl px-4">
 
