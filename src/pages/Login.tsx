@@ -259,6 +259,92 @@ export default function Login() {
               </div>
             </form>
 
+            {/* Passkey / Biometric Login */}
+            {!canSignup && (
+              <div className="mt-5 login-field-enter" style={{ animationDelay: "0.3s" }}>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex-1 h-px bg-white/[0.04]" />
+                  <span className="font-body text-[10px] text-white/20 uppercase tracking-[0.15em]">or</span>
+                  <div className="flex-1 h-px bg-white/[0.04]" />
+                </div>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!window.PublicKeyCredential) {
+                      toast.error("Passkeys are not supported on this device/browser");
+                      return;
+                    }
+                    try {
+                      setLoading(true);
+                      // Get authentication options
+                      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+                      const optRes = await fetch(`https://${projectId}.supabase.co/functions/v1/passkey-authenticate`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json", "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+                        body: JSON.stringify({ action: "get-options", email: email || undefined }),
+                      });
+                      const opts = await optRes.json();
+                      if (opts.error) { toast.error(opts.error); setLoading(false); return; }
+
+                      // Trigger biometric prompt
+                      const credential = await navigator.credentials.get({
+                        publicKey: {
+                          challenge: Uint8Array.from(atob(opts.challenge.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)),
+                          rpId: opts.rpId,
+                          allowCredentials: opts.allowCredentials?.map((c: any) => ({
+                            id: Uint8Array.from(atob(c.id.replace(/-/g, "+").replace(/_/g, "/")), ch => ch.charCodeAt(0)),
+                            type: c.type,
+                            transports: c.transports,
+                          })) || [],
+                          userVerification: "preferred",
+                          timeout: 60000,
+                        },
+                      }) as PublicKeyCredential;
+
+                      if (!credential) { toast.error("Authentication cancelled"); setLoading(false); return; }
+
+                      const rawId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+
+                      // Verify with server
+                      const authRes = await fetch(`https://${projectId}.supabase.co/functions/v1/passkey-authenticate`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json", "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+                        body: JSON.stringify({ action: "authenticate", credentialId: rawId }),
+                      });
+                      const authData = await authRes.json();
+
+                      if (authData.error) { toast.error(authData.error); setLoading(false); return; }
+
+                      if (authData.token && authData.email) {
+                        // Use the token to verify OTP and sign in
+                        const { error: verifyError } = await (await import("@/integrations/supabase/client")).supabase.auth.verifyOtp({
+                          email: authData.email,
+                          token: authData.token,
+                          type: "magiclink",
+                        });
+                        if (verifyError) { toast.error(verifyError.message); setLoading(false); return; }
+                        toast.success("Signed in with passkey!");
+                      }
+                    } catch (err: any) {
+                      if (err.name === "NotAllowedError") {
+                        toast.error("Authentication was cancelled or timed out");
+                      } else {
+                        toast.error("Passkey authentication failed");
+                      }
+                      setLoading(false);
+                    }
+                  }}
+                  disabled={loading}
+                  className="w-full py-3.5 rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.1] transition-all duration-300 flex items-center justify-center gap-2.5 group"
+                >
+                  <Fingerprint className="w-5 h-5 text-white/30 group-hover:text-secondary/60 transition-colors duration-300" />
+                  <span className="font-body text-[13px] font-medium text-white/40 group-hover:text-white/60 transition-colors duration-300">
+                    Sign in with Passkey
+                  </span>
+                </button>
+              </div>
+            )}
+
             {/* Trust bar */}
             <div className="flex items-center justify-center gap-4 sm:gap-5 mt-6 sm:mt-8 pt-5 sm:pt-7 border-t border-white/[0.04]">
               {[

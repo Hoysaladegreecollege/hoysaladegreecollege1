@@ -965,6 +965,39 @@ export type Database = {
         }
         Relationships: []
       }
+      passkeys: {
+        Row: {
+          counter: number
+          created_at: string
+          credential_id: string
+          id: string
+          name: string | null
+          public_key: string
+          transports: string[] | null
+          user_id: string
+        }
+        Insert: {
+          counter?: number
+          created_at?: string
+          credential_id: string
+          id?: string
+          name?: string | null
+          public_key: string
+          transports?: string[] | null
+          user_id: string
+        }
+        Update: {
+          counter?: number
+          created_at?: string
+          credential_id?: string
+          id?: string
+          name?: string | null
+          public_key?: string
+          transports?: string[] | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       pending_admin_requests: {
         Row: {
           approved_at: string | null

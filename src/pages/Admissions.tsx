@@ -254,6 +254,69 @@ export default function Admissions() {
         </div>
       </section>
 
+      {/* Scholarships Section */}
+      <section className="py-20 sm:py-28 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-card/50 via-background to-card/50" />
+        <div className="container max-w-3xl px-4 relative">
+          <ScrollReveal>
+            <SectionHeading title="Scholarships & Financial Aid" subtitle="We believe in making education accessible to all" />
+          </ScrollReveal>
+          <ScrollReveal delay={100}>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {[
+                { title: "Merit Scholarship", desc: "Up to 50% fee waiver for students with 90%+ in 12th grade", icon: Award, color: "42, 87%, 55%" },
+                { title: "SC/ST Scholarship", desc: "Government scholarship schemes for eligible students", icon: Shield, color: "220, 80%, 55%" },
+                { title: "Sports Quota", desc: "Special fee concession for state/national level athletes", icon: Star, color: "155, 65%, 45%" },
+                { title: "Need-Based Aid", desc: "Financial assistance based on family income criteria", icon: Users, color: "280, 60%, 55%" },
+              ].map((s, i) => (
+                <div key={s.title} className="group p-6 rounded-2xl bg-card border border-border/30 hover:border-border/60 hover:-translate-y-1 transition-all duration-400 overflow-hidden relative">
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none" style={{ background: `linear-gradient(135deg, hsla(${s.color}, 0.06), transparent 70%)` }} />
+                  <div className="relative z-10">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 border border-border/30" style={{ background: `hsla(${s.color}, 0.08)` }}>
+                      <s.icon className="w-6 h-6" style={{ color: `hsla(${s.color}, 0.8)` }} />
+                    </div>
+                    <h3 className="font-display text-base font-bold text-foreground mb-1.5">{s.title}</h3>
+                    <p className="font-body text-sm text-muted-foreground">{s.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-20 sm:py-28 bg-background relative overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full blur-[120px] pointer-events-none" style={{ background: "hsla(var(--secondary), 0.03)" }} />
+        <div className="container max-w-3xl px-4 relative">
+          <ScrollReveal>
+            <SectionHeading title="Frequently Asked Questions" subtitle="Common queries about admissions" />
+          </ScrollReveal>
+          <ScrollReveal delay={100}>
+            <div className="space-y-3">
+              {[
+                { q: "What is the admission deadline?", a: "Admissions are open until all seats are filled. We recommend applying early as seats are limited. The academic year starts in July." },
+                { q: "Can I apply online?", a: "Yes! You can apply online through our Apply Now page. Fill in your details, upload documents, and pay the registration fee online." },
+                { q: "What documents are required?", a: "You need 10th & 12th marksheets, Transfer Certificate, Migration Certificate, Aadhar Card, passport photos, and caste/income certificates if applicable." },
+                { q: "Is hostel facility available?", a: "Currently, we do not have on-campus hostel facilities. However, there are several affordable PG accommodations near the campus." },
+                { q: "What is the fee structure?", a: "Fees vary by course: BCA (₹80,000/yr), B.Com Regular (₹60,000/yr), B.Com Professional (₹60,000/yr), BBA (₹70,000/yr). Scholarships and fee concessions are available." },
+                { q: "How can I check my application status?", a: "Visit our Track Application page and enter your application number and registered email to check the current status of your application." },
+              ].map((faq, i) => (
+                <details key={i} className="group bg-card border border-border/30 rounded-2xl overflow-hidden hover:border-border/60 transition-all duration-300">
+                  <summary className="flex items-center justify-between p-5 sm:p-6 cursor-pointer list-none font-display text-sm sm:text-base font-bold text-foreground">
+                    {faq.q}
+                    <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 ml-3 transition-transform duration-300 group-open:rotate-90" />
+                  </summary>
+                  <div className="px-5 sm:px-6 pb-5 sm:pb-6 -mt-1">
+                    <p className="font-body text-sm text-muted-foreground leading-relaxed">{faq.a}</p>
+                  </div>
+                </details>
+              ))}
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
       {/* Help CTA */}
       <section className="py-20 sm:py-24 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-card/50 via-background to-card/50" />
