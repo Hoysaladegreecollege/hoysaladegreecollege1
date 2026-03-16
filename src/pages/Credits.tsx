@@ -30,7 +30,7 @@ export default function Credits() {
     <FeatureHighlights key="features" />,
     <TechStack key="tech" />,
 
-    {/* Purchase CTA */}
+    // Purchase CTA
     <div key="purchase-cta" className="max-w-3xl mx-auto mt-10">
       <div className="relative rounded-3xl overflow-hidden border border-[hsl(42_87%_55%_/_0.15)]"
         style={{ background: "linear-gradient(135deg, rgba(198,167,94,0.04), rgba(20,24,36,0.95))", boxShadow: "0 30px 80px -20px rgba(0,0,0,0.4), 0 0 40px rgba(198,167,94,0.05)" }}>

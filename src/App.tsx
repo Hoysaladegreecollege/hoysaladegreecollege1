@@ -163,6 +163,7 @@ const App = () => (
               <Route path="/placements" element={<SuspenseWrap><Placements /></SuspenseWrap>} />
               <Route path="/campus" element={<SuspenseWrap><CampusPage /></SuspenseWrap>} />
               <Route path="/alumni" element={<SuspenseWrap><Alumni /></SuspenseWrap>} />
+              <Route path="/purchase" element={<SuspenseWrap><PurchaseWebsite /></SuspenseWrap>} />
             </Route>
 
             <Route path="/login" element={<SuspenseWrap><Login /></SuspenseWrap>} />
