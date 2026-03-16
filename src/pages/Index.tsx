@@ -258,14 +258,7 @@ export default function Index() {
   const testimonialRef = useRef<NodeJS.Timeout | null>(null);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
-  useEffect(() => {
-    testimonialRef.current = setInterval(() => {
-      setTestimonialIndex((prev) => (prev + 1) % Math.ceil(testimonials.length / 2));
-    }, 5000);
-    return () => {
-      if (testimonialRef.current) clearInterval(testimonialRef.current);
-    };
-  }, []);
+  // Manual testimonial navigation only (no auto-scroll)
 
   const { data: liveStats } = useQuery({
     queryKey: ["homepage-stats"],
