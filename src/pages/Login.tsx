@@ -286,11 +286,15 @@ export default function Login() {
                       const opts = await optRes.json();
                       if (opts.error) { toast.error(opts.error); setLoading(false); return; }
 
+                      // Compute rpId client-side to always match current domain
+                      const hostname = window.location.hostname;
+                      const clientRpId = hostname === "localhost" ? "localhost" : hostname;
+
                       // Trigger biometric prompt
                       const credential = await navigator.credentials.get({
                         publicKey: {
                           challenge: Uint8Array.from(atob(opts.challenge.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)),
-                          rpId: opts.rpId,
+                          rpId: clientRpId,
                           allowCredentials: opts.allowCredentials?.map((c: any) => ({
                             id: Uint8Array.from(atob(c.id.replace(/-/g, "+").replace(/_/g, "/")), ch => ch.charCodeAt(0)),
                             type: c.type,

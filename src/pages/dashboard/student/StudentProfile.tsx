@@ -1,7 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { User, Phone, MapPin, Calendar, BookOpen, Hash, Camera, Upload, Sparkles, Shield } from "lucide-react";
+import { User, Phone, MapPin, Calendar, BookOpen, Hash, Camera, Upload, Sparkles, Shield, Fingerprint, Trash2 } from "lucide-react";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ export default function StudentProfile() {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [registeringPasskey, setRegisteringPasskey] = useState(false);
 
   const { data: student } = useQuery({
     queryKey: ["student-record", user?.id],
@@ -21,6 +22,19 @@ export default function StudentProfile() {
         .eq("user_id", user!.id)
         .single();
       return data;
+    },
+    enabled: !!user,
+  });
+
+  const { data: passkeys, refetch: refetchPasskeys } = useQuery({
+    queryKey: ["passkeys", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("passkeys")
+        .select("id, name, created_at")
+        .eq("user_id", user!.id)
+        .order("created_at", { ascending: false });
+      return data || [];
     },
     enabled: !!user,
   });
@@ -45,6 +59,101 @@ export default function StudentProfile() {
     },
     onError: (e: any) => { toast.error(e.message); setUploading(false); },
   });
+
+  const handleRegisterPasskey = async () => {
+    if (!window.PublicKeyCredential) {
+      toast.error("Passkeys are not supported on this device/browser");
+      return;
+    }
+    try {
+      setRegisteringPasskey(true);
+      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+      const session = (await supabase.auth.getSession()).data.session;
+      if (!session) { toast.error("Not authenticated"); setRegisteringPasskey(false); return; }
+
+      const optRes = await fetch(`https://${projectId}.supabase.co/functions/v1/passkey-register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          "authorization": `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ action: "get-options" }),
+      });
+      const optData = await optRes.json();
+      if (optData.error) { toast.error(optData.error); setRegisteringPasskey(false); return; }
+
+      const opts = optData.options;
+      const clientRpId = window.location.hostname === "localhost" ? "localhost" : window.location.hostname;
+
+      const credential = await navigator.credentials.create({
+        publicKey: {
+          challenge: Uint8Array.from(atob(opts.challenge.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)),
+          rp: { name: opts.rp.name, id: clientRpId },
+          user: {
+            id: Uint8Array.from(atob(opts.user.id.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)),
+            name: opts.user.name,
+            displayName: opts.user.displayName,
+          },
+          pubKeyCredParams: opts.pubKeyCredParams,
+          authenticatorSelection: opts.authenticatorSelection,
+          timeout: opts.timeout,
+          excludeCredentials: (opts.excludeCredentials || []).map((c: any) => ({
+            id: Uint8Array.from(atob(c.id.replace(/-/g, "+").replace(/_/g, "/")), ch => ch.charCodeAt(0)),
+            type: c.type,
+          })),
+        },
+      }) as PublicKeyCredential;
+
+      if (!credential) { toast.error("Registration cancelled"); setRegisteringPasskey(false); return; }
+
+      const response = credential.response as AuthenticatorAttestationResponse;
+      const rawId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+      const attestationObject = btoa(String.fromCharCode(...new Uint8Array(response.attestationObject))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+
+      const regRes = await fetch(`https://${projectId}.supabase.co/functions/v1/passkey-register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          "authorization": `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          action: "register",
+          credential: {
+            id: credential.id,
+            rawId,
+            response: { attestationObject },
+            type: credential.type,
+            transports: (response as any).getTransports?.() || [],
+            name: "My Passkey",
+          },
+        }),
+      });
+      const regData = await regRes.json();
+      if (regData.error) { toast.error(regData.error); } else {
+        toast.success("Passkey registered successfully!");
+        refetchPasskeys();
+      }
+    } catch (err: any) {
+      console.error("Passkey registration error:", err);
+      if (err.name === "NotAllowedError") {
+        toast.error("Registration was cancelled");
+      } else {
+        toast.error(err?.message || "Passkey registration failed");
+      }
+    } finally {
+      setRegisteringPasskey(false);
+    }
+  };
+
+  const handleDeletePasskey = async (passkeyId: string) => {
+    const { error } = await supabase.from("passkeys").delete().eq("id", passkeyId);
+    if (error) { toast.error("Failed to delete passkey"); } else {
+      toast.success("Passkey removed");
+      refetchPasskeys();
+    }
+  };
 
   const fields = [
     { icon: User, label: "Full Name", value: profile?.full_name },
@@ -162,6 +271,54 @@ export default function StudentProfile() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Passkey / Biometric Authentication */}
+      <div className="relative overflow-hidden bg-card border border-border/40 rounded-3xl p-6 sm:p-8">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent" />
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-9 h-9 rounded-xl bg-primary/8 border border-primary/10 flex items-center justify-center">
+            <Fingerprint className="w-4 h-4 text-primary" />
+          </div>
+          <div>
+            <h3 className="font-body text-xs font-bold text-muted-foreground uppercase tracking-[0.15em]">Passkey / Biometric Login</h3>
+            <p className="font-body text-[10px] text-muted-foreground mt-0.5">Sign in with fingerprint, face, or screen lock</p>
+          </div>
+        </div>
+
+        {passkeys && passkeys.length > 0 && (
+          <div className="space-y-2 mb-4">
+            {passkeys.map((pk: any) => (
+              <div key={pk.id} className="flex items-center justify-between p-3 rounded-2xl bg-muted/30 border border-border/20">
+                <div className="flex items-center gap-2">
+                  <Fingerprint className="w-4 h-4 text-primary" />
+                  <span className="font-body text-sm text-foreground">{pk.name || "My Passkey"}</span>
+                  <span className="font-body text-[10px] text-muted-foreground">
+                    {new Date(pk.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+                <button
+                  onClick={() => handleDeletePasskey(pk.id)}
+                  className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <Button
+          variant="outline"
+          size="sm"
+          className="rounded-2xl font-body text-xs border-border/50 hover:border-primary/30 hover:bg-primary/5 transition-all duration-300"
+          disabled={registeringPasskey}
+          onClick={handleRegisterPasskey}
+        >
+          {registeringPasskey ? "Registering..." : (
+            <><Fingerprint className="w-3 h-3 mr-1.5" /> Register Passkey</>
+          )}
+        </Button>
       </div>
     </div>
   );

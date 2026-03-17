@@ -16,11 +16,7 @@ function getRpId(req: Request, supabaseUrl: string): string {
   const origin = req.headers.get("origin");
   if (origin) {
     try {
-      const hostname = new URL(origin).hostname;
-      // Use the root domain for cross-subdomain compatibility
-      if (hostname.endsWith(".lovable.app")) return "lovable.app";
-      if (hostname.endsWith(".lovableproject.com")) return "lovableproject.com";
-      return hostname;
+      return new URL(origin).hostname;
     } catch {}
   }
   try { return new URL(supabaseUrl).hostname; } catch { return "localhost"; }
