@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 function generateChallenge(): string {
@@ -12,8 +12,21 @@ function generateChallenge(): string {
   return btoa(String.fromCharCode(...array)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
 }
 
+function getRpId(req: Request, supabaseUrl: string): string {
+  const origin = req.headers.get("origin");
+  if (origin) {
+    try {
+      const hostname = new URL(origin).hostname;
+      if (hostname.endsWith(".lovable.app")) return "lovable.app";
+      if (hostname.endsWith(".lovableproject.com")) return "lovableproject.com";
+      return hostname;
+    } catch {}
+  }
+  try { return new URL(supabaseUrl).hostname; } catch { return "localhost"; }
+}
+
 serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
     const authHeader = req.headers.get("authorization");
@@ -29,25 +42,23 @@ serve(async (req) => {
 
     const { action, credential } = await req.json();
     const supabaseAdmin = createClient(supabaseUrl, serviceKey);
+    const rpId = getRpId(req, supabaseUrl);
 
     if (action === "get-options") {
-      // Return registration options
       const challenge = generateChallenge();
-
-      // Get existing passkeys for excludeCredentials
       const { data: existing } = await supabaseAdmin.from("passkeys").select("credential_id").eq("user_id", user.id);
 
       const options = {
         challenge,
-        rp: { name: "Hoysala Degree College", id: new URL(req.headers.get("origin") || supabaseUrl).hostname },
+        rp: { name: "Hoysala Degree College", id: rpId },
         user: {
           id: btoa(user.id),
           name: user.email || user.id,
           displayName: user.user_metadata?.full_name || user.email || "User",
         },
         pubKeyCredParams: [
-          { alg: -7, type: "public-key" },   // ES256
-          { alg: -257, type: "public-key" },  // RS256
+          { alg: -7, type: "public-key" },
+          { alg: -257, type: "public-key" },
         ],
         authenticatorSelection: {
           authenticatorAttachment: "platform",
@@ -58,12 +69,10 @@ serve(async (req) => {
         excludeCredentials: (existing || []).map((e: any) => ({ id: e.credential_id, type: "public-key" })),
       };
 
-      // Store challenge temporarily
       return new Response(JSON.stringify({ options, challenge }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     if (action === "register") {
-      // Store the credential
       const { id, rawId, response: credResponse, type, name } = credential;
 
       const { error: insertError } = await supabaseAdmin.from("passkeys").insert({
@@ -84,6 +93,7 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({ error: "Invalid action" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (err) {
+    console.error("passkey-register error:", err);
     return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 });

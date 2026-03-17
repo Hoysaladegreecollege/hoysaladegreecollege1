@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 function generateChallenge(): string {
@@ -12,8 +12,22 @@ function generateChallenge(): string {
   return btoa(String.fromCharCode(...array)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
 }
 
+function getRpId(req: Request, supabaseUrl: string): string {
+  const origin = req.headers.get("origin");
+  if (origin) {
+    try {
+      const hostname = new URL(origin).hostname;
+      // Use the root domain for cross-subdomain compatibility
+      if (hostname.endsWith(".lovable.app")) return "lovable.app";
+      if (hostname.endsWith(".lovableproject.com")) return "lovableproject.com";
+      return hostname;
+    } catch {}
+  }
+  try { return new URL(supabaseUrl).hostname; } catch { return "localhost"; }
+}
+
 serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -21,12 +35,11 @@ serve(async (req) => {
     const supabaseAdmin = createClient(supabaseUrl, serviceKey);
 
     const { action, credentialId, email } = await req.json();
+    const rpId = getRpId(req, supabaseUrl);
 
     if (action === "get-options") {
-      // Generate authentication options
       const challenge = generateChallenge();
 
-      // If email provided, get user's passkeys
       let allowCredentials: any[] = [];
       if (email) {
         const { data: userData } = await supabaseAdmin.auth.admin.listUsers();
@@ -43,7 +56,7 @@ serve(async (req) => {
 
       return new Response(JSON.stringify({
         challenge,
-        rpId: new URL(req.headers.get("origin") || supabaseUrl).hostname,
+        rpId,
         allowCredentials,
         userVerification: "preferred",
         timeout: 60000,
@@ -51,26 +64,22 @@ serve(async (req) => {
     }
 
     if (action === "authenticate") {
-      // Find user by credential ID
       const { data: passkey } = await supabaseAdmin.from("passkeys")
         .select("*")
         .eq("credential_id", credentialId)
         .single();
 
       if (!passkey) {
-        return new Response(JSON.stringify({ error: "Passkey not found" }), { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        return new Response(JSON.stringify({ error: "Passkey not found. Please register a passkey first." }), { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
 
-      // Update counter
       await supabaseAdmin.from("passkeys").update({ counter: passkey.counter + 1 }).eq("id", passkey.id);
 
-      // Get user email and generate a magic link / sign in token
       const { data: userData } = await supabaseAdmin.auth.admin.getUserById(passkey.user_id);
       if (!userData?.user?.email) {
         return new Response(JSON.stringify({ error: "User not found" }), { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
 
-      // Generate a sign-in link
       const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
         type: "magiclink",
         email: userData.user.email,
@@ -89,6 +98,7 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({ error: "Invalid action" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (err) {
+    console.error("passkey-authenticate error:", err);
     return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 });

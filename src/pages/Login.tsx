@@ -326,10 +326,11 @@ export default function Login() {
                         toast.success("Signed in with passkey!");
                       }
                     } catch (err: any) {
+                      console.error("Passkey auth error:", err);
                       if (err.name === "NotAllowedError") {
                         toast.error("Authentication was cancelled or timed out");
                       } else {
-                        toast.error("Passkey authentication failed");
+                        toast.error(err?.message || "Passkey authentication failed");
                       }
                       setLoading(false);
                     }
