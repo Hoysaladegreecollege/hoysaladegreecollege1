@@ -769,6 +769,7 @@ export type Database = {
       }
       gallery_images: {
         Row: {
+          album_name: string | null
           category: string
           created_at: string
           description: string | null
@@ -780,6 +781,7 @@ export type Database = {
           title: string
         }
         Insert: {
+          album_name?: string | null
           category?: string
           created_at?: string
           description?: string | null
@@ -791,6 +793,7 @@ export type Database = {
           title: string
         }
         Update: {
+          album_name?: string | null
           category?: string
           created_at?: string
           description?: string | null

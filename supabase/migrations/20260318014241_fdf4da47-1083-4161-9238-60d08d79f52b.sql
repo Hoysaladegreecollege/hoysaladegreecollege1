@@ -1,0 +1,1 @@
+ALTER TABLE public.gallery_images ADD COLUMN album_name TEXT DEFAULT NULL;
