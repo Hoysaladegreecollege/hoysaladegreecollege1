@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import PageHeader from "@/components/PageHeader";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
-import { Camera, ChevronLeft, ChevronRight, X, Maximize2 } from "lucide-react";
+import { Camera, ChevronLeft, ChevronRight, X, Maximize2, FolderOpen, ArrowLeft } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import galleryCampus from "@/assets/gallery-campus.jpg";
@@ -17,18 +17,19 @@ import galleryEvents from "@/assets/gallery-events.jpg";
 import gallerySports from "@/assets/gallery-sports.jpg";
 
 const fallbackImages = [
-  { id: "f1", title: "Campus Building", category: "Campus", image_url: galleryCampus },
-  { id: "f2", title: "Computer Lab", category: "Facilities", image_url: galleryLab },
-  { id: "f3", title: "Library", category: "Facilities", image_url: galleryLibrary },
-  { id: "f4", title: "Classroom", category: "Academics", image_url: galleryClassroom },
-  { id: "f5", title: "Annual Day", category: "Events", image_url: galleryEvents },
-  { id: "f6", title: "Sports Ground", category: "Sports", image_url: gallerySports },
+  { id: "f1", title: "Campus Building", category: "Campus", image_url: galleryCampus, album_name: null },
+  { id: "f2", title: "Computer Lab", category: "Facilities", image_url: galleryLab, album_name: null },
+  { id: "f3", title: "Library", category: "Facilities", image_url: galleryLibrary, album_name: null },
+  { id: "f4", title: "Classroom", category: "Academics", image_url: galleryClassroom, album_name: null },
+  { id: "f5", title: "Annual Day", category: "Events", image_url: galleryEvents, album_name: null },
+  { id: "f6", title: "Sports Ground", category: "Sports", image_url: gallerySports, album_name: null },
 ];
 
 export default function Gallery() {
   const [filter, setFilter] = useState("All");
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [activeAlbum, setActiveAlbum] = useState<string | null>(null);
 
   const { data: dbImages = [], isLoading } = useQuery({
     queryKey: ["public-gallery"],
@@ -39,8 +40,22 @@ export default function Gallery() {
   });
 
   const images = dbImages.length > 0 ? dbImages : fallbackImages;
+
+  // Derive albums
+  const albums = Array.from(new Set(images.filter((img: any) => img.album_name).map((img: any) => img.album_name))) as string[];
+  const albumCovers = albums.map(name => {
+    const albumImages = images.filter((img: any) => img.album_name === name);
+    return { name, cover: albumImages[0]?.image_url, count: albumImages.length };
+  });
+
+  // Filter logic
+  const displayImages = activeAlbum
+    ? images.filter((img: any) => img.album_name === activeAlbum)
+    : filter === "All"
+      ? images
+      : images.filter((img: any) => img.category === filter);
+
   const categories = ["All", ...Array.from(new Set(images.map((img: any) => img.category)))];
-  const filtered = filter === "All" ? images : images.filter((img: any) => img.category === filter);
 
   const openLightbox = useCallback((index: number) => {
     setLightboxIdx(index);
@@ -54,13 +69,13 @@ export default function Gallery() {
 
   const goNext = useCallback(() => {
     if (lightboxIdx === null) return;
-    setLightboxIdx((lightboxIdx + 1) % filtered.length);
-  }, [lightboxIdx, filtered.length]);
+    setLightboxIdx((lightboxIdx + 1) % displayImages.length);
+  }, [lightboxIdx, displayImages.length]);
 
   const goPrev = useCallback(() => {
     if (lightboxIdx === null) return;
-    setLightboxIdx((lightboxIdx - 1 + filtered.length) % filtered.length);
-  }, [lightboxIdx, filtered.length]);
+    setLightboxIdx((lightboxIdx - 1 + displayImages.length) % displayImages.length);
+  }, [lightboxIdx, displayImages.length]);
 
   useEffect(() => {
     if (lightboxIdx === null) return;
@@ -91,20 +106,63 @@ export default function Gallery() {
             <SectionHeading title="Photo Gallery" subtitle="A glimpse into life at Hoysala Degree College" />
           </ScrollReveal>
 
-          <ScrollReveal delay={100}>
-            <div className="flex flex-wrap gap-2 mb-10 justify-center">
-              {categories.map((c: any) => (
-                <button key={c} onClick={() => setFilter(c)}
-                  className={`font-body text-xs px-5 py-2.5 rounded-full transition-all duration-400 font-semibold border backdrop-blur-sm ${
-                    filter === c
-                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105 border-primary"
-                      : "bg-card/80 border-border text-muted-foreground hover:bg-muted hover:scale-105 hover:border-primary/30 hover:shadow-md"
-                  }`}>
-                  {c}
-                </button>
-              ))}
-            </div>
-          </ScrollReveal>
+          {/* Album Folders */}
+          {!activeAlbum && albums.length > 0 && (
+            <ScrollReveal delay={50}>
+              <div className="mb-10">
+                <h3 className="font-display text-base font-bold text-foreground mb-4 flex items-center gap-2">
+                  <FolderOpen className="w-4 h-4 text-primary" /> Albums
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+                  {albumCovers.map((album, i) => (
+                    <div
+                      key={album.name}
+                      onClick={() => { setActiveAlbum(album.name); setFilter("All"); }}
+                      className="relative group cursor-pointer rounded-2xl overflow-hidden border border-border/40 aspect-[4/3] hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                    >
+                      <img src={album.cover} alt={album.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/30 to-transparent" />
+                      <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <FolderOpen className="w-3.5 h-3.5 text-secondary" />
+                          <span className="font-body text-[10px] text-white/70">{album.count} photos</span>
+                        </div>
+                        <p className="font-display text-sm sm:text-base font-bold text-white leading-tight">{album.name}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </ScrollReveal>
+          )}
+
+          {/* Back from album */}
+          {activeAlbum && (
+            <ScrollReveal>
+              <button onClick={() => setActiveAlbum(null)} className="flex items-center gap-2 mb-6 font-body text-sm font-semibold text-primary hover:underline">
+                <ArrowLeft className="w-4 h-4" /> Back to Gallery
+              </button>
+              <h3 className="font-display text-lg font-bold text-foreground mb-6">{activeAlbum}</h3>
+            </ScrollReveal>
+          )}
+
+          {/* Category filter (only when not viewing album) */}
+          {!activeAlbum && (
+            <ScrollReveal delay={100}>
+              <div className="flex flex-wrap gap-2 mb-10 justify-center">
+                {categories.map((c: any) => (
+                  <button key={c} onClick={() => setFilter(c)}
+                    className={`font-body text-xs px-5 py-2.5 rounded-full transition-all duration-400 font-semibold border backdrop-blur-sm ${
+                      filter === c
+                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105 border-primary"
+                        : "bg-card/80 border-border text-muted-foreground hover:bg-muted hover:scale-105 hover:border-primary/30 hover:shadow-md"
+                    }`}>
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </ScrollReveal>
+          )}
 
           {isLoading ? (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5">
@@ -112,7 +170,7 @@ export default function Gallery() {
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5">
-              {filtered.map((img: any, i: number) => (
+              {displayImages.map((img: any, i: number) => (
                 <ScrollReveal key={img.id} delay={i * 60}>
                   <div
                     className="relative group cursor-pointer overflow-hidden rounded-2xl sm:rounded-3xl border border-border/40 aspect-[4/3] transition-all duration-600 active:scale-[0.97] touch-manipulation"
@@ -131,17 +189,11 @@ export default function Gallery() {
                     }}
                   >
                     <img src={img.image_url} alt={img.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[800ms]" loading="lazy" />
-                    
-                    {/* Multi-layer overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    
-                    {/* Bottom info */}
                     <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-5 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
                       <span className="inline-block text-[9px] sm:text-[10px] px-2.5 py-0.5 rounded-full bg-secondary/90 text-primary-foreground font-body font-bold mb-1.5 backdrop-blur-sm">{img.category}</span>
                       <p className="font-display text-sm sm:text-base font-bold text-white">{img.title}</p>
                     </div>
-                    
-                    {/* Expand icon */}
                     <div className="absolute top-3 right-3 sm:top-4 sm:right-4 w-9 h-9 rounded-xl bg-white/15 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 border border-white/20 group-hover:scale-110">
                       <Maximize2 className="w-4 h-4 text-white" />
                     </div>
@@ -189,14 +241,14 @@ export default function Gallery() {
             </button>
 
             <img
-              src={(filtered[lightboxIdx] as any).image_url}
-              alt={(filtered[lightboxIdx] as any).title}
+              src={(displayImages[lightboxIdx] as any).image_url}
+              alt={(displayImages[lightboxIdx] as any).title}
               className="w-full max-h-[65dvh] sm:max-h-[75vh] object-contain rounded-2xl shadow-2xl animate-scale-bounce"
               key={lightboxIdx}
             />
             <div className="mt-4 text-center bg-white/[0.06] backdrop-blur-xl px-6 py-3.5 rounded-xl border border-white/[0.08]">
-              <p className="font-display text-base sm:text-lg font-bold text-white">{(filtered[lightboxIdx] as any).title}</p>
-              <p className="font-body text-xs text-white/40 mt-1">{(filtered[lightboxIdx] as any).category} • {lightboxIdx + 1} / {filtered.length}</p>
+              <p className="font-display text-base sm:text-lg font-bold text-white">{(displayImages[lightboxIdx] as any).title}</p>
+              <p className="font-body text-xs text-white/40 mt-1">{(displayImages[lightboxIdx] as any).category} • {lightboxIdx + 1} / {displayImages.length}</p>
             </div>
           </div>
         </div>,

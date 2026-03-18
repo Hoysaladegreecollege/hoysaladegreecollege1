@@ -258,6 +258,19 @@ export default function Index() {
   const testimonialRef = useRef<NodeJS.Timeout | null>(null);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+
+  const { data: dbGalleryImages = [] } = useQuery({
+    queryKey: ["homepage-gallery"],
+    queryFn: async () => {
+      const { data } = await supabase.from("gallery_images").select("*").eq("is_active", true).order("sort_order").order("created_at", { ascending: false }).limit(6);
+      return data || [];
+    },
+  });
+
+  const galleryImages = dbGalleryImages.length > 0
+    ? dbGalleryImages.map((img: any) => ({ src: img.image_url, title: img.title, category: img.category }))
+    : fallbackGalleryImages;
+
   // Manual testimonial navigation only (no auto-scroll)
 
   const { data: liveStats } = useQuery({
