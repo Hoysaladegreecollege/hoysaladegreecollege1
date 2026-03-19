@@ -20,6 +20,7 @@ const Apply = lazy(() => import("./pages/Apply"));
 const Departments = lazy(() => import("./pages/Departments"));
 const Faculty = lazy(() => import("./pages/Faculty"));
 const Events = lazy(() => import("./pages/Events"));
+const EventDetail = lazy(() => import("./pages/EventDetail"));
 const Notices = lazy(() => import("./pages/Notices"));
 const Achievements = lazy(() => import("./pages/Achievements"));
 const Contact = lazy(() => import("./pages/Contact"));
@@ -42,126 +43,12 @@ const Placements = lazy(() => import("./pages/Placements"));
 const CampusPage = lazy(() => import("./pages/Campus"));
 const Alumni = lazy(() => import("./pages/Alumni"));
 const PurchaseWebsite = lazy(() => import("./pages/PurchaseWebsite"));
-
-// Lazy load student dashboard
-const StudentDashboard = lazy(() => import("./pages/dashboard/StudentDashboard"));
-const StudentProfile = lazy(() => import("./pages/dashboard/student/StudentProfile"));
-const StudentAttendance = lazy(() => import("./pages/dashboard/student/StudentAttendance"));
-const StudentMarks = lazy(() => import("./pages/dashboard/student/StudentMarks"));
-const StudentTimetable = lazy(() => import("./pages/dashboard/student/StudentTimetable"));
-const StudentNotices = lazy(() => import("./pages/dashboard/student/StudentNotices"));
-const StudentMaterials = lazy(() => import("./pages/dashboard/student/StudentMaterials"));
-const StudentAnnouncements = lazy(() => import("./pages/dashboard/student/StudentAnnouncements"));
-const StudentFees = lazy(() => import("./pages/dashboard/student/StudentFees"));
-const StudentMessages = lazy(() => import("./pages/dashboard/student/StudentMessages"));
-
-// Lazy load teacher dashboard
-const TeacherDashboard = lazy(() => import("./pages/dashboard/TeacherDashboard"));
-const TeacherStudents = lazy(() => import("./pages/dashboard/teacher/TeacherStudents"));
-const TeacherAttendance = lazy(() => import("./pages/dashboard/teacher/TeacherAttendance"));
-const TeacherMarks = lazy(() => import("./pages/dashboard/teacher/TeacherMarks"));
-const TeacherAbsent = lazy(() => import("./pages/dashboard/teacher/TeacherAbsent"));
-const TeacherMaterials = lazy(() => import("./pages/dashboard/teacher/TeacherMaterials"));
-const TeacherNotices = lazy(() => import("./pages/dashboard/teacher/TeacherNotices"));
-const TeacherTimetable = lazy(() => import("./pages/dashboard/teacher/TeacherTimetable"));
-const TeacherAnnouncements = lazy(() => import("./pages/dashboard/teacher/TeacherAnnouncements"));
-const TeacherAttendanceOverview = lazy(() => import("./pages/dashboard/teacher/TeacherAttendanceOverview"));
-const TeacherMessages = lazy(() => import("./pages/dashboard/teacher/TeacherMessages"));
-
-// Lazy load principal dashboard
-const PrincipalDashboard = lazy(() => import("./pages/dashboard/PrincipalDashboard"));
-const PrincipalTopStudents = lazy(() => import("./pages/dashboard/principal/PrincipalTopStudents"));
-const PrincipalEvents = lazy(() => import("./pages/dashboard/principal/PrincipalEvents"));
-const PrincipalNotices = lazy(() => import("./pages/dashboard/principal/PrincipalNotices"));
-const PrincipalCourses = lazy(() => import("./pages/dashboard/principal/PrincipalCourses"));
-const PrincipalDepartments = lazy(() => import("./pages/dashboard/principal/PrincipalDepartments"));
-const PrincipalTeachers = lazy(() => import("./pages/dashboard/principal/PrincipalTeachers"));
-const PrincipalStudents = lazy(() => import("./pages/dashboard/principal/PrincipalStudents"));
-
-// Lazy load admin dashboard
-const AdminDashboard = lazy(() => import("./pages/dashboard/AdminDashboard"));
-const AdminUsers = lazy(() => import("./pages/dashboard/admin/AdminUsers"));
-const AdminRoles = lazy(() => import("./pages/dashboard/admin/AdminRoles"));
-const AdminSettings = lazy(() => import("./pages/dashboard/admin/AdminSettings"));
-const AdminApplications = lazy(() => import("./pages/dashboard/admin/AdminApplications"));
-const AdminContacts = lazy(() => import("./pages/dashboard/admin/AdminContacts"));
-const AdminTopRankers = lazy(() => import("./pages/dashboard/admin/AdminTopRankers"));
-const AdminTimetable = lazy(() => import("./pages/dashboard/admin/AdminTimetable"));
-const AdminEvents = lazy(() => import("./pages/dashboard/admin/AdminEvents"));
-const AdminFaculty = lazy(() => import("./pages/dashboard/admin/AdminFaculty"));
-const AdminBannerAndPapers = lazy(() => import("./pages/dashboard/admin/AdminBannerAndPapers"));
-const AdminFeeManagement = lazy(() => import("./pages/dashboard/admin/AdminFeeManagement"));
-const AdminPostNotice = lazy(() => import("./pages/dashboard/admin/AdminPostNotice"));
-const AdminSemesterPromotion = lazy(() => import("./pages/dashboard/admin/AdminSemesterPromotion"));
-const AdminAcademicYear = lazy(() => import("./pages/dashboard/admin/AdminAcademicYear"));
-const AdminAbsentReport = lazy(() => import("./pages/dashboard/admin/AdminAbsentReport"));
-const AdminAttendanceHub = lazy(() => import("./pages/dashboard/admin/AdminAttendanceHub"));
-const AdminGallery = lazy(() => import("./pages/dashboard/admin/AdminGallery"));
-const AdminBirthdaySettings = lazy(() => import("./pages/dashboard/admin/AdminBirthdaySettings"));
-const AdminAddStaff = lazy(() => import("./pages/dashboard/admin/AdminAddStaff"));
-const AdminCourses = lazy(() => import("./pages/dashboard/admin/AdminCourses"));
-const AdminAttendanceOverview = lazy(() => import("./pages/dashboard/admin/AdminAttendanceOverview"));
-const AdminApproveAdmins = lazy(() => import("./pages/dashboard/admin/AdminApproveAdmins"));
-const AdminStudentFeeDetail = lazy(() => import("./pages/dashboard/admin/AdminStudentFeeDetail"));
-const AdminDepartmentsAndSeats = lazy(() => import("./pages/dashboard/admin/AdminDepartmentsAndSeats"));
-const AdminReports = lazy(() => import("./pages/dashboard/admin/AdminReports"));
-const AdminAlumni = lazy(() => import("./pages/dashboard/admin/AdminAlumni"));
-
-const queryClient = new QueryClient();
-
-const SuspenseWrap = ({ children }: { children: React.ReactNode }) => (
-  <Suspense fallback={<div className="flex items-center justify-center min-h-[40vh]"><div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
-    {children}
-  </Suspense>
-);
-
-const StudentRoute = ({ children }: { children: React.ReactNode }) => (
-  <ProtectedRoute allowedRoles={["student"]}><DashboardLayout><SuspenseWrap>{children}</SuspenseWrap></DashboardLayout></ProtectedRoute>
-);
-const TeacherRoute = ({ children }: { children: React.ReactNode }) => (
-  <ProtectedRoute allowedRoles={["teacher"]}><DashboardLayout><SuspenseWrap>{children}</SuspenseWrap></DashboardLayout></ProtectedRoute>
-);
-const PrincipalRoute = ({ children }: { children: React.ReactNode }) => (
-  <ProtectedRoute allowedRoles={["principal"]}><DashboardLayout><SuspenseWrap>{children}</SuspenseWrap></DashboardLayout></ProtectedRoute>
-);
-const AdminRoute = ({ children }: { children: React.ReactNode }) => (
-  <ProtectedRoute allowedRoles={["admin"]}><DashboardLayout><SuspenseWrap>{children}</SuspenseWrap></DashboardLayout></ProtectedRoute>
-);
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            {/* Public pages */}
-            <Route element={<Layout />}>
-              <Route path="/" element={<Index />} />
-              <Route path="/about" element={<SuspenseWrap><About /></SuspenseWrap>} />
-              <Route path="/courses" element={<SuspenseWrap><Courses /></SuspenseWrap>} />
-              <Route path="/admissions" element={<SuspenseWrap><Admissions /></SuspenseWrap>} />
-              <Route path="/apply" element={<SuspenseWrap><Apply /></SuspenseWrap>} />
-              <Route path="/departments" element={<SuspenseWrap><Departments /></SuspenseWrap>} />
+...
               <Route path="/faculty" element={<SuspenseWrap><Faculty /></SuspenseWrap>} />
               <Route path="/events" element={<SuspenseWrap><Events /></SuspenseWrap>} />
+              <Route path="/events/:eventId" element={<SuspenseWrap><EventDetail /></SuspenseWrap>} />
               <Route path="/notices" element={<SuspenseWrap><Notices /></SuspenseWrap>} />
-              <Route path="/achievements" element={<SuspenseWrap><Achievements /></SuspenseWrap>} />
-              <Route path="/contact" element={<SuspenseWrap><Contact /></SuspenseWrap>} />
-              <Route path="/support" element={<SuspenseWrap><Support /></SuspenseWrap>} />
-              <Route path="/management" element={<SuspenseWrap><Management /></SuspenseWrap>} />
-              <Route path="/committees" element={<SuspenseWrap><Committees /></SuspenseWrap>} />
-              <Route path="/addon-courses" element={<SuspenseWrap><AddOnCourses /></SuspenseWrap>} />
-              <Route path="/student-absent" element={<SuspenseWrap><StudentAbsent /></SuspenseWrap>} />
-              <Route path="/application-status" element={<SuspenseWrap><ApplicationStatus /></SuspenseWrap>} />
-              <Route path="/previous-year-papers" element={<SuspenseWrap><PreviousYearPapers /></SuspenseWrap>} />
-              <Route path="/gallery" element={<SuspenseWrap><Gallery /></SuspenseWrap>} />
-              <Route path="/download" element={<SuspenseWrap><DownloadApp /></SuspenseWrap>} />
-              <Route path="/credits" element={<SuspenseWrap><Credits /></SuspenseWrap>} />
-              <Route path="/offers" element={<SuspenseWrap><Offers /></SuspenseWrap>} />
-              <Route path="/placements" element={<SuspenseWrap><Placements /></SuspenseWrap>} />
-              <Route path="/campus" element={<SuspenseWrap><CampusPage /></SuspenseWrap>} />
+...
               <Route path="/alumni" element={<SuspenseWrap><Alumni /></SuspenseWrap>} />
               <Route path="/purchase" element={<SuspenseWrap><PurchaseWebsite /></SuspenseWrap>} />
             </Route>
