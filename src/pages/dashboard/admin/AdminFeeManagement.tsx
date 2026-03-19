@@ -871,14 +871,12 @@ export default function AdminFeeManagement() {
               });
               return students.filter((s: any) => {
                 const curSem = s.semester || 1;
-                const curSemFee = semFeeMap[s.id]?.[curSem] || ((s.total_fee || 0) / 6);
-                const curSemPaid = semPayMap[s.id]?.[curSem] || 0;
-                const curDue = curSemFee > 0 && curSemPaid < curSemFee;
-                const prevSem = curSem - 1;
-                const prevSemFee = prevSem >= 1 ? (semFeeMap[s.id]?.[prevSem] || ((s.total_fee || 0) / 6)) : 0;
-                const prevSemPaid = prevSem >= 1 ? (semPayMap[s.id]?.[prevSem] || 0) : 0;
-                const prevDue = prevSem >= 1 && prevSemFee > 0 && prevSemPaid < prevSemFee;
-                return curDue || prevDue;
+                const hasCurrentSemesterFee = semFeeMap[s.id]?.[curSem] !== undefined;
+                if (!hasCurrentSemesterFee) return false;
+                const curSemFee = Number(semFeeMap[s.id][curSem] || 0);
+                if (curSemFee <= 0) return false;
+                const curSemPaid = Number(semPayMap[s.id]?.[curSem] || 0);
+                return curSemPaid < curSemFee;
               }).length;
             })()} student(s)
           </span>
@@ -899,15 +897,12 @@ export default function AdminFeeManagement() {
 
           const defaulters = students.filter((s: any) => {
             const curSem = s.semester || 1;
-            const curSemFee = semFeeMap[s.id]?.[curSem] || ((s.total_fee || 0) / 6);
-            const curSemPaid = semPayMap[s.id]?.[curSem] || 0;
-            const curDue = curSemFee > 0 && curSemPaid < curSemFee;
-            // Also check previous semester
-            const prevSem = curSem - 1;
-            const prevSemFee = prevSem >= 1 ? (semFeeMap[s.id]?.[prevSem] || ((s.total_fee || 0) / 6)) : 0;
-            const prevSemPaid = prevSem >= 1 ? (semPayMap[s.id]?.[prevSem] || 0) : 0;
-            const prevDue = prevSem >= 1 && prevSemFee > 0 && prevSemPaid < prevSemFee;
-            return curDue || prevDue;
+            const hasCurrentSemesterFee = semFeeMap[s.id]?.[curSem] !== undefined;
+            if (!hasCurrentSemesterFee) return false;
+            const curSemFee = Number(semFeeMap[s.id][curSem] || 0);
+            if (curSemFee <= 0) return false;
+            const curSemPaid = Number(semPayMap[s.id]?.[curSem] || 0);
+            return curSemPaid < curSemFee;
           });
 
           if (defaulters.length === 0) return (
@@ -915,7 +910,7 @@ export default function AdminFeeManagement() {
               <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-3">
                 <CheckCircle className="w-7 h-7 text-emerald-400" />
               </div>
-              <p className="font-body text-sm text-muted-foreground">All current & previous semester fees are cleared! 🎉</p>
+              <p className="font-body text-sm text-muted-foreground">All current semester fees are cleared! 🎉</p>
             </div>
           );
           const bySemester: Record<number, any[]> = {};
@@ -935,16 +930,16 @@ export default function AdminFeeManagement() {
                     <span className="font-body text-[10px] text-muted-foreground">
                       {studs.length} defaulter(s) · ₹{studs.reduce((sum: number, st: any) => {
                         const curSem = st.semester || 1;
-                        const curSemFee = semFeeMap[st.id]?.[curSem] || ((st.total_fee || 0) / 6);
-                        const curSemPaid = semPayMap[st.id]?.[curSem] || 0;
+                        const curSemFee = Number(semFeeMap[st.id]?.[curSem] || 0);
+                        const curSemPaid = Number(semPayMap[st.id]?.[curSem] || 0);
                         return sum + Math.max(0, curSemFee - curSemPaid);
                       }, 0).toLocaleString()} pending
                     </span>
                   </div>
                   {studs.map((s: any) => {
                     const curSem = s.semester || 1;
-                    const curSemFee = semFeeMap[s.id]?.[curSem] || ((s.total_fee || 0) / 6);
-                    const curSemPaid = semPayMap[s.id]?.[curSem] || 0;
+                    const curSemFee = Number(semFeeMap[s.id]?.[curSem] || 0);
+                    const curSemPaid = Number(semPayMap[s.id]?.[curSem] || 0);
                     const curDue = Math.max(0, curSemFee - curSemPaid);
                     return (
                       <div key={s.id} className="flex items-center gap-3 px-5 py-3.5 hover:bg-muted/10 transition-colors duration-200">

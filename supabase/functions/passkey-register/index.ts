@@ -9,7 +9,13 @@ const corsHeaders = {
 function generateChallenge(): string {
   const array = new Uint8Array(32);
   crypto.getRandomValues(array);
-  return btoa(String.fromCharCode(...array)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+  let binary = "";
+  array.forEach((b) => (binary += String.fromCharCode(b)));
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+}
+
+function toBase64Url(value: string): string {
+  return btoa(value).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
 }
 
 function getRpId(req: Request, supabaseUrl: string): string {
@@ -17,9 +23,15 @@ function getRpId(req: Request, supabaseUrl: string): string {
   if (origin) {
     try {
       return new URL(origin).hostname;
-    } catch {}
+    } catch {
+      // ignore
+    }
   }
-  try { return new URL(supabaseUrl).hostname; } catch { return "localhost"; }
+  try {
+    return new URL(supabaseUrl).hostname;
+  } catch {
+    return "localhost";
+  }
 }
 
 serve(async (req) => {
@@ -27,7 +39,12 @@ serve(async (req) => {
 
   try {
     const authHeader = req.headers.get("authorization");
-    if (!authHeader) return new Response(JSON.stringify({ error: "No auth" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "No auth" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY")!;
@@ -35,7 +52,12 @@ serve(async (req) => {
 
     const supabaseUser = createClient(supabaseUrl, supabaseKey, { global: { headers: { authorization: authHeader } } });
     const { data: { user }, error: userError } = await supabaseUser.auth.getUser();
-    if (userError || !user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    if (userError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const { action, credential } = await req.json();
     const supabaseAdmin = createClient(supabaseUrl, serviceKey);
@@ -49,7 +71,7 @@ serve(async (req) => {
         challenge,
         rp: { name: "Hoysala Degree College", id: rpId },
         user: {
-          id: btoa(user.id),
+          id: toBase64Url(user.id),
           name: user.email || user.id,
           displayName: user.user_metadata?.full_name || user.email || "User",
         },
@@ -66,31 +88,50 @@ serve(async (req) => {
         excludeCredentials: (existing || []).map((e: any) => ({ id: e.credential_id, type: "public-key" })),
       };
 
-      return new Response(JSON.stringify({ options, challenge }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ options, challenge }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     if (action === "register") {
-      const { id, rawId, response: credResponse, type, name } = credential;
+      const { id, rawId, response: credResponse, name } = credential || {};
+      if (!id && !rawId) {
+        return new Response(JSON.stringify({ error: "Invalid credential id" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
 
       const { error: insertError } = await supabaseAdmin.from("passkeys").insert({
         user_id: user.id,
         credential_id: rawId || id,
-        public_key: credResponse.publicKey || credResponse.attestationObject || "",
+        public_key: credResponse?.publicKey || credResponse?.attestationObject || "",
         counter: 0,
-        transports: credential.transports || [],
+        transports: credential?.transports || [],
         name: name || "My Passkey",
       });
 
       if (insertError) {
-        return new Response(JSON.stringify({ error: insertError.message }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        return new Response(JSON.stringify({ error: insertError.message }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
 
-      return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    return new Response(JSON.stringify({ error: "Invalid action" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ error: "Invalid action" }), {
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (err) {
     console.error("passkey-register error:", err);
-    return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });
