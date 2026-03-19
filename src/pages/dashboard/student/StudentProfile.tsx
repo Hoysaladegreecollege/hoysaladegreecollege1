@@ -6,92 +6,52 @@ import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
-export default function StudentProfile() {
-  const { user, profile } = useAuth();
-  const queryClient = useQueryClient();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [uploading, setUploading] = useState(false);
-  const [registeringPasskey, setRegisteringPasskey] = useState(false);
+const base64UrlToUint8Array = (value: string) => {
+  const base64 = value.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(value.length / 4) * 4, "=");
+  return Uint8Array.from(atob(base64), (char) => char.charCodeAt(0));
+};
 
-  const { data: student } = useQuery({
-    queryKey: ["student-record", user?.id],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("students")
-        .select("*, courses(name, code)")
-        .eq("user_id", user!.id)
-        .single();
-      return data;
-    },
-    enabled: !!user,
-  });
-
-  const { data: passkeys, refetch: refetchPasskeys } = useQuery({
-    queryKey: ["passkeys", user?.id],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("passkeys")
-        .select("id, name, created_at")
-        .eq("user_id", user!.id)
-        .order("created_at", { ascending: false });
-      return data || [];
-    },
-    enabled: !!user,
-  });
-
-  const uploadAvatarMutation = useMutation({
-    mutationFn: async (file: File) => {
-      setUploading(true);
-      const ext = file.name.split(".").pop();
-      const path = `avatars/${user!.id}-${Date.now()}.${ext}`;
-      const { error: uploadErr } = await supabase.storage.from("uploads").upload(path, file, { upsert: true });
-      if (uploadErr) throw new Error("Upload failed: " + uploadErr.message);
-      const { data: urlData } = supabase.storage.from("uploads").getPublicUrl(path);
-      const avatar_url = urlData.publicUrl;
-      const { error } = await supabase.from("students").update({ avatar_url }).eq("user_id", user!.id);
-      if (error) throw error;
-      return avatar_url;
-    },
-    onSuccess: () => {
-      toast.success("Profile photo updated!");
-      queryClient.invalidateQueries({ queryKey: ["student-record", user?.id] });
-      setUploading(false);
-    },
-    onError: (e: any) => { toast.error(e.message); setUploading(false); },
-  });
-
+const arrayBufferToBase64Url = (buffer: ArrayBuffer) => {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  bytes.forEach((b) => (binary += String.fromCharCode(b)));
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+};
+...
   const handleRegisterPasskey = async () => {
     if (!window.PublicKeyCredential) {
       toast.error("Passkeys are not supported on this device/browser");
       return;
     }
+
     try {
       setRegisteringPasskey(true);
-      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
       const session = (await supabase.auth.getSession()).data.session;
-      if (!session) { toast.error("Not authenticated"); setRegisteringPasskey(false); return; }
+      if (!session) {
+        toast.error("Not authenticated");
+        setRegisteringPasskey(false);
+        return;
+      }
 
-      const optRes = await fetch(`https://${projectId}.supabase.co/functions/v1/passkey-register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          "authorization": `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({ action: "get-options" }),
+      const { data: optData, error: optionsError } = await supabase.functions.invoke("passkey-register", {
+        body: { action: "get-options" },
       });
-      const optData = await optRes.json();
-      if (optData.error) { toast.error(optData.error); setRegisteringPasskey(false); return; }
+
+      if (optionsError || optData?.error) {
+        toast.error(optionsError?.message || optData?.error || "Failed to load passkey options");
+        setRegisteringPasskey(false);
+        return;
+      }
 
       const opts = optData.options;
       const clientRpId = window.location.hostname === "localhost" ? "localhost" : window.location.hostname;
 
       const credential = await navigator.credentials.create({
         publicKey: {
-          challenge: Uint8Array.from(atob(opts.challenge.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)),
+          challenge: base64UrlToUint8Array(opts.challenge),
           rp: { name: opts.rp.name, id: clientRpId },
           user: {
-            id: Uint8Array.from(atob(opts.user.id.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)),
+            id: base64UrlToUint8Array(opts.user.id),
             name: opts.user.name,
             displayName: opts.user.displayName,
           },
@@ -99,26 +59,24 @@ export default function StudentProfile() {
           authenticatorSelection: opts.authenticatorSelection,
           timeout: opts.timeout,
           excludeCredentials: (opts.excludeCredentials || []).map((c: any) => ({
-            id: Uint8Array.from(atob(c.id.replace(/-/g, "+").replace(/_/g, "/")), ch => ch.charCodeAt(0)),
+            id: base64UrlToUint8Array(c.id),
             type: c.type,
           })),
         },
       }) as PublicKeyCredential;
 
-      if (!credential) { toast.error("Registration cancelled"); setRegisteringPasskey(false); return; }
+      if (!credential) {
+        toast.error("Registration cancelled");
+        setRegisteringPasskey(false);
+        return;
+      }
 
       const response = credential.response as AuthenticatorAttestationResponse;
-      const rawId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
-      const attestationObject = btoa(String.fromCharCode(...new Uint8Array(response.attestationObject))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+      const rawId = arrayBufferToBase64Url(credential.rawId);
+      const attestationObject = arrayBufferToBase64Url(response.attestationObject);
 
-      const regRes = await fetch(`https://${projectId}.supabase.co/functions/v1/passkey-register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          "authorization": `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({
+      const { data: regData, error: registerError } = await supabase.functions.invoke("passkey-register", {
+        body: {
           action: "register",
           credential: {
             id: credential.id,
@@ -128,10 +86,12 @@ export default function StudentProfile() {
             transports: (response as any).getTransports?.() || [],
             name: "My Passkey",
           },
-        }),
+        },
       });
-      const regData = await regRes.json();
-      if (regData.error) { toast.error(regData.error); } else {
+
+      if (registerError || regData?.error) {
+        toast.error(registerError?.message || regData?.error || "Passkey registration failed");
+      } else {
         toast.success("Passkey registered successfully!");
         refetchPasskeys();
       }
