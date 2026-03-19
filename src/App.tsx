@@ -20,6 +20,7 @@ const Apply = lazy(() => import("./pages/Apply"));
 const Departments = lazy(() => import("./pages/Departments"));
 const Faculty = lazy(() => import("./pages/Faculty"));
 const Events = lazy(() => import("./pages/Events"));
+const EventDetail = lazy(() => import("./pages/EventDetail"));
 const Notices = lazy(() => import("./pages/Notices"));
 const Achievements = lazy(() => import("./pages/Achievements"));
 const Contact = lazy(() => import("./pages/Contact"));
@@ -146,6 +147,7 @@ const App = () => (
               <Route path="/departments" element={<SuspenseWrap><Departments /></SuspenseWrap>} />
               <Route path="/faculty" element={<SuspenseWrap><Faculty /></SuspenseWrap>} />
               <Route path="/events" element={<SuspenseWrap><Events /></SuspenseWrap>} />
+              <Route path="/events/:eventId" element={<SuspenseWrap><EventDetail /></SuspenseWrap>} />
               <Route path="/notices" element={<SuspenseWrap><Notices /></SuspenseWrap>} />
               <Route path="/achievements" element={<SuspenseWrap><Achievements /></SuspenseWrap>} />
               <Route path="/contact" element={<SuspenseWrap><Contact /></SuspenseWrap>} />

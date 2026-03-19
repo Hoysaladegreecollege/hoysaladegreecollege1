@@ -164,17 +164,62 @@ export default function AdminDashboard() {
   const { data: feeDefaulters = [] } = useQuery({
     queryKey: ["admin-fee-defaulters"],
     queryFn: async () => {
-      const { data: students } = await supabase.from("students").select("id, roll_number, total_fee, fee_paid, fee_due_date, user_id, courses(name, code)").eq("is_active", true).gt("total_fee", 0);
-      if (!students) return [];
-      const defaulters = students.filter((s: any) => ((s.total_fee || 0) - (s.fee_paid || 0)) > 0);
+      const { data: students } = await supabase
+        .from("students")
+        .select("id, roll_number, semester, user_id, courses(name, code)")
+        .eq("is_active", true);
+
+      if (!students?.length) return [];
+
+      const studentIds = students.map((s: any) => s.id);
+      const [{ data: semesterFees }, { data: payments }] = await Promise.all([
+        supabase
+          .from("semester_fees")
+          .select("student_id, semester, fee_amount")
+          .in("student_id", studentIds),
+        supabase
+          .from("fee_payments")
+          .select("student_id, semester, amount")
+          .in("student_id", studentIds),
+      ]);
+
+      const semFeeMap: Record<string, Record<number, number>> = {};
+      (semesterFees || []).forEach((sf: any) => {
+        if (!semFeeMap[sf.student_id]) semFeeMap[sf.student_id] = {};
+        semFeeMap[sf.student_id][sf.semester] = Number(sf.fee_amount || 0);
+      });
+
+      const semPayMap: Record<string, Record<number, number>> = {};
+      (payments || []).forEach((p: any) => {
+        if (!p.student_id || !p.semester) return;
+        if (!semPayMap[p.student_id]) semPayMap[p.student_id] = {};
+        semPayMap[p.student_id][p.semester] = (semPayMap[p.student_id][p.semester] || 0) + Number(p.amount || 0);
+      });
+
+      const defaulters = students
+        .map((s: any) => {
+          const curSem = s.semester || 1;
+          const curSemFee = Number(semFeeMap[s.id]?.[curSem] || 0);
+          if (curSemFee <= 0) return null;
+          const curSemPaid = Number(semPayMap[s.id]?.[curSem] || 0);
+          const due = Math.max(0, curSemFee - curSemPaid);
+          if (due <= 0) return null;
+          return { ...s, due };
+        })
+        .filter(Boolean) as any[];
+
       if (defaulters.length === 0) return [];
+
       const userIds = defaulters.map((s: any) => s.user_id);
       const { data: profiles } = await supabase.from("profiles").select("user_id, full_name").in("user_id", userIds);
-      return defaulters.map((s: any) => ({
-        ...s,
-        name: profiles?.find((p: any) => p.user_id === s.user_id)?.full_name || s.roll_number,
-        due: (s.total_fee || 0) - (s.fee_paid || 0),
-      })).sort((a: any, b: any) => b.due - a.due).slice(0, 10);
+
+      return defaulters
+        .map((s: any) => ({
+          ...s,
+          name: profiles?.find((p: any) => p.user_id === s.user_id)?.full_name || s.roll_number,
+        }))
+        .sort((a: any, b: any) => b.due - a.due)
+        .slice(0, 10);
     },
   });
 

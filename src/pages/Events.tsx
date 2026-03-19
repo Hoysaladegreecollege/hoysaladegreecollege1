@@ -3,11 +3,11 @@ import SEOHead from "@/components/SEOHead";
 import SectionHeading from "@/components/SectionHeading";
 import ScrollReveal from "@/components/ScrollReveal";
 import PageHeader from "@/components/PageHeader";
-import { Calendar, Image as ImageIcon, ChevronLeft, ChevronRight, Search, Filter } from "lucide-react";
+import { Calendar, Image as ImageIcon, ChevronRight, Filter } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from "react-router-dom";
 
 const fallbackEvents = [
   { id: "1", title: "Annual Sports Day 2026", event_date: "2026-03-15", category: "Sports", description: "Inter-college sports competition.", image_url: "" },
@@ -40,8 +40,6 @@ function parseGallery(description: string | null): { text: string; gallery: stri
 
 export default function Events() {
   const [filter, setFilter] = useState("All");
-  const [selectedEvent, setSelectedEvent] = useState<any>(null);
-  const [galleryIndex, setGalleryIndex] = useState(0);
 
   const { data: dbEvents = [], isLoading } = useQuery({
     queryKey: ["public-events"],
@@ -53,9 +51,6 @@ export default function Events() {
 
   const events = dbEvents.length > 0 ? dbEvents : fallbackEvents;
   const filtered = filter === "All" ? events : events.filter((e: any) => e.category === filter);
-
-  const selectedParsed = selectedEvent ? parseGallery(selectedEvent.description) : null;
-  const allImages = selectedEvent ? [selectedEvent.image_url, ...(selectedParsed?.gallery || [])].filter(Boolean) : [];
 
   const catColor = (cat: string) => CATEGORY_COLORS[cat] || "from-muted to-muted/50 text-muted-foreground";
 
@@ -70,15 +65,17 @@ export default function Events() {
         <div className="container px-4 relative">
           <ScrollReveal><SectionHeading title="College Events" subtitle="Discover what makes campus life exciting" /></ScrollReveal>
 
-          {/* Category filter pills */}
           <div className="flex flex-wrap gap-2 justify-center mb-10">
             {categories.map((c) => (
-              <button key={c} onClick={() => setFilter(c)}
+              <button
+                key={c}
+                onClick={() => setFilter(c)}
                 className={`font-body text-xs sm:text-sm px-4 py-2 rounded-full transition-all duration-300 border ${
                   filter === c
                     ? "bg-primary text-primary-foreground border-primary shadow-lg scale-105 shadow-primary/20"
                     : "bg-card border-border text-muted-foreground hover:border-primary/30 hover:bg-muted hover:scale-105"
-                }`}>
+                }`}
+              >
                 {c}
               </button>
             ))}
@@ -101,31 +98,32 @@ export default function Events() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
               {filtered.map((e: any, i: number) => (
                 <ScrollReveal key={e.id} delay={i * 60}>
-                  <div onClick={() => { setSelectedEvent(e); setGalleryIndex(0); }}
-                    className="premium-card overflow-hidden cursor-pointer group h-full flex flex-col card-stack border-glow">
+                  <Link
+                    to={`/events/${e.id}`}
+                    className="premium-card overflow-hidden group h-full flex flex-col card-stack border-glow"
+                  >
                     {e.image_url ? (
                       <div className="overflow-hidden relative h-52">
-                        <img src={e.image_url} alt={e.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                        <img src={e.image_url} alt={e.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                         <div className="absolute top-3 left-3">
                           <span className={`text-[10px] font-body font-bold px-2.5 py-1 rounded-full bg-gradient-to-r ${catColor(e.category || "General")} border border-white/20 backdrop-blur-sm shadow-sm`}>
                             {e.category || "General"}
                           </span>
                         </div>
-                        <div className="absolute inset-0 bg-gradient-to-t from-foreground/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-400">
-                          <div className="bg-card/90 backdrop-blur-sm rounded-xl px-4 py-2 font-body text-xs font-bold text-foreground shadow-lg">View Gallery</div>
-                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-foreground/50 to-transparent" />
                       </div>
                     ) : (
                       <div className="h-52 bg-gradient-to-br from-primary/5 via-secondary/8 to-primary/3 flex items-center justify-center relative overflow-hidden">
-                        <div className="absolute inset-0 opacity-[0.04]"
-                          style={{ backgroundImage: "radial-gradient(hsl(var(--primary)) 1px, transparent 1px)", backgroundSize: "16px 16px" }} />
+                        <div
+                          className="absolute inset-0 opacity-[0.04]"
+                          style={{ backgroundImage: "radial-gradient(hsl(var(--primary)) 1px, transparent 1px)", backgroundSize: "16px 16px" }}
+                        />
                         <div className="absolute top-3 left-3">
                           <span className={`text-[10px] font-body font-bold px-2.5 py-1 rounded-full bg-gradient-to-r ${catColor(e.category || "General")} border border-current/10`}>
                             {e.category || "General"}
                           </span>
                         </div>
-                        <ImageIcon className="w-14 h-14 text-muted-foreground/15 group-hover:scale-110 transition-transform duration-500" />
+                        <ImageIcon className="w-14 h-14 text-muted-foreground/15" />
                       </div>
                     )}
                     <div className="p-5 sm:p-6 flex-1 flex flex-col">
@@ -141,15 +139,16 @@ export default function Events() {
                       {e.description && (
                         <p className="font-body text-sm text-muted-foreground mt-2 line-clamp-2">{parseGallery(e.description).text}</p>
                       )}
-                      <div className="mt-4 flex items-center text-xs font-body font-semibold text-primary opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300 gap-1">
-                        View Details <ChevronRight className="w-3 h-3" />
+                      <div className="mt-4 flex items-center text-xs font-body font-semibold text-primary gap-1">
+                        Open Event Page <ChevronRight className="w-3 h-3" />
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 </ScrollReveal>
               ))}
             </div>
           )}
+
           {!isLoading && filtered.length === 0 && (
             <div className="text-center py-20">
               <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-4">
@@ -161,68 +160,6 @@ export default function Events() {
           )}
         </div>
       </section>
-
-      <Dialog open={!!selectedEvent} onOpenChange={() => setSelectedEvent(null)}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl">
-          {selectedEvent && selectedParsed && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="font-display text-2xl">{selectedEvent.title}</DialogTitle>
-              </DialogHeader>
-
-              {allImages.length > 0 && (
-                <div className="relative rounded-xl overflow-hidden group">
-                  <img src={allImages[galleryIndex]} alt={selectedEvent.title} className="w-full object-cover max-h-96 transition-all duration-500" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  {allImages.length > 1 && (
-                    <>
-                      {[{ Icon: ChevronLeft, pos: "left-2", fn: () => setGalleryIndex(prev => prev === 0 ? allImages.length - 1 : prev - 1) },
-                        { Icon: ChevronRight, pos: "right-2", fn: () => setGalleryIndex(prev => (prev + 1) % allImages.length) }].map(({ Icon, pos, fn }, i) => (
-                        <button key={i} onClick={fn}
-                          className={`absolute ${pos} top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-card/90 shadow-lg flex items-center justify-center hover:bg-card hover:scale-110 transition-all duration-200 backdrop-blur-sm`}>
-                          <Icon className="w-4 h-4" />
-                        </button>
-                      ))}
-                      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
-                        {allImages.map((_, i) => (
-                          <button key={i} onClick={() => setGalleryIndex(i)}
-                            className={`rounded-full transition-all duration-300 ${i === galleryIndex ? "bg-primary w-6 h-2" : "bg-card/70 w-2 h-2 hover:bg-card"}`} />
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
-              )}
-
-              {allImages.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto py-2 scrollbar-none">
-                  {allImages.map((url, i) => (
-                    <img key={i} src={url} onClick={() => setGalleryIndex(i)} alt=""
-                      className={`w-16 h-16 rounded-xl object-cover cursor-pointer border-2 transition-all duration-300 shrink-0 hover:opacity-100 ${i === galleryIndex ? "border-primary scale-105 shadow-md" : "border-transparent opacity-60"}`} />
-                  ))}
-                </div>
-              )}
-
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className={`text-xs font-body font-bold px-3 py-1 rounded-full bg-gradient-to-r ${catColor(selectedEvent.category || "General")}`}>
-                    {selectedEvent.category || "General"}
-                  </span>
-                  {selectedEvent.event_date && (
-                    <span className="text-sm font-body text-muted-foreground flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5" />
-                      {new Date(selectedEvent.event_date).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
-                    </span>
-                  )}
-                </div>
-                {selectedParsed.text && (
-                  <p className="font-body text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{selectedParsed.text}</p>
-                )}
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
