@@ -147,7 +147,11 @@ export default function StudentProfile() {
     } catch (err: any) {
       console.error("Passkey registration error:", err);
       if (err?.name === "NotAllowedError") {
-        toast.error("Registration was cancelled");
+        toast.error("Registration was cancelled or timed out");
+      } else if (err?.name === "InvalidStateError") {
+        toast.error("This passkey is already registered on this device");
+      } else if (err?.name === "SecurityError") {
+        toast.error("Security error — passkeys require HTTPS");
       } else {
         toast.error(err?.message || "Passkey registration failed");
       }
