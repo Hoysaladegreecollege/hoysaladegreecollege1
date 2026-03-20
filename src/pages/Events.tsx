@@ -110,7 +110,7 @@ export default function Events() {
                             {e.category || "General"}
                           </span>
                         </div>
-                        <div className="absolute inset-0 bg-gradient-to-t from-foreground/50 to-transparent" />
+                        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/40 to-transparent" />
                       </div>
                     ) : (
                       <div className="h-52 bg-gradient-to-br from-primary/5 via-secondary/8 to-primary/3 flex items-center justify-center relative overflow-hidden">
