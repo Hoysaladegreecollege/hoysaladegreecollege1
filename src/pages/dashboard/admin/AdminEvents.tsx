@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { Plus, Calendar, Trash2, Image, Upload, ArrowLeft, Eye, EyeOff, Tag } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -22,6 +23,7 @@ export default function AdminEvents() {
   const [form, setForm] = useState({ title: "", description: "", event_date: "", category: "General" });
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
 
   const { data: events = [], isLoading } = useQuery({
     queryKey: ["admin-events"],
@@ -34,15 +36,21 @@ export default function AdminEvents() {
   const addEvent = useMutation({
     mutationFn: async () => {
       setUploading(true);
+      const totalFiles = imageFiles.length;
+      setUploadProgress({ current: 0, total: totalFiles });
       const uploadedUrls: string[] = [];
-      for (const file of imageFiles) {
+
+      for (let i = 0; i < totalFiles; i++) {
+        const file = imageFiles[i];
         const ext = file.name.split(".").pop();
         const path = `events/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
         const { error: uploadErr } = await supabase.storage.from("uploads").upload(path, file);
         if (uploadErr) throw new Error("Upload failed: " + uploadErr.message);
         const { data: urlData } = supabase.storage.from("uploads").getPublicUrl(path);
         uploadedUrls.push(urlData.publicUrl);
+        setUploadProgress({ current: i + 1, total: totalFiles });
       }
+
       const image_url = uploadedUrls[0] || null;
       let description = form.description || "";
       if (uploadedUrls.length > 1) description += `\n\n---gallery---\n${uploadedUrls.join("\n")}`;
@@ -54,9 +62,9 @@ export default function AdminEvents() {
       qc.invalidateQueries({ queryKey: ["public-events"] });
       toast.success("Event posted!");
       setForm({ title: "", description: "", event_date: "", category: "General" });
-      setImageFiles([]); setUploading(false);
+      setImageFiles([]); setUploading(false); setUploadProgress({ current: 0, total: 0 });
     },
-    onError: (e: any) => { toast.error("Failed: " + e.message); setUploading(false); },
+    onError: (e: any) => { toast.error("Failed: " + e.message); setUploading(false); setUploadProgress({ current: 0, total: 0 }); },
   });
 
   const toggleActive = useMutation({
@@ -76,6 +84,7 @@ export default function AdminEvents() {
   });
 
   const inputClass = "w-full border border-border/60 rounded-xl px-3 py-2.5 font-body text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all";
+  const progressPercent = uploadProgress.total > 0 ? Math.round((uploadProgress.current / uploadProgress.total) * 100) : 0;
 
   return (
     <div className="space-y-6">
@@ -138,6 +147,23 @@ export default function AdminEvents() {
               }
             </div>
           </div>
+
+          {/* Upload Progress Bar */}
+          {uploading && uploadProgress.total > 0 && (
+            <div className="sm:col-span-2 space-y-2 animate-fade-in">
+              <div className="flex items-center justify-between">
+                <p className="font-body text-xs font-semibold text-foreground">
+                  Uploading file {uploadProgress.current} of {uploadProgress.total}
+                </p>
+                <span className="font-body text-xs font-bold text-primary">{progressPercent}%</span>
+              </div>
+              <Progress value={progressPercent} className="h-3 rounded-xl" />
+              {uploadProgress.current === uploadProgress.total && uploadProgress.total > 0 && (
+                <p className="font-body text-xs text-primary font-semibold animate-fade-in">✓ All files uploaded — saving event...</p>
+              )}
+            </div>
+          )}
+
           <div className="sm:col-span-2">
             <Button type="submit" disabled={uploading} className="font-body rounded-xl shadow-md hover:shadow-lg transition-all">
               {uploading ? <span className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> Uploading...</span>
