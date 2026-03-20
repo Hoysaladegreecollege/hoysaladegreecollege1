@@ -43,6 +43,8 @@ const techStack = [
 ];
 
 export default function PurchaseWebsite() {
+  const [priceRevealed, setPriceRevealed] = useState(false);
+
   return (
     <div className="min-h-screen" style={{ background: "linear-gradient(180deg, #050608 0%, #0a0c14 50%, #050608 100%)" }}>
       <SEOHead title="Get This Website — College Management System | ₹15,000" description="Purchase this premium college management website with multi-role dashboards, attendance, fees, admissions and more. Built by Pavan A." canonical="/purchase" />

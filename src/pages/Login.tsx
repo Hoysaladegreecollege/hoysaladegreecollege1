@@ -276,27 +276,28 @@ export default function Login() {
                     }
                     try {
                       setLoading(true);
-                      // Get authentication options
-                      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-                      const optRes = await fetch(`https://${projectId}.supabase.co/functions/v1/passkey-authenticate`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json", "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
-                        body: JSON.stringify({ action: "get-options", email: email || undefined }),
-                      });
-                      const opts = await optRes.json();
-                      if (opts.error) { toast.error(opts.error); setLoading(false); return; }
+                      const { supabase } = await import("@/integrations/supabase/client");
 
-                      // Compute rpId client-side to always match current domain
+                      const { data: opts, error: optErr } = await supabase.functions.invoke("passkey-authenticate", {
+                        body: { action: "get-options", email: email || undefined },
+                      });
+                      if (optErr || opts?.error) { toast.error(optErr?.message || opts?.error); setLoading(false); return; }
+
+                      const b64ToArr = (v: string) => {
+                        const n = v.replace(/-/g, "+").replace(/_/g, "/");
+                        const p = n.padEnd(Math.ceil(n.length / 4) * 4, "=");
+                        return Uint8Array.from(atob(p), c => c.charCodeAt(0));
+                      };
+
                       const hostname = window.location.hostname;
                       const clientRpId = hostname === "localhost" ? "localhost" : hostname;
 
-                      // Trigger biometric prompt
                       const credential = await navigator.credentials.get({
                         publicKey: {
-                          challenge: Uint8Array.from(atob(opts.challenge.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)),
+                          challenge: b64ToArr(opts.challenge),
                           rpId: clientRpId,
                           allowCredentials: opts.allowCredentials?.map((c: any) => ({
-                            id: Uint8Array.from(atob(c.id.replace(/-/g, "+").replace(/_/g, "/")), ch => ch.charCodeAt(0)),
+                            id: b64ToArr(c.id),
                             type: c.type,
                             transports: c.transports,
                           })) || [],
@@ -309,24 +310,21 @@ export default function Login() {
 
                       const rawId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
 
-                      // Verify with server
-                      const authRes = await fetch(`https://${projectId}.supabase.co/functions/v1/passkey-authenticate`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json", "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
-                        body: JSON.stringify({ action: "authenticate", credentialId: rawId }),
+                      const { data: authData, error: authErr } = await supabase.functions.invoke("passkey-authenticate", {
+                        body: { action: "authenticate", credentialId: rawId },
                       });
-                      const authData = await authRes.json();
 
-                      if (authData.error) { toast.error(authData.error); setLoading(false); return; }
+                      if (authErr || authData?.error) { toast.error(authErr?.message || authData?.error); setLoading(false); return; }
 
                       if (authData.token && authData.email) {
-                        // Use the token to verify OTP and sign in
-                        const { error: verifyError } = await (await import("@/integrations/supabase/client")).supabase.auth.verifyOtp({
+                        const { error: verifyError } = await supabase.auth.verifyOtp({
                           email: authData.email,
                           token: authData.token,
                           type: "magiclink",
                         });
                         if (verifyError) { toast.error(verifyError.message); setLoading(false); return; }
+                        sessionStorage.setItem("hdc_remember", "1");
+                        localStorage.setItem("hdc_remember", "1");
                         toast.success("Signed in with passkey!");
                       }
                     } catch (err: any) {
