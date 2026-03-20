@@ -39,7 +39,8 @@ serve(async (req) => {
 
   try {
     const authHeader = req.headers.get("authorization");
-    if (!authHeader) {
+    if (!authHeader?.startsWith("Bearer ")) {
+      console.error("passkey-register: No auth header");
       return new Response(JSON.stringify({ error: "No auth" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -50,83 +51,37 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    const supabaseUser = createClient(supabaseUrl, supabaseKey, { global: { headers: { authorization: authHeader } } });
-    const { data: { user }, error: userError } = await supabaseUser.auth.getUser();
-    if (userError || !user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const { action, credential } = await req.json();
-    const supabaseAdmin = createClient(supabaseUrl, serviceKey);
-    const rpId = getRpId(req, supabaseUrl);
-
-    if (action === "get-options") {
-      const challenge = generateChallenge();
-      const { data: existing } = await supabaseAdmin.from("passkeys").select("credential_id").eq("user_id", user.id);
-
-      const options = {
-        challenge,
-        rp: { name: "Hoysala Degree College", id: rpId },
-        user: {
-          id: toBase64Url(user.id),
-          name: user.email || user.id,
-          displayName: user.user_metadata?.full_name || user.email || "User",
-        },
-        pubKeyCredParams: [
-          { alg: -7, type: "public-key" },
-          { alg: -257, type: "public-key" },
-        ],
-        authenticatorSelection: {
-          authenticatorAttachment: "platform",
-          userVerification: "preferred",
-          residentKey: "preferred",
-        },
-        timeout: 60000,
-        excludeCredentials: (existing || []).map((e: any) => ({ id: e.credential_id, type: "public-key" })),
-      };
-
-      return new Response(JSON.stringify({ options, challenge }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    if (action === "register") {
-      const { id, rawId, response: credResponse, name } = credential || {};
-      if (!id && !rawId) {
-        return new Response(JSON.stringify({ error: "Invalid credential id" }), {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      const { error: insertError } = await supabaseAdmin.from("passkeys").insert({
-        user_id: user.id,
-        credential_id: rawId || id,
-        public_key: credResponse?.publicKey || credResponse?.attestationObject || "",
-        counter: 0,
-        transports: credential?.transports || [],
-        name: name || "My Passkey",
-      });
-
-      if (insertError) {
-        return new Response(JSON.stringify({ error: insertError.message }), {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      return new Response(JSON.stringify({ success: true }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    return new Response(JSON.stringify({ error: "Invalid action" }), {
-      status: 400,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    // Use getClaims for signing-keys compatibility
+    const supabaseUser = createClient(supabaseUrl, supabaseKey, {
+      global: { headers: { authorization: authHeader } },
     });
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await supabaseUser.auth.getClaims(token);
+
+    if (claimsError || !claimsData?.claims?.sub) {
+      console.error("passkey-register: getClaims failed", claimsError);
+      // Fallback to getUser
+      const { data: { user }, error: userError } = await supabaseUser.auth.getUser();
+      if (userError || !user) {
+        console.error("passkey-register: getUser also failed", userError);
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      // Use user from getUser fallback
+      return await handleRequest(req, user.id, user.email || user.id, user.user_metadata?.full_name || user.email || "User", supabaseUrl, serviceKey);
+    }
+
+    const userId = claimsData.claims.sub as string;
+    const email = (claimsData.claims.email as string) || userId;
+    
+    // Get full user data for display name
+    const { data: { user: fullUser } } = await supabaseUser.auth.getUser();
+    const displayName = fullUser?.user_metadata?.full_name || email || "User";
+
+    return await handleRequest(req, userId, email, displayName, supabaseUrl, serviceKey);
   } catch (err) {
     console.error("passkey-register error:", err);
     return new Response(JSON.stringify({ error: err.message }), {
@@ -135,3 +90,75 @@ serve(async (req) => {
     });
   }
 });
+
+async function handleRequest(req: Request, userId: string, email: string, displayName: string, supabaseUrl: string, serviceKey: string) {
+  const { action, credential } = await req.json();
+  const supabaseAdmin = createClient(supabaseUrl, serviceKey);
+  const rpId = getRpId(req, supabaseUrl);
+
+  if (action === "get-options") {
+    const challenge = generateChallenge();
+    const { data: existing } = await supabaseAdmin.from("passkeys").select("credential_id").eq("user_id", userId);
+
+    const options = {
+      challenge,
+      rp: { name: "Hoysala Degree College", id: rpId },
+      user: {
+        id: toBase64Url(userId),
+        name: email,
+        displayName: displayName,
+      },
+      pubKeyCredParams: [
+        { alg: -7, type: "public-key" },
+        { alg: -257, type: "public-key" },
+      ],
+      authenticatorSelection: {
+        authenticatorAttachment: "platform",
+        userVerification: "preferred",
+        residentKey: "preferred",
+      },
+      timeout: 60000,
+      excludeCredentials: (existing || []).map((e: any) => ({ id: e.credential_id, type: "public-key" })),
+    };
+
+    return new Response(JSON.stringify({ options, challenge }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  if (action === "register") {
+    const { id, rawId, response: credResponse, name } = credential || {};
+    if (!id && !rawId) {
+      return new Response(JSON.stringify({ error: "Invalid credential id" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const { error: insertError } = await supabaseAdmin.from("passkeys").insert({
+      user_id: userId,
+      credential_id: rawId || id,
+      public_key: credResponse?.publicKey || credResponse?.attestationObject || "",
+      counter: 0,
+      transports: credential?.transports || [],
+      name: name || "My Passkey",
+    });
+
+    if (insertError) {
+      console.error("passkey-register insert error:", insertError);
+      return new Response(JSON.stringify({ error: insertError.message }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  return new Response(JSON.stringify({ error: "Invalid action" }), {
+    status: 400,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
