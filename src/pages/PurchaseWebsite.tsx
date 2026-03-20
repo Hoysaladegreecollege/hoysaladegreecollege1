@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SEOHead from "@/components/SEOHead";
 import ScrollReveal from "@/components/ScrollReveal";
 import { Link } from "react-router-dom";
@@ -8,7 +8,77 @@ import {
   ArrowRight, Heart, Phone, Mail, ExternalLink, Crown, Layers, Lock, Eye,
   ClipboardCheck, Award, Brain, Camera, TrendingUp, CircuitBoard,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+
+const PRICE_CHARS = ["₹", "1", "5", ",", "0", "0", "0"];
+const DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+const SPECIAL_CHARS = ["₹", ","];
+
+function SlotDigit({ char, delay, revealed }: { char: string; delay: number; revealed: boolean }) {
+  const isSpecial = SPECIAL_CHARS.includes(char);
+  const targetIndex = isSpecial ? 0 : DIGITS.indexOf(char);
+  const stripItems = isSpecial ? [char] : DIGITS;
+  const itemH = 72;
+  const totalH = stripItems.length * itemH;
+  const [landed, setLanded] = useState(false);
+
+  useEffect(() => {
+    if (!revealed) { setLanded(false); return; }
+    const t = setTimeout(() => setLanded(true), delay);
+    return () => clearTimeout(t);
+  }, [revealed, delay]);
+
+  if (!revealed) return null;
+
+  return (
+    <div className="relative overflow-hidden" style={{ height: itemH, width: isSpecial ? 30 : (char === "," ? 16 : 40) }}>
+      <AnimatePresence>
+        {landed && (
+          <motion.div
+            className="absolute inset-0 z-10 pointer-events-none rounded-lg"
+            initial={{ opacity: 0.9 }}
+            animate={{ opacity: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            style={{ background: "radial-gradient(circle, hsla(42,87%,65%,0.5), transparent 70%)" }}
+          />
+        )}
+      </AnimatePresence>
+
+      <motion.div
+        className="flex flex-col"
+        initial={{ y: -(Math.random() * totalH * 2 + totalH * 2) }}
+        animate={landed
+          ? { y: -(targetIndex * itemH) }
+          : { y: [-(totalH * 3), 0] }
+        }
+        transition={landed
+          ? { type: "spring", stiffness: 280, damping: 18, mass: 0.8 }
+          : { duration: 0.25, repeat: Infinity, ease: "linear" }
+        }
+      >
+        {(!landed ? [...stripItems, ...stripItems, ...stripItems, ...stripItems] : stripItems).map((d, i) => (
+          <div
+            key={i}
+            className="flex items-center justify-center shrink-0 font-display font-bold"
+            style={{
+              height: itemH,
+              fontSize: isSpecial ? 28 : (char === "," ? 28 : 42),
+              background: "linear-gradient(135deg, hsl(42,87%,55%), hsl(38,92%,65%))",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            {d}
+          </div>
+        ))}
+      </motion.div>
+
+      <div className="absolute top-0 left-0 right-0 h-3 pointer-events-none" style={{ background: "linear-gradient(to bottom, #050608, transparent)" }} />
+      <div className="absolute bottom-0 left-0 right-0 h-3 pointer-events-none" style={{ background: "linear-gradient(to top, #050608, transparent)" }} />
+    </div>
+  );
+}
 
 const allFeatures = [
   { icon: Users, title: "Multi-Role Dashboards", desc: "Separate dashboards for Students, Teachers, Principals & Admins with role-based access", color: "220, 80%, 55%" },
@@ -74,53 +144,65 @@ export default function PurchaseWebsite() {
               Multi-role dashboards, attendance, marks, fees, admissions, messaging, gallery, AI chatbot — everything built and ready to deploy for your institution.
             </p>
 
-            {/* Price with reveal animation */}
+            {/* Price with slot-machine reveal animation */}
             <div className="mt-10 inline-flex flex-col items-center gap-2">
-              {priceRevealed ? (
-                <motion.div
-                  initial={{ scale: 0.5, opacity: 0, filter: "blur(20px)" }}
-                  animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
-                  transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                  className="flex flex-col items-center gap-2"
-                >
-                  <div className="flex items-baseline gap-2">
-                    <motion.span
-                      className="font-display text-6xl sm:text-7xl font-bold"
-                      style={{ background: "linear-gradient(135deg, hsl(42,87%,55%), hsl(38,92%,65%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
-                      initial={{ y: 20 }}
-                      animate={{ y: 0 }}
-                      transition={{ delay: 0.2, duration: 0.5 }}
-                    >₹15,000</motion.span>
-                    <motion.span
-                      className="font-body text-white/30 text-sm"
+              <AnimatePresence mode="wait">
+                {priceRevealed ? (
+                  <motion.div
+                    key="price"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex flex-col items-center gap-3"
+                  >
+                    <div className="flex items-center justify-center">
+                      {PRICE_CHARS.map((char, i) => (
+                        <SlotDigit key={i} char={char} delay={400 + i * 350} revealed={priceRevealed} />
+                      ))}
+                    </div>
+
+                    <motion.div
+                      className="relative overflow-hidden rounded-full px-6 py-1.5 mt-1"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      transition={{ delay: 0.5 }}
-                    >one-time</motion.span>
-                  </div>
-                  <motion.p
-                    className="font-body text-white/25 text-xs"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6 }}
-                  >Full source code • Lifetime ownership • Free deployment support</motion.p>
-                </motion.div>
-              ) : (
-                <motion.button
-                  onClick={() => setPriceRevealed(true)}
-                  className="group relative inline-flex items-center gap-3 px-10 py-5 rounded-2xl font-body text-base font-bold border border-[hsl(42_87%_55%_/_0.3)] transition-all duration-500 overflow-hidden"
-                  style={{ background: "rgba(198,167,94,0.06)" }}
-                  whileHover={{ scale: 1.05, y: -4 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <span className="absolute inset-0 overflow-hidden rounded-2xl">
-                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-[hsl(42_87%_55%_/_0.15)] to-transparent -translate-x-full animate-[loginShimmer_3s_ease-in-out_infinite]" />
-                  </span>
-                  <Eye className="w-5 h-5 relative z-10" style={{ color: "hsl(42, 87%, 55%)" }} />
-                  <span className="relative z-10" style={{ color: "hsl(42, 87%, 55%)" }}>Reveal Price</span>
-                  <Sparkles className="w-4 h-4 relative z-10 opacity-50" style={{ color: "hsl(42, 87%, 55%)" }} />
-                </motion.button>
-              )}
+                      transition={{ delay: 3.2 }}
+                    >
+                      <motion.div
+                        className="absolute inset-0 pointer-events-none"
+                        initial={{ x: "-100%" }}
+                        animate={{ x: "200%" }}
+                        transition={{ delay: 3.4, duration: 0.8, ease: "easeInOut" }}
+                        style={{ background: "linear-gradient(90deg, transparent, hsla(42,87%,65%,0.3), transparent)", width: "50%" }}
+                      />
+                      <span className="font-body text-white/30 text-sm relative z-10">one-time payment</span>
+                    </motion.div>
+
+                    <motion.p
+                      className="font-body text-white/25 text-xs"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 3.6 }}
+                    >Full source code • Lifetime ownership • Free deployment support</motion.p>
+                  </motion.div>
+                ) : (
+                  <motion.button
+                    key="button"
+                    onClick={() => setPriceRevealed(true)}
+                    className="group relative inline-flex items-center gap-3 px-10 py-5 rounded-2xl font-body text-base font-bold border border-[hsl(42_87%_55%_/_0.3)] transition-all duration-500 overflow-hidden"
+                    style={{ background: "rgba(198,167,94,0.06)" }}
+                    whileHover={{ scale: 1.05, y: -4 }}
+                    whileTap={{ scale: 0.98 }}
+                    exit={{ scale: 0.8, opacity: 0, filter: "blur(10px)" }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    <span className="absolute inset-0 overflow-hidden rounded-2xl">
+                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-[hsl(42_87%_55%_/_0.15)] to-transparent -translate-x-full animate-[loginShimmer_3s_ease-in-out_infinite]" />
+                    </span>
+                    <Eye className="w-5 h-5 relative z-10" style={{ color: "hsl(42, 87%, 55%)" }} />
+                    <span className="relative z-10" style={{ color: "hsl(42, 87%, 55%)" }}>Reveal Price</span>
+                    <Sparkles className="w-4 h-4 relative z-10 opacity-50" style={{ color: "hsl(42, 87%, 55%)" }} />
+                  </motion.button>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* CTA Buttons */}

@@ -147,7 +147,11 @@ export default function StudentProfile() {
     } catch (err: any) {
       console.error("Passkey registration error:", err);
       if (err?.name === "NotAllowedError") {
-        toast.error("Registration was cancelled");
+        toast.error("Registration was cancelled or timed out");
+      } else if (err?.name === "InvalidStateError") {
+        toast.error("This passkey is already registered on this device");
+      } else if (err?.name === "SecurityError") {
+        toast.error("Security error — passkeys require HTTPS");
       } else {
         toast.error(err?.message || "Passkey registration failed");
       }
@@ -282,6 +286,9 @@ export default function StudentProfile() {
         <Button variant="outline" size="sm" className="rounded-2xl font-body text-xs" disabled={registeringPasskey} onClick={handleRegisterPasskey}>
           {registeringPasskey ? "Registering..." : <><Fingerprint className="w-3 h-3 mr-1.5" /> Register Passkey</>}
         </Button>
+        <p className="font-body text-[10px] text-muted-foreground/60 mt-2.5 leading-relaxed">
+          ⚠️ Passkeys are bound to the domain where registered. A passkey created here (<span className="font-semibold text-muted-foreground/80">{window.location.hostname}</span>) will only work on this same domain.
+        </p>
       </div>
     </div>
   );
