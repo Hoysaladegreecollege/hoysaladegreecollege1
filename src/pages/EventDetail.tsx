@@ -159,7 +159,7 @@ export default function EventDetail() {
             <img
               src={allImages[activeIndex] || "/placeholder.svg"}
               alt={`${event.title} - Image ${activeIndex + 1}`}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
               draggable={false}
             />
           </motion.div>
