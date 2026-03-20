@@ -33,22 +33,60 @@ export default function AdminEvents() {
     },
   });
 
+  const compressImage = async (file: File, maxWidth = 1200, quality = 0.8): Promise<File> => {
+    if (file.type.startsWith("video/")) return file;
+    return new Promise((resolve) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ratio = Math.min(maxWidth / img.width, 1);
+        canvas.width = img.width * ratio;
+        canvas.height = img.height * ratio;
+        const ctx = canvas.getContext("2d")!;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(
+          (blob) => {
+            if (blob && blob.size < file.size) {
+              resolve(new File([blob], file.name, { type: "image/webp" }));
+            } else {
+              resolve(file);
+            }
+          },
+          "image/webp",
+          quality
+        );
+      };
+      img.onerror = () => resolve(file);
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
   const addEvent = useMutation({
     mutationFn: async () => {
       setUploading(true);
       const totalFiles = imageFiles.length;
       setUploadProgress({ current: 0, total: totalFiles });
-      const uploadedUrls: string[] = [];
+      let completed = 0;
 
-      for (let i = 0; i < totalFiles; i++) {
-        const file = imageFiles[i];
-        const ext = file.name.split(".").pop();
+      const uploadOne = async (file: File): Promise<string> => {
+        const compressed = await compressImage(file);
+        const ext = compressed.type.startsWith("video/") ? file.name.split(".").pop() : "webp";
         const path = `events/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-        const { error: uploadErr } = await supabase.storage.from("uploads").upload(path, file);
+        const { error: uploadErr } = await supabase.storage.from("uploads").upload(path, compressed);
         if (uploadErr) throw new Error("Upload failed: " + uploadErr.message);
         const { data: urlData } = supabase.storage.from("uploads").getPublicUrl(path);
-        uploadedUrls.push(urlData.publicUrl);
-        setUploadProgress({ current: i + 1, total: totalFiles });
+        completed++;
+        setUploadProgress({ current: completed, total: totalFiles });
+        return urlData.publicUrl;
+      };
+
+      // Upload all files in parallel (batches of 4)
+      const uploadedUrls: string[] = [];
+      const batchSize = 4;
+      for (let i = 0; i < totalFiles; i += batchSize) {
+        const batch = imageFiles.slice(i, i + batchSize);
+        const results = await Promise.all(batch.map(uploadOne));
+        uploadedUrls.push(...results);
       }
 
       const image_url = uploadedUrls[0] || null;
