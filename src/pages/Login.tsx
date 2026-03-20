@@ -331,6 +331,8 @@ export default function Login() {
                       console.error("Passkey auth error:", err);
                       if (err.name === "NotAllowedError") {
                         toast.error("Authentication was cancelled or timed out");
+                      } else if (err?.message?.includes("not found") || err?.message?.includes("Passkey not found")) {
+                        toast.error("Passkey not found for this domain. Re-register your passkey on " + window.location.hostname);
                       } else {
                         toast.error(err?.message || "Passkey authentication failed");
                       }
