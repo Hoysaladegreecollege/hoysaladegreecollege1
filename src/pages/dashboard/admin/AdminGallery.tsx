@@ -19,6 +19,8 @@ export default function AdminGallery() {
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [activeAlbum, setActiveAlbum] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
+  const [draggedId, setDraggedId] = useState<string | null>(null);
 
   const { data: images = [], isLoading } = useQuery({
     queryKey: ["admin-gallery"],
