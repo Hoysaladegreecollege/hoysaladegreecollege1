@@ -23,7 +23,9 @@ export default function EventDetail() {
   const [direction, setDirection] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [lightboxZoom, setLightboxZoom] = useState(1);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pinchStateRef = useRef<{ initialDistance: number; initialZoom: number } | null>(null);
 
   const { data: event, isLoading } = useQuery({
     queryKey: ["public-event", eventId],
@@ -61,6 +63,12 @@ export default function EventDetail() {
     goTo(activeIndex === 0 ? allImages.length - 1 : activeIndex - 1, -1);
   }, [activeIndex, allImages.length, goTo]);
 
+  const closeLightbox = useCallback(() => {
+    setLightboxOpen(false);
+    setLightboxZoom(1);
+    pinchStateRef.current = null;
+  }, []);
+
   // Auto-scroll every 4 seconds (pause when lightbox is open)
   useEffect(() => {
     if (allImages.length <= 1 || lightboxOpen) return;
@@ -77,7 +85,7 @@ export default function EventDetail() {
   useEffect(() => {
     if (!lightboxOpen) return;
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setLightboxOpen(false);
+      if (e.key === "Escape") closeLightbox();
       if (e.key === "ArrowRight") setLightboxIndex((p) => (p + 1) % allImages.length);
       if (e.key === "ArrowLeft") setLightboxIndex((p) => (p === 0 ? allImages.length - 1 : p - 1));
     };
@@ -87,11 +95,56 @@ export default function EventDetail() {
       document.body.style.overflow = "";
       window.removeEventListener("keydown", handler);
     };
-  }, [lightboxOpen, allImages.length]);
+  }, [closeLightbox, lightboxOpen, allImages.length]);
+
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    setLightboxZoom(1);
+    pinchStateRef.current = null;
+  }, [lightboxIndex, lightboxOpen]);
 
   const openLightbox = useCallback((idx: number) => {
     setLightboxIndex(idx);
+    setLightboxZoom(1);
+    pinchStateRef.current = null;
     setLightboxOpen(true);
+  }, []);
+
+  const changeLightboxZoom = useCallback((delta: number) => {
+    setLightboxZoom((prev) => {
+      const next = Math.max(1, Math.min(4, Number((prev + delta).toFixed(2))));
+      return next;
+    });
+  }, []);
+
+  const handleLightboxWheel = useCallback((e: any) => {
+    e.preventDefault();
+    changeLightboxZoom(e.deltaY < 0 ? 0.2 : -0.2);
+  }, [changeLightboxZoom]);
+
+  const handleLightboxTouchStart = useCallback((e: any) => {
+    if (e.touches.length !== 2) return;
+    const [a, b] = e.touches;
+    pinchStateRef.current = {
+      initialDistance: Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY),
+      initialZoom: lightboxZoom,
+    };
+  }, [lightboxZoom]);
+
+  const handleLightboxTouchMove = useCallback((e: any) => {
+    if (e.touches.length !== 2 || !pinchStateRef.current) return;
+    e.preventDefault();
+    const [a, b] = e.touches;
+    const distance = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+    if (!pinchStateRef.current.initialDistance) return;
+    const nextZoom = Math.max(1, Math.min(4, Number((pinchStateRef.current.initialZoom * (distance / pinchStateRef.current.initialDistance)).toFixed(2))));
+    setLightboxZoom(nextZoom);
+  }, []);
+
+  const handleLightboxTouchEnd = useCallback((e: any) => {
+    if (e.touches.length < 2) {
+      pinchStateRef.current = null;
+    }
   }, []);
 
   const slideVariants = {
