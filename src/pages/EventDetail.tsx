@@ -278,96 +278,99 @@ export default function EventDetail() {
         </div>
       </section>
 
-      {/* Fullscreen Lightbox */}
-      <AnimatePresence>
-        {lightboxOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-[200] bg-black flex items-center justify-center"
-            onClick={() => setLightboxOpen(false)}
-          >
-            {/* Close button */}
-            <button
+      {/* Fullscreen Lightbox - Portal to body to escape stacking contexts */}
+      {createPortal(
+        <AnimatePresence>
+          {lightboxOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="fixed inset-0 z-[9999] bg-black flex items-center justify-center"
               onClick={() => setLightboxOpen(false)}
-              className="absolute top-4 right-4 w-11 h-11 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-20"
-              aria-label="Close fullscreen"
             >
-              <X className="w-5 h-5" />
-            </button>
+              {/* Close button */}
+              <button
+                onClick={() => setLightboxOpen(false)}
+                className="absolute top-4 right-4 w-11 h-11 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-20"
+                aria-label="Close fullscreen"
+              >
+                <X className="w-5 h-5" />
+              </button>
 
-            {/* Image counter */}
-            {allImages.length > 1 && (
-              <span className="absolute top-4 left-4 text-sm font-body font-semibold text-white/80 bg-white/10 backdrop-blur-sm px-4 py-1.5 rounded-full z-20">
-                {lightboxIndex + 1} / {allImages.length}
-              </span>
-            )}
+              {/* Image counter */}
+              {allImages.length > 1 && (
+                <span className="absolute top-4 left-4 text-sm font-body font-semibold text-white/80 bg-white/10 backdrop-blur-sm px-4 py-1.5 rounded-full z-20">
+                  {lightboxIndex + 1} / {allImages.length}
+                </span>
+              )}
 
-            {/* Main image */}
-            <img
-              src={allImages[lightboxIndex]}
-              alt={`${event.title} - Fullscreen ${lightboxIndex + 1}`}
-              className="max-w-full max-h-full object-contain select-none"
-              onClick={(e) => e.stopPropagation()}
-              draggable={false}
-            />
+              {/* Main image */}
+              <img
+                src={allImages[lightboxIndex]}
+                alt={`${event.title} - Fullscreen ${lightboxIndex + 1}`}
+                className="max-w-full max-h-full object-contain select-none"
+                onClick={(e) => e.stopPropagation()}
+                draggable={false}
+              />
 
-            {/* Lightbox nav arrows */}
-            {allImages.length > 1 && (
-              <>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setLightboxIndex((p) => (p === 0 ? allImages.length - 1 : p - 1));
-                  }}
-                  className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-20"
-                  aria-label="Previous image"
-                >
-                  <ChevronLeft className="w-6 h-6" />
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setLightboxIndex((p) => (p + 1) % allImages.length);
-                  }}
-                  className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-20"
-                  aria-label="Next image"
-                >
-                  <ChevronRight className="w-6 h-6" />
-                </button>
-              </>
-            )}
-
-            {/* Lightbox thumbnail strip */}
-            {allImages.length > 1 && (
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20 max-w-[90vw] overflow-x-auto pb-1">
-                {allImages.map((url, idx) => (
+              {/* Lightbox nav arrows */}
+              {allImages.length > 1 && (
+                <>
                   <button
-                    key={`lb-${idx}`}
                     onClick={(e) => {
                       e.stopPropagation();
-                      setLightboxIndex(idx);
+                      setLightboxIndex((p) => (p === 0 ? allImages.length - 1 : p - 1));
                     }}
-                    className={`shrink-0 rounded-md overflow-hidden border-2 transition-all duration-200 ${
-                      idx === lightboxIndex
-                        ? "border-white shadow-lg scale-110"
-                        : "border-transparent opacity-50 hover:opacity-80"
-                    }`}
+                    className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-20"
+                    aria-label="Previous image"
                   >
-                    <img
-                      src={url}
-                      alt={`Thumb ${idx + 1}`}
-                      className="w-14 h-10 sm:w-16 sm:h-12 object-cover"
-                    />
+                    <ChevronLeft className="w-6 h-6" />
                   </button>
-                ))}
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setLightboxIndex((p) => (p + 1) % allImages.length);
+                    }}
+                    className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-20"
+                    aria-label="Next image"
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
+                </>
+              )}
+
+              {/* Lightbox thumbnail strip */}
+              {allImages.length > 1 && (
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20 max-w-[90vw] overflow-x-auto pb-1">
+                  {allImages.map((url, idx) => (
+                    <button
+                      key={`lb-${idx}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setLightboxIndex(idx);
+                      }}
+                      className={`shrink-0 rounded-md overflow-hidden border-2 transition-all duration-200 ${
+                        idx === lightboxIndex
+                          ? "border-white shadow-lg scale-110"
+                          : "border-transparent opacity-50 hover:opacity-80"
+                      }`}
+                    >
+                      <img
+                        src={url}
+                        alt={`Thumb ${idx + 1}`}
+                        className="w-14 h-10 sm:w-16 sm:h-12 object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </div>
   );
 }
