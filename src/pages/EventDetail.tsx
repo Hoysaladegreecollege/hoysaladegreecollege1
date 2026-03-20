@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import SEOHead from "@/components/SEOHead";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Calendar, Tag, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, Calendar, Tag, ChevronLeft, ChevronRight, Maximize2, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 function parseGallery(description: string | null): { text: string; gallery: string[] } {
@@ -20,6 +20,8 @@ export default function EventDetail() {
   const { eventId } = useParams();
   const [activeIndex, setActiveIndex] = useState(0);
   const [direction, setDirection] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const { data: event, isLoading } = useQuery({
@@ -58,18 +60,38 @@ export default function EventDetail() {
     goTo(activeIndex === 0 ? allImages.length - 1 : activeIndex - 1, -1);
   }, [activeIndex, allImages.length, goTo]);
 
-  // Auto-scroll every 4 seconds
+  // Auto-scroll every 4 seconds (pause when lightbox is open)
   useEffect(() => {
-    if (allImages.length <= 1) return;
+    if (allImages.length <= 1 || lightboxOpen) return;
     timerRef.current = setInterval(goNext, 4000);
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [goNext, allImages.length]);
+  }, [goNext, allImages.length, lightboxOpen]);
 
-  // Reset on new event
   useEffect(() => {
     setActiveIndex(0);
     setDirection(0);
   }, [event?.id]);
+
+  // Lightbox keyboard navigation
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightboxOpen(false);
+      if (e.key === "ArrowRight") setLightboxIndex((p) => (p + 1) % allImages.length);
+      if (e.key === "ArrowLeft") setLightboxIndex((p) => (p === 0 ? allImages.length - 1 : p - 1));
+    };
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handler);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handler);
+    };
+  }, [lightboxOpen, allImages.length]);
+
+  const openLightbox = useCallback((idx: number) => {
+    setLightboxIndex(idx);
+    setLightboxOpen(true);
+  }, []);
 
   const slideVariants = {
     enter: (dir: number) => ({ x: dir >= 0 ? "100%" : "-100%", opacity: 0 }),
@@ -130,7 +152,8 @@ export default function EventDetail() {
             animate="center"
             exit="exit"
             transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-            className="absolute inset-0 w-full h-full"
+            className="absolute inset-0 w-full h-full cursor-pointer"
+            onClick={() => openLightbox(activeIndex)}
           >
             <img
               src={allImages[activeIndex] || "/placeholder.svg"}
@@ -141,8 +164,17 @@ export default function EventDetail() {
           </motion.div>
         </AnimatePresence>
 
-        {/* Gradient overlay at bottom for text readability */}
+        {/* Gradient overlay at bottom */}
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+
+        {/* Fullscreen button */}
+        <button
+          onClick={() => openLightbox(activeIndex)}
+          className="absolute top-4 left-4 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white hover:bg-black/60 transition-colors z-10"
+          aria-label="View fullscreen"
+        >
+          <Maximize2 className="w-4 h-4" />
+        </button>
 
         {/* Nav arrows */}
         {allImages.length > 1 && (
@@ -244,6 +276,97 @@ export default function EventDetail() {
           </div>
         </div>
       </section>
+
+      {/* Fullscreen Lightbox */}
+      <AnimatePresence>
+        {lightboxOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-[100] bg-black flex items-center justify-center"
+            onClick={() => setLightboxOpen(false)}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setLightboxOpen(false)}
+              className="absolute top-4 right-4 w-11 h-11 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-20"
+              aria-label="Close fullscreen"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Image counter */}
+            {allImages.length > 1 && (
+              <span className="absolute top-4 left-4 text-sm font-body font-semibold text-white/80 bg-white/10 backdrop-blur-sm px-4 py-1.5 rounded-full z-20">
+                {lightboxIndex + 1} / {allImages.length}
+              </span>
+            )}
+
+            {/* Main image */}
+            <img
+              src={allImages[lightboxIndex]}
+              alt={`${event.title} - Fullscreen ${lightboxIndex + 1}`}
+              className="max-w-full max-h-full object-contain select-none"
+              onClick={(e) => e.stopPropagation()}
+              draggable={false}
+            />
+
+            {/* Lightbox nav arrows */}
+            {allImages.length > 1 && (
+              <>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLightboxIndex((p) => (p === 0 ? allImages.length - 1 : p - 1));
+                  }}
+                  className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-20"
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLightboxIndex((p) => (p + 1) % allImages.length);
+                  }}
+                  className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-20"
+                  aria-label="Next image"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+              </>
+            )}
+
+            {/* Lightbox thumbnail strip */}
+            {allImages.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20 max-w-[90vw] overflow-x-auto pb-1">
+                {allImages.map((url, idx) => (
+                  <button
+                    key={`lb-${idx}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setLightboxIndex(idx);
+                    }}
+                    className={`shrink-0 rounded-md overflow-hidden border-2 transition-all duration-200 ${
+                      idx === lightboxIndex
+                        ? "border-white shadow-lg scale-110"
+                        : "border-transparent opacity-50 hover:opacity-80"
+                    }`}
+                  >
+                    <img
+                      src={url}
+                      alt={`Thumb ${idx + 1}`}
+                      className="w-14 h-10 sm:w-16 sm:h-12 object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
