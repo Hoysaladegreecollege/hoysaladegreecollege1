@@ -306,13 +306,27 @@ export default function EventDetail() {
                 </span>
               )}
 
-              {/* Main image */}
-              <img
+              {/* Main image with swipe support */}
+              <motion.img
+                key={`lb-img-${lightboxIndex}`}
                 src={allImages[lightboxIndex]}
                 alt={`${event.title} - Fullscreen ${lightboxIndex + 1}`}
-                className="max-w-full max-h-full object-contain select-none"
+                className="max-w-full max-h-full object-contain select-none touch-manipulation"
                 onClick={(e) => e.stopPropagation()}
                 draggable={false}
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.2}
+                onDragEnd={(_e, info) => {
+                  if (info.offset.x < -80 && allImages.length > 1) {
+                    setLightboxIndex((p) => (p + 1) % allImages.length);
+                  } else if (info.offset.x > 80 && allImages.length > 1) {
+                    setLightboxIndex((p) => (p === 0 ? allImages.length - 1 : p - 1));
+                  }
+                }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.2 }}
               />
 
               {/* Lightbox nav arrows */}
