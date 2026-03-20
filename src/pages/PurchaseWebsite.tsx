@@ -1,3 +1,4 @@
+import { useState } from "react";
 import SEOHead from "@/components/SEOHead";
 import ScrollReveal from "@/components/ScrollReveal";
 import { Link } from "react-router-dom";
