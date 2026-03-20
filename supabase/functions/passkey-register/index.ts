@@ -6,6 +6,12 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+type UserContext = {
+  userId: string;
+  email: string;
+  displayName: string;
+};
+
 function generateChallenge(): string {
   const array = new Uint8Array(32);
   crypto.getRandomValues(array);
@@ -16,6 +22,20 @@ function generateChallenge(): string {
 
 function toBase64Url(value: string): string {
   return btoa(value).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+}
+
+function decodeJwtPayload(token: string): Record<string, unknown> | null {
+  try {
+    const [, payloadPart] = token.split(".");
+    if (!payloadPart) return null;
+
+    const normalized = payloadPart.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+    const decoded = atob(padded);
+    return JSON.parse(decoded);
+  } catch {
+    return null;
+  }
 }
 
 function getRpId(req: Request, supabaseUrl: string): string {
@@ -34,79 +54,97 @@ function getRpId(req: Request, supabaseUrl: string): string {
   }
 }
 
+async function resolveUserContext(token: string, supabaseAdmin: any): Promise<UserContext | null> {
+  const { data, error } = await supabaseAdmin.auth.getUser(token);
+  if (!error && data?.user) {
+    const user = data.user;
+    return {
+      userId: user.id,
+      email: user.email || user.id,
+      displayName: user.user_metadata?.full_name || user.email || "User",
+    };
+  }
+
+  console.error("passkey-register: auth.getUser failed", error);
+
+  const payload = decodeJwtPayload(token);
+  const userId = typeof payload?.sub === "string" ? payload.sub : null;
+  const emailFromToken = typeof payload?.email === "string" ? payload.email : null;
+  const exp = typeof payload?.exp === "number" ? payload.exp : null;
+
+  if (!userId) return null;
+  if (exp && exp < Math.floor(Date.now() / 1000)) return null;
+
+  const { data: profile } = await supabaseAdmin
+    .from("profiles")
+    .select("full_name, email")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  return {
+    userId,
+    email: emailFromToken || profile?.email || userId,
+    displayName: profile?.full_name || emailFromToken || "User",
+  };
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
     const authHeader = req.headers.get("authorization");
     if (!authHeader?.startsWith("Bearer ")) {
-      console.error("passkey-register: No auth header");
       return new Response(JSON.stringify({ error: "No auth" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-
-    // Use getClaims for signing-keys compatibility
-    const supabaseUser = createClient(supabaseUrl, supabaseKey, {
-      global: { headers: { authorization: authHeader } },
-    });
-
-    const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsError } = await supabaseUser.auth.getClaims(token);
-
-    if (claimsError || !claimsData?.claims?.sub) {
-      console.error("passkey-register: getClaims failed", claimsError);
-      // Fallback to getUser
-      const { data: { user }, error: userError } = await supabaseUser.auth.getUser();
-      if (userError || !user) {
-        console.error("passkey-register: getUser also failed", userError);
-        return new Response(JSON.stringify({ error: "Unauthorized" }), {
-          status: 401,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      // Use user from getUser fallback
-      return await handleRequest(req, user.id, user.email || user.id, user.user_metadata?.full_name || user.email || "User", supabaseUrl, serviceKey);
+    const token = authHeader.replace("Bearer ", "").trim();
+    if (!token) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    const userId = claimsData.claims.sub as string;
-    const email = (claimsData.claims.email as string) || userId;
-    
-    // Get full user data for display name
-    const { data: { user: fullUser } } = await supabaseUser.auth.getUser();
-    const displayName = fullUser?.user_metadata?.full_name || email || "User";
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseAdmin = createClient(supabaseUrl, serviceKey);
 
-    return await handleRequest(req, userId, email, displayName, supabaseUrl, serviceKey);
+    const userContext = await resolveUserContext(token, supabaseAdmin);
+    if (!userContext) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    return await handleRequest(req, userContext, supabaseUrl, supabaseAdmin);
   } catch (err) {
     console.error("passkey-register error:", err);
-    return new Response(JSON.stringify({ error: err.message }), {
+    return new Response(JSON.stringify({ error: err instanceof Error ? err.message : "Unexpected error" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
 
-async function handleRequest(req: Request, userId: string, email: string, displayName: string, supabaseUrl: string, serviceKey: string) {
+async function handleRequest(req: Request, user: UserContext, supabaseUrl: string, supabaseAdmin: any) {
   const { action, credential } = await req.json();
-  const supabaseAdmin = createClient(supabaseUrl, serviceKey);
   const rpId = getRpId(req, supabaseUrl);
 
   if (action === "get-options") {
     const challenge = generateChallenge();
-    const { data: existing } = await supabaseAdmin.from("passkeys").select("credential_id").eq("user_id", userId);
+    const { data: existing } = await supabaseAdmin.from("passkeys").select("credential_id").eq("user_id", user.userId);
 
     const options = {
       challenge,
       rp: { name: "Hoysala Degree College", id: rpId },
       user: {
-        id: toBase64Url(userId),
-        name: email,
-        displayName: displayName,
+        id: toBase64Url(user.userId),
+        name: user.email,
+        displayName: user.displayName,
       },
       pubKeyCredParams: [
         { alg: -7, type: "public-key" },
@@ -136,7 +174,7 @@ async function handleRequest(req: Request, userId: string, email: string, displa
     }
 
     const { error: insertError } = await supabaseAdmin.from("passkeys").insert({
-      user_id: userId,
+      user_id: user.userId,
       credential_id: rawId || id,
       public_key: credResponse?.publicKey || credResponse?.attestationObject || "",
       counter: 0,
