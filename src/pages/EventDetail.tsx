@@ -23,7 +23,9 @@ export default function EventDetail() {
   const [direction, setDirection] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [lightboxZoom, setLightboxZoom] = useState(1);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pinchStateRef = useRef<{ initialDistance: number; initialZoom: number } | null>(null);
 
   const { data: event, isLoading } = useQuery({
     queryKey: ["public-event", eventId],
@@ -61,6 +63,12 @@ export default function EventDetail() {
     goTo(activeIndex === 0 ? allImages.length - 1 : activeIndex - 1, -1);
   }, [activeIndex, allImages.length, goTo]);
 
+  const closeLightbox = useCallback(() => {
+    setLightboxOpen(false);
+    setLightboxZoom(1);
+    pinchStateRef.current = null;
+  }, []);
+
   // Auto-scroll every 4 seconds (pause when lightbox is open)
   useEffect(() => {
     if (allImages.length <= 1 || lightboxOpen) return;
@@ -77,7 +85,7 @@ export default function EventDetail() {
   useEffect(() => {
     if (!lightboxOpen) return;
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setLightboxOpen(false);
+      if (e.key === "Escape") closeLightbox();
       if (e.key === "ArrowRight") setLightboxIndex((p) => (p + 1) % allImages.length);
       if (e.key === "ArrowLeft") setLightboxIndex((p) => (p === 0 ? allImages.length - 1 : p - 1));
     };
@@ -87,11 +95,56 @@ export default function EventDetail() {
       document.body.style.overflow = "";
       window.removeEventListener("keydown", handler);
     };
-  }, [lightboxOpen, allImages.length]);
+  }, [closeLightbox, lightboxOpen, allImages.length]);
+
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    setLightboxZoom(1);
+    pinchStateRef.current = null;
+  }, [lightboxIndex, lightboxOpen]);
 
   const openLightbox = useCallback((idx: number) => {
     setLightboxIndex(idx);
+    setLightboxZoom(1);
+    pinchStateRef.current = null;
     setLightboxOpen(true);
+  }, []);
+
+  const changeLightboxZoom = useCallback((delta: number) => {
+    setLightboxZoom((prev) => {
+      const next = Math.max(1, Math.min(4, Number((prev + delta).toFixed(2))));
+      return next;
+    });
+  }, []);
+
+  const handleLightboxWheel = useCallback((e: any) => {
+    e.preventDefault();
+    changeLightboxZoom(e.deltaY < 0 ? 0.2 : -0.2);
+  }, [changeLightboxZoom]);
+
+  const handleLightboxTouchStart = useCallback((e: any) => {
+    if (e.touches.length !== 2) return;
+    const [a, b] = e.touches;
+    pinchStateRef.current = {
+      initialDistance: Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY),
+      initialZoom: lightboxZoom,
+    };
+  }, [lightboxZoom]);
+
+  const handleLightboxTouchMove = useCallback((e: any) => {
+    if (e.touches.length !== 2 || !pinchStateRef.current) return;
+    e.preventDefault();
+    const [a, b] = e.touches;
+    const distance = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+    if (!pinchStateRef.current.initialDistance) return;
+    const nextZoom = Math.max(1, Math.min(4, Number((pinchStateRef.current.initialZoom * (distance / pinchStateRef.current.initialDistance)).toFixed(2))));
+    setLightboxZoom(nextZoom);
+  }, []);
+
+  const handleLightboxTouchEnd = useCallback((e: any) => {
+    if (e.touches.length < 2) {
+      pinchStateRef.current = null;
+    }
   }, []);
 
   const slideVariants = {
@@ -288,11 +341,11 @@ export default function EventDetail() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
               className="fixed inset-0 z-[9999] bg-black flex items-center justify-center"
-              onClick={() => setLightboxOpen(false)}
+              onClick={closeLightbox}
             >
               {/* Close button */}
               <button
-                onClick={() => setLightboxOpen(false)}
+                onClick={closeLightbox}
                 className="absolute top-4 right-4 w-11 h-11 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-20"
                 aria-label="Close fullscreen"
               >
@@ -306,28 +359,77 @@ export default function EventDetail() {
                 </span>
               )}
 
-              {/* Main image with swipe support */}
-              <motion.img
-                key={`lb-img-${lightboxIndex}`}
-                src={allImages[lightboxIndex]}
-                alt={`${event.title} - Fullscreen ${lightboxIndex + 1}`}
-                className="max-w-full max-h-full object-contain select-none touch-manipulation"
+              {/* Zoom controls */}
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    changeLightboxZoom(-0.2);
+                  }}
+                  className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors touch-manipulation"
+                  aria-label="Zoom out"
+                >
+                  −
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLightboxZoom(1);
+                  }}
+                  className="px-3 h-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white/90 text-xs font-body font-semibold hover:bg-white/20 transition-colors touch-manipulation"
+                  aria-label="Reset zoom"
+                >
+                  {Math.round(lightboxZoom * 100)}%
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    changeLightboxZoom(0.2);
+                  }}
+                  className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors touch-manipulation"
+                  aria-label="Zoom in"
+                >
+                  +
+                </button>
+              </div>
+
+              {/* Main image with swipe + pinch zoom */}
+              <div
+                className="relative max-w-full max-h-full overflow-hidden touch-manipulation"
                 onClick={(e) => e.stopPropagation()}
-                draggable={false}
-                drag="x"
-                dragConstraints={{ left: 0, right: 0 }}
-                dragElastic={0.2}
-                onDragEnd={(_e, info) => {
-                  if (info.offset.x < -80 && allImages.length > 1) {
-                    setLightboxIndex((p) => (p + 1) % allImages.length);
-                  } else if (info.offset.x > 80 && allImages.length > 1) {
-                    setLightboxIndex((p) => (p === 0 ? allImages.length - 1 : p - 1));
-                  }
-                }}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.2 }}
-              />
+                onWheel={handleLightboxWheel}
+                onTouchStart={handleLightboxTouchStart}
+                onTouchMove={handleLightboxTouchMove}
+                onTouchEnd={handleLightboxTouchEnd}
+                style={{ touchAction: lightboxZoom > 1 ? "none" : "pan-y" }}
+              >
+                <motion.img
+                  key={`lb-img-${lightboxIndex}`}
+                  src={allImages[lightboxIndex]}
+                  alt={`${event.title} - Fullscreen ${lightboxIndex + 1}`}
+                  className="max-w-full max-h-full object-contain select-none touch-manipulation cursor-grab active:cursor-grabbing"
+                  draggable={false}
+                  style={{ scale: lightboxZoom }}
+                  onDoubleClick={(e) => {
+                    e.stopPropagation();
+                    setLightboxZoom((z) => (z === 1 ? 2 : 1));
+                  }}
+                  drag={lightboxZoom === 1 ? "x" : false}
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.2}
+                  onDragEnd={(_e, info) => {
+                    if (lightboxZoom > 1 || allImages.length <= 1) return;
+                    if (info.offset.x < -80) {
+                      setLightboxIndex((p) => (p + 1) % allImages.length);
+                    } else if (info.offset.x > 80) {
+                      setLightboxIndex((p) => (p === 0 ? allImages.length - 1 : p - 1));
+                    }
+                  }}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.2 }}
+                />
+              </div>
 
               {/* Lightbox nav arrows */}
               {allImages.length > 1 && (
