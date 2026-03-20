@@ -122,19 +122,23 @@ export default function EventDetail() {
       {/* Full-width image carousel */}
       <section className="relative w-full h-[55vh] sm:h-[70vh] bg-black overflow-hidden">
         <AnimatePresence initial={false} custom={direction} mode="popLayout">
-          <motion.img
+          <motion.div
             key={`${allImages[activeIndex]}-${activeIndex}`}
-            src={allImages[activeIndex] || "/placeholder.svg"}
-            alt={`${event.title} - Image ${activeIndex + 1}`}
             custom={direction}
             variants={slideVariants}
             initial="enter"
             animate="center"
             exit="exit"
             transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-            className="absolute inset-0 w-full h-full object-contain"
-            draggable={false}
-          />
+            className="absolute inset-0 w-full h-full"
+          >
+            <img
+              src={allImages[activeIndex] || "/placeholder.svg"}
+              alt={`${event.title} - Image ${activeIndex + 1}`}
+              className="w-full h-full object-cover"
+              draggable={false}
+            />
+          </motion.div>
         </AnimatePresence>
 
         {/* Gradient overlay at bottom for text readability */}
