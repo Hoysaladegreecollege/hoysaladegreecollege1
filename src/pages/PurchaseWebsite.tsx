@@ -1,3 +1,4 @@
+import { useState } from "react";
 import SEOHead from "@/components/SEOHead";
 import ScrollReveal from "@/components/ScrollReveal";
 import { Link } from "react-router-dom";
@@ -42,6 +43,8 @@ const techStack = [
 ];
 
 export default function PurchaseWebsite() {
+  const [priceRevealed, setPriceRevealed] = useState(false);
+
   return (
     <div className="min-h-screen" style={{ background: "linear-gradient(180deg, #050608 0%, #0a0c14 50%, #050608 100%)" }}>
       <SEOHead title="Get This Website — College Management System | ₹15,000" description="Purchase this premium college management website with multi-role dashboards, attendance, fees, admissions and more. Built by Pavan A." canonical="/purchase" />
@@ -71,13 +74,53 @@ export default function PurchaseWebsite() {
               Multi-role dashboards, attendance, marks, fees, admissions, messaging, gallery, AI chatbot — everything built and ready to deploy for your institution.
             </p>
 
-            {/* Price */}
+            {/* Price with reveal animation */}
             <div className="mt-10 inline-flex flex-col items-center gap-2">
-              <div className="flex items-baseline gap-2">
-                <span className="font-display text-6xl sm:text-7xl font-bold" style={{ background: "linear-gradient(135deg, hsl(42,87%,55%), hsl(38,92%,65%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>₹15,000</span>
-                <span className="font-body text-white/30 text-sm">one-time</span>
-              </div>
-              <p className="font-body text-white/25 text-xs">Full source code • Lifetime ownership • Free deployment support</p>
+              {priceRevealed ? (
+                <motion.div
+                  initial={{ scale: 0.5, opacity: 0, filter: "blur(20px)" }}
+                  animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
+                  transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                  className="flex flex-col items-center gap-2"
+                >
+                  <div className="flex items-baseline gap-2">
+                    <motion.span
+                      className="font-display text-6xl sm:text-7xl font-bold"
+                      style={{ background: "linear-gradient(135deg, hsl(42,87%,55%), hsl(38,92%,65%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
+                      initial={{ y: 20 }}
+                      animate={{ y: 0 }}
+                      transition={{ delay: 0.2, duration: 0.5 }}
+                    >₹15,000</motion.span>
+                    <motion.span
+                      className="font-body text-white/30 text-sm"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.5 }}
+                    >one-time</motion.span>
+                  </div>
+                  <motion.p
+                    className="font-body text-white/25 text-xs"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
+                  >Full source code • Lifetime ownership • Free deployment support</motion.p>
+                </motion.div>
+              ) : (
+                <motion.button
+                  onClick={() => setPriceRevealed(true)}
+                  className="group relative inline-flex items-center gap-3 px-10 py-5 rounded-2xl font-body text-base font-bold border border-[hsl(42_87%_55%_/_0.3)] transition-all duration-500 overflow-hidden"
+                  style={{ background: "rgba(198,167,94,0.06)" }}
+                  whileHover={{ scale: 1.05, y: -4 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <span className="absolute inset-0 overflow-hidden rounded-2xl">
+                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-[hsl(42_87%_55%_/_0.15)] to-transparent -translate-x-full animate-[loginShimmer_3s_ease-in-out_infinite]" />
+                  </span>
+                  <Eye className="w-5 h-5 relative z-10" style={{ color: "hsl(42, 87%, 55%)" }} />
+                  <span className="relative z-10" style={{ color: "hsl(42, 87%, 55%)" }}>Reveal Price</span>
+                  <Sparkles className="w-4 h-4 relative z-10 opacity-50" style={{ color: "hsl(42, 87%, 55%)" }} />
+                </motion.button>
+              )}
             </div>
 
             {/* CTA Buttons */}

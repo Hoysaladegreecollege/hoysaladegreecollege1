@@ -19,6 +19,8 @@ export default function AdminGallery() {
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [activeAlbum, setActiveAlbum] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
+  const [draggedId, setDraggedId] = useState<string | null>(null);
 
   const { data: images = [], isLoading } = useQuery({
     queryKey: ["admin-gallery"],
@@ -220,7 +222,31 @@ export default function AdminGallery() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {filteredImages.map((img: any, i: number) => (
             <div key={img.id}
-              className={`relative group rounded-3xl border overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fade-in ${img.is_active ? "border-border/40" : "border-destructive/30 opacity-60"}`}
+              draggable
+              onDragStart={() => setDraggedId(img.id)}
+              onDragOver={(e) => { e.preventDefault(); setDragOverId(img.id); }}
+              onDragLeave={() => setDragOverId(null)}
+              onDrop={async (e) => {
+                e.preventDefault();
+                setDragOverId(null);
+                if (!draggedId || draggedId === img.id) return;
+                const allImgs = [...filteredImages];
+                const fromIdx = allImgs.findIndex((x: any) => x.id === draggedId);
+                const toIdx = allImgs.findIndex((x: any) => x.id === img.id);
+                if (fromIdx === -1 || toIdx === -1) return;
+                const [moved] = allImgs.splice(fromIdx, 1);
+                allImgs.splice(toIdx, 0, moved);
+                for (let j = 0; j < allImgs.length; j++) {
+                  await supabase.from("gallery_images").update({ sort_order: j }).eq("id", (allImgs[j] as any).id);
+                }
+                setDraggedId(null);
+                queryClient.invalidateQueries({ queryKey: ["admin-gallery"] });
+                toast.success("Order updated");
+              }}
+              onDragEnd={() => { setDraggedId(null); setDragOverId(null); }}
+              className={`relative group rounded-3xl border overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fade-in cursor-grab active:cursor-grabbing ${
+                img.is_active ? "border-border/40" : "border-destructive/30 opacity-60"
+              } ${dragOverId === img.id ? "ring-2 ring-primary scale-[1.02]" : ""} ${draggedId === img.id ? "opacity-50" : ""}`}
               style={{ animationDelay: `${i * 50}ms`, opacity: 0, animationFillMode: 'forwards' }}>
               <div className="aspect-[4/3]">
                 <img src={img.image_url} alt={img.title} className="w-full h-full object-cover" />
