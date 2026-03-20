@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SEOHead from "@/components/SEOHead";
 import ScrollReveal from "@/components/ScrollReveal";
 import { Link } from "react-router-dom";
@@ -8,7 +8,77 @@ import {
   ArrowRight, Heart, Phone, Mail, ExternalLink, Crown, Layers, Lock, Eye,
   ClipboardCheck, Award, Brain, Camera, TrendingUp, CircuitBoard,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+
+const PRICE_CHARS = ["₹", "1", "5", ",", "0", "0", "0"];
+const DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+const SPECIAL_CHARS = ["₹", ","];
+
+function SlotDigit({ char, delay, revealed }: { char: string; delay: number; revealed: boolean }) {
+  const isSpecial = SPECIAL_CHARS.includes(char);
+  const targetIndex = isSpecial ? 0 : DIGITS.indexOf(char);
+  const stripItems = isSpecial ? [char] : DIGITS;
+  const itemH = 72;
+  const totalH = stripItems.length * itemH;
+  const [landed, setLanded] = useState(false);
+
+  useEffect(() => {
+    if (!revealed) { setLanded(false); return; }
+    const t = setTimeout(() => setLanded(true), delay);
+    return () => clearTimeout(t);
+  }, [revealed, delay]);
+
+  if (!revealed) return null;
+
+  return (
+    <div className="relative overflow-hidden" style={{ height: itemH, width: isSpecial ? 30 : (char === "," ? 16 : 40) }}>
+      <AnimatePresence>
+        {landed && (
+          <motion.div
+            className="absolute inset-0 z-10 pointer-events-none rounded-lg"
+            initial={{ opacity: 0.9 }}
+            animate={{ opacity: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            style={{ background: "radial-gradient(circle, hsla(42,87%,65%,0.5), transparent 70%)" }}
+          />
+        )}
+      </AnimatePresence>
+
+      <motion.div
+        className="flex flex-col"
+        initial={{ y: -(Math.random() * totalH * 2 + totalH * 2) }}
+        animate={landed
+          ? { y: -(targetIndex * itemH) }
+          : { y: [-(totalH * 3), 0] }
+        }
+        transition={landed
+          ? { type: "spring", stiffness: 280, damping: 18, mass: 0.8 }
+          : { duration: 0.25, repeat: Infinity, ease: "linear" }
+        }
+      >
+        {(!landed ? [...stripItems, ...stripItems, ...stripItems, ...stripItems] : stripItems).map((d, i) => (
+          <div
+            key={i}
+            className="flex items-center justify-center shrink-0 font-display font-bold"
+            style={{
+              height: itemH,
+              fontSize: isSpecial ? 28 : (char === "," ? 28 : 42),
+              background: "linear-gradient(135deg, hsl(42,87%,55%), hsl(38,92%,65%))",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            {d}
+          </div>
+        ))}
+      </motion.div>
+
+      <div className="absolute top-0 left-0 right-0 h-3 pointer-events-none" style={{ background: "linear-gradient(to bottom, #050608, transparent)" }} />
+      <div className="absolute bottom-0 left-0 right-0 h-3 pointer-events-none" style={{ background: "linear-gradient(to top, #050608, transparent)" }} />
+    </div>
+  );
+}
 
 const allFeatures = [
   { icon: Users, title: "Multi-Role Dashboards", desc: "Separate dashboards for Students, Teachers, Principals & Admins with role-based access", color: "220, 80%, 55%" },
