@@ -82,6 +82,13 @@ export default function EventDetail() {
     setDirection(0);
   }, [event?.id]);
 
+  // Auto-scroll thumbnail strip to active thumbnail
+  useEffect(() => {
+    if (!thumbStripRef.current) return;
+    const btn = thumbStripRef.current.children[activeIndex] as HTMLElement;
+    if (btn) btn.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }, [activeIndex]);
+
   // Lightbox keyboard navigation
   useEffect(() => {
     if (!lightboxOpen) return;
