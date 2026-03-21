@@ -20,6 +20,7 @@ function parseGallery(description: string | null): {text: string;gallery: string
 export default function EventDetail() {
   const { eventId } = useParams();
   const [activeIndex, setActiveIndex] = useState(0);
+  const thumbStripRef = useRef<HTMLDivElement>(null);
   const [direction, setDirection] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
@@ -80,6 +81,13 @@ export default function EventDetail() {
     setActiveIndex(0);
     setDirection(0);
   }, [event?.id]);
+
+  // Auto-scroll thumbnail strip to active thumbnail
+  useEffect(() => {
+    if (!thumbStripRef.current) return;
+    const btn = thumbStripRef.current.children[activeIndex] as HTMLElement;
+    if (btn) btn.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }, [activeIndex]);
 
   // Lightbox keyboard navigation
   useEffect(() => {
@@ -279,7 +287,7 @@ export default function EventDetail() {
       {/* Thumbnail strip */}
       {allImages.length > 1 &&
       <div className="container px-4 py-3">
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+          <div ref={thumbStripRef} className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide justify-center">
             {allImages.map((url, idx) =>
           <button
             key={`${url}-${idx}`}
@@ -407,9 +415,9 @@ export default function EventDetail() {
                 key={`lb-img-${lightboxIndex}`}
                 src={allImages[lightboxIndex]}
                 alt={`${event.title} - Fullscreen ${lightboxIndex + 1}`}
-                className="max-w-full max-h-full object-contain select-none touch-manipulation cursor-grab active:cursor-grabbing"
+                className="max-w-[90vw] max-h-[80vh] object-contain select-none touch-manipulation cursor-grab active:cursor-grabbing"
                 draggable={false}
-                style={{ scale: lightboxZoom }}
+                style={{ transform: `scale(${lightboxZoom})`, transition: "transform 0.15s ease-out" }}
                 onDoubleClick={(e) => {
                   e.stopPropagation();
                   setLightboxZoom((z) => z === 1 ? 2 : 1);
@@ -425,8 +433,8 @@ export default function EventDetail() {
                     setLightboxIndex((p) => p === 0 ? allImages.length - 1 : p - 1);
                   }
                 }}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 transition={{ duration: 0.2 }} />
               
               </div>
