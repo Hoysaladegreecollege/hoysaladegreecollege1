@@ -20,6 +20,7 @@ function parseGallery(description: string | null): {text: string;gallery: string
 export default function EventDetail() {
   const { eventId } = useParams();
   const [activeIndex, setActiveIndex] = useState(0);
+  const thumbStripRef = useRef<HTMLDivElement>(null);
   const [direction, setDirection] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
