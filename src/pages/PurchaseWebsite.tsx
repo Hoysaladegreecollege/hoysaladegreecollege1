@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import SEOHead from "@/components/SEOHead";
 import ScrollReveal from "@/components/ScrollReveal";
 import { Link } from "react-router-dom";
@@ -8,65 +8,105 @@ import {
   ArrowRight, Heart, Phone, Mail, ExternalLink, Crown, Layers, Lock, Eye,
   ClipboardCheck, Award, Brain, Camera, TrendingUp, CircuitBoard,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion";
 
 const PRICE_CHARS = ["₹", "1", "5", ",", "0", "0", "0"];
 const DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 const SPECIAL_CHARS = ["₹", ","];
 
-function SlotDigit({ char, delay, revealed }: { char: string; delay: number; revealed: boolean }) {
+function SlotDigit({ char, delay, revealed, onLand }: { char: string; delay: number; revealed: boolean; onLand?: () => void }) {
   const isSpecial = SPECIAL_CHARS.includes(char);
   const targetIndex = isSpecial ? 0 : DIGITS.indexOf(char);
   const stripItems = isSpecial ? [char] : DIGITS;
-  const itemH = 72;
-  const totalH = stripItems.length * itemH;
-  const [landed, setLanded] = useState(false);
+  const itemH = 80;
+  const [phase, setPhase] = useState<"idle" | "spinning" | "landing" | "landed">("idle");
+  const yRef = useMotionValue(0);
 
   useEffect(() => {
-    if (!revealed) { setLanded(false); return; }
-    const t = setTimeout(() => setLanded(true), delay);
-    return () => clearTimeout(t);
+    if (!revealed) { setPhase("idle"); return; }
+    // Start spinning immediately
+    setPhase("spinning");
+    
+    // After delay, begin landing
+    const landTimer = setTimeout(() => {
+      setPhase("landing");
+      const targetY = -(targetIndex * itemH);
+      // Animate to target with dramatic overshoot
+      animate(yRef, targetY, {
+        type: "spring",
+        stiffness: 200,
+        damping: 14,
+        mass: 1.2,
+        velocity: -800,
+        onComplete: () => {
+          setPhase("landed");
+          onLand?.();
+        },
+      });
+    }, delay);
+    
+    return () => clearTimeout(landTimer);
   }, [revealed, delay]);
 
-  if (!revealed) return null;
+  // Spinning animation
+  useEffect(() => {
+    if (phase !== "spinning") return;
+    const totalH = stripItems.length * itemH;
+    let raf: number;
+    let pos = -Math.random() * totalH * 2;
+    const speed = 18 + Math.random() * 8; // px per frame
+    const tick = () => {
+      pos -= speed;
+      if (pos < -totalH * 3) pos += totalH;
+      yRef.set(pos);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [phase]);
+
+  if (!revealed) return <div style={{ width: isSpecial ? 34 : (char === "," ? 18 : 48), height: itemH }} />;
 
   return (
-    <div className="relative overflow-hidden" style={{ height: itemH, width: isSpecial ? 30 : (char === "," ? 16 : 40) }}>
+    <div className="relative overflow-hidden" style={{ height: itemH, width: isSpecial ? 34 : (char === "," ? 18 : 48) }}>
+      {/* Gold flash on land */}
       <AnimatePresence>
-        {landed && (
+        {phase === "landed" && (
           <motion.div
-            className="absolute inset-0 z-10 pointer-events-none rounded-lg"
-            initial={{ opacity: 0.9 }}
-            animate={{ opacity: 0 }}
+            className="absolute inset-0 z-20 pointer-events-none rounded-lg"
+            initial={{ opacity: 1, scale: 1.3 }}
+            animate={{ opacity: 0, scale: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            style={{ background: "radial-gradient(circle, hsla(42,87%,65%,0.5), transparent 70%)" }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            style={{ background: "radial-gradient(circle, hsla(42,90%,65%,0.7), hsla(42,87%,55%,0.2) 50%, transparent 70%)" }}
           />
         )}
       </AnimatePresence>
 
-      <motion.div
-        className="flex flex-col"
-        initial={{ y: -(Math.random() * totalH * 2 + totalH * 2) }}
-        animate={landed
-          ? { y: -(targetIndex * itemH) }
-          : { y: [-(totalH * 3), 0] }
-        }
-        transition={landed
-          ? { type: "spring", stiffness: 280, damping: 18, mass: 0.8 }
-          : { duration: 0.25, repeat: Infinity, ease: "linear" }
-        }
-      >
-        {(!landed ? [...stripItems, ...stripItems, ...stripItems, ...stripItems] : stripItems).map((d, i) => (
+      {/* Bounce glow ring on land */}
+      {phase === "landed" && (
+        <motion.div
+          className="absolute inset-0 z-10 pointer-events-none"
+          initial={{ boxShadow: "inset 0 0 20px hsla(42,90%,60%,0.6)" }}
+          animate={{ boxShadow: "inset 0 0 0px hsla(42,90%,60%,0)" }}
+          transition={{ duration: 0.8 }}
+          style={{ borderRadius: 8 }}
+        />
+      )}
+
+      <motion.div className="flex flex-col will-change-transform" style={{ y: yRef }}>
+        {[...stripItems, ...stripItems, ...stripItems, ...stripItems].map((d, i) => (
           <div
             key={i}
-            className="flex items-center justify-center shrink-0 font-display font-bold"
+            className="flex items-center justify-center shrink-0 font-display font-black select-none"
             style={{
               height: itemH,
-              fontSize: isSpecial ? 28 : (char === "," ? 28 : 42),
-              background: "linear-gradient(135deg, hsl(42,87%,55%), hsl(38,92%,65%))",
+              fontSize: isSpecial ? 32 : (char === "," ? 32 : 52),
+              background: "linear-gradient(180deg, hsl(42,90%,60%), hsl(38,92%,50%), hsl(35,85%,45%))",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
+              textShadow: "none",
+              filter: phase === "landed" ? "drop-shadow(0 0 8px hsla(42,87%,55%,0.4))" : "none",
             }}
           >
             {d}
@@ -74,8 +114,45 @@ function SlotDigit({ char, delay, revealed }: { char: string; delay: number; rev
         ))}
       </motion.div>
 
-      <div className="absolute top-0 left-0 right-0 h-3 pointer-events-none" style={{ background: "linear-gradient(to bottom, #050608, transparent)" }} />
-      <div className="absolute bottom-0 left-0 right-0 h-3 pointer-events-none" style={{ background: "linear-gradient(to top, #050608, transparent)" }} />
+      {/* Edge fades */}
+      <div className="absolute top-0 left-0 right-0 h-6 pointer-events-none z-10" style={{ background: "linear-gradient(to bottom, #050608, transparent)" }} />
+      <div className="absolute bottom-0 left-0 right-0 h-6 pointer-events-none z-10" style={{ background: "linear-gradient(to top, #050608, transparent)" }} />
+    </div>
+  );
+}
+
+// Dramatic countdown before reveal
+function RevealCountdown({ onComplete }: { onComplete: () => void }) {
+  const [count, setCount] = useState(3);
+  
+  useEffect(() => {
+    if (count <= 0) { onComplete(); return; }
+    const t = setTimeout(() => setCount(count - 1), 600);
+    return () => clearTimeout(t);
+  }, [count]);
+
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <AnimatePresence mode="wait">
+        <motion.span
+          key={count}
+          className="font-display text-7xl font-black"
+          style={{ color: "hsl(42, 87%, 55%)" }}
+          initial={{ scale: 2, opacity: 0, filter: "blur(10px)" }}
+          animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
+          exit={{ scale: 0.5, opacity: 0, filter: "blur(8px)" }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {count > 0 ? count : ""}
+        </motion.span>
+      </AnimatePresence>
+      <motion.p
+        className="font-body text-xs tracking-[0.2em] uppercase text-white/30"
+        animate={{ opacity: [0.3, 0.7, 0.3] }}
+        transition={{ duration: 1.2, repeat: Infinity }}
+      >
+        Revealing price...
+      </motion.p>
     </div>
   );
 }
@@ -113,7 +190,17 @@ const techStack = [
 ];
 
 export default function PurchaseWebsite() {
-  const [priceRevealed, setPriceRevealed] = useState(false);
+  const [revealPhase, setRevealPhase] = useState<"idle" | "countdown" | "spinning" | "done">("idle");
+  const [landedCount, setLandedCount] = useState(0);
+  const allLanded = landedCount >= PRICE_CHARS.length;
+
+  // When all digits land, mark as done
+  useEffect(() => {
+    if (revealPhase === "spinning" && allLanded) {
+      const t = setTimeout(() => setRevealPhase("done"), 300);
+      return () => clearTimeout(t);
+    }
+  }, [allLanded, revealPhase]);
 
   return (
     <div className="min-h-screen" style={{ background: "linear-gradient(180deg, #050608 0%, #0a0c14 50%, #050608 100%)" }}>
@@ -144,55 +231,19 @@ export default function PurchaseWebsite() {
               Multi-role dashboards, attendance, marks, fees, admissions, messaging, gallery, AI chatbot — everything built and ready to deploy for your institution.
             </p>
 
-            {/* Price with slot-machine reveal animation */}
-            <div className="mt-10 inline-flex flex-col items-center gap-2">
+            {/* Price with ultra-premium slot-machine reveal */}
+            <div className="mt-10 inline-flex flex-col items-center gap-2" style={{ minHeight: 160 }}>
               <AnimatePresence mode="wait">
-                {priceRevealed ? (
-                  <motion.div
-                    key="price"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="flex flex-col items-center gap-3"
-                  >
-                    <div className="flex items-center justify-center">
-                      {PRICE_CHARS.map((char, i) => (
-                        <SlotDigit key={i} char={char} delay={400 + i * 350} revealed={priceRevealed} />
-                      ))}
-                    </div>
-
-                    <motion.div
-                      className="relative overflow-hidden rounded-full px-6 py-1.5 mt-1"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 3.2 }}
-                    >
-                      <motion.div
-                        className="absolute inset-0 pointer-events-none"
-                        initial={{ x: "-100%" }}
-                        animate={{ x: "200%" }}
-                        transition={{ delay: 3.4, duration: 0.8, ease: "easeInOut" }}
-                        style={{ background: "linear-gradient(90deg, transparent, hsla(42,87%,65%,0.3), transparent)", width: "50%" }}
-                      />
-                      <span className="font-body text-white/30 text-sm relative z-10">one-time payment</span>
-                    </motion.div>
-
-                    <motion.p
-                      className="font-body text-white/25 text-xs"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 3.6 }}
-                    >Full source code • Lifetime ownership • Free deployment support</motion.p>
-                  </motion.div>
-                ) : (
+                {revealPhase === "idle" && (
                   <motion.button
-                    key="button"
-                    onClick={() => setPriceRevealed(true)}
+                    key="reveal-btn"
+                    onClick={() => setRevealPhase("countdown")}
                     className="group relative inline-flex items-center gap-3 px-10 py-5 rounded-2xl font-body text-base font-bold border border-[hsl(42_87%_55%_/_0.3)] transition-all duration-500 overflow-hidden"
                     style={{ background: "rgba(198,167,94,0.06)" }}
                     whileHover={{ scale: 1.05, y: -4 }}
                     whileTap={{ scale: 0.98 }}
-                    exit={{ scale: 0.8, opacity: 0, filter: "blur(10px)" }}
-                    transition={{ duration: 0.4 }}
+                    exit={{ scale: 0.6, opacity: 0, filter: "blur(16px)", y: 20 }}
+                    transition={{ duration: 0.5 }}
                   >
                     <span className="absolute inset-0 overflow-hidden rounded-2xl">
                       <span className="absolute inset-0 bg-gradient-to-r from-transparent via-[hsl(42_87%_55%_/_0.15)] to-transparent -translate-x-full animate-[loginShimmer_3s_ease-in-out_infinite]" />
@@ -201,6 +252,92 @@ export default function PurchaseWebsite() {
                     <span className="relative z-10" style={{ color: "hsl(42, 87%, 55%)" }}>Reveal Price</span>
                     <Sparkles className="w-4 h-4 relative z-10 opacity-50" style={{ color: "hsl(42, 87%, 55%)" }} />
                   </motion.button>
+                )}
+
+                {revealPhase === "countdown" && (
+                  <motion.div
+                    key="countdown"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 1.2, filter: "blur(12px)" }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    <RevealCountdown onComplete={() => setRevealPhase("spinning")} />
+                  </motion.div>
+                )}
+
+                {(revealPhase === "spinning" || revealPhase === "done") && (
+                  <motion.div
+                    key="price-slots"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex flex-col items-center gap-3"
+                  >
+                    {/* Slot machine container with premium border */}
+                    <div className="relative">
+                      {/* Ambient glow behind slots */}
+                      <div className="absolute inset-0 -m-6 rounded-3xl pointer-events-none" style={{
+                        background: "radial-gradient(ellipse at center, hsla(42,87%,55%,0.08), transparent 70%)",
+                        filter: "blur(20px)",
+                      }} />
+                      
+                      <div className="relative flex items-center justify-center px-4 py-2 rounded-2xl border border-[hsl(42_87%_55%_/_0.15)]" style={{ background: "rgba(198,167,94,0.03)" }}>
+                        {PRICE_CHARS.map((char, i) => (
+                          <SlotDigit
+                            key={i}
+                            char={char}
+                            delay={200 + i * 400}
+                            revealed={true}
+                            onLand={() => setLandedCount((c) => c + 1)}
+                          />
+                        ))}
+                      </div>
+
+                      {/* Final shimmer sweep across price */}
+                      {revealPhase === "done" && (
+                        <motion.div
+                          className="absolute inset-0 rounded-2xl pointer-events-none overflow-hidden z-30"
+                          initial={{ opacity: 1 }}
+                          animate={{ opacity: 0 }}
+                          transition={{ delay: 0.8, duration: 0.3 }}
+                        >
+                          <motion.div
+                            className="absolute inset-y-0 w-1/3"
+                            initial={{ left: "-33%" }}
+                            animate={{ left: "133%" }}
+                            transition={{ duration: 0.7, ease: "easeInOut" }}
+                            style={{ background: "linear-gradient(90deg, transparent, hsla(42,90%,70%,0.4), hsla(42,87%,55%,0.15), transparent)" }}
+                          />
+                        </motion.div>
+                      )}
+                    </div>
+
+                    {/* "one-time payment" badge */}
+                    <motion.div
+                      className="relative overflow-hidden rounded-full px-6 py-1.5 mt-1"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={revealPhase === "done" ? { opacity: 1, y: 0 } : { opacity: 0 }}
+                      transition={{ delay: 0.3, duration: 0.5 }}
+                    >
+                      <motion.div
+                        className="absolute inset-0 pointer-events-none"
+                        initial={{ x: "-100%" }}
+                        animate={{ x: "200%" }}
+                        transition={{ delay: 0.6, duration: 0.8, ease: "easeInOut" }}
+                        style={{ background: "linear-gradient(90deg, transparent, hsla(42,87%,65%,0.3), transparent)", width: "50%" }}
+                      />
+                      <span className="font-body text-white/30 text-sm relative z-10">one-time payment</span>
+                    </motion.div>
+
+                    <motion.p
+                      className="font-body text-white/25 text-xs"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={revealPhase === "done" ? { opacity: 1, y: 0 } : { opacity: 0 }}
+                      transition={{ delay: 0.6 }}
+                    >
+                      Full source code • Lifetime ownership • Free deployment support
+                    </motion.p>
+                  </motion.div>
                 )}
               </AnimatePresence>
             </div>
