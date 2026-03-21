@@ -91,7 +91,7 @@ export default function PageLoader() {
               animation: "splash-ring-glow 2s ease-in-out infinite alternate"
             }}>
               <div className="w-[94px] h-[94px] rounded-[21px] overflow-hidden flex items-center justify-center" style={{ background: "rgba(255,255,255,0.97)" }}>
-                <img src="/lovable-uploads/bacc5b2d-3f25-473a-a2ee-a0d75a0cb7e3.png" alt="Logo" className="w-[85%] h-[85%] object-contain" fetchPriority="high" />
+                <img src="/lovable-uploads/bacc5b2d-3f25-473a-a2ee-a0d75a0cb7e3.png" alt="Logo" className="w-[85%] h-[85%] object-contain" fetchPriority="high" decoding="async" width={80} height={80} />
               </div>
             </div>
           </div>
