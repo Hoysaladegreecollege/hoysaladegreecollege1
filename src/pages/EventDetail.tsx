@@ -287,7 +287,7 @@ export default function EventDetail() {
       {/* Thumbnail strip */}
       {allImages.length > 1 &&
       <div className="container px-4 py-3">
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+          <div ref={thumbStripRef} className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide justify-center">
             {allImages.map((url, idx) =>
           <button
             key={`${url}-${idx}`}
