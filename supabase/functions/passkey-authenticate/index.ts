@@ -87,6 +87,7 @@ serve(async (req) => {
 
       return new Response(JSON.stringify({
         success: true,
+        token_hash: linkData?.properties?.hashed_token,
         token: linkData?.properties?.hashed_token,
         email: userData.user.email,
       }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });

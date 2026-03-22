@@ -316,16 +316,38 @@ export default function Login() {
 
                       if (authErr || authData?.error) { toast.error(authErr?.message || authData?.error); setLoading(false); return; }
 
-                      if (authData.token && authData.email) {
-                        const { error: verifyError } = await supabase.auth.verifyOtp({
-                          email: authData.email,
-                          token: authData.token,
+                      const tokenHash = authData?.token_hash || authData?.token;
+
+                      if (tokenHash && authData?.email) {
+                        let verifyError: any = null;
+
+                        const primaryAttempt = await supabase.auth.verifyOtp({
+                          token_hash: tokenHash,
                           type: "magiclink",
-                        });
-                        if (verifyError) { toast.error(verifyError.message); setLoading(false); return; }
+                        } as any);
+                        verifyError = primaryAttempt.error;
+
+                        if (verifyError) {
+                          const fallbackAttempt = await supabase.auth.verifyOtp({
+                            token_hash: tokenHash,
+                            type: "email",
+                          } as any);
+                          verifyError = fallbackAttempt.error;
+                        }
+
+                        if (verifyError) {
+                          toast.error("Passkey login token was invalid. Please try passkey sign-in again.");
+                          setLoading(false);
+                          return;
+                        }
+
                         sessionStorage.setItem("hdc_remember", "1");
                         localStorage.setItem("hdc_remember", "1");
                         toast.success("Signed in with passkey!");
+                      } else {
+                        toast.error("Passkey verification token missing. Please try again.");
+                        setLoading(false);
+                        return;
                       }
                     } catch (err: any) {
                       console.error("Passkey auth error:", err);

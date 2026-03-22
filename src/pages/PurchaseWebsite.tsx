@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion";
 
-const PRICE_CHARS = ["₹", "1", "5", ",", "0", "0", "0"];
+const PRICE_CHARS = ["₹", "3", "5", ",", "0", "0", "0"];
 const DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 const SPECIAL_CHARS = ["₹", ","];
 
@@ -18,7 +18,7 @@ function SlotDigit({ char, delay, revealed, onLand }: { char: string; delay: num
   const isSpecial = SPECIAL_CHARS.includes(char);
   const targetIndex = isSpecial ? 0 : DIGITS.indexOf(char);
   const stripItems = isSpecial ? [char] : DIGITS;
-  const itemH = 80;
+  const itemH = 88;
   const [phase, setPhase] = useState<"idle" | "spinning" | "landing" | "landed">("idle");
   const yRef = useMotionValue(0);
 
@@ -54,7 +54,7 @@ function SlotDigit({ char, delay, revealed, onLand }: { char: string; delay: num
     const totalH = stripItems.length * itemH;
     let raf: number;
     let pos = -Math.random() * totalH * 2;
-    const speed = 18 + Math.random() * 8; // px per frame
+    const speed = 22 + Math.random() * 12; // px per frame
     const tick = () => {
       pos -= speed;
       if (pos < -totalH * 3) pos += totalH;
@@ -121,42 +121,6 @@ function SlotDigit({ char, delay, revealed, onLand }: { char: string; delay: num
   );
 }
 
-// Dramatic countdown before reveal
-function RevealCountdown({ onComplete }: { onComplete: () => void }) {
-  const [count, setCount] = useState(3);
-  
-  useEffect(() => {
-    if (count <= 0) { onComplete(); return; }
-    const t = setTimeout(() => setCount(count - 1), 600);
-    return () => clearTimeout(t);
-  }, [count]);
-
-  return (
-    <div className="flex flex-col items-center gap-4">
-      <AnimatePresence mode="wait">
-        <motion.span
-          key={count}
-          className="font-display text-7xl font-black"
-          style={{ color: "hsl(42, 87%, 55%)" }}
-          initial={{ scale: 2, opacity: 0, filter: "blur(10px)" }}
-          animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
-          exit={{ scale: 0.5, opacity: 0, filter: "blur(8px)" }}
-          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-        >
-          {count > 0 ? count : ""}
-        </motion.span>
-      </AnimatePresence>
-      <motion.p
-        className="font-body text-xs tracking-[0.2em] uppercase text-white/30"
-        animate={{ opacity: [0.3, 0.7, 0.3] }}
-        transition={{ duration: 1.2, repeat: Infinity }}
-      >
-        Revealing price...
-      </motion.p>
-    </div>
-  );
-}
-
 const allFeatures = [
   { icon: Users, title: "Multi-Role Dashboards", desc: "Separate dashboards for Students, Teachers, Principals & Admins with role-based access", color: "220, 80%, 55%" },
   { icon: ClipboardCheck, title: "Attendance Management", desc: "Mark, track, and analyze attendance with visual reports and absent notifications", color: "160, 60%, 50%" },
@@ -190,7 +154,7 @@ const techStack = [
 ];
 
 export default function PurchaseWebsite() {
-  const [revealPhase, setRevealPhase] = useState<"idle" | "countdown" | "spinning" | "done">("idle");
+  const [revealPhase, setRevealPhase] = useState<"idle" | "spinning" | "done">("idle");
   const [landedCount, setLandedCount] = useState(0);
   const allLanded = landedCount >= PRICE_CHARS.length;
 
@@ -204,7 +168,7 @@ export default function PurchaseWebsite() {
 
   return (
     <div className="min-h-screen" style={{ background: "linear-gradient(180deg, #050608 0%, #0a0c14 50%, #050608 100%)" }}>
-      <SEOHead title="Get This Website — College Management System | ₹15,000" description="Purchase this premium college management website with multi-role dashboards, attendance, fees, admissions and more. Built by Pavan A." canonical="/purchase" />
+      <SEOHead title="Get This Website — College Management System | ₹35,000" description="Purchase this premium college management website with multi-role dashboards, attendance, fees, admissions and more. Built by Pavan A." canonical="/purchase" />
 
       {/* Hero */}
       <section className="relative overflow-hidden pt-20 pb-24 sm:pt-32 sm:pb-36">
@@ -237,7 +201,10 @@ export default function PurchaseWebsite() {
                 {revealPhase === "idle" && (
                   <motion.button
                     key="reveal-btn"
-                    onClick={() => setRevealPhase("countdown")}
+                    onClick={() => {
+                      setLandedCount(0);
+                      setRevealPhase("spinning");
+                    }}
                     className="group relative inline-flex items-center gap-3 px-10 py-5 rounded-2xl font-body text-base font-bold border border-[hsl(42_87%_55%_/_0.3)] transition-all duration-500 overflow-hidden"
                     style={{ background: "rgba(198,167,94,0.06)" }}
                     whileHover={{ scale: 1.05, y: -4 }}
@@ -252,18 +219,6 @@ export default function PurchaseWebsite() {
                     <span className="relative z-10" style={{ color: "hsl(42, 87%, 55%)" }}>Reveal Price</span>
                     <Sparkles className="w-4 h-4 relative z-10 opacity-50" style={{ color: "hsl(42, 87%, 55%)" }} />
                   </motion.button>
-                )}
-
-                {revealPhase === "countdown" && (
-                  <motion.div
-                    key="countdown"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 1.2, filter: "blur(12px)" }}
-                    transition={{ duration: 0.4 }}
-                  >
-                    <RevealCountdown onComplete={() => setRevealPhase("spinning")} />
-                  </motion.div>
                 )}
 
                 {(revealPhase === "spinning" || revealPhase === "done") && (
@@ -282,11 +237,21 @@ export default function PurchaseWebsite() {
                       }} />
                       
                       <div className="relative flex items-center justify-center px-4 py-2 rounded-2xl border border-[hsl(42_87%_55%_/_0.15)]" style={{ background: "rgba(198,167,94,0.03)" }}>
+                        {revealPhase === "spinning" && (
+                          <motion.div
+                            className="absolute inset-y-0 w-1/3 pointer-events-none"
+                            initial={{ left: "-40%", opacity: 0.35 }}
+                            animate={{ left: ["-40%", "130%"], opacity: [0.2, 0.5, 0.2] }}
+                            transition={{ duration: 0.95, ease: "linear", repeat: Infinity }}
+                            style={{ background: "linear-gradient(90deg, transparent, hsla(42,87%,70%,0.26), transparent)" }}
+                          />
+                        )}
+
                         {PRICE_CHARS.map((char, i) => (
                           <SlotDigit
                             key={i}
                             char={char}
-                            delay={200 + i * 400}
+                            delay={500 + i * 460}
                             revealed={true}
                             onLand={() => setLandedCount((c) => c + 1)}
                           />
@@ -311,6 +276,14 @@ export default function PurchaseWebsite() {
                         </motion.div>
                       )}
                     </div>
+
+                    <motion.p
+                      className="font-body text-[10px] tracking-[0.24em] uppercase text-white/25"
+                      animate={revealPhase === "done" ? { opacity: 0 } : { opacity: [0.2, 0.55, 0.2] }}
+                      transition={revealPhase === "done" ? { duration: 0.2 } : { duration: 1.15, repeat: Infinity }}
+                    >
+                      Unlocking premium offer...
+                    </motion.p>
 
                     {/* "one-time payment" badge */}
                     <motion.div
@@ -478,7 +451,7 @@ export default function PurchaseWebsite() {
                   <p className="font-body text-white/35 text-sm mb-8">Everything included — no hidden costs</p>
 
                   <div className="flex items-baseline justify-center gap-2 mb-8">
-                    <span className="font-display text-5xl sm:text-6xl font-bold" style={{ color: "hsl(42, 87%, 55%)" }}>₹15,000</span>
+                    <span className="font-display text-5xl sm:text-6xl font-bold" style={{ color: "hsl(42, 87%, 55%)" }}>₹35,000</span>
                     <span className="font-body text-white/30 text-sm">one-time</span>
                   </div>
 
@@ -500,7 +473,7 @@ export default function PurchaseWebsite() {
                     ))}
                   </div>
 
-                  <a href="https://api.whatsapp.com/send/?phone=9036048950&text=Hi+Pavan%2C+I+want+to+purchase+the+college+website+for+%E2%82%B915%2C000.&type=phone_number&app_absent=0" target="_blank" rel="noopener noreferrer"
+                  <a href="https://api.whatsapp.com/send/?phone=9036048950&text=Hi+Pavan%2C+I+want+to+purchase+the+college+website+for+%E2%82%B935%2C000.&type=phone_number&app_absent=0" target="_blank" rel="noopener noreferrer"
                     className="group relative inline-flex items-center gap-3 px-12 py-5 rounded-2xl font-body text-base font-bold w-full justify-center transition-all duration-500 hover:scale-[1.02] hover:-translate-y-0.5"
                     style={{ background: "linear-gradient(135deg, hsl(42,87%,58%), hsl(38,92%,50%))", color: "hsl(30,10%,10%)", boxShadow: "0 12px 40px hsla(42,87%,52%,0.3), inset 0 1px 0 hsla(50,100%,90%,0.3)" }}>
                     <span className="absolute inset-0 overflow-hidden rounded-2xl">
