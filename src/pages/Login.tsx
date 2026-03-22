@@ -322,7 +322,6 @@ export default function Login() {
                         let verifyError: any = null;
 
                         const primaryAttempt = await supabase.auth.verifyOtp({
-                          email: authData.email,
                           token_hash: tokenHash,
                           type: "magiclink",
                         } as any);
@@ -330,7 +329,6 @@ export default function Login() {
 
                         if (verifyError) {
                           const fallbackAttempt = await supabase.auth.verifyOtp({
-                            email: authData.email,
                             token_hash: tokenHash,
                             type: "email",
                           } as any);
