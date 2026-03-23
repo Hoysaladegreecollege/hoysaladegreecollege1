@@ -89,7 +89,157 @@ function FloatingParticle({ delay, x, size }: { delay: number; x: string; size: 
   );
 }
 
-const allFeatures = [
+const demoPages = [
+  { label: "Homepage", path: "/", color: "42, 87%, 55%" },
+  { label: "Events", path: "/events", color: "340, 65%, 55%" },
+  { label: "Courses", path: "/courses", color: "220, 80%, 55%" },
+  { label: "Gallery", path: "/gallery", color: "270, 60%, 55%" },
+  { label: "Admissions", path: "/admissions", color: "160, 60%, 50%" },
+  { label: "Contact", path: "/contact", color: "190, 70%, 50%" },
+];
+
+function LiveDemoSection() {
+  const [activePage, setActivePage] = useState(0);
+  const [iframeLoaded, setIframeLoaded] = useState(false);
+  const baseUrl = "https://hoysaladegreecollege1.lovable.app";
+
+  useEffect(() => {
+    setIframeLoaded(false);
+  }, [activePage]);
+
+  return (
+    <div className="max-w-5xl mx-auto">
+      {/* Tab bar */}
+      <ScrollReveal delay={60}>
+        <div className="flex flex-wrap justify-center gap-2 mb-8">
+          {demoPages.map((page, i) => (
+            <motion.button
+              key={page.label}
+              onClick={() => setActivePage(i)}
+              className={`relative px-5 py-2.5 rounded-xl font-body text-xs font-bold transition-all duration-300 border ${
+                activePage === i
+                  ? "text-white border-white/15"
+                  : "text-white/35 border-white/[0.05] hover:text-white/60 hover:border-white/10"
+              }`}
+              style={activePage === i ? { background: `hsla(${page.color}, 0.1)` } : { background: "rgba(255,255,255,0.015)" }}
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              {activePage === i && (
+                <motion.div
+                  className="absolute inset-0 rounded-xl pointer-events-none"
+                  layoutId="demo-tab-glow"
+                  style={{ boxShadow: `0 0 20px hsla(${page.color}, 0.15), inset 0 0 20px hsla(${page.color}, 0.05)` }}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
+              <span className="relative z-10">{page.label}</span>
+            </motion.button>
+          ))}
+        </div>
+      </ScrollReveal>
+
+      {/* Browser chrome + iframe */}
+      <ScrollReveal delay={120}>
+        <motion.div
+          className="relative rounded-2xl border overflow-hidden"
+          style={{
+            borderColor: "hsla(42,87%,55%,0.12)",
+            background: "linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))",
+            boxShadow: "0 40px 100px -30px rgba(0,0,0,0.7), 0 0 60px hsla(42,87%,55%,0.04)",
+          }}
+          layout
+        >
+          {/* Browser top bar */}
+          <div className="flex items-center gap-3 px-5 py-3 border-b border-white/[0.06]" style={{ background: "rgba(255,255,255,0.02)" }}>
+            <div className="flex gap-1.5">
+              <div className="w-2.5 h-2.5 rounded-full" style={{ background: "hsla(0,65%,55%,0.7)" }} />
+              <div className="w-2.5 h-2.5 rounded-full" style={{ background: "hsla(42,87%,55%,0.7)" }} />
+              <div className="w-2.5 h-2.5 rounded-full" style={{ background: "hsla(145,65%,50%,0.7)" }} />
+            </div>
+            <div className="flex-1 flex items-center justify-center">
+              <div className="flex items-center gap-2 px-4 py-1 rounded-lg border border-white/[0.06] max-w-md w-full" style={{ background: "rgba(0,0,0,0.3)" }}>
+                <Lock className="w-2.5 h-2.5 text-white/20" />
+                <span className="font-body text-[10px] text-white/30 truncate">
+                  hoysaladegreecollege1.lovable.app{demoPages[activePage].path}
+                </span>
+              </div>
+            </div>
+            <motion.a
+              href={`${baseUrl}${demoPages[activePage].path}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-lg border border-white/[0.06] font-body text-[10px] text-white/35 hover:text-white/60 hover:border-white/15 transition-all duration-300"
+              style={{ background: "rgba(255,255,255,0.02)" }}
+              whileHover={{ y: -1 }}
+            >
+              <ExternalLink className="w-3 h-3" />
+              <span className="hidden sm:inline">Open</span>
+            </motion.a>
+          </div>
+
+          {/* iframe container */}
+          <div className="relative" style={{ height: "clamp(360px, 55vw, 600px)" }}>
+            {/* Loading state */}
+            <AnimatePresence>
+              {!iframeLoaded && (
+                <motion.div
+                  className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4"
+                  style={{ background: "rgba(7,8,12,0.95)" }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <motion.div
+                    className="w-10 h-10 rounded-xl border-2 border-t-transparent"
+                    style={{ borderColor: "hsla(42,87%,55%,0.3)", borderTopColor: "transparent" }}
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  />
+                  <p className="font-body text-[11px] text-white/25 tracking-wider">Loading live preview...</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <iframe
+              key={activePage}
+              src={`${baseUrl}${demoPages[activePage].path}`}
+              className="w-full h-full border-0"
+              title={`Live demo - ${demoPages[activePage].label}`}
+              onLoad={() => setIframeLoaded(true)}
+              style={{ background: "#07080c" }}
+              sandbox="allow-scripts allow-same-origin allow-popups"
+            />
+          </div>
+
+          {/* Bottom info bar */}
+          <div className="flex items-center justify-between px-5 py-2.5 border-t border-white/[0.04]" style={{ background: "rgba(255,255,255,0.015)" }}>
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "hsl(145, 65%, 50%)" }} />
+              <span className="font-body text-[10px] text-white/25">Live • Production Build</span>
+            </div>
+            <span className="font-body text-[10px] text-white/15">Fully interactive — scroll, click, navigate</span>
+          </div>
+        </motion.div>
+      </ScrollReveal>
+
+      {/* Hint text */}
+      <motion.p
+        className="text-center mt-6 font-body text-[11px] text-white/20"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.5 }}
+      >
+        👆 This is the actual live website — interact with it directly above, or{" "}
+        <a href={baseUrl} target="_blank" rel="noopener noreferrer" className="underline text-white/35 hover:text-white/50 transition-colors">
+          open in a new tab
+        </a>
+      </motion.p>
+    </div>
+  );
+}
+
+
   { icon: Users, title: "Multi-Role Dashboards", desc: "Separate dashboards for Students, Teachers, Principals & Admins with role-based access", color: "220, 80%, 55%" },
   { icon: ClipboardCheck, title: "Attendance Management", desc: "Mark, track, and analyze attendance with visual reports and absent notifications", color: "160, 60%, 50%" },
   { icon: BarChart3, title: "Marks & Results", desc: "Upload, manage and view internal & external exam marks with analytics", color: "270, 60%, 55%" },
