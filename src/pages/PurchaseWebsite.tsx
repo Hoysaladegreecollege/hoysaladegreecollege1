@@ -428,6 +428,34 @@ export default function PurchaseWebsite() {
         </div>
       </section>
 
+      {/* ─── LIVE DEMO PREVIEW ─── */}
+      <section className="py-24 sm:py-32 relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, hsla(42,87%,55%,0.08), transparent)" }} />
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full blur-[200px]" style={{ background: "radial-gradient(circle, hsla(220,80%,55%,0.04), transparent 70%)" }} />
+        </div>
+
+        <div className="container px-4 relative">
+          <ScrollReveal>
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/[0.06] mb-5" style={{ background: "rgba(255,255,255,0.02)" }}>
+                <Monitor className="w-3.5 h-3.5" style={{ color: "hsla(42,87%,55%,0.6)" }} />
+                <span className="font-body text-[10px] font-bold tracking-[0.2em] uppercase text-white/40">Live Preview</span>
+              </div>
+              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
+                See It <span style={{ color: "hsl(42, 87%, 55%)" }}>In Action</span>
+              </h2>
+              <p className="font-body text-white/30 text-sm mt-4 max-w-lg mx-auto leading-relaxed">
+                Explore the actual live platform — interact with the real dashboards, navigate pages, and experience the quality firsthand.
+              </p>
+            </div>
+          </ScrollReveal>
+
+          {/* Demo tabs */}
+          <LiveDemoSection />
+        </div>
+      </section>
+
       {/* ─── TECH STACK ─── */}
       <section className="py-16 sm:py-24 relative">
         <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, hsla(42,87%,55%,0.08), transparent)" }} />
