@@ -90,13 +90,202 @@ function FloatingParticle({ delay, x, size }: { delay: number; x: string; size: 
 }
 
 const demoPages = [
-  { label: "Homepage", path: "/", color: "42, 87%, 55%" },
-  { label: "Events", path: "/events", color: "340, 65%, 55%" },
-  { label: "Courses", path: "/courses", color: "220, 80%, 55%" },
-  { label: "Gallery", path: "/gallery", color: "270, 60%, 55%" },
-  { label: "Admissions", path: "/admissions", color: "160, 60%, 50%" },
-  { label: "Contact", path: "/contact", color: "190, 70%, 50%" },
+  { label: "Admin Dashboard", path: "/dashboard/admin", color: "42, 87%, 55%", icon: "⚙️" },
+  { label: "Admin Users", path: "/dashboard/admin/users", color: "220, 80%, 55%", icon: "👥" },
+  { label: "Admin Attendance", path: "/dashboard/admin/attendance-overview", color: "160, 60%, 50%", icon: "📊" },
+  { label: "Admin Events", path: "/dashboard/admin/events", color: "340, 65%, 55%", icon: "🎉" },
+  { label: "Admin Fee Mgmt", path: "/dashboard/admin/fee-management", color: "270, 60%, 55%", icon: "💰" },
+  { label: "Teacher Dashboard", path: "/dashboard/teacher", color: "190, 70%, 50%", icon: "📚" },
+  { label: "Student Dashboard", path: "/dashboard/student", color: "145, 65%, 42%", icon: "🎓" },
 ];
+
+/* ── Apple-style Device Scene ── */
+function AppleDeviceScene() {
+  return (
+    <div className="relative max-w-5xl mx-auto py-20 sm:py-32">
+      {/* Floating devices composition */}
+      <div className="relative flex items-center justify-center" style={{ perspective: "1200px" }}>
+        {/* Main laptop device */}
+        <motion.div
+          className="relative z-10"
+          initial={{ opacity: 0, y: 80, rotateX: 15 }}
+          whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {/* Screen frame */}
+          <div className="relative rounded-2xl sm:rounded-3xl border overflow-hidden mx-4 sm:mx-0"
+            style={{
+              borderColor: "hsla(0,0%,100%,0.08)",
+              background: "linear-gradient(180deg, rgba(30,32,40,1), rgba(18,20,28,1))",
+              boxShadow: "0 60px 120px -30px rgba(0,0,0,0.8), 0 0 80px hsla(42,87%,55%,0.06), inset 0 1px 0 hsla(0,0%,100%,0.08)",
+            }}>
+            {/* Camera notch */}
+            <div className="flex items-center justify-center py-2">
+              <div className="w-2 h-2 rounded-full" style={{ background: "hsla(0,0%,100%,0.06)", boxShadow: "inset 0 1px 2px rgba(0,0,0,0.5)" }} />
+            </div>
+            {/* Screen content - animated gradient representing dashboard */}
+            <div className="relative mx-3 mb-3 rounded-lg overflow-hidden" style={{ height: "clamp(200px, 35vw, 400px)" }}>
+              <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, #0c0e14, #111320)" }} />
+              {/* Sidebar mock */}
+              <div className="absolute left-0 top-0 bottom-0 border-r border-white/[0.04]" style={{ width: "22%", background: "rgba(255,255,255,0.015)" }}>
+                {[...Array(7)].map((_, i) => (
+                  <motion.div key={i} className="mx-3 my-2 rounded-md" style={{ height: 8, background: i === 1 ? "hsla(42,87%,55%,0.25)" : "hsla(0,0%,100%,0.04)" }}
+                    initial={{ scaleX: 0, originX: 0 }}
+                    whileInView={{ scaleX: 0.5 + Math.random() * 0.5 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.8 + i * 0.1, duration: 0.6 }}
+                  />
+                ))}
+              </div>
+              {/* Main content mock */}
+              <div className="absolute top-0 bottom-0 right-0" style={{ left: "22%" }}>
+                {/* Top bar */}
+                <div className="h-10 border-b border-white/[0.04] flex items-center px-4 gap-3">
+                  <motion.div className="rounded" style={{ width: 60, height: 6, background: "hsla(0,0%,100%,0.08)" }}
+                    initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }} transition={{ delay: 0.6, duration: 0.5 }} />
+                </div>
+                {/* Stat cards */}
+                <div className="grid grid-cols-4 gap-2 p-3">
+                  {[
+                    { color: "42, 87%, 55%", delay: 0.9 },
+                    { color: "220, 80%, 55%", delay: 1.0 },
+                    { color: "160, 60%, 50%", delay: 1.1 },
+                    { color: "340, 65%, 55%", delay: 1.2 },
+                  ].map((card, i) => (
+                    <motion.div key={i} className="rounded-lg border border-white/[0.04] p-2"
+                      style={{ background: `hsla(${card.color}, 0.04)` }}
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: card.delay, duration: 0.5 }}>
+                      <div className="rounded w-6 h-1.5 mb-2" style={{ background: `hsla(${card.color}, 0.3)` }} />
+                      <div className="rounded w-10 h-3" style={{ background: `hsla(${card.color}, 0.15)` }} />
+                    </motion.div>
+                  ))}
+                </div>
+                {/* Chart area */}
+                <div className="mx-3 rounded-lg border border-white/[0.04] p-3" style={{ background: "rgba(255,255,255,0.01)" }}>
+                  <div className="flex items-end gap-1.5 h-16">
+                    {[40, 65, 35, 80, 55, 70, 45, 90, 60, 75, 50, 85].map((h, i) => (
+                      <motion.div key={i} className="flex-1 rounded-sm"
+                        style={{ background: `linear-gradient(180deg, hsla(42,87%,55%,0.5), hsla(42,87%,55%,0.1))` }}
+                        initial={{ height: 0 }}
+                        whileInView={{ height: `${h}%` }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 1.3 + i * 0.06, duration: 0.6, ease: "easeOut" }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              {/* Animated scan line */}
+              <motion.div className="absolute inset-x-0 h-px pointer-events-none z-10"
+                style={{ background: "linear-gradient(90deg, transparent, hsla(42,87%,55%,0.15), transparent)" }}
+                animate={{ top: ["0%", "100%"] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+              />
+            </div>
+          </div>
+          {/* Stand base */}
+          <div className="mx-auto" style={{ width: "30%", height: 24, background: "linear-gradient(180deg, rgba(30,32,40,0.8), rgba(20,22,28,0.6))", borderRadius: "0 0 12px 12px", borderLeft: "1px solid hsla(0,0%,100%,0.05)", borderRight: "1px solid hsla(0,0%,100%,0.05)", borderBottom: "1px solid hsla(0,0%,100%,0.05)" }} />
+          <div className="mx-auto rounded-b-xl" style={{ width: "45%", height: 4, background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent)" }} />
+        </motion.div>
+
+        {/* Floating phone - left */}
+        <motion.div
+          className="absolute z-20 hidden lg:block"
+          style={{ left: "-5%", top: "15%" }}
+          initial={{ opacity: 0, x: -60, rotateY: -15 }}
+          whileInView={{ opacity: 1, x: 0, rotateY: -5 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <div className="rounded-2xl border overflow-hidden"
+            style={{ width: 120, borderColor: "hsla(0,0%,100%,0.08)", background: "linear-gradient(180deg, rgba(30,32,40,1), rgba(18,20,28,1))", boxShadow: "0 30px 60px -15px rgba(0,0,0,0.7)" }}>
+            <div className="flex justify-center py-1.5">
+              <div className="w-8 h-1 rounded-full" style={{ background: "hsla(0,0%,100%,0.06)" }} />
+            </div>
+            <div className="mx-1.5 mb-1.5 rounded-lg overflow-hidden" style={{ height: 200, background: "#0c0e14" }}>
+              {[...Array(5)].map((_, i) => (
+                <motion.div key={i} className="mx-2 my-1.5 rounded" style={{ height: 6, background: i === 0 ? "hsla(42,87%,55%,0.2)" : "hsla(0,0%,100%,0.04)" }}
+                  initial={{ scaleX: 0 }} whileInView={{ scaleX: 0.4 + Math.random() * 0.6 }} viewport={{ once: true }}
+                  transition={{ delay: 1.5 + i * 0.1, duration: 0.4 }} />
+              ))}
+              <div className="mx-2 mt-2 rounded-lg border border-white/[0.04] p-1.5" style={{ background: "rgba(255,255,255,0.01)" }}>
+                <div className="flex items-end gap-0.5 h-8">
+                  {[50, 70, 40, 85, 60].map((h, i) => (
+                    <motion.div key={i} className="flex-1 rounded-sm" style={{ background: "hsla(160,60%,50%,0.3)" }}
+                      initial={{ height: 0 }} whileInView={{ height: `${h}%` }} viewport={{ once: true }}
+                      transition={{ delay: 1.8 + i * 0.08, duration: 0.5 }} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Floating tablet - right */}
+        <motion.div
+          className="absolute z-20 hidden lg:block"
+          style={{ right: "-3%", top: "8%" }}
+          initial={{ opacity: 0, x: 60, rotateY: 15 }}
+          whileInView={{ opacity: 1, x: 0, rotateY: 5 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <div className="rounded-2xl border overflow-hidden"
+            style={{ width: 160, borderColor: "hsla(0,0%,100%,0.08)", background: "linear-gradient(180deg, rgba(30,32,40,1), rgba(18,20,28,1))", boxShadow: "0 30px 60px -15px rgba(0,0,0,0.7)" }}>
+            <div className="flex justify-center py-1.5">
+              <div className="w-1.5 h-1.5 rounded-full" style={{ background: "hsla(0,0%,100%,0.06)" }} />
+            </div>
+            <div className="mx-1.5 mb-1.5 rounded-lg overflow-hidden" style={{ height: 220, background: "#0c0e14" }}>
+              <div className="grid grid-cols-2 gap-1 p-2">
+                {[
+                  "42, 87%, 55%",
+                  "220, 80%, 55%",
+                  "160, 60%, 50%",
+                  "340, 65%, 55%",
+                ].map((c, i) => (
+                  <motion.div key={i} className="rounded-md border border-white/[0.04] p-1.5"
+                    style={{ background: `hsla(${c}, 0.04)` }}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 1.6 + i * 0.1, duration: 0.4 }}>
+                    <div className="rounded w-4 h-1 mb-1" style={{ background: `hsla(${c}, 0.3)` }} />
+                    <div className="rounded w-8 h-2" style={{ background: `hsla(${c}, 0.15)` }} />
+                  </motion.div>
+                ))}
+              </div>
+              {/* Table mock */}
+              <div className="mx-2 mt-1">
+                {[...Array(4)].map((_, i) => (
+                  <motion.div key={i} className="flex gap-1 mb-1"
+                    initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
+                    transition={{ delay: 2 + i * 0.08 }}>
+                    <div className="rounded h-1.5 flex-1" style={{ background: "hsla(0,0%,100%,0.04)" }} />
+                    <div className="rounded h-1.5 w-4" style={{ background: "hsla(0,0%,100%,0.03)" }} />
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Caption */}
+      <motion.div className="text-center mt-12"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.8, duration: 0.6 }}>
+        <p className="font-display text-lg sm:text-xl font-bold text-white/80 mb-2">Works on every device</p>
+        <p className="font-body text-xs text-white/25">Desktop • Tablet • Mobile — fully responsive across all screens</p>
+      </motion.div>
+    </div>
+  );
+}
 
 function LiveDemoSection() {
   const [activePage, setActivePage] = useState(0);
@@ -116,7 +305,7 @@ function LiveDemoSection() {
             <motion.button
               key={page.label}
               onClick={() => setActivePage(i)}
-              className={`relative px-5 py-2.5 rounded-xl font-body text-xs font-bold transition-all duration-300 border ${
+              className={`relative px-4 py-2 rounded-xl font-body text-[10px] sm:text-xs font-bold transition-all duration-300 border ${
                 activePage === i
                   ? "text-white border-white/15"
                   : "text-white/35 border-white/[0.05] hover:text-white/60 hover:border-white/10"
@@ -133,7 +322,11 @@ function LiveDemoSection() {
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 />
               )}
-              <span className="relative z-10">{page.label}</span>
+              <span className="relative z-10 flex items-center gap-1.5">
+                <span>{page.icon}</span>
+                <span className="hidden sm:inline">{page.label}</span>
+                <span className="sm:hidden">{page.label.split(' ').pop()}</span>
+              </span>
             </motion.button>
           ))}
         </div>
@@ -195,7 +388,7 @@ function LiveDemoSection() {
                     animate={{ rotate: 360 }}
                     transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                   />
-                  <p className="font-body text-[11px] text-white/25 tracking-wider">Loading live preview...</p>
+                  <p className="font-body text-[11px] text-white/25 tracking-wider">Loading dashboard preview...</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -215,7 +408,7 @@ function LiveDemoSection() {
           <div className="flex items-center justify-between px-5 py-2.5 border-t border-white/[0.04]" style={{ background: "rgba(255,255,255,0.015)" }}>
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "hsl(145, 65%, 50%)" }} />
-              <span className="font-body text-[10px] text-white/25">Live • Production Build</span>
+              <span className="font-body text-[10px] text-white/25">Live • Admin Dashboard</span>
             </div>
             <span className="font-body text-[10px] text-white/15">Fully interactive — scroll, click, navigate</span>
           </div>
@@ -230,7 +423,7 @@ function LiveDemoSection() {
         viewport={{ once: true }}
         transition={{ delay: 0.5 }}
       >
-        👆 This is the actual live website — interact with it directly above, or{" "}
+        👆 These are the actual live admin dashboards — interact directly above, or{" "}
         <a href={baseUrl} target="_blank" rel="noopener noreferrer" className="underline text-white/35 hover:text-white/50 transition-colors">
           open in a new tab
         </a>
@@ -478,6 +671,31 @@ export default function PurchaseWebsite() {
               </motion.a>
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* ─── APPLE DEVICE SCENE ─── */}
+      <section className="relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, hsla(42,87%,55%,0.08), transparent)" }} />
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] rounded-full blur-[200px]" style={{ background: "radial-gradient(circle, hsla(42,80%,55%,0.05), transparent 70%)" }} />
+        </div>
+        <div className="container px-4 relative">
+          <ScrollReveal>
+            <div className="text-center pt-24 sm:pt-32">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/[0.06] mb-5" style={{ background: "rgba(255,255,255,0.02)" }}>
+                <MonitorSmartphone className="w-3.5 h-3.5" style={{ color: "hsla(42,87%,55%,0.6)" }} />
+                <span className="font-body text-[10px] font-bold tracking-[0.2em] uppercase text-white/40">Multi-Device</span>
+              </div>
+              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
+                Designed for <span style={{ color: "hsl(42, 87%, 55%)" }}>Every Screen</span>
+              </h2>
+              <p className="font-body text-white/30 text-sm mt-4 max-w-lg mx-auto leading-relaxed">
+                A seamless experience across laptops, tablets, and smartphones — pixel-perfect on every device.
+              </p>
+            </div>
+          </ScrollReveal>
+          <AppleDeviceScene />
         </div>
       </section>
 

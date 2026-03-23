@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+}
+
 /* Fonts loaded via index.html with preload + media swap for faster rendering */
 
 @layer base {
