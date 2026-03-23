@@ -674,6 +674,31 @@ export default function PurchaseWebsite() {
         </div>
       </section>
 
+      {/* ─── APPLE DEVICE SCENE ─── */}
+      <section className="relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, hsla(42,87%,55%,0.08), transparent)" }} />
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] rounded-full blur-[200px]" style={{ background: "radial-gradient(circle, hsla(42,80%,55%,0.05), transparent 70%)" }} />
+        </div>
+        <div className="container px-4 relative">
+          <ScrollReveal>
+            <div className="text-center pt-24 sm:pt-32">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/[0.06] mb-5" style={{ background: "rgba(255,255,255,0.02)" }}>
+                <MonitorSmartphone className="w-3.5 h-3.5" style={{ color: "hsla(42,87%,55%,0.6)" }} />
+                <span className="font-body text-[10px] font-bold tracking-[0.2em] uppercase text-white/40">Multi-Device</span>
+              </div>
+              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
+                Designed for <span style={{ color: "hsl(42, 87%, 55%)" }}>Every Screen</span>
+              </h2>
+              <p className="font-body text-white/30 text-sm mt-4 max-w-lg mx-auto leading-relaxed">
+                A seamless experience across laptops, tablets, and smartphones — pixel-perfect on every device.
+              </p>
+            </div>
+          </ScrollReveal>
+          <AppleDeviceScene />
+        </div>
+      </section>
+
       {/* ─── FEATURE GRID ─── */}
       <section className="py-24 sm:py-32 relative">
         {/* Subtle grid pattern */}
