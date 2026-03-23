@@ -4,7 +4,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { Link } from "react-router-dom";
 import {
   Sparkles, Shield, Zap, Users, BookOpen, Bell, BarChart3, Calendar, MessageSquare,
-  GraduationCap, Upload, Fingerprint, Globe, MonitorSmartphone, Star, CheckCircle,
+  GraduationCap, Upload, Fingerprint, Globe, MonitorSmartphone, Monitor, Star, CheckCircle,
   ArrowRight, Heart, Phone, Mail, ExternalLink, Crown, Layers, Lock, Eye,
   ClipboardCheck, Award, Brain, Camera, TrendingUp, CircuitBoard, Gem, Rocket,
 } from "lucide-react";
