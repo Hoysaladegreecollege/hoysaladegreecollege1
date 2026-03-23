@@ -1,13 +1,28 @@
 <!doctype html>
 <html lang="en" class="dark">
   <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SD5N8PMZWG"></script>
+    <!-- Google tag (gtag.js) - deferred to reduce unused JS -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', 'G-SD5N8PMZWG');
+      // Load gtag.js after page becomes interactive
+      if (requestIdleCallback) {
+        requestIdleCallback(function() {
+          var s = document.createElement('script');
+          s.src = 'https://www.googletagmanager.com/gtag/js?id=G-SD5N8PMZWG';
+          s.async = true;
+          document.head.appendChild(s);
+        });
+      } else {
+        setTimeout(function() {
+          var s = document.createElement('script');
+          s.src = 'https://www.googletagmanager.com/gtag/js?id=G-SD5N8PMZWG';
+          s.async = true;
+          document.head.appendChild(s);
+        }, 3000);
+      }
     </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
