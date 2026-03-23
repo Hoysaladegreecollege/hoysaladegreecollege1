@@ -240,6 +240,7 @@ function LiveDemoSection() {
 }
 
 
+const allFeatures = [
   { icon: Users, title: "Multi-Role Dashboards", desc: "Separate dashboards for Students, Teachers, Principals & Admins with role-based access", color: "220, 80%, 55%" },
   { icon: ClipboardCheck, title: "Attendance Management", desc: "Mark, track, and analyze attendance with visual reports and absent notifications", color: "160, 60%, 50%" },
   { icon: BarChart3, title: "Marks & Results", desc: "Upload, manage and view internal & external exam marks with analytics", color: "270, 60%, 55%" },
