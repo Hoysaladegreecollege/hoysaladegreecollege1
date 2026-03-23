@@ -1,8 +1,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 serve(async (req) => {
@@ -11,6 +12,40 @@ serve(async (req) => {
   }
 
   try {
+    // Authenticate caller
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: { user }, error: authErr } = await userClient.auth.getUser();
+    if (authErr || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Check role - only staff can send receipts
+    const adminClient = createClient(supabaseUrl, supabaseServiceKey);
+    const { data: roleData } = await adminClient.from("user_roles").select("role").eq("user_id", user.id).maybeSingle();
+    if (!roleData || !["admin", "principal", "teacher"].includes(roleData.role)) {
+      return new Response(JSON.stringify({ error: "Insufficient permissions" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { studentEmail, studentName, receiptNumber, amount, paymentMethod, courseName, rollNumber, remarks, date, semester } = await req.json();
 
     if (!studentEmail || !amount || !receiptNumber) {
@@ -35,14 +70,12 @@ serve(async (req) => {
       <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
       <body style="margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;background:#f0f4f8;">
         <div style="max-width:520px;margin:40px auto;background:white;border-radius:20px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.08);">
-          <!-- Header -->
           <div style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6e 60%, #0a1628 100%);padding:36px 32px;text-align:center;">
             <div style="font-size:36px;margin-bottom:8px;">🎓</div>
             <h1 style="color:white;margin:0;font-size:22px;font-weight:800;">Hoysala Degree College</h1>
             <p style="color:rgba(255,255,255,0.5);margin:6px 0 0;font-size:12px;letter-spacing:1px;text-transform:uppercase;">Official Payment Receipt</p>
           </div>
           
-          <!-- Success Badge -->
           <div style="padding:24px 32px 0;">
             <div style="background:linear-gradient(135deg, #dcfce7, #f0fdf4);border:2px solid #86efac;border-radius:16px;padding:20px;text-align:center;">
               <div style="font-size:32px;margin-bottom:4px;">✅</div>
@@ -51,7 +84,6 @@ serve(async (req) => {
             </div>
           </div>
 
-          <!-- Receipt Details -->
           <div style="padding:24px 32px;">
             <table style="width:100%;border-collapse:collapse;font-size:14px;">
               <tr style="border-bottom:1px solid #f1f5f9;">
@@ -89,7 +121,6 @@ serve(async (req) => {
             </table>
           </div>
 
-          <!-- Footer -->
           <div style="text-align:center;padding:20px 32px 28px;background:#f8fafc;border-top:1px solid #e2e8f0;">
             <p style="font-size:11px;color:#94a3b8;margin:0;">This is an auto-generated receipt from Hoysala Degree College.</p>
             <p style="font-size:11px;color:#94a3b8;margin:4px 0 0;">Please keep this for your records.</p>
@@ -117,7 +148,7 @@ serve(async (req) => {
     const resData = await res.json();
     if (!res.ok) {
       console.error("Resend error:", resData);
-      return new Response(JSON.stringify({ error: "Failed to send email", details: resData }), {
+      return new Response(JSON.stringify({ error: "Failed to send email" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -128,7 +159,7 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error("Error:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
