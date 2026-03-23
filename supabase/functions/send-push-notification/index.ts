@@ -13,6 +13,40 @@ serve(async (req) => {
   }
 
   try {
+    // Authenticate caller
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: { user }, error: authErr } = await userClient.auth.getUser();
+    if (authErr || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Check role - only staff can send push notifications
+    const adminClient = createClient(supabaseUrl, supabaseServiceKey);
+    const { data: roleData } = await adminClient.from('user_roles').select('role').eq('user_id', user.id).maybeSingle();
+    if (!roleData || !['admin', 'principal', 'teacher'].includes(roleData.role)) {
+      return new Response(
+        JSON.stringify({ error: 'Insufficient permissions' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const vapidPublicKey = Deno.env.get('VAPID_PUBLIC_KEY');
     const vapidPrivateKey = Deno.env.get('VAPID_PRIVATE_KEY');
     
@@ -23,29 +57,14 @@ serve(async (req) => {
       );
     }
 
-    console.log('VAPID keys configured successfully');
-
     webpush.setVapidDetails(
       'mailto:pavanaofficial05@gmail.com',
       vapidPublicKey,
       vapidPrivateKey
     );
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = adminClient;
 
-    // Log caller info (auth is optional since verify_jwt=false)
-    const authHeader = req.headers.get('Authorization');
-    if (authHeader && authHeader !== `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`) {
-      const token = authHeader.replace('Bearer ', '');
-      const { data: { user } } = await supabase.auth.getUser(token);
-      if (user) {
-        console.log('Authenticated caller:', user.id, user.email);
-      }
-    }
-
-    // notifications: array of { user_id, title, body, url, tag }
     const { notifications } = await req.json();
     
     if (!notifications || !Array.isArray(notifications) || notifications.length === 0) {
@@ -55,10 +74,8 @@ serve(async (req) => {
       );
     }
 
-    // Get all unique user_ids
     const userIds = [...new Set(notifications.map((n: any) => n.user_id))];
     
-    // Fetch subscriptions
     const { data: subscriptions } = await supabase
       .from('push_subscriptions')
       .select('*')
@@ -71,7 +88,6 @@ serve(async (req) => {
       );
     }
 
-    // Group subscriptions by user_id
     const subsByUser: Record<string, any[]> = {};
     for (const sub of subscriptions) {
       if (!subsByUser[sub.user_id]) subsByUser[sub.user_id] = [];
@@ -99,9 +115,8 @@ serve(async (req) => {
           );
           sentCount++;
         } catch (err: any) {
-          console.error('Push send error:', err.statusCode, err.message, err.body);
+          console.error('Push send error:', err.statusCode, err.message);
           failedCount++;
-          // Remove expired subscriptions
           if (err.statusCode === 410 || err.statusCode === 404) {
             await supabase.from('push_subscriptions').delete().eq('id', sub.id);
           }
@@ -114,6 +129,7 @@ serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
+    console.error('Push notification error:', error);
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
