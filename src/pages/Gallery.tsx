@@ -173,7 +173,7 @@ export default function Gallery() {
               {displayImages.map((img: any, i: number) => (
                 <ScrollReveal key={img.id} delay={i * 60}>
                   <div
-                    className="relative group cursor-pointer overflow-hidden rounded-2xl sm:rounded-3xl border border-border/40 aspect-[4/3] transition-all duration-600 active:scale-[0.97] touch-manipulation"
+                    className="relative group cursor-pointer overflow-hidden rounded-2xl sm:rounded-3xl border border-border/40 aspect-[4/3] active:scale-[0.97] touch-manipulation"
                     style={{
                       transition: "all 0.6s cubic-bezier(0.16,1,0.3,1)",
                       boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
@@ -189,12 +189,12 @@ export default function Gallery() {
                     }}
                   >
                     <img src={img.image_url} alt={img.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[800ms]" loading="lazy" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-5 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
                       <span className="inline-block text-[9px] sm:text-[10px] px-2.5 py-0.5 rounded-full bg-secondary/90 text-primary-foreground font-body font-bold mb-1.5 backdrop-blur-sm">{img.category}</span>
                       <p className="font-display text-sm sm:text-base font-bold text-white">{img.title}</p>
                     </div>
-                    <div className="absolute top-3 right-3 sm:top-4 sm:right-4 w-9 h-9 rounded-xl bg-white/15 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 border border-white/20 group-hover:scale-110">
+                    <div className="absolute top-3 right-3 sm:top-4 sm:right-4 w-9 h-9 rounded-xl bg-black/30 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 border border-white/10 group-hover:scale-110">
                       <Maximize2 className="w-4 h-4 text-white" />
                     </div>
                   </div>

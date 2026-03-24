@@ -120,15 +120,15 @@ export default function Navbar() {
         <div className="absolute top-0 left-0 right-0 h-[0.5px] bg-gradient-to-r from-transparent via-secondary/30 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 h-[0.5px] bg-gradient-to-r from-transparent via-primary-foreground/[0.06] to-transparent" />
 
-        <div className="container px-4 relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-0">
-          <div className="flex items-center gap-2 sm:text-left animate-fade-in">
-            <img src={saiBabaImg} alt="Shri Shirdi Sai" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-secondary/40 shadow-md" />
-            <p className="font-display text-[11px] sm:text-[13px] font-bold tracking-[0.04em] text-primary-foreground/90">
+        <div className="container px-4 relative flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0 animate-fade-in">
+            <img src={saiBabaImg} alt="Shri Shirdi Sai" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-secondary/40 shadow-md shrink-0" />
+            <p className="font-display text-[10px] sm:text-[13px] font-bold tracking-[0.04em] text-primary-foreground/90 truncate">
               ಶ್ರೀಶಿರಡಿ ಸಾಯಿ ಎಜುಕೇಷನಲ್ ಟ್ರಸ್ಟ್ (ರಿ.)
             </p>
           </div>
-          <div className="flex items-center gap-3 sm:gap-5 flex-wrap justify-center sm:justify-end text-[10px] sm:text-[11px] animate-fade-in" style={{ animationDelay: "0.15s" }}>
-            <span className="flex items-center gap-2 font-medium tracking-wide text-secondary">
+          <div className="flex items-center gap-2 sm:gap-5 shrink-0 text-[10px] sm:text-[11px] animate-fade-in" style={{ animationDelay: "0.15s" }}>
+            <span className="hidden sm:flex items-center gap-2 font-medium tracking-wide text-secondary">
               <span className="relative flex h-1.5 w-1.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-50 bg-secondary" />
                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-secondary" />
@@ -136,14 +136,14 @@ export default function Navbar() {
               Recognized by Govt. of Karnataka
             </span>
             <span className="hidden sm:block w-[0.5px] h-3 bg-primary-foreground/[0.08]" />
-            <a href="tel:7676272167" className="text-primary-foreground/40 hover:text-primary-foreground/80 transition-all duration-400 hidden sm:inline-flex items-center gap-1.5 group hover:-translate-y-[0.5px]">
-              <Phone className="w-3 h-3 opacity-50 group-hover:opacity-100 transition-all duration-400" />
-              <span className="tracking-wide">7676272167</span>
+            <a href="tel:7676272167" className="text-primary-foreground/60 hover:text-primary-foreground/90 transition-all duration-400 inline-flex items-center gap-1.5 group hover:-translate-y-[0.5px]">
+              <Phone className="w-3 h-3 opacity-60 group-hover:opacity-100 transition-all duration-400" />
+              <span className="tracking-wide hidden sm:inline">7676272167</span>
             </a>
             <span className="hidden sm:block w-[0.5px] h-3 bg-primary-foreground/[0.08]" />
-            <a href="mailto:principal.hoysaladegreecollege@gmail.com" className="text-primary-foreground/40 hover:text-primary-foreground/80 transition-all duration-400 hidden sm:inline-flex items-center gap-1.5 group hover:-translate-y-[0.5px]">
-              <Mail className="w-3 h-3 opacity-50 group-hover:opacity-100 transition-all duration-400" />
-              <span className="tracking-wide">Mail Us</span>
+            <a href="mailto:principal.hoysaladegreecollege@gmail.com" className="text-primary-foreground/60 hover:text-primary-foreground/90 transition-all duration-400 inline-flex items-center gap-1.5 group hover:-translate-y-[0.5px]">
+              <Mail className="w-3 h-3 opacity-60 group-hover:opacity-100 transition-all duration-400" />
+              <span className="tracking-wide hidden sm:inline">Mail Us</span>
             </a>
           </div>
         </div>
