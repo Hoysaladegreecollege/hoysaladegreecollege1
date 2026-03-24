@@ -710,7 +710,8 @@ export default function Index() {
             {galleryImages.map((img, i) => (
               <ScrollReveal key={img.title} delay={i * 60}>
                 <div
-                  className="relative group cursor-pointer overflow-hidden rounded-xl sm:rounded-2xl border border-border aspect-[4/3] hover:shadow-2xl active:scale-[0.97] transition-all duration-500 touch-manipulation"
+                  className="relative group cursor-pointer overflow-hidden rounded-xl sm:rounded-2xl border border-border/40 aspect-[4/3] active:scale-[0.97] transition-all duration-500 touch-manipulation"
+                  style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}
                   onClick={() => {
                     setLightboxIdx(i);
                     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -724,14 +725,14 @@ export default function Index() {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="absolute bottom-0 left-0 right-0 p-2.5 sm:p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
                     <span className="inline-block text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full bg-secondary/90 text-primary-foreground font-body font-bold mb-0.5 sm:mb-1">
                       {img.category}
                     </span>
                     <p className="font-display text-xs sm:text-base font-bold text-white">{img.title}</p>
                   </div>
-                  <div className="absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                  <div className="absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 border border-white/10">
                     <Camera className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                   </div>
                 </div>
