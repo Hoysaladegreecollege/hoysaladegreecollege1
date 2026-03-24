@@ -7,8 +7,10 @@ import {
   GraduationCap, Upload, Fingerprint, Globe, MonitorSmartphone, Monitor, Star, CheckCircle,
   ArrowRight, Heart, Phone, Mail, ExternalLink, Crown, Layers, Lock, Eye,
   ClipboardCheck, Award, Brain, Camera, TrendingUp, CircuitBoard, Gem, Rocket,
+  LayoutDashboard, Clock, DollarSign, Image, Settings, UserCheck, Activity,
+  PieChart, FileText, Search, ChevronRight
 } from "lucide-react";
-import { motion, AnimatePresence, useMotionValue, animate } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, animate, useScroll, useTransform } from "framer-motion";
 
 /* ── Slot Machine ── */
 const PRICE_CHARS = ["₹", "3", "5", ",", "0", "0", "0"];
@@ -89,262 +91,114 @@ function FloatingParticle({ delay, x, size }: { delay: number; x: string; size: 
   );
 }
 
-const demoPages = [
-  { label: "Admin Dashboard", path: "/dashboard/admin", color: "42, 87%, 55%", icon: "⚙️" },
-  { label: "Admin Users", path: "/dashboard/admin/users", color: "220, 80%, 55%", icon: "👥" },
-  { label: "Admin Attendance", path: "/dashboard/admin/attendance-overview", color: "160, 60%, 50%", icon: "📊" },
-  { label: "Admin Events", path: "/dashboard/admin/events", color: "340, 65%, 55%", icon: "🎉" },
-  { label: "Admin Fee Mgmt", path: "/dashboard/admin/fee-management", color: "270, 60%, 55%", icon: "💰" },
-  { label: "Teacher Dashboard", path: "/dashboard/teacher", color: "190, 70%, 50%", icon: "📚" },
-  { label: "Student Dashboard", path: "/dashboard/student", color: "145, 65%, 42%", icon: "🎓" },
-];
-
-/* ── Apple-style Device Scene ── */
-function AppleDeviceScene() {
-  return (
-    <div className="relative max-w-5xl mx-auto py-20 sm:py-32">
-      {/* Floating devices composition */}
-      <div className="relative flex items-center justify-center" style={{ perspective: "1200px" }}>
-        {/* Main laptop device */}
-        <motion.div
-          className="relative z-10"
-          initial={{ opacity: 0, y: 80, rotateX: 15 }}
-          whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-        >
-          {/* Screen frame */}
-          <div className="relative rounded-2xl sm:rounded-3xl border overflow-hidden mx-4 sm:mx-0"
-            style={{
-              borderColor: "hsla(0,0%,100%,0.08)",
-              background: "linear-gradient(180deg, rgba(30,32,40,1), rgba(18,20,28,1))",
-              boxShadow: "0 60px 120px -30px rgba(0,0,0,0.8), 0 0 80px hsla(42,87%,55%,0.06), inset 0 1px 0 hsla(0,0%,100%,0.08)",
-            }}>
-            {/* Camera notch */}
-            <div className="flex items-center justify-center py-2">
-              <div className="w-2 h-2 rounded-full" style={{ background: "hsla(0,0%,100%,0.06)", boxShadow: "inset 0 1px 2px rgba(0,0,0,0.5)" }} />
-            </div>
-            {/* Screen content - animated gradient representing dashboard */}
-            <div className="relative mx-3 mb-3 rounded-lg overflow-hidden" style={{ height: "clamp(200px, 35vw, 400px)" }}>
-              <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, #0c0e14, #111320)" }} />
-              {/* Sidebar mock */}
-              <div className="absolute left-0 top-0 bottom-0 border-r border-white/[0.04]" style={{ width: "22%", background: "rgba(255,255,255,0.015)" }}>
-                {[...Array(7)].map((_, i) => (
-                  <motion.div key={i} className="mx-3 my-2 rounded-md" style={{ height: 8, background: i === 1 ? "hsla(42,87%,55%,0.25)" : "hsla(0,0%,100%,0.04)" }}
-                    initial={{ scaleX: 0, originX: 0 }}
-                    whileInView={{ scaleX: 0.5 + Math.random() * 0.5 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.8 + i * 0.1, duration: 0.6 }}
-                  />
-                ))}
-              </div>
-              {/* Main content mock */}
-              <div className="absolute top-0 bottom-0 right-0" style={{ left: "22%" }}>
-                {/* Top bar */}
-                <div className="h-10 border-b border-white/[0.04] flex items-center px-4 gap-3">
-                  <motion.div className="rounded" style={{ width: 60, height: 6, background: "hsla(0,0%,100%,0.08)" }}
-                    initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }} transition={{ delay: 0.6, duration: 0.5 }} />
-                </div>
-                {/* Stat cards */}
-                <div className="grid grid-cols-4 gap-2 p-3">
-                  {[
-                    { color: "42, 87%, 55%", delay: 0.9 },
-                    { color: "220, 80%, 55%", delay: 1.0 },
-                    { color: "160, 60%, 50%", delay: 1.1 },
-                    { color: "340, 65%, 55%", delay: 1.2 },
-                  ].map((card, i) => (
-                    <motion.div key={i} className="rounded-lg border border-white/[0.04] p-2"
-                      style={{ background: `hsla(${card.color}, 0.04)` }}
-                      initial={{ opacity: 0, y: 10 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: card.delay, duration: 0.5 }}>
-                      <div className="rounded w-6 h-1.5 mb-2" style={{ background: `hsla(${card.color}, 0.3)` }} />
-                      <div className="rounded w-10 h-3" style={{ background: `hsla(${card.color}, 0.15)` }} />
-                    </motion.div>
-                  ))}
-                </div>
-                {/* Chart area */}
-                <div className="mx-3 rounded-lg border border-white/[0.04] p-3" style={{ background: "rgba(255,255,255,0.01)" }}>
-                  <div className="flex items-end gap-1.5 h-16">
-                    {[40, 65, 35, 80, 55, 70, 45, 90, 60, 75, 50, 85].map((h, i) => (
-                      <motion.div key={i} className="flex-1 rounded-sm"
-                        style={{ background: `linear-gradient(180deg, hsla(42,87%,55%,0.5), hsla(42,87%,55%,0.1))` }}
-                        initial={{ height: 0 }}
-                        whileInView={{ height: `${h}%` }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 1.3 + i * 0.06, duration: 0.6, ease: "easeOut" }}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-              {/* Animated scan line */}
-              <motion.div className="absolute inset-x-0 h-px pointer-events-none z-10"
-                style={{ background: "linear-gradient(90deg, transparent, hsla(42,87%,55%,0.15), transparent)" }}
-                animate={{ top: ["0%", "100%"] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-              />
-            </div>
-          </div>
-          {/* Stand base */}
-          <div className="mx-auto" style={{ width: "30%", height: 24, background: "linear-gradient(180deg, rgba(30,32,40,0.8), rgba(20,22,28,0.6))", borderRadius: "0 0 12px 12px", borderLeft: "1px solid hsla(0,0%,100%,0.05)", borderRight: "1px solid hsla(0,0%,100%,0.05)", borderBottom: "1px solid hsla(0,0%,100%,0.05)" }} />
-          <div className="mx-auto rounded-b-xl" style={{ width: "45%", height: 4, background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent)" }} />
-        </motion.div>
-
-        {/* Floating phone - left */}
-        <motion.div
-          className="absolute z-20 hidden lg:block"
-          style={{ left: "-5%", top: "15%" }}
-          initial={{ opacity: 0, x: -60, rotateY: -15 }}
-          whileInView={{ opacity: 1, x: 0, rotateY: -5 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <div className="rounded-2xl border overflow-hidden"
-            style={{ width: 120, borderColor: "hsla(0,0%,100%,0.08)", background: "linear-gradient(180deg, rgba(30,32,40,1), rgba(18,20,28,1))", boxShadow: "0 30px 60px -15px rgba(0,0,0,0.7)" }}>
-            <div className="flex justify-center py-1.5">
-              <div className="w-8 h-1 rounded-full" style={{ background: "hsla(0,0%,100%,0.06)" }} />
-            </div>
-            <div className="mx-1.5 mb-1.5 rounded-lg overflow-hidden" style={{ height: 200, background: "#0c0e14" }}>
-              {[...Array(5)].map((_, i) => (
-                <motion.div key={i} className="mx-2 my-1.5 rounded" style={{ height: 6, background: i === 0 ? "hsla(42,87%,55%,0.2)" : "hsla(0,0%,100%,0.04)" }}
-                  initial={{ scaleX: 0 }} whileInView={{ scaleX: 0.4 + Math.random() * 0.6 }} viewport={{ once: true }}
-                  transition={{ delay: 1.5 + i * 0.1, duration: 0.4 }} />
-              ))}
-              <div className="mx-2 mt-2 rounded-lg border border-white/[0.04] p-1.5" style={{ background: "rgba(255,255,255,0.01)" }}>
-                <div className="flex items-end gap-0.5 h-8">
-                  {[50, 70, 40, 85, 60].map((h, i) => (
-                    <motion.div key={i} className="flex-1 rounded-sm" style={{ background: "hsla(160,60%,50%,0.3)" }}
-                      initial={{ height: 0 }} whileInView={{ height: `${h}%` }} viewport={{ once: true }}
-                      transition={{ delay: 1.8 + i * 0.08, duration: 0.5 }} />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Floating tablet - right */}
-        <motion.div
-          className="absolute z-20 hidden lg:block"
-          style={{ right: "-3%", top: "8%" }}
-          initial={{ opacity: 0, x: 60, rotateY: 15 }}
-          whileInView={{ opacity: 1, x: 0, rotateY: 5 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <div className="rounded-2xl border overflow-hidden"
-            style={{ width: 160, borderColor: "hsla(0,0%,100%,0.08)", background: "linear-gradient(180deg, rgba(30,32,40,1), rgba(18,20,28,1))", boxShadow: "0 30px 60px -15px rgba(0,0,0,0.7)" }}>
-            <div className="flex justify-center py-1.5">
-              <div className="w-1.5 h-1.5 rounded-full" style={{ background: "hsla(0,0%,100%,0.06)" }} />
-            </div>
-            <div className="mx-1.5 mb-1.5 rounded-lg overflow-hidden" style={{ height: 220, background: "#0c0e14" }}>
-              <div className="grid grid-cols-2 gap-1 p-2">
-                {[
-                  "42, 87%, 55%",
-                  "220, 80%, 55%",
-                  "160, 60%, 50%",
-                  "340, 65%, 55%",
-                ].map((c, i) => (
-                  <motion.div key={i} className="rounded-md border border-white/[0.04] p-1.5"
-                    style={{ background: `hsla(${c}, 0.04)` }}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 1.6 + i * 0.1, duration: 0.4 }}>
-                    <div className="rounded w-4 h-1 mb-1" style={{ background: `hsla(${c}, 0.3)` }} />
-                    <div className="rounded w-8 h-2" style={{ background: `hsla(${c}, 0.15)` }} />
-                  </motion.div>
-                ))}
-              </div>
-              {/* Table mock */}
-              <div className="mx-2 mt-1">
-                {[...Array(4)].map((_, i) => (
-                  <motion.div key={i} className="flex gap-1 mb-1"
-                    initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-                    transition={{ delay: 2 + i * 0.08 }}>
-                    <div className="rounded h-1.5 flex-1" style={{ background: "hsla(0,0%,100%,0.04)" }} />
-                    <div className="rounded h-1.5 w-4" style={{ background: "hsla(0,0%,100%,0.03)" }} />
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Caption */}
-      <motion.div className="text-center mt-12"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ delay: 0.8, duration: 0.6 }}>
-        <p className="font-display text-lg sm:text-xl font-bold text-white/80 mb-2">Works on every device</p>
-        <p className="font-body text-xs text-white/25">Desktop • Tablet • Mobile — fully responsive across all screens</p>
-      </motion.div>
-    </div>
-  );
-}
-
-function LiveDemoSection() {
-  const [activePage, setActivePage] = useState(0);
-  const [iframeLoaded, setIframeLoaded] = useState(false);
-  const baseUrl = "https://hoysaladegreecollege1.lovable.app";
+/* ── Animated Counter ── */
+function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [inView, setInView] = useState(false);
 
   useEffect(() => {
-    setIframeLoaded(false);
-  }, [activePage]);
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setInView(true); }, { threshold: 0.5 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!inView || !ref.current) return;
+    let start = 0;
+    const duration = 1500;
+    const startTime = performance.now();
+    const step = (now: number) => {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 4);
+      start = Math.floor(eased * value);
+      if (ref.current) ref.current.textContent = start + suffix;
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [inView, value, suffix]);
+
+  return <span ref={ref}>0{suffix}</span>;
+}
+
+/* ── Mock Dashboard Preview ── */
+function MockDashboardPreview() {
+  const [activeTab, setActiveTab] = useState(0);
+  const tabs = [
+    { label: "Admin Dashboard", icon: LayoutDashboard, color: "42, 87%, 55%" },
+    { label: "User Management", icon: Users, color: "220, 80%, 55%" },
+    { label: "Attendance Hub", icon: UserCheck, color: "160, 60%, 50%" },
+    { label: "Fee Management", icon: DollarSign, color: "340, 65%, 55%" },
+  ];
+
+  const sidebarItems = [
+    { icon: LayoutDashboard, label: "Dashboard", active: true },
+    { icon: Bell, label: "Post Notice" },
+    { icon: BookOpen, label: "Courses" },
+    { icon: UserCheck, label: "Attendance Hub" },
+    { icon: FileText, label: "Applications" },
+    { icon: Users, label: "Users" },
+    { icon: DollarSign, label: "Fee Management" },
+    { icon: Award, label: "Top Rankers" },
+    { icon: Calendar, label: "Timetable" },
+    { icon: Image, label: "Events" },
+    { icon: Camera, label: "Gallery" },
+    { icon: Settings, label: "Settings" },
+  ];
+
+  const statCards = [
+    { label: "Total Students", value: 1247, icon: GraduationCap, change: "+12%", color: "42, 87%, 55%" },
+    { label: "Total Teachers", value: 86, icon: Users, change: "+3%", color: "220, 80%, 55%" },
+    { label: "Attendance Rate", value: 94, icon: UserCheck, suffix: "%", change: "+2.1%", color: "160, 60%, 50%" },
+    { label: "Fee Collection", value: 98, icon: DollarSign, suffix: "%", change: "+5%", color: "340, 65%, 55%" },
+  ];
 
   return (
-    <div className="max-w-5xl mx-auto">
-      {/* Tab bar */}
+    <div className="max-w-6xl mx-auto">
+      {/* Tab selector */}
       <ScrollReveal delay={60}>
         <div className="flex flex-wrap justify-center gap-2 mb-8">
-          {demoPages.map((page, i) => (
+          {tabs.map((tab, i) => (
             <motion.button
-              key={page.label}
-              onClick={() => setActivePage(i)}
-              className={`relative px-4 py-2 rounded-xl font-body text-[10px] sm:text-xs font-bold transition-all duration-300 border ${
-                activePage === i
+              key={tab.label}
+              onClick={() => setActiveTab(i)}
+              className={`relative px-4 py-2.5 rounded-xl font-body text-[11px] sm:text-xs font-bold transition-all duration-300 border flex items-center gap-2 ${
+                activeTab === i
                   ? "text-white border-white/15"
                   : "text-white/35 border-white/[0.05] hover:text-white/60 hover:border-white/10"
               }`}
-              style={activePage === i ? { background: `hsla(${page.color}, 0.1)` } : { background: "rgba(255,255,255,0.015)" }}
+              style={activeTab === i ? { background: `hsla(${tab.color}, 0.1)` } : { background: "rgba(255,255,255,0.015)" }}
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.97 }}
             >
-              {activePage === i && (
+              {activeTab === i && (
                 <motion.div
                   className="absolute inset-0 rounded-xl pointer-events-none"
-                  layoutId="demo-tab-glow"
-                  style={{ boxShadow: `0 0 20px hsla(${page.color}, 0.15), inset 0 0 20px hsla(${page.color}, 0.05)` }}
+                  layoutId="mock-tab-glow"
+                  style={{ boxShadow: `0 0 20px hsla(${tab.color}, 0.15), inset 0 0 20px hsla(${tab.color}, 0.05)` }}
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 />
               )}
-              <span className="relative z-10 flex items-center gap-1.5">
-                <span>{page.icon}</span>
-                <span className="hidden sm:inline">{page.label}</span>
-                <span className="sm:hidden">{page.label.split(' ').pop()}</span>
-              </span>
+              <tab.icon className="w-3.5 h-3.5 relative z-10" style={activeTab === i ? { color: `hsl(${tab.color})` } : {}} />
+              <span className="relative z-10 hidden sm:inline">{tab.label}</span>
+              <span className="relative z-10 sm:hidden">{tab.label.split(' ').pop()}</span>
             </motion.button>
           ))}
         </div>
       </ScrollReveal>
 
-      {/* Browser chrome + iframe */}
+      {/* Browser chrome + mock dashboard */}
       <ScrollReveal delay={120}>
         <motion.div
-          className="relative rounded-2xl border overflow-hidden"
+          className="relative rounded-2xl sm:rounded-3xl border overflow-hidden"
           style={{
             borderColor: "hsla(42,87%,55%,0.12)",
             background: "linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))",
-            boxShadow: "0 40px 100px -30px rgba(0,0,0,0.7), 0 0 60px hsla(42,87%,55%,0.04)",
+            boxShadow: "0 60px 140px -40px rgba(0,0,0,0.8), 0 0 80px hsla(42,87%,55%,0.05)",
           }}
           layout
         >
           {/* Browser top bar */}
-          <div className="flex items-center gap-3 px-5 py-3 border-b border-white/[0.06]" style={{ background: "rgba(255,255,255,0.02)" }}>
+          <div className="flex items-center gap-3 px-4 sm:px-5 py-3 border-b border-white/[0.06]" style={{ background: "rgba(255,255,255,0.02)" }}>
             <div className="flex gap-1.5">
               <div className="w-2.5 h-2.5 rounded-full" style={{ background: "hsla(0,65%,55%,0.7)" }} />
               <div className="w-2.5 h-2.5 rounded-full" style={{ background: "hsla(42,87%,55%,0.7)" }} />
@@ -354,68 +208,311 @@ function LiveDemoSection() {
               <div className="flex items-center gap-2 px-4 py-1 rounded-lg border border-white/[0.06] max-w-md w-full" style={{ background: "rgba(0,0,0,0.3)" }}>
                 <Lock className="w-2.5 h-2.5 text-white/20" />
                 <span className="font-body text-[10px] text-white/30 truncate">
-                  hoysaladegreecollege1.lovable.app{demoPages[activePage].path}
+                  hoysaladegreecollege.in/dashboard/admin
                 </span>
               </div>
             </div>
-            <motion.a
-              href={`${baseUrl}${demoPages[activePage].path}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1 rounded-lg border border-white/[0.06] font-body text-[10px] text-white/35 hover:text-white/60 hover:border-white/15 transition-all duration-300"
-              style={{ background: "rgba(255,255,255,0.02)" }}
-              whileHover={{ y: -1 }}
-            >
-              <ExternalLink className="w-3 h-3" />
-              <span className="hidden sm:inline">Open</span>
-            </motion.a>
           </div>
 
-          {/* iframe container */}
-          <div className="relative" style={{ height: "clamp(360px, 55vw, 600px)" }}>
-            {/* Loading state */}
-            <AnimatePresence>
-              {!iframeLoaded && (
-                <motion.div
-                  className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4"
-                  style={{ background: "rgba(7,8,12,0.95)" }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.4 }}
-                >
+          {/* Dashboard content */}
+          <div className="flex" style={{ height: "clamp(380px, 55vw, 580px)" }}>
+            {/* Sidebar */}
+            <div className="hidden sm:flex flex-col border-r border-white/[0.04] shrink-0" style={{ width: 200, background: "rgba(14,16,22,0.98)" }}>
+              {/* Logo area */}
+              <div className="px-4 pt-4 pb-3 border-b border-white/[0.04]">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "hsla(42,87%,55%,0.15)" }}>
+                    <GraduationCap className="w-4 h-4" style={{ color: "hsl(42,87%,55%)" }} />
+                  </div>
+                  <div>
+                    <p className="font-body text-[11px] font-bold text-white/80">Hoysala College</p>
+                    <p className="font-body text-[8px] text-white/25">Admin Portal</p>
+                  </div>
+                </div>
+              </div>
+              {/* Nav items */}
+              <div className="flex-1 overflow-hidden px-2 pt-2 space-y-0.5">
+                {sidebarItems.map((item, i) => (
                   <motion.div
-                    className="w-10 h-10 rounded-xl border-2 border-t-transparent"
-                    style={{ borderColor: "hsla(42,87%,55%,0.3)", borderTopColor: "transparent" }}
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  />
-                  <p className="font-body text-[11px] text-white/25 tracking-wider">Loading dashboard preview...</p>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                    key={item.label}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-body ${
+                      item.active
+                        ? "text-white/90 font-medium"
+                        : "text-white/30"
+                    }`}
+                    style={item.active ? { background: "rgba(255,255,255,0.06)" } : {}}
+                    initial={{ opacity: 0, x: -12 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.4 + i * 0.05, duration: 0.4 }}
+                  >
+                    {item.active && (
+                      <div className="absolute left-0 w-[2px] h-3 rounded-full" style={{ background: "hsl(42,87%,55%)" }} />
+                    )}
+                    <item.icon className="w-3.5 h-3.5 shrink-0" style={item.active ? { color: "hsl(42,87%,55%)" } : {}} />
+                    <span className="truncate">{item.label}</span>
+                  </motion.div>
+                ))}
+              </div>
+              {/* User area */}
+              <div className="px-3 py-3 border-t border-white/[0.04]">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.06)" }}>
+                    <Users className="w-3 h-3 text-white/40" />
+                  </div>
+                  <div>
+                    <p className="font-body text-[10px] text-white/50 font-medium">Admin User</p>
+                    <p className="font-body text-[8px] text-white/20">admin@college.in</p>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-            <iframe
-              key={activePage}
-              src={`${baseUrl}${demoPages[activePage].path}`}
-              className="w-full h-full border-0"
-              title={`Live demo - ${demoPages[activePage].label}`}
-              onLoad={() => setIframeLoaded(true)}
-              style={{ background: "#07080c" }}
-              sandbox="allow-scripts allow-same-origin allow-popups"
-            />
+            {/* Main content area */}
+            <div className="flex-1 flex flex-col overflow-hidden" style={{ background: "rgba(10,12,20,0.95)" }}>
+              {/* Top header */}
+              <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-white/[0.04]" style={{ background: "rgba(255,255,255,0.01)" }}>
+                <div>
+                  <motion.p className="font-body text-[13px] font-bold text-white/80"
+                    initial={{ opacity: 0, y: -5 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.3 }}>
+                    Admin Dashboard
+                  </motion.p>
+                  <p className="font-body text-[9px] text-white/25">Hoysala Degree College</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <motion.div className="w-7 h-7 rounded-lg flex items-center justify-center border border-white/[0.06]"
+                    style={{ background: "rgba(255,255,255,0.02)" }}
+                    whileHover={{ scale: 1.1 }}>
+                    <Search className="w-3.5 h-3.5 text-white/30" />
+                  </motion.div>
+                  <motion.div className="relative w-7 h-7 rounded-lg flex items-center justify-center border border-white/[0.06]"
+                    style={{ background: "rgba(255,255,255,0.02)" }}
+                    whileHover={{ scale: 1.1 }}>
+                    <Bell className="w-3.5 h-3.5 text-white/30" />
+                    <div className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full" style={{ background: "hsl(0,65%,55%)" }} />
+                  </motion.div>
+                </div>
+              </div>
+
+              {/* Dashboard content */}
+              <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
+                {/* Welcome */}
+                <motion.div
+                  className="flex items-center justify-between"
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.4, duration: 0.5 }}
+                >
+                  <div>
+                    <p className="font-body text-[15px] font-bold text-white/85">Welcome back, Admin 👋</p>
+                    <p className="font-body text-[10px] text-white/30 mt-0.5">Here's what's happening at your institution today</p>
+                  </div>
+                  <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/[0.06]" style={{ background: "rgba(255,255,255,0.02)" }}>
+                    <Calendar className="w-3 h-3 text-white/30" />
+                    <span className="font-body text-[10px] text-white/35">Mar 2026</span>
+                  </div>
+                </motion.div>
+
+                {/* Stat cards */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+                  {statCards.map((stat, i) => (
+                    <motion.div
+                      key={stat.label}
+                      className="group relative rounded-xl border border-white/[0.05] p-3 sm:p-4 overflow-hidden"
+                      style={{ background: `linear-gradient(135deg, hsla(${stat.color}, 0.06), rgba(255,255,255,0.01))` }}
+                      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.5 + i * 0.1, duration: 0.5, type: "spring", stiffness: 200 }}
+                    >
+                      <div className="absolute top-0 right-0 w-16 h-16 rounded-bl-full opacity-[0.03]"
+                        style={{ background: `hsl(${stat.color})` }} />
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center border border-white/[0.06]"
+                          style={{ background: `hsla(${stat.color}, 0.1)` }}>
+                          <stat.icon className="w-4 h-4" style={{ color: `hsl(${stat.color})` }} />
+                        </div>
+                        <span className="font-body text-[9px] font-bold px-1.5 py-0.5 rounded-md"
+                          style={{ color: "hsl(145,65%,55%)", background: "hsla(145,65%,50%,0.1)" }}>
+                          {stat.change}
+                        </span>
+                      </div>
+                      <p className="font-display text-xl sm:text-2xl font-bold text-white/90">
+                        <AnimatedCounter value={stat.value} suffix={stat.suffix || ""} />
+                      </p>
+                      <p className="font-body text-[9px] text-white/30 mt-0.5">{stat.label}</p>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Charts row */}
+                <div className="grid sm:grid-cols-2 gap-3">
+                  {/* Attendance chart */}
+                  <motion.div
+                    className="rounded-xl border border-white/[0.05] p-4 overflow-hidden"
+                    style={{ background: "rgba(255,255,255,0.015)" }}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.8, duration: 0.6 }}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: "hsla(220,80%,55%,0.1)" }}>
+                          <BarChart3 className="w-3 h-3" style={{ color: "hsl(220,80%,55%)" }} />
+                        </div>
+                        <span className="font-body text-[11px] font-bold text-white/60">Weekly Attendance</span>
+                      </div>
+                      <div className="flex items-center gap-1 px-2 py-0.5 rounded-md border border-white/[0.04]" style={{ background: "rgba(255,255,255,0.02)" }}>
+                        <span className="font-body text-[8px] text-white/25">This Week</span>
+                        <ChevronRight className="w-2.5 h-2.5 text-white/20" />
+                      </div>
+                    </div>
+                    <div className="flex items-end gap-1.5 h-24">
+                      {[72, 88, 65, 95, 78, 92, 85].map((h, i) => (
+                        <motion.div
+                          key={i}
+                          className="flex-1 rounded-t-md relative overflow-hidden"
+                          style={{ background: `linear-gradient(180deg, hsla(220,80%,55%,0.6), hsla(220,80%,55%,0.15))` }}
+                          initial={{ height: 0 }}
+                          whileInView={{ height: `${h}%` }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 1.0 + i * 0.07, duration: 0.6, ease: "easeOut" }}
+                        >
+                          <motion.div
+                            className="absolute inset-0 opacity-0"
+                            style={{ background: "linear-gradient(180deg, hsla(220,80%,70%,0.3), transparent)" }}
+                            whileHover={{ opacity: 1 }}
+                          />
+                        </motion.div>
+                      ))}
+                    </div>
+                    <div className="flex gap-1.5 mt-2">
+                      {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(d => (
+                        <span key={d} className="flex-1 text-center font-body text-[7px] text-white/20">{d}</span>
+                      ))}
+                    </div>
+                  </motion.div>
+
+                  {/* Revenue / Fee collection */}
+                  <motion.div
+                    className="rounded-xl border border-white/[0.05] p-4 overflow-hidden"
+                    style={{ background: "rgba(255,255,255,0.015)" }}
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.9, duration: 0.6 }}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: "hsla(42,87%,55%,0.1)" }}>
+                          <DollarSign className="w-3 h-3" style={{ color: "hsl(42,87%,55%)" }} />
+                        </div>
+                        <span className="font-body text-[11px] font-bold text-white/60">Fee Collection</span>
+                      </div>
+                      <span className="font-body text-[9px] font-bold" style={{ color: "hsl(145,65%,55%)" }}>₹12.4L</span>
+                    </div>
+                    {/* Donut chart mock */}
+                    <div className="flex items-center gap-4">
+                      <div className="relative w-20 h-20 shrink-0">
+                        <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
+                          <motion.circle cx="18" cy="18" r="14" fill="none" stroke="hsla(42,87%,55%,0.15)" strokeWidth="3" />
+                          <motion.circle cx="18" cy="18" r="14" fill="none" stroke="hsl(42,87%,55%)" strokeWidth="3"
+                            strokeDasharray="88" strokeLinecap="round"
+                            initial={{ strokeDashoffset: 88 }}
+                            whileInView={{ strokeDashoffset: 88 * 0.02 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 1.2, duration: 1.5, ease: "easeOut" }}
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="font-display text-sm font-bold text-white/80">98%</span>
+                        </div>
+                      </div>
+                      <div className="space-y-2 flex-1">
+                        {[
+                          { label: "Collected", pct: 98, color: "42, 87%, 55%" },
+                          { label: "Pending", pct: 2, color: "340, 65%, 55%" },
+                        ].map((item, i) => (
+                          <div key={item.label}>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="font-body text-[9px] text-white/40">{item.label}</span>
+                              <span className="font-body text-[9px] font-bold text-white/50">{item.pct}%</span>
+                            </div>
+                            <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.04)" }}>
+                              <motion.div className="h-full rounded-full"
+                                style={{ background: `hsl(${item.color})` }}
+                                initial={{ width: 0 }}
+                                whileInView={{ width: `${item.pct}%` }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 1.3 + i * 0.15, duration: 0.8 }}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
+
+                {/* Recent activity table */}
+                <motion.div
+                  className="rounded-xl border border-white/[0.05] overflow-hidden"
+                  style={{ background: "rgba(255,255,255,0.015)" }}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 1.0, duration: 0.5 }}
+                >
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.04]">
+                    <div className="flex items-center gap-2">
+                      <Activity className="w-3.5 h-3.5" style={{ color: "hsla(42,87%,55%,0.6)" }} />
+                      <span className="font-body text-[11px] font-bold text-white/60">Recent Activity</span>
+                    </div>
+                    <span className="font-body text-[9px] text-white/25 cursor-pointer hover:text-white/40 transition-colors">View All →</span>
+                  </div>
+                  <div className="divide-y divide-white/[0.03]">
+                    {[
+                      { action: "Attendance marked for BCA Sem-3", time: "2 min ago", icon: Clock, color: "160, 60%, 50%" },
+                      { action: "Fee payment recorded — ₹24,000", time: "15 min ago", icon: DollarSign, color: "42, 87%, 55%" },
+                      { action: "New admission application received", time: "1 hr ago", icon: FileText, color: "220, 80%, 55%" },
+                      { action: "Notice posted: Annual Day Event", time: "3 hrs ago", icon: Bell, color: "340, 65%, 55%" },
+                    ].map((item, i) => (
+                      <motion.div
+                        key={i}
+                        className="flex items-center gap-3 px-4 py-2.5"
+                        initial={{ opacity: 0, x: -10 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 1.2 + i * 0.08, duration: 0.4 }}
+                      >
+                        <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0"
+                          style={{ background: `hsla(${item.color}, 0.08)` }}>
+                          <item.icon className="w-3 h-3" style={{ color: `hsla(${item.color}, 0.7)` }} />
+                        </div>
+                        <span className="font-body text-[10px] text-white/45 flex-1">{item.action}</span>
+                        <span className="font-body text-[8px] text-white/20 shrink-0">{item.time}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              </div>
+            </div>
           </div>
 
-          {/* Bottom info bar */}
-          <div className="flex items-center justify-between px-5 py-2.5 border-t border-white/[0.04]" style={{ background: "rgba(255,255,255,0.015)" }}>
+          {/* Bottom status bar */}
+          <div className="flex items-center justify-between px-4 sm:px-5 py-2.5 border-t border-white/[0.04]" style={{ background: "rgba(255,255,255,0.015)" }}>
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "hsl(145, 65%, 50%)" }} />
-              <span className="font-body text-[10px] text-white/25">Live • Admin Dashboard</span>
+              <span className="font-body text-[10px] text-white/25">Sample Preview • Admin Dashboard</span>
             </div>
-            <span className="font-body text-[10px] text-white/15">Fully interactive — scroll, click, navigate</span>
+            <span className="font-body text-[10px] text-white/15">Static preview — no login required</span>
           </div>
         </motion.div>
       </ScrollReveal>
 
-      {/* Hint text */}
+      {/* Caption */}
       <motion.p
         className="text-center mt-6 font-body text-[11px] text-white/20"
         initial={{ opacity: 0 }}
@@ -423,15 +520,34 @@ function LiveDemoSection() {
         viewport={{ once: true }}
         transition={{ delay: 0.5 }}
       >
-        👆 These are the actual live admin dashboards — interact directly above, or{" "}
-        <a href={baseUrl} target="_blank" rel="noopener noreferrer" className="underline text-white/35 hover:text-white/50 transition-colors">
-          open in a new tab
-        </a>
+        ✨ This is a sample preview of the admin dashboard — the actual product includes all interactive features
       </motion.p>
     </div>
   );
 }
 
+/* ── Marquee Line ── */
+function InfiniteMarquee({ items, reverse = false }: { items: string[]; reverse?: boolean }) {
+  return (
+    <div className="relative overflow-hidden py-3">
+      <div className="absolute left-0 top-0 bottom-0 w-20 z-10" style={{ background: "linear-gradient(90deg, #07080c, transparent)" }} />
+      <div className="absolute right-0 top-0 bottom-0 w-20 z-10" style={{ background: "linear-gradient(-90deg, #07080c, transparent)" }} />
+      <motion.div
+        className="flex gap-4 whitespace-nowrap"
+        animate={{ x: reverse ? ["0%", "-50%"] : ["-50%", "0%"] }}
+        transition={{ duration: 30, ease: "linear", repeat: Infinity }}
+      >
+        {[...items, ...items].map((item, i) => (
+          <span key={i} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-white/[0.04] font-body text-[11px] text-white/30"
+            style={{ background: "rgba(255,255,255,0.015)" }}>
+            <CheckCircle className="w-3 h-3" style={{ color: "hsla(42,87%,55%,0.4)" }} />
+            {item}
+          </span>
+        ))}
+      </motion.div>
+    </div>
+  );
+}
 
 const allFeatures = [
   { icon: Users, title: "Multi-Role Dashboards", desc: "Separate dashboards for Students, Teachers, Principals & Admins with role-based access", color: "220, 80%, 55%" },
@@ -472,10 +588,25 @@ const trustBadges = [
   { icon: Rocket, label: "Production Ready", sub: "Deploy today" },
 ];
 
+const marqueeItems1 = [
+  "Student Management", "Teacher Portal", "Attendance Tracking", "Fee Collection",
+  "Exam Results", "Timetable System", "Notice Board", "Gallery Management",
+  "Admission Portal", "Push Notifications", "Dark Mode", "PWA Support",
+];
+const marqueeItems2 = [
+  "Role-Based Access", "Activity Logs", "Passkey Login", "Direct Messaging",
+  "Study Materials", "Top Rankers", "Alumni Portal", "PDF Reports",
+  "WhatsApp Integration", "Birthday Wishes", "Semester Promotion", "AI Chatbot",
+];
+
 export default function PurchaseWebsite() {
   const [revealPhase, setRevealPhase] = useState<"idle" | "spinning" | "done">("idle");
   const [landedCount, setLandedCount] = useState(0);
   const allLanded = landedCount >= PRICE_CHARS.length;
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const heroScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.95]);
 
   useEffect(() => {
     if (revealPhase === "spinning" && allLanded) {
@@ -489,12 +620,12 @@ export default function PurchaseWebsite() {
       <SEOHead title="Get This Website — College Management System | ₹35,000" description="Purchase this premium college management website with multi-role dashboards, attendance, fees, admissions and more. Built by Pavan A." canonical="/purchase" />
 
       {/* Floating ambient particles */}
-      {[...Array(12)].map((_, i) => (
-        <FloatingParticle key={i} delay={i * 1.8} x={`${8 + (i * 7.5) % 85}%`} size={2 + (i % 3)} />
+      {[...Array(16)].map((_, i) => (
+        <FloatingParticle key={i} delay={i * 1.4} x={`${5 + (i * 6) % 90}%`} size={2 + (i % 4)} />
       ))}
 
       {/* ─── HERO ─── */}
-      <section className="relative overflow-hidden pt-24 pb-28 sm:pt-36 sm:pb-40">
+      <motion.section ref={heroRef} className="relative overflow-hidden pt-24 pb-28 sm:pt-36 sm:pb-40" style={{ opacity: heroOpacity, scale: heroScale }}>
         {/* Multi-layer ambient glow */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-[5%] left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full blur-[200px]" style={{ background: "radial-gradient(circle, hsla(42,80%,55%,0.07), transparent 70%)" }} />
@@ -546,7 +677,7 @@ export default function PurchaseWebsite() {
             </p>
 
             {/* Trust badges */}
-            <div className="flex flex-wrap justify-center gap-6 mt-10">
+            <div className="flex flex-wrap justify-center gap-3 sm:gap-6 mt-10">
               {trustBadges.map((b, i) => (
                 <motion.div 
                   key={b.label}
@@ -555,6 +686,7 @@ export default function PurchaseWebsite() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 + i * 0.1, duration: 0.6 }}
+                  whileHover={{ y: -3, borderColor: "hsla(42,87%,55%,0.15)" }}
                 >
                   <b.icon className="w-4 h-4" style={{ color: "hsla(42,87%,55%,0.7)" }} />
                   <div className="text-left">
@@ -597,7 +729,6 @@ export default function PurchaseWebsite() {
                     transition={{ type: "spring", stiffness: 200, damping: 20 }}
                     className="flex flex-col items-center gap-3">
                     <div className="relative">
-                      {/* Double ambient glow */}
                       <motion.div className="absolute -inset-10 rounded-3xl pointer-events-none"
                         animate={{ opacity: [0.4, 0.8, 0.4] }}
                         transition={{ duration: 2, repeat: Infinity }}
@@ -672,36 +803,17 @@ export default function PurchaseWebsite() {
             </div>
           </motion.div>
         </div>
-      </section>
+      </motion.section>
 
-      {/* ─── APPLE DEVICE SCENE ─── */}
-      <section className="relative overflow-hidden">
+      {/* ─── MARQUEE STRIP ─── */}
+      <section className="relative py-8 overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, hsla(42,87%,55%,0.08), transparent)" }} />
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] rounded-full blur-[200px]" style={{ background: "radial-gradient(circle, hsla(42,80%,55%,0.05), transparent 70%)" }} />
-        </div>
-        <div className="container px-4 relative">
-          <ScrollReveal>
-            <div className="text-center pt-24 sm:pt-32">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/[0.06] mb-5" style={{ background: "rgba(255,255,255,0.02)" }}>
-                <MonitorSmartphone className="w-3.5 h-3.5" style={{ color: "hsla(42,87%,55%,0.6)" }} />
-                <span className="font-body text-[10px] font-bold tracking-[0.2em] uppercase text-white/40">Multi-Device</span>
-              </div>
-              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
-                Designed for <span style={{ color: "hsl(42, 87%, 55%)" }}>Every Screen</span>
-              </h2>
-              <p className="font-body text-white/30 text-sm mt-4 max-w-lg mx-auto leading-relaxed">
-                A seamless experience across laptops, tablets, and smartphones — pixel-perfect on every device.
-              </p>
-            </div>
-          </ScrollReveal>
-          <AppleDeviceScene />
-        </div>
+        <InfiniteMarquee items={marqueeItems1} />
+        <InfiniteMarquee items={marqueeItems2} reverse />
       </section>
 
       {/* ─── FEATURE GRID ─── */}
       <section className="py-24 sm:py-32 relative">
-        {/* Subtle grid pattern */}
         <div className="absolute inset-0 opacity-[0.012]" style={{ backgroundImage: "linear-gradient(hsla(42,87%,55%,0.4) 1px, transparent 1px), linear-gradient(90deg, hsla(42,87%,55%,0.4) 1px, transparent 1px)", backgroundSize: "100px 100px" }} />
         <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, hsla(42,87%,55%,0.08), transparent)" }} />
 
@@ -728,16 +840,14 @@ export default function PurchaseWebsite() {
                   whileHover={{ y: -4, borderColor: "rgba(255,255,255,0.1)" }}
                   transition={{ duration: 0.3 }}
                 >
-                  {/* Hover gradient */}
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                     style={{ background: `linear-gradient(135deg, hsla(${f.color}, 0.07), transparent 60%)` }} />
-                  {/* Top accent line */}
                   <div className="absolute top-0 left-0 right-0 h-px scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"
                     style={{ background: `linear-gradient(90deg, hsla(${f.color}, 0.6), transparent)` }} />
                   
                   <div className="relative z-10">
                     <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4 border border-white/[0.06] group-hover:scale-110 group-hover:rotate-3 transition-all duration-300"
-                      style={{ background: `hsla(${f.color}, 0.08)`, boxShadow: `0 0 0 hsla(${f.color}, 0)` }}>
+                      style={{ background: `hsla(${f.color}, 0.08)` }}>
                       <f.icon className="w-5 h-5" style={{ color: `hsla(${f.color}, 0.85)` }} />
                     </div>
                     <h3 className="font-display text-sm font-bold text-white/90 mb-1.5">{f.title}</h3>
@@ -750,7 +860,7 @@ export default function PurchaseWebsite() {
         </div>
       </section>
 
-      {/* ─── DASHBOARD PREVIEWS ─── */}
+      {/* ─── DASHBOARD PREVIEWS (Role cards) ─── */}
       <section className="py-24 sm:py-32 relative">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] rounded-full blur-[180px] pointer-events-none" style={{ background: "radial-gradient(circle, hsla(42,80%,55%,0.04), transparent 70%)" }} />
         <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, hsla(42,87%,55%,0.08), transparent)" }} />
@@ -776,7 +886,6 @@ export default function PurchaseWebsite() {
                   whileHover={{ y: -6, borderColor: "rgba(255,255,255,0.12)" }}
                   transition={{ duration: 0.3 }}
                 >
-                  {/* Top accent */}
                   <div className="h-[2px] w-full" style={{ background: `linear-gradient(90deg, transparent, hsla(${d.color}, 0.5), transparent)` }} />
                   <div className="p-7 sm:p-8">
                     <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300 inline-block">{d.emoji}</div>
@@ -797,7 +906,7 @@ export default function PurchaseWebsite() {
         </div>
       </section>
 
-      {/* ─── LIVE DEMO PREVIEW ─── */}
+      {/* ─── MOCK DASHBOARD PREVIEW ─── */}
       <section className="py-24 sm:py-32 relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, hsla(42,87%,55%,0.08), transparent)" }} />
         <div className="absolute inset-0 pointer-events-none">
@@ -809,19 +918,18 @@ export default function PurchaseWebsite() {
             <div className="text-center mb-16">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/[0.06] mb-5" style={{ background: "rgba(255,255,255,0.02)" }}>
                 <Monitor className="w-3.5 h-3.5" style={{ color: "hsla(42,87%,55%,0.6)" }} />
-                <span className="font-body text-[10px] font-bold tracking-[0.2em] uppercase text-white/40">Live Preview</span>
+                <span className="font-body text-[10px] font-bold tracking-[0.2em] uppercase text-white/40">Dashboard Preview</span>
               </div>
               <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
-                See It <span style={{ color: "hsl(42, 87%, 55%)" }}>In Action</span>
+                See the <span style={{ color: "hsl(42, 87%, 55%)" }}>Dashboard</span> in Action
               </h2>
               <p className="font-body text-white/30 text-sm mt-4 max-w-lg mx-auto leading-relaxed">
-                Explore the actual live platform — interact with the real dashboards, navigate pages, and experience the quality firsthand.
+                A fully functional admin dashboard with real-time analytics, user management, and comprehensive institutional controls.
               </p>
             </div>
           </ScrollReveal>
 
-          {/* Demo tabs */}
-          <LiveDemoSection />
+          <MockDashboardPreview />
         </div>
       </section>
 
@@ -869,10 +977,8 @@ export default function PurchaseWebsite() {
                 whileHover={{ boxShadow: "0 50px 120px -30px rgba(0,0,0,0.6), 0 0 100px rgba(198,167,94,0.08)" }}
                 transition={{ duration: 0.5 }}
               >
-                {/* Top gold accent */}
                 <div className="h-[2px]" style={{ background: "linear-gradient(90deg, transparent, hsl(42 87% 55% / 0.7), transparent)" }} />
                 
-                {/* Corner accents */}
                 <div className="absolute top-0 left-0 w-20 h-20 pointer-events-none" style={{ background: "linear-gradient(135deg, hsla(42,87%,55%,0.06), transparent 50%)" }} />
                 <div className="absolute top-0 right-0 w-20 h-20 pointer-events-none" style={{ background: "linear-gradient(225deg, hsla(42,87%,55%,0.06), transparent 50%)" }} />
 
