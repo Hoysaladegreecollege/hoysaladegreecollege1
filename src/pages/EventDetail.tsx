@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import SEOHead from "@/components/SEOHead";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Calendar, Tag, ChevronLeft, ChevronRight, Maximize2, X } from "lucide-react";
+import { ArrowLeft, Calendar, Tag, ChevronLeft, ChevronRight, Maximize2, X, ImageIcon, Share2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 function parseGallery(description: string | null): { text: string; gallery: string[] } {
@@ -17,7 +17,6 @@ function parseGallery(description: string | null): { text: string; gallery: stri
   };
 }
 
-// Only render thumbnails in a window around the active index for performance
 const THUMB_WINDOW = 30;
 
 export default function EventDetail() {
@@ -93,11 +92,11 @@ export default function EventDetail() {
     setImgLoaded(false);
   }, [event?.id]);
 
-  // Auto-scroll thumbnail strip - use scrollLeft for perf with many thumbs
+  // Auto-scroll thumbnail strip
   useEffect(() => {
     if (!thumbStripRef.current) return;
     const container = thumbStripRef.current;
-    const thumbWidth = 88; // ~w-20 + gap
+    const thumbWidth = 88;
     const scrollTarget = activeIndex * thumbWidth - container.clientWidth / 2 + thumbWidth / 2;
     container.scrollTo({ left: scrollTarget, behavior: "smooth" });
   }, [activeIndex]);
@@ -172,9 +171,16 @@ export default function EventDetail() {
     if (e.touches.length < 2) pinchStateRef.current = null;
   }, []);
 
-  // Compute visible thumbnail window
   const thumbStart = Math.max(0, activeIndex - THUMB_WINDOW);
   const thumbEnd = Math.min(allImages.length, activeIndex + THUMB_WINDOW);
+
+  const handleShare = useCallback(() => {
+    if (navigator.share && event) {
+      navigator.share({ title: event.title, url: window.location.href });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+    }
+  }, [event]);
 
   if (isLoading) {
     return (
@@ -211,15 +217,22 @@ export default function EventDetail() {
         canonical={`/events/${event.id}`}
       />
 
-      {/* Back button */}
-      <div className="container px-4 pt-6 pb-2">
+      {/* Back button + share */}
+      <div className="container px-4 pt-6 pb-2 flex items-center justify-between">
         <Link to="/events" className="inline-flex items-center gap-2 text-sm font-body font-semibold text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to events
         </Link>
+        <button onClick={handleShare} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-body font-semibold text-muted-foreground hover:text-foreground border border-border/40 hover:border-border transition-all">
+          <Share2 className="w-3.5 h-3.5" /> Share
+        </button>
       </div>
 
-      {/* Full-width image carousel - NO AnimatePresence for perf with 650 images */}
-      <section className="relative w-full h-[55vh] sm:h-[70vh] bg-black overflow-hidden">
+      {/* Full-width image carousel */}
+      <section className="relative w-full h-[55vh] sm:h-[70vh] bg-black overflow-hidden group/carousel">
+        {/* Edge gradients for cinematic look */}
+        <div className="absolute inset-y-0 left-0 w-16 sm:w-24 z-[5] pointer-events-none" style={{ background: "linear-gradient(90deg, rgba(0,0,0,0.4), transparent)" }} />
+        <div className="absolute inset-y-0 right-0 w-16 sm:w-24 z-[5] pointer-events-none" style={{ background: "linear-gradient(-90deg, rgba(0,0,0,0.4), transparent)" }} />
+        
         <div className="absolute inset-0 w-full h-full flex items-center justify-center">
           {!imgLoaded && (
             <div className="absolute inset-0 flex items-center justify-center z-[1]">
@@ -237,28 +250,28 @@ export default function EventDetail() {
           />
         </div>
 
-        {/* Fullscreen button */}
+        {/* Fullscreen button - glassmorphism */}
         <button
           onClick={() => openLightbox(activeIndex)}
-          className="absolute top-4 left-4 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white hover:bg-black/60 transition-colors z-10"
+          className="absolute top-4 left-4 w-10 h-10 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white/80 hover:text-white hover:bg-black/50 hover:border-white/20 transition-all duration-300 z-10"
           aria-label="View fullscreen"
         >
           <Maximize2 className="w-4 h-4" />
         </button>
 
-        {/* Nav arrows */}
+        {/* Nav arrows - glassmorphism */}
         {allImages.length > 1 && (
           <>
             <button
               onClick={goPrev}
-              className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white hover:bg-black/60 transition-colors z-10"
+              className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white/80 hover:text-white hover:bg-black/50 hover:border-white/20 hover:scale-105 transition-all duration-300 z-10"
               aria-label="Previous image"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
               onClick={goNext}
-              className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white hover:bg-black/60 transition-colors z-10"
+              className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white/80 hover:text-white hover:bg-black/50 hover:border-white/20 hover:scale-105 transition-all duration-300 z-10"
               aria-label="Next image"
             >
               <ChevronRight className="w-5 h-5" />
@@ -266,15 +279,18 @@ export default function EventDetail() {
           </>
         )}
 
-        {/* Image counter */}
+        {/* Image counter - glassmorphism pill */}
         {allImages.length > 1 && (
-          <span className="absolute top-4 right-4 text-xs font-body font-semibold text-white/80 bg-black/40 backdrop-blur-sm px-3 py-1 rounded-full z-10">
-            {activeIndex + 1} / {allImages.length}
-          </span>
+          <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+            <span className="inline-flex items-center gap-1.5 text-xs font-body font-semibold text-white/90 bg-black/30 backdrop-blur-xl border border-white/10 px-3.5 py-1.5 rounded-xl">
+              <ImageIcon className="w-3 h-3 text-white/50" />
+              {activeIndex + 1} / {allImages.length}
+            </span>
+          </div>
         )}
       </section>
 
-      {/* Thumbnail strip - virtualized: only render nearby thumbs */}
+      {/* Thumbnail strip - with active glow */}
       {allImages.length > 1 && (
         <div className="container px-4 py-3">
           <div
@@ -282,19 +298,20 @@ export default function EventDetail() {
             className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide"
             style={{ scrollBehavior: "smooth" }}
           >
-            {/* Spacer for items before window */}
             {thumbStart > 0 && <div style={{ minWidth: thumbStart * 88, flexShrink: 0 }} />}
             {allImages.slice(thumbStart, thumbEnd).map((url, i) => {
               const idx = thumbStart + i;
+              const isActive = idx === activeIndex;
               return (
                 <button
                   key={`thumb-${idx}`}
                   onClick={() => goTo(idx, idx > activeIndex ? 1 : -1)}
-                  className={`shrink-0 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
-                    idx === activeIndex
-                      ? "border-primary shadow-md scale-105"
-                      : "border-transparent opacity-60 hover:opacity-100"
+                  className={`shrink-0 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
+                    isActive
+                      ? "border-primary scale-105"
+                      : "border-transparent opacity-50 hover:opacity-90 hover:border-border/40"
                   }`}
+                  style={isActive ? { boxShadow: "0 0 12px hsl(var(--primary) / 0.3)" } : {}}
                 >
                   <img
                     src={url}
@@ -305,36 +322,56 @@ export default function EventDetail() {
                 </button>
               );
             })}
-            {/* Spacer for items after window */}
             {thumbEnd < allImages.length && <div style={{ minWidth: (allImages.length - thumbEnd) * 88, flexShrink: 0 }} />}
           </div>
         </div>
       )}
 
-      {/* Event details below images */}
+      {/* Event details — glassmorphism card */}
       <section className="container px-4 py-6 sm:py-10">
         <div className="max-w-3xl mx-auto space-y-5">
-          <header className="space-y-3">
+          <motion.header 
+            className="space-y-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          >
             <h1 className="font-display text-2xl sm:text-4xl font-bold text-foreground leading-tight">{event.title}</h1>
             <div className="flex flex-wrap items-center gap-2.5">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary font-body text-xs font-semibold">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-primary/10 border border-primary/20 text-primary font-body text-xs font-semibold backdrop-blur-sm"
+                style={{ boxShadow: "0 0 10px hsl(var(--primary) / 0.08)" }}>
                 <Tag className="w-3.5 h-3.5" /> {event.category || "General"}
               </span>
               {event.event_date && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted text-muted-foreground font-body text-xs font-semibold">
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-muted/80 border border-border/30 text-muted-foreground font-body text-xs font-semibold backdrop-blur-sm">
                   <Calendar className="w-3.5 h-3.5" />
                   {new Date(event.event_date).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
                 </span>
               )}
+              {allImages.length > 1 && (
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-secondary/10 border border-secondary/20 text-secondary font-body text-xs font-semibold backdrop-blur-sm">
+                  <ImageIcon className="w-3.5 h-3.5" /> {allImages.length} Photos
+                </span>
+              )}
             </div>
-          </header>
+          </motion.header>
 
-          <div className="bg-card border border-border/40 rounded-2xl p-5 sm:p-7">
-            <h2 className="font-display text-lg font-bold text-foreground mb-3">Event Details</h2>
-            <p className="font-body text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
-              {parsed.text || "No description available for this event yet."}
-            </p>
-          </div>
+          <motion.div 
+            className="relative rounded-2xl border border-border/40 bg-card overflow-hidden"
+            style={{ boxShadow: "0 4px 24px rgba(0,0,0,0.04)" }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {/* Top accent line */}
+            <div className="h-[2px] bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+            <div className="p-5 sm:p-7">
+              <h2 className="font-display text-lg font-bold text-foreground mb-3">Event Details</h2>
+              <p className="font-body text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+                {parsed.text || "No description available for this event yet."}
+              </p>
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -352,14 +389,14 @@ export default function EventDetail() {
             >
               <button
                 onClick={closeLightbox}
-                className="absolute top-4 right-4 w-11 h-11 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-20"
+                className="absolute top-4 right-4 w-11 h-11 rounded-xl bg-white/10 backdrop-blur-xl border border-white/15 flex items-center justify-center text-white hover:bg-white/20 transition-all z-20"
                 aria-label="Close fullscreen"
               >
                 <X className="w-5 h-5" />
               </button>
 
               {allImages.length > 1 && (
-                <span className="absolute top-4 left-4 text-sm font-body font-semibold text-white/80 bg-white/10 backdrop-blur-sm px-4 py-1.5 rounded-full z-20">
+                <span className="absolute top-4 left-4 text-sm font-body font-semibold text-white/80 bg-white/10 backdrop-blur-xl border border-white/15 px-4 py-1.5 rounded-xl z-20">
                   {lightboxIndex + 1} / {allImages.length}
                 </span>
               )}
@@ -368,19 +405,19 @@ export default function EventDetail() {
               <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
                 <button
                   onClick={(e) => { e.stopPropagation(); changeLightboxZoom(-0.2); }}
-                  className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors touch-manipulation"
+                  className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-xl border border-white/15 flex items-center justify-center text-white hover:bg-white/20 transition-all touch-manipulation"
                 >
                   −
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); setLightboxZoom(1); }}
-                  className="px-3 h-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white/90 text-xs font-body font-semibold hover:bg-white/20 transition-colors touch-manipulation"
+                  className="px-3 h-10 rounded-xl bg-white/10 backdrop-blur-xl border border-white/15 flex items-center justify-center text-white/90 text-xs font-body font-semibold hover:bg-white/20 transition-all touch-manipulation"
                 >
                   {Math.round(lightboxZoom * 100)}%
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); changeLightboxZoom(0.2); }}
-                  className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors touch-manipulation"
+                  className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-xl border border-white/15 flex items-center justify-center text-white hover:bg-white/20 transition-all touch-manipulation"
                 >
                   +
                 </button>
@@ -429,7 +466,7 @@ export default function EventDetail() {
                       e.stopPropagation();
                       setLightboxIndex((p) => (p === 0 ? allImages.length - 1 : p - 1));
                     }}
-                    className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-20"
+                    className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-xl bg-white/10 backdrop-blur-xl border border-white/15 flex items-center justify-center text-white hover:bg-white/20 transition-all z-20"
                   >
                     <ChevronLeft className="w-6 h-6" />
                   </button>
@@ -438,20 +475,21 @@ export default function EventDetail() {
                       e.stopPropagation();
                       setLightboxIndex((p) => (p + 1) % allImages.length);
                     }}
-                    className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-20"
+                    className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-xl bg-white/10 backdrop-blur-xl border border-white/15 flex items-center justify-center text-white hover:bg-white/20 transition-all z-20"
                   >
                     <ChevronRight className="w-6 h-6" />
                   </button>
                 </>
               )}
 
-              {/* Lightbox thumbnail strip - also virtualized */}
+              {/* Lightbox thumbnail strip */}
               {allImages.length > 1 && (
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20 max-w-[90vw] overflow-x-auto pb-1">
                   {allImages
                     .slice(Math.max(0, lightboxIndex - 15), Math.min(allImages.length, lightboxIndex + 15))
                     .map((url, i) => {
                       const idx = Math.max(0, lightboxIndex - 15) + i;
+                      const isActive = idx === lightboxIndex;
                       return (
                         <button
                           key={`lb-${idx}`}
@@ -459,9 +497,10 @@ export default function EventDetail() {
                             e.stopPropagation();
                             setLightboxIndex(idx);
                           }}
-                          className={`shrink-0 rounded-md overflow-hidden border-2 transition-all duration-200 ${
-                            idx === lightboxIndex ? "border-white shadow-lg scale-110" : "border-transparent opacity-50 hover:opacity-80"
+                          className={`shrink-0 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
+                            isActive ? "border-white scale-110" : "border-transparent opacity-50 hover:opacity-80"
                           }`}
+                          style={isActive ? { boxShadow: "0 0 16px rgba(255,255,255,0.3)" } : {}}
                         >
                           <img src={url} alt={`Thumb ${idx + 1}`} className="w-14 h-10 sm:w-16 sm:h-12 object-cover" loading="lazy" />
                         </button>
