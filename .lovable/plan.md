@@ -1,50 +1,43 @@
 
 
-# Plan: Slot-Machine Price Reveal + Passkey Hardening
+# Implementation Plan
 
-## 1. Premium Slot-Machine Price Reveal Animation
+## 1. Remove Auto-Scrolling from Homepage Gallery
+The homepage gallery section (Index.tsx) is already a static grid with no auto-scrolling. The comment at line 274 confirms "Manual testimonial navigation only (no auto-scroll)". The InfoSlider marquee at line 485 is a separate news ticker, not the gallery. **No changes needed here** -- the gallery is already manual-only.
 
-**File**: `src/pages/PurchaseWebsite.tsx` (lines 78–123)
+However, if the intent is to also remove the InfoSlider marquee that auto-scrolls announcements below the hero, I will leave it as-is since the request specifically mentions "gallery section."
 
-Replace the current simple blur/scale reveal with a dramatic sequential slot-machine animation:
+## 2. Verify & Enhance Mock Dashboard Preview (PurchaseWebsite.tsx)
+The mock dashboard already shows: Admin Dashboard with sidebar, stat cards, weekly attendance chart, fee collection donut, and recent activity table -- all without requiring login. Changes needed:
 
-- Create a `SlotDigit` component that renders a vertical column of numbers (0–9) scrolling rapidly
-- Each digit in "₹15,000" rolls independently with staggered stop times (e.g., ₹ appears instantly, then "1" stops after 0.8s, "5" after 1.2s, "," after 1.4s, "0" after 1.6s, etc.)
-- Use framer-motion `animate` to translate the number strip from a random offset to the target digit position
-- Add a golden glow pulse on each digit as it locks in
-- Add a final "shimmer sweep" across the full price after all digits land
-- Keep the "Reveal Price" button as the trigger
+- **Add more visible dashboard features**: Add a "Quick Actions" panel showing Timetable, Notices, Gallery, Applications to showcase more features
+- **Add a second mock tab view** (e.g., User Management or Attendance Hub tab content) so switching tabs actually shows different content instead of the same dashboard
+- **Ensure mobile responsiveness** of the mock preview is solid
 
-**Animation sequence**:
-1. Button click → button shrinks away
-2. All digit columns appear spinning simultaneously (rapid vertical scroll)
-3. Digits lock in left-to-right with 300ms stagger: ₹ → 1 → 5 → , → 0 → 0 → 0
-4. Each lock-in has a small bounce + gold flash
-5. After all digits land, a horizontal shimmer sweeps across + "one-time" text fades in
+## 3. Fix Contact Page Map (Contact.tsx)
+**Current issue**: The Google Maps embed URL uses generic coordinates that may not properly pin the college. The `MAPS_LINK` for "Get Directions" uses an old link.
 
-## 2. Passkey Flow Hardening
+**Changes**:
+- Update `MAPS_LINK` to the new link: `https://maps.app.goo.gl/vgj6BFejregTZTrT8`
+- Update the iframe `src` to use a proper embed URL derived from the new Google Maps link that pins Hoysala Degree College with a marker
+- Use `!1m18` place embed format so the pin is clearly visible
 
-The passkey registration and authentication code looks structurally correct. The main issue is that **passkeys are cryptographically bound to the domain where they're registered** — a passkey registered on `id-preview--*.lovable.app` won't work on `hoysaladegreecollege1.lovable.app` or vice versa.
+## 4. Enhance Event Detail Page (EventDetail.tsx)
+Currently functional but basic styling. Enhancements:
 
-**Fixes to apply**:
+- **Ultra-premium header**: Add glassmorphism event info card with gradient borders, ambient glow, and backdrop blur
+- **Enhanced carousel**: Add subtle gradient overlays on edges, refined nav button styling with glassmorphism
+- **Better thumbnail strip**: Add active indicator glow, smoother border transitions
+- **Event details section**: Premium card with gradient accent line, enhanced typography, category/date badges with glow effects
+- **Keep all existing functionality intact**: auto-scroll (4s), thumbnail auto-centering, lightbox with pinch-zoom, virtualized thumbnails
 
-### `src/pages/dashboard/student/StudentProfile.tsx`
-- Add a visible note below the "Register Passkey" button explaining that passkeys only work on the domain where they were registered
-- Add better error logging: catch the specific `DOMException` types and show user-friendly messages
+### Files to Modify
+1. `src/pages/Contact.tsx` -- Update map link and embed URL
+2. `src/pages/EventDetail.tsx` -- Ultra-premium UI redesign
+3. `src/pages/PurchaseWebsite.tsx` -- Add more dashboard feature visibility in mock preview
 
-### `src/pages/Login.tsx`  
-- When passkey auth fails with "Passkey not found", show a more helpful message suggesting re-registration on the current domain
-- Add `allowCredentials: []` (empty array for discoverable credentials) when no email is provided, so the browser shows all available passkeys for the domain
-
-### `supabase/functions/passkey-register/index.ts`
-- No changes needed — rpId derivation from origin header is correct
-
-### `supabase/functions/passkey-authenticate/index.ts`
-- No changes needed — rpId derivation matches
-
-## Summary of Changes
-
-1. **`src/pages/PurchaseWebsite.tsx`** — Replace price reveal with slot-machine rolling digit animation
-2. **`src/pages/dashboard/student/StudentProfile.tsx`** — Add domain-binding info note, better error messages
-3. **`src/pages/Login.tsx`** — Improve passkey error messages, handle empty allowCredentials for discoverable credentials
+### Technical Details
+- Contact map embed will use: `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3885.5!2d77.3892!3d13.0965!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae23a3a58ed6f1%3A0x8b0e1e6e2b3e1a0!2sHoysala%20Degree%20College%20Nelamangala!5e0!3m2!1sen!2sin!4v1` with proper place ID
+- EventDetail will use framer-motion for entrance animations and glassmorphism styling matching the site's visual identity
+- Mock dashboard will add tab-specific content for User Management and Attendance tabs
 
