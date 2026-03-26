@@ -120,6 +120,438 @@ function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: strin
   return <span ref={ref}>0{suffix}</span>;
 }
 
+/* ── Mock Tab Content Components ── */
+function MockAdminContent() {
+  const statCards = [
+    { label: "Total Students", value: 1247, icon: GraduationCap, change: "+12%", color: "42, 87%, 55%" },
+    { label: "Total Teachers", value: 86, icon: Users, change: "+3%", color: "220, 80%, 55%" },
+    { label: "Attendance Rate", value: 94, icon: UserCheck, suffix: "%", change: "+2.1%", color: "160, 60%, 50%" },
+    { label: "Fee Collection", value: 98, icon: DollarSign, suffix: "%", change: "+5%", color: "340, 65%, 55%" },
+  ];
+  return (
+    <>
+      <motion.div className="flex items-center justify-between" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+        <div>
+          <p className="font-body text-[15px] font-bold text-white/85">Welcome back, Admin 👋</p>
+          <p className="font-body text-[10px] text-white/30 mt-0.5">Here's what's happening at your institution today</p>
+        </div>
+        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/[0.06]" style={{ background: "rgba(255,255,255,0.02)" }}>
+          <Calendar className="w-3 h-3 text-white/30" />
+          <span className="font-body text-[10px] text-white/35">Mar 2026</span>
+        </div>
+      </motion.div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+        {statCards.map((stat, i) => (
+          <motion.div key={stat.label} className="relative rounded-xl border border-white/[0.05] p-3 sm:p-4 overflow-hidden"
+            style={{ background: `linear-gradient(135deg, hsla(${stat.color}, 0.06), rgba(255,255,255,0.01))` }}
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08, duration: 0.4 }}>
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center border border-white/[0.06]" style={{ background: `hsla(${stat.color}, 0.1)` }}>
+                <stat.icon className="w-4 h-4" style={{ color: `hsl(${stat.color})` }} />
+              </div>
+              <span className="font-body text-[9px] font-bold px-1.5 py-0.5 rounded-md" style={{ color: "hsl(145,65%,55%)", background: "hsla(145,65%,50%,0.1)" }}>{stat.change}</span>
+            </div>
+            <p className="font-display text-xl sm:text-2xl font-bold text-white/90"><AnimatedCounter value={stat.value} suffix={stat.suffix || ""} /></p>
+            <p className="font-body text-[9px] text-white/30 mt-0.5">{stat.label}</p>
+          </motion.div>
+        ))}
+      </div>
+      <div className="grid sm:grid-cols-2 gap-3">
+        <motion.div className="rounded-xl border border-white/[0.05] p-4" style={{ background: "rgba(255,255,255,0.015)" }}
+          initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3, duration: 0.5 }}>
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: "hsla(220,80%,55%,0.1)" }}>
+              <BarChart3 className="w-3 h-3" style={{ color: "hsl(220,80%,55%)" }} />
+            </div>
+            <span className="font-body text-[11px] font-bold text-white/60">Weekly Attendance</span>
+          </div>
+          <div className="flex items-end gap-1.5 h-24">
+            {[72, 88, 65, 95, 78, 92, 85].map((h, i) => (
+              <motion.div key={i} className="flex-1 rounded-t-md" style={{ background: `linear-gradient(180deg, hsla(220,80%,55%,0.6), hsla(220,80%,55%,0.15))` }}
+                initial={{ height: 0 }} animate={{ height: `${h}%` }} transition={{ delay: 0.5 + i * 0.07, duration: 0.6 }} />
+            ))}
+          </div>
+          <div className="flex gap-1.5 mt-2">
+            {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(d => (
+              <span key={d} className="flex-1 text-center font-body text-[7px] text-white/20">{d}</span>
+            ))}
+          </div>
+        </motion.div>
+        <motion.div className="rounded-xl border border-white/[0.05] p-4" style={{ background: "rgba(255,255,255,0.015)" }}
+          initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4, duration: 0.5 }}>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: "hsla(42,87%,55%,0.1)" }}>
+                <DollarSign className="w-3 h-3" style={{ color: "hsl(42,87%,55%)" }} />
+              </div>
+              <span className="font-body text-[11px] font-bold text-white/60">Fee Collection</span>
+            </div>
+            <span className="font-body text-[9px] font-bold" style={{ color: "hsl(145,65%,55%)" }}>₹12.4L</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="relative w-20 h-20 shrink-0">
+              <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
+                <circle cx="18" cy="18" r="14" fill="none" stroke="hsla(42,87%,55%,0.15)" strokeWidth="3" />
+                <motion.circle cx="18" cy="18" r="14" fill="none" stroke="hsl(42,87%,55%)" strokeWidth="3"
+                  strokeDasharray="88" strokeLinecap="round" initial={{ strokeDashoffset: 88 }} animate={{ strokeDashoffset: 88 * 0.02 }} transition={{ delay: 0.6, duration: 1.5 }} />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center"><span className="font-display text-sm font-bold text-white/80">98%</span></div>
+            </div>
+            <div className="space-y-2 flex-1">
+              {[{ label: "Collected", pct: 98, color: "42, 87%, 55%" }, { label: "Pending", pct: 2, color: "340, 65%, 55%" }].map((item, i) => (
+                <div key={item.label}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-body text-[9px] text-white/40">{item.label}</span>
+                    <span className="font-body text-[9px] font-bold text-white/50">{item.pct}%</span>
+                  </div>
+                  <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.04)" }}>
+                    <motion.div className="h-full rounded-full" style={{ background: `hsl(${item.color})` }}
+                      initial={{ width: 0 }} animate={{ width: `${item.pct}%` }} transition={{ delay: 0.8 + i * 0.15, duration: 0.8 }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      </div>
+      <motion.div className="rounded-xl border border-white/[0.05] overflow-hidden" style={{ background: "rgba(255,255,255,0.015)" }}
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.5 }}>
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.04]">
+          <div className="flex items-center gap-2">
+            <Activity className="w-3.5 h-3.5" style={{ color: "hsla(42,87%,55%,0.6)" }} />
+            <span className="font-body text-[11px] font-bold text-white/60">Recent Activity</span>
+          </div>
+        </div>
+        <div className="divide-y divide-white/[0.03]">
+          {[
+            { action: "Attendance marked for BCA Sem-3", time: "2 min ago", icon: Clock, color: "160, 60%, 50%" },
+            { action: "Fee payment recorded — ₹24,000", time: "15 min ago", icon: DollarSign, color: "42, 87%, 55%" },
+            { action: "New admission application received", time: "1 hr ago", icon: FileText, color: "220, 80%, 55%" },
+            { action: "Notice posted: Annual Day Event", time: "3 hrs ago", icon: Bell, color: "340, 65%, 55%" },
+          ].map((item, i) => (
+            <motion.div key={i} className="flex items-center gap-3 px-4 py-2.5" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 + i * 0.08, duration: 0.4 }}>
+              <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0" style={{ background: `hsla(${item.color}, 0.08)` }}>
+                <item.icon className="w-3 h-3" style={{ color: `hsla(${item.color}, 0.7)` }} />
+              </div>
+              <span className="font-body text-[10px] text-white/45 flex-1">{item.action}</span>
+              <span className="font-body text-[8px] text-white/20 shrink-0">{item.time}</span>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+    </>
+  );
+}
+
+function MockUserManagementContent() {
+  const users = [
+    { name: "Priya Sharma", role: "Student", course: "BCA", sem: 3, status: "Active", avatar: "PS" },
+    { name: "Rajesh Kumar", role: "Student", course: "B.Com", sem: 5, status: "Active", avatar: "RK" },
+    { name: "Aisha Patel", role: "Teacher", course: "CS Dept", sem: null, status: "Active", avatar: "AP" },
+    { name: "Vikram Singh", role: "Student", course: "BBA", sem: 1, status: "Inactive", avatar: "VS" },
+    { name: "Meena Rao", role: "Teacher", course: "Commerce", sem: null, status: "Active", avatar: "MR" },
+    { name: "Karthik N", role: "Student", course: "BCA", sem: 5, status: "Active", avatar: "KN" },
+  ];
+  const roleTabs = ["All", "Students", "Teachers", "Admins"];
+  return (
+    <>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+        <p className="font-body text-[15px] font-bold text-white/85">User Management</p>
+        <p className="font-body text-[10px] text-white/30 mt-0.5">Manage all users across the institution</p>
+      </motion.div>
+      <motion.div className="flex items-center gap-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}>
+        {roleTabs.map((t, i) => (
+          <span key={t} className={`px-3 py-1.5 rounded-lg font-body text-[10px] font-bold border ${i === 0 ? "text-white/80 border-white/10" : "text-white/30 border-white/[0.04]"}`}
+            style={i === 0 ? { background: "rgba(255,255,255,0.06)" } : { background: "rgba(255,255,255,0.015)" }}>{t}</span>
+        ))}
+        <div className="ml-auto flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/[0.06]" style={{ background: "rgba(255,255,255,0.02)" }}>
+          <Search className="w-3 h-3 text-white/25" />
+          <span className="font-body text-[10px] text-white/20">Search users...</span>
+        </div>
+      </motion.div>
+      <motion.div className="rounded-xl border border-white/[0.05] overflow-hidden" style={{ background: "rgba(255,255,255,0.015)" }}
+        initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }}>
+        <div className="grid grid-cols-[1fr_auto_auto_auto] gap-4 px-4 py-2.5 border-b border-white/[0.06] text-[9px] font-body font-bold text-white/30 uppercase tracking-wider">
+          <span>User</span><span className="hidden sm:block">Course</span><span className="hidden sm:block">Semester</span><span>Status</span>
+        </div>
+        <div className="divide-y divide-white/[0.03]">
+          {users.map((u, i) => (
+            <motion.div key={i} className="grid grid-cols-[1fr_auto_auto_auto] gap-4 items-center px-4 py-2.5"
+              initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 + i * 0.06, duration: 0.35 }}>
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 font-body text-[9px] font-bold"
+                  style={{ background: "hsla(220,80%,55%,0.1)", color: "hsl(220,80%,65%)" }}>{u.avatar}</div>
+                <div className="min-w-0">
+                  <p className="font-body text-[11px] text-white/70 font-medium truncate">{u.name}</p>
+                  <p className="font-body text-[8px] text-white/25">{u.role}</p>
+                </div>
+              </div>
+              <span className="font-body text-[10px] text-white/35 hidden sm:block">{u.course}</span>
+              <span className="font-body text-[10px] text-white/35 hidden sm:block">{u.sem ? `Sem ${u.sem}` : "—"}</span>
+              <span className={`font-body text-[9px] font-bold px-2 py-0.5 rounded-md ${u.status === "Active" ? "text-[hsl(145,65%,55%)]" : "text-[hsl(0,65%,55%)]"}`}
+                style={{ background: u.status === "Active" ? "hsla(145,65%,50%,0.1)" : "hsla(0,65%,50%,0.1)" }}>{u.status}</span>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+    </>
+  );
+}
+
+function MockAttendanceContent() {
+  const courses = [
+    { name: "BCA", total: 180, present: 162, rate: "90%" },
+    { name: "B.Com", total: 240, present: 228, rate: "95%" },
+    { name: "BBA", total: 120, present: 108, rate: "90%" },
+    { name: "BA", total: 90, present: 81, rate: "90%" },
+  ];
+  return (
+    <>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+        <p className="font-body text-[15px] font-bold text-white/85">Attendance Hub</p>
+        <p className="font-body text-[10px] text-white/30 mt-0.5">Monitor attendance across all courses and semesters</p>
+      </motion.div>
+      <motion.div className="flex items-center gap-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}>
+        <span className="px-3 py-1.5 rounded-lg font-body text-[10px] font-bold text-white/80 border border-white/10" style={{ background: "rgba(255,255,255,0.06)" }}>Overview</span>
+        <span className="px-3 py-1.5 rounded-lg font-body text-[10px] font-bold text-white/30 border border-white/[0.04]" style={{ background: "rgba(255,255,255,0.015)" }}>Absent Report</span>
+      </motion.div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        {courses.map((c, i) => (
+          <motion.div key={c.name} className="rounded-xl border border-white/[0.05] p-3" style={{ background: "rgba(255,255,255,0.015)" }}
+            initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + i * 0.08, duration: 0.4 }}>
+            <p className="font-body text-[11px] font-bold text-white/60 mb-2">{c.name}</p>
+            <p className="font-display text-xl font-bold" style={{ color: "hsl(160,60%,50%)" }}>{c.rate}</p>
+            <div className="h-1.5 rounded-full mt-2 overflow-hidden" style={{ background: "rgba(255,255,255,0.04)" }}>
+              <motion.div className="h-full rounded-full" style={{ background: "hsl(160,60%,50%)" }}
+                initial={{ width: 0 }} animate={{ width: c.rate }} transition={{ delay: 0.4 + i * 0.1, duration: 0.8 }} />
+            </div>
+            <p className="font-body text-[8px] text-white/25 mt-1.5">{c.present}/{c.total} students</p>
+          </motion.div>
+        ))}
+      </div>
+      <motion.div className="rounded-xl border border-white/[0.05] p-4" style={{ background: "rgba(255,255,255,0.015)" }}
+        initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.5 }}>
+        <div className="flex items-center gap-2 mb-3">
+          <Clock className="w-3.5 h-3.5" style={{ color: "hsl(340,65%,55%)" }} />
+          <span className="font-body text-[11px] font-bold text-white/60">Low Attendance Alerts (&lt;75%)</span>
+        </div>
+        <div className="divide-y divide-white/[0.03]">
+          {[
+            { name: "Rahul M", course: "BCA", sem: 3, rate: "68%" },
+            { name: "Sneha K", course: "B.Com", sem: 1, rate: "71%" },
+            { name: "Ajay P", course: "BBA", sem: 5, rate: "62%" },
+          ].map((s, i) => (
+            <motion.div key={i} className="flex items-center justify-between py-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 + i * 0.08 }}>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: "hsla(340,65%,55%,0.1)" }}>
+                  <Users className="w-3 h-3" style={{ color: "hsl(340,65%,55%)" }} />
+                </div>
+                <div>
+                  <p className="font-body text-[10px] text-white/60">{s.name}</p>
+                  <p className="font-body text-[8px] text-white/25">{s.course} — Sem {s.sem}</p>
+                </div>
+              </div>
+              <span className="font-body text-[10px] font-bold" style={{ color: "hsl(340,65%,55%)" }}>{s.rate}</span>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+    </>
+  );
+}
+
+function MockFeeManagementContent() {
+  return (
+    <>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+        <p className="font-body text-[15px] font-bold text-white/85">Fee Management</p>
+        <p className="font-body text-[10px] text-white/30 mt-0.5">Track and manage student fee payments across semesters</p>
+      </motion.div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+        {[
+          { label: "Total Collected", value: "₹12.4L", icon: DollarSign, color: "145, 65%, 50%" },
+          { label: "Pending Amount", value: "₹85,000", icon: Clock, color: "340, 65%, 55%" },
+          { label: "Total Students", value: "1,247", icon: Users, color: "42, 87%, 55%" },
+        ].map((s, i) => (
+          <motion.div key={s.label} className="rounded-xl border border-white/[0.05] p-3 sm:p-4" style={{ background: `linear-gradient(135deg, hsla(${s.color}, 0.06), rgba(255,255,255,0.01))` }}
+            initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08, duration: 0.4 }}>
+            <s.icon className="w-4 h-4 mb-2" style={{ color: `hsl(${s.color})` }} />
+            <p className="font-display text-lg font-bold text-white/85">{s.value}</p>
+            <p className="font-body text-[9px] text-white/30 mt-0.5">{s.label}</p>
+          </motion.div>
+        ))}
+      </div>
+      <motion.div className="rounded-xl border border-white/[0.05] overflow-hidden" style={{ background: "rgba(255,255,255,0.015)" }}
+        initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.5 }}>
+        <div className="px-4 py-3 border-b border-white/[0.04]">
+          <span className="font-body text-[11px] font-bold text-white/60">Recent Payments</span>
+        </div>
+        <div className="divide-y divide-white/[0.03]">
+          {[
+            { name: "Priya S", amount: "₹24,000", date: "Today", sem: 3, method: "UPI" },
+            { name: "Rajesh K", amount: "₹22,500", date: "Yesterday", sem: 5, method: "Cash" },
+            { name: "Arun M", amount: "₹24,000", date: "2 days ago", sem: 1, method: "Bank" },
+            { name: "Deepa R", amount: "₹23,000", date: "3 days ago", sem: 3, method: "UPI" },
+          ].map((p, i) => (
+            <motion.div key={i} className="flex items-center gap-3 px-4 py-2.5" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 + i * 0.08 }}>
+              <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style={{ background: "hsla(145,65%,50%,0.1)" }}>
+                <DollarSign className="w-3 h-3" style={{ color: "hsl(145,65%,55%)" }} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-body text-[10px] text-white/60 font-medium">{p.name} — Sem {p.sem}</p>
+                <p className="font-body text-[8px] text-white/25">{p.method} • {p.date}</p>
+              </div>
+              <span className="font-body text-[11px] font-bold" style={{ color: "hsl(145,65%,55%)" }}>{p.amount}</span>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+    </>
+  );
+}
+
+function MockTeacherDashboardContent() {
+  return (
+    <>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+        <p className="font-body text-[15px] font-bold text-white/85">Welcome, Prof. Aisha 👩‍🏫</p>
+        <p className="font-body text-[10px] text-white/30 mt-0.5">Computer Science Department • BCA</p>
+      </motion.div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+        {[
+          { label: "My Students", value: "64", icon: Users, color: "220, 80%, 55%" },
+          { label: "Avg Attendance", value: "91%", icon: UserCheck, color: "160, 60%, 50%" },
+          { label: "Avg Marks", value: "72%", icon: BarChart3, color: "42, 87%, 55%" },
+          { label: "Materials", value: "23", icon: Upload, color: "270, 60%, 55%" },
+        ].map((s, i) => (
+          <motion.div key={s.label} className="rounded-xl border border-white/[0.05] p-3" style={{ background: `linear-gradient(135deg, hsla(${s.color}, 0.06), rgba(255,255,255,0.01))` }}
+            initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08, duration: 0.4 }}>
+            <s.icon className="w-4 h-4 mb-1.5" style={{ color: `hsl(${s.color})` }} />
+            <p className="font-display text-xl font-bold text-white/85">{s.value}</p>
+            <p className="font-body text-[9px] text-white/30">{s.label}</p>
+          </motion.div>
+        ))}
+      </div>
+      <div className="grid sm:grid-cols-2 gap-3">
+        <motion.div className="rounded-xl border border-white/[0.05] p-4" style={{ background: "rgba(255,255,255,0.015)" }}
+          initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3, duration: 0.5 }}>
+          <div className="flex items-center gap-2 mb-3">
+            <Award className="w-3.5 h-3.5" style={{ color: "hsl(42,87%,55%)" }} />
+            <span className="font-body text-[11px] font-bold text-white/60">Top Performers</span>
+          </div>
+          {[{ name: "Priya S", marks: "95%", rank: 1 }, { name: "Karthik N", marks: "92%", rank: 2 }, { name: "Meena R", marks: "89%", rank: 3 }].map((s, i) => (
+            <motion.div key={i} className="flex items-center gap-2.5 py-1.5" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 + i * 0.08 }}>
+              <span className="w-5 h-5 rounded-full flex items-center justify-center font-body text-[9px] font-bold"
+                style={{ background: i === 0 ? "hsla(42,87%,55%,0.15)" : "rgba(255,255,255,0.04)", color: i === 0 ? "hsl(42,87%,60%)" : "white/40" }}>#{s.rank}</span>
+              <span className="font-body text-[10px] text-white/55 flex-1">{s.name}</span>
+              <span className="font-body text-[10px] font-bold" style={{ color: "hsl(145,65%,55%)" }}>{s.marks}</span>
+            </motion.div>
+          ))}
+        </motion.div>
+        <motion.div className="rounded-xl border border-white/[0.05] p-4" style={{ background: "rgba(255,255,255,0.015)" }}
+          initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.35, duration: 0.5 }}>
+          <div className="flex items-center gap-2 mb-3">
+            <Calendar className="w-3.5 h-3.5" style={{ color: "hsl(220,80%,55%)" }} />
+            <span className="font-body text-[11px] font-bold text-white/60">Today's Schedule</span>
+          </div>
+          {[{ time: "9:00 AM", subject: "Data Structures", room: "Lab 2" }, { time: "11:00 AM", subject: "DBMS", room: "Room 104" }, { time: "2:00 PM", subject: "Python Lab", room: "Lab 1" }].map((s, i) => (
+            <motion.div key={i} className="flex items-center gap-2.5 py-1.5" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 + i * 0.08 }}>
+              <span className="font-body text-[9px] text-white/25 w-14 shrink-0">{s.time}</span>
+              <span className="font-body text-[10px] text-white/55 flex-1">{s.subject}</span>
+              <span className="font-body text-[8px] text-white/20 px-1.5 py-0.5 rounded border border-white/[0.04]">{s.room}</span>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </>
+  );
+}
+
+function MockStudentDashboardContent() {
+  return (
+    <>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+        <p className="font-body text-[15px] font-bold text-white/85">Welcome, Priya 🎓</p>
+        <p className="font-body text-[10px] text-white/30 mt-0.5">BCA • Semester 3 • Roll No: BCA2024003</p>
+      </motion.div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+        {[
+          { label: "Attendance", value: "91%", icon: UserCheck, color: "160, 60%, 50%" },
+          { label: "Avg Marks", value: "82%", icon: BarChart3, color: "220, 80%, 55%" },
+          { label: "Fee Status", value: "Paid", icon: DollarSign, color: "145, 65%, 50%" },
+          { label: "Notices", value: "5", icon: Bell, color: "42, 87%, 55%" },
+        ].map((s, i) => (
+          <motion.div key={s.label} className="rounded-xl border border-white/[0.05] p-3" style={{ background: `linear-gradient(135deg, hsla(${s.color}, 0.06), rgba(255,255,255,0.01))` }}
+            initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08, duration: 0.4 }}>
+            <s.icon className="w-4 h-4 mb-1.5" style={{ color: `hsl(${s.color})` }} />
+            <p className="font-display text-xl font-bold text-white/85">{s.value}</p>
+            <p className="font-body text-[9px] text-white/30">{s.label}</p>
+          </motion.div>
+        ))}
+      </div>
+      <div className="grid sm:grid-cols-2 gap-3">
+        <motion.div className="rounded-xl border border-white/[0.05] p-4" style={{ background: "rgba(255,255,255,0.015)" }}
+          initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3, duration: 0.5 }}>
+          <div className="flex items-center gap-2 mb-3">
+            <Calendar className="w-3.5 h-3.5" style={{ color: "hsl(42,87%,55%)" }} />
+            <span className="font-body text-[11px] font-bold text-white/60">Today's Timetable</span>
+          </div>
+          {[
+            { time: "9:00 AM", subject: "Data Structures", teacher: "Prof. Aisha" },
+            { time: "11:00 AM", subject: "DBMS", teacher: "Prof. Vikram" },
+            { time: "1:00 PM", subject: "Web Tech", teacher: "Prof. Meena" },
+            { time: "3:00 PM", subject: "Python Lab", teacher: "Prof. Aisha" },
+          ].map((s, i) => (
+            <motion.div key={i} className="flex items-center gap-2.5 py-1.5" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 + i * 0.06 }}>
+              <span className="font-body text-[9px] text-white/25 w-14 shrink-0">{s.time}</span>
+              <div className="flex-1 min-w-0">
+                <p className="font-body text-[10px] text-white/55">{s.subject}</p>
+                <p className="font-body text-[8px] text-white/20">{s.teacher}</p>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+        <motion.div className="rounded-xl border border-white/[0.05] p-4" style={{ background: "rgba(255,255,255,0.015)" }}
+          initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.35, duration: 0.5 }}>
+          <div className="flex items-center gap-2 mb-3">
+            <BarChart3 className="w-3.5 h-3.5" style={{ color: "hsl(220,80%,55%)" }} />
+            <span className="font-body text-[11px] font-bold text-white/60">Recent Marks</span>
+          </div>
+          {[
+            { subject: "Data Structures", marks: "42/50", type: "Internal" },
+            { subject: "DBMS", marks: "38/50", type: "Internal" },
+            { subject: "Web Tech", marks: "45/50", type: "Internal" },
+          ].map((s, i) => (
+            <motion.div key={i} className="flex items-center justify-between py-1.5" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 + i * 0.08 }}>
+              <div>
+                <p className="font-body text-[10px] text-white/55">{s.subject}</p>
+                <p className="font-body text-[8px] text-white/20">{s.type}</p>
+              </div>
+              <span className="font-body text-[11px] font-bold" style={{ color: "hsl(145,65%,55%)" }}>{s.marks}</span>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+      <motion.div className="rounded-xl border border-white/[0.05] p-4" style={{ background: "rgba(255,255,255,0.015)" }}
+        initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.5 }}>
+        <div className="flex items-center gap-2 mb-3">
+          <Megaphone className="w-3.5 h-3.5" style={{ color: "hsl(340,65%,55%)" }} />
+          <span className="font-body text-[11px] font-bold text-white/60">Latest Announcements</span>
+        </div>
+        {[
+          { title: "Annual Day Celebration — March 28", time: "2 hrs ago" },
+          { title: "Submit assignments by Friday", time: "1 day ago" },
+        ].map((a, i) => (
+          <motion.div key={i} className="flex items-center justify-between py-1.5" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 + i * 0.08 }}>
+            <span className="font-body text-[10px] text-white/50">{a.title}</span>
+            <span className="font-body text-[8px] text-white/20">{a.time}</span>
+          </motion.div>
+        ))}
+      </motion.div>
+    </>
+  );
+}
+
 /* ── Mock Dashboard Preview ── */
 function MockDashboardPreview() {
   const [activeTab, setActiveTab] = useState(0);
@@ -128,55 +560,61 @@ function MockDashboardPreview() {
     { label: "User Management", icon: Users, color: "220, 80%, 55%" },
     { label: "Attendance Hub", icon: UserCheck, color: "160, 60%, 50%" },
     { label: "Fee Management", icon: DollarSign, color: "340, 65%, 55%" },
+    { label: "Teacher Dashboard", icon: BookOpen, color: "270, 60%, 55%" },
+    { label: "Student Dashboard", icon: GraduationCap, color: "190, 70%, 50%" },
   ];
 
-  const sidebarItems = [
-    { icon: LayoutDashboard, label: "Dashboard", active: true },
-    { icon: Bell, label: "Post Notice" },
-    { icon: BookOpen, label: "Courses" },
-    { icon: UserCheck, label: "Attendance Hub" },
-    { icon: FileText, label: "Applications" },
-    { icon: Users, label: "Users" },
-    { icon: DollarSign, label: "Fee Management" },
-    { icon: Award, label: "Top Rankers" },
-    { icon: Calendar, label: "Timetable" },
-    { icon: Image, label: "Events" },
-    { icon: Camera, label: "Gallery" },
-    { icon: Settings, label: "Settings" },
-  ];
+  const sidebarConfigs: Record<number, { items: { icon: React.ElementType; label: string; active?: boolean }[]; portalLabel: string }> = {
+    0: { portalLabel: "Admin Portal", items: [
+      { icon: LayoutDashboard, label: "Dashboard", active: true }, { icon: Bell, label: "Post Notice" }, { icon: BookOpen, label: "Courses" },
+      { icon: UserCheck, label: "Attendance Hub" }, { icon: FileText, label: "Applications" }, { icon: Users, label: "Users" },
+      { icon: DollarSign, label: "Fee Management" }, { icon: Award, label: "Top Rankers" }, { icon: Calendar, label: "Timetable" },
+      { icon: Image, label: "Events" }, { icon: Camera, label: "Gallery" }, { icon: Settings, label: "Settings" },
+    ]},
+    1: { portalLabel: "Admin Portal", items: [
+      { icon: LayoutDashboard, label: "Dashboard" }, { icon: Users, label: "Users", active: true }, { icon: UserCheck, label: "Attendance Hub" },
+      { icon: DollarSign, label: "Fee Management" }, { icon: BookOpen, label: "Courses" }, { icon: Settings, label: "Settings" },
+    ]},
+    2: { portalLabel: "Admin Portal", items: [
+      { icon: LayoutDashboard, label: "Dashboard" }, { icon: Users, label: "Users" }, { icon: UserCheck, label: "Attendance Hub", active: true },
+      { icon: DollarSign, label: "Fee Management" }, { icon: BookOpen, label: "Courses" }, { icon: Settings, label: "Settings" },
+    ]},
+    3: { portalLabel: "Admin Portal", items: [
+      { icon: LayoutDashboard, label: "Dashboard" }, { icon: Users, label: "Users" }, { icon: UserCheck, label: "Attendance Hub" },
+      { icon: DollarSign, label: "Fee Management", active: true }, { icon: BookOpen, label: "Courses" }, { icon: Settings, label: "Settings" },
+    ]},
+    4: { portalLabel: "Teacher Portal", items: [
+      { icon: LayoutDashboard, label: "Dashboard", active: true }, { icon: Users, label: "Students" }, { icon: Clock, label: "Attendance" },
+      { icon: UserCheck, label: "Att. Overview" }, { icon: BarChart3, label: "Marks" }, { icon: Calendar, label: "Timetable" },
+      { icon: Upload, label: "Materials" }, { icon: Bell, label: "Notices" }, { icon: MessageSquare, label: "Messages" },
+    ]},
+    5: { portalLabel: "Student Portal", items: [
+      { icon: LayoutDashboard, label: "Dashboard", active: true }, { icon: User, label: "My Profile" }, { icon: Clock, label: "Attendance" },
+      { icon: BarChart3, label: "Marks" }, { icon: DollarSign, label: "Fee Details" }, { icon: Calendar, label: "Timetable" },
+      { icon: Bell, label: "Notices" }, { icon: BookOpen, label: "Materials" }, { icon: MessageSquare, label: "Messages" },
+    ]},
+  };
 
-  const statCards = [
-    { label: "Total Students", value: 1247, icon: GraduationCap, change: "+12%", color: "42, 87%, 55%" },
-    { label: "Total Teachers", value: 86, icon: Users, change: "+3%", color: "220, 80%, 55%" },
-    { label: "Attendance Rate", value: 94, icon: UserCheck, suffix: "%", change: "+2.1%", color: "160, 60%, 50%" },
-    { label: "Fee Collection", value: 98, icon: DollarSign, suffix: "%", change: "+5%", color: "340, 65%, 55%" },
-  ];
+  const headerTitles = ["Admin Dashboard", "User Management", "Attendance Hub", "Fee Management", "Teacher Dashboard", "Student Dashboard"];
+  const urlPaths = ["/dashboard/admin", "/dashboard/admin/users", "/dashboard/admin/attendance", "/dashboard/admin/fees", "/dashboard/teacher", "/dashboard/student"];
+
+  const currentSidebar = sidebarConfigs[activeTab] || sidebarConfigs[0];
 
   return (
     <div className="max-w-6xl mx-auto">
-      {/* Tab selector */}
       <ScrollReveal delay={60}>
         <div className="flex flex-wrap justify-center gap-2 mb-8">
           {tabs.map((tab, i) => (
-            <motion.button
-              key={tab.label}
-              onClick={() => setActiveTab(i)}
-              className={`relative px-4 py-2.5 rounded-xl font-body text-[11px] sm:text-xs font-bold transition-all duration-300 border flex items-center gap-2 ${
-                activeTab === i
-                  ? "text-white border-white/15"
-                  : "text-white/35 border-white/[0.05] hover:text-white/60 hover:border-white/10"
+            <motion.button key={tab.label} onClick={() => setActiveTab(i)}
+              className={`relative px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-body text-[10px] sm:text-xs font-bold transition-all duration-300 border flex items-center gap-1.5 sm:gap-2 ${
+                activeTab === i ? "text-white border-white/15" : "text-white/35 border-white/[0.05] hover:text-white/60 hover:border-white/10"
               }`}
               style={activeTab === i ? { background: `hsla(${tab.color}, 0.1)` } : { background: "rgba(255,255,255,0.015)" }}
-              whileHover={{ y: -2 }}
-              whileTap={{ scale: 0.97 }}
-            >
+              whileHover={{ y: -2 }} whileTap={{ scale: 0.97 }}>
               {activeTab === i && (
-                <motion.div
-                  className="absolute inset-0 rounded-xl pointer-events-none"
-                  layoutId="mock-tab-glow"
+                <motion.div className="absolute inset-0 rounded-xl pointer-events-none" layoutId="mock-tab-glow"
                   style={{ boxShadow: `0 0 20px hsla(${tab.color}, 0.15), inset 0 0 20px hsla(${tab.color}, 0.05)` }}
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                />
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }} />
               )}
               <tab.icon className="w-3.5 h-3.5 relative z-10" style={activeTab === i ? { color: `hsl(${tab.color})` } : {}} />
               <span className="relative z-10 hidden sm:inline">{tab.label}</span>
@@ -186,17 +624,10 @@ function MockDashboardPreview() {
         </div>
       </ScrollReveal>
 
-      {/* Browser chrome + mock dashboard */}
       <ScrollReveal delay={120}>
-        <motion.div
-          className="relative rounded-2xl sm:rounded-3xl border overflow-hidden"
-          style={{
-            borderColor: "hsla(42,87%,55%,0.12)",
-            background: "linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))",
-            boxShadow: "0 60px 140px -40px rgba(0,0,0,0.8), 0 0 80px hsla(42,87%,55%,0.05)",
-          }}
-          layout
-        >
+        <motion.div className="relative rounded-2xl sm:rounded-3xl border overflow-hidden"
+          style={{ borderColor: "hsla(42,87%,55%,0.12)", background: "linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))", boxShadow: "0 60px 140px -40px rgba(0,0,0,0.8), 0 0 80px hsla(42,87%,55%,0.05)" }}
+          layout>
           {/* Browser top bar */}
           <div className="flex items-center gap-3 px-4 sm:px-5 py-3 border-b border-white/[0.06]" style={{ background: "rgba(255,255,255,0.02)" }}>
             <div className="flex gap-1.5">
@@ -207,18 +638,15 @@ function MockDashboardPreview() {
             <div className="flex-1 flex items-center justify-center">
               <div className="flex items-center gap-2 px-4 py-1 rounded-lg border border-white/[0.06] max-w-md w-full" style={{ background: "rgba(0,0,0,0.3)" }}>
                 <Lock className="w-2.5 h-2.5 text-white/20" />
-                <span className="font-body text-[10px] text-white/30 truncate">
-                  hoysaladegreecollege.in/dashboard/admin
-                </span>
+                <span className="font-body text-[10px] text-white/30 truncate">hoysaladegreecollege.in{urlPaths[activeTab]}</span>
               </div>
             </div>
           </div>
 
           {/* Dashboard content */}
-          <div className="flex" style={{ height: "clamp(380px, 55vw, 580px)" }}>
+          <div className="flex" style={{ height: "clamp(400px, 58vw, 600px)" }}>
             {/* Sidebar */}
             <div className="hidden sm:flex flex-col border-r border-white/[0.04] shrink-0" style={{ width: 200, background: "rgba(14,16,22,0.98)" }}>
-              {/* Logo area */}
               <div className="px-4 pt-4 pb-3 border-b border-white/[0.04]">
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "hsla(42,87%,55%,0.15)" }}>
@@ -226,43 +654,30 @@ function MockDashboardPreview() {
                   </div>
                   <div>
                     <p className="font-body text-[11px] font-bold text-white/80">Hoysala College</p>
-                    <p className="font-body text-[8px] text-white/25">Admin Portal</p>
+                    <p className="font-body text-[8px] text-white/25">{currentSidebar.portalLabel}</p>
                   </div>
                 </div>
               </div>
-              {/* Nav items */}
               <div className="flex-1 overflow-hidden px-2 pt-2 space-y-0.5">
-                {sidebarItems.map((item, i) => (
-                  <motion.div
-                    key={item.label}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-body ${
-                      item.active
-                        ? "text-white/90 font-medium"
-                        : "text-white/30"
-                    }`}
+                {currentSidebar.items.map((item, i) => (
+                  <motion.div key={`${activeTab}-${item.label}`}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-body ${item.active ? "text-white/90 font-medium" : "text-white/30"}`}
                     style={item.active ? { background: "rgba(255,255,255,0.06)" } : {}}
-                    initial={{ opacity: 0, x: -12 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.4 + i * 0.05, duration: 0.4 }}
-                  >
-                    {item.active && (
-                      <div className="absolute left-0 w-[2px] h-3 rounded-full" style={{ background: "hsl(42,87%,55%)" }} />
-                    )}
+                    initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04, duration: 0.3 }}>
+                    {item.active && <div className="absolute left-0 w-[2px] h-3 rounded-full" style={{ background: "hsl(42,87%,55%)" }} />}
                     <item.icon className="w-3.5 h-3.5 shrink-0" style={item.active ? { color: "hsl(42,87%,55%)" } : {}} />
                     <span className="truncate">{item.label}</span>
                   </motion.div>
                 ))}
               </div>
-              {/* User area */}
               <div className="px-3 py-3 border-t border-white/[0.04]">
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.06)" }}>
-                    <Users className="w-3 h-3 text-white/40" />
+                    <User className="w-3 h-3 text-white/40" />
                   </div>
                   <div>
-                    <p className="font-body text-[10px] text-white/50 font-medium">Admin User</p>
-                    <p className="font-body text-[8px] text-white/20">admin@college.in</p>
+                    <p className="font-body text-[10px] text-white/50 font-medium">{activeTab >= 4 ? (activeTab === 4 ? "Prof. Aisha" : "Priya S") : "Admin User"}</p>
+                    <p className="font-body text-[8px] text-white/20">{activeTab >= 4 ? (activeTab === 4 ? "teacher@college.in" : "student@college.in") : "admin@college.in"}</p>
                   </div>
                 </div>
               </div>
@@ -270,257 +685,48 @@ function MockDashboardPreview() {
 
             {/* Main content area */}
             <div className="flex-1 flex flex-col overflow-hidden" style={{ background: "rgba(10,12,20,0.95)" }}>
-              {/* Top header */}
               <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-white/[0.04]" style={{ background: "rgba(255,255,255,0.01)" }}>
                 <div>
-                  <motion.p className="font-body text-[13px] font-bold text-white/80"
-                    initial={{ opacity: 0, y: -5 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.3 }}>
-                    Admin Dashboard
-                  </motion.p>
+                  <p className="font-body text-[13px] font-bold text-white/80">{headerTitles[activeTab]}</p>
                   <p className="font-body text-[9px] text-white/25">Hoysala Degree College</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <motion.div className="w-7 h-7 rounded-lg flex items-center justify-center border border-white/[0.06]"
-                    style={{ background: "rgba(255,255,255,0.02)" }}
-                    whileHover={{ scale: 1.1 }}>
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center border border-white/[0.06]" style={{ background: "rgba(255,255,255,0.02)" }}>
                     <Search className="w-3.5 h-3.5 text-white/30" />
-                  </motion.div>
-                  <motion.div className="relative w-7 h-7 rounded-lg flex items-center justify-center border border-white/[0.06]"
-                    style={{ background: "rgba(255,255,255,0.02)" }}
-                    whileHover={{ scale: 1.1 }}>
+                  </div>
+                  <div className="relative w-7 h-7 rounded-lg flex items-center justify-center border border-white/[0.06]" style={{ background: "rgba(255,255,255,0.02)" }}>
                     <Bell className="w-3.5 h-3.5 text-white/30" />
                     <div className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full" style={{ background: "hsl(0,65%,55%)" }} />
-                  </motion.div>
+                  </div>
                 </div>
               </div>
-
-              {/* Dashboard content */}
-              <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
-                {/* Welcome */}
-                <motion.div
-                  className="flex items-center justify-between"
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.4, duration: 0.5 }}
-                >
-                  <div>
-                    <p className="font-body text-[15px] font-bold text-white/85">Welcome back, Admin 👋</p>
-                    <p className="font-body text-[10px] text-white/30 mt-0.5">Here's what's happening at your institution today</p>
-                  </div>
-                  <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/[0.06]" style={{ background: "rgba(255,255,255,0.02)" }}>
-                    <Calendar className="w-3 h-3 text-white/30" />
-                    <span className="font-body text-[10px] text-white/35">Mar 2026</span>
-                  </div>
+              <AnimatePresence mode="wait">
+                <motion.div key={activeTab} className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4"
+                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
+                  {activeTab === 0 && <MockAdminContent />}
+                  {activeTab === 1 && <MockUserManagementContent />}
+                  {activeTab === 2 && <MockAttendanceContent />}
+                  {activeTab === 3 && <MockFeeManagementContent />}
+                  {activeTab === 4 && <MockTeacherDashboardContent />}
+                  {activeTab === 5 && <MockStudentDashboardContent />}
                 </motion.div>
-
-                {/* Stat cards */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-                  {statCards.map((stat, i) => (
-                    <motion.div
-                      key={stat.label}
-                      className="group relative rounded-xl border border-white/[0.05] p-3 sm:p-4 overflow-hidden"
-                      style={{ background: `linear-gradient(135deg, hsla(${stat.color}, 0.06), rgba(255,255,255,0.01))` }}
-                      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: 0.5 + i * 0.1, duration: 0.5, type: "spring", stiffness: 200 }}
-                    >
-                      <div className="absolute top-0 right-0 w-16 h-16 rounded-bl-full opacity-[0.03]"
-                        style={{ background: `hsl(${stat.color})` }} />
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="w-8 h-8 rounded-lg flex items-center justify-center border border-white/[0.06]"
-                          style={{ background: `hsla(${stat.color}, 0.1)` }}>
-                          <stat.icon className="w-4 h-4" style={{ color: `hsl(${stat.color})` }} />
-                        </div>
-                        <span className="font-body text-[9px] font-bold px-1.5 py-0.5 rounded-md"
-                          style={{ color: "hsl(145,65%,55%)", background: "hsla(145,65%,50%,0.1)" }}>
-                          {stat.change}
-                        </span>
-                      </div>
-                      <p className="font-display text-xl sm:text-2xl font-bold text-white/90">
-                        <AnimatedCounter value={stat.value} suffix={stat.suffix || ""} />
-                      </p>
-                      <p className="font-body text-[9px] text-white/30 mt-0.5">{stat.label}</p>
-                    </motion.div>
-                  ))}
-                </div>
-
-                {/* Charts row */}
-                <div className="grid sm:grid-cols-2 gap-3">
-                  {/* Attendance chart */}
-                  <motion.div
-                    className="rounded-xl border border-white/[0.05] p-4 overflow-hidden"
-                    style={{ background: "rgba(255,255,255,0.015)" }}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.8, duration: 0.6 }}
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: "hsla(220,80%,55%,0.1)" }}>
-                          <BarChart3 className="w-3 h-3" style={{ color: "hsl(220,80%,55%)" }} />
-                        </div>
-                        <span className="font-body text-[11px] font-bold text-white/60">Weekly Attendance</span>
-                      </div>
-                      <div className="flex items-center gap-1 px-2 py-0.5 rounded-md border border-white/[0.04]" style={{ background: "rgba(255,255,255,0.02)" }}>
-                        <span className="font-body text-[8px] text-white/25">This Week</span>
-                        <ChevronRight className="w-2.5 h-2.5 text-white/20" />
-                      </div>
-                    </div>
-                    <div className="flex items-end gap-1.5 h-24">
-                      {[72, 88, 65, 95, 78, 92, 85].map((h, i) => (
-                        <motion.div
-                          key={i}
-                          className="flex-1 rounded-t-md relative overflow-hidden"
-                          style={{ background: `linear-gradient(180deg, hsla(220,80%,55%,0.6), hsla(220,80%,55%,0.15))` }}
-                          initial={{ height: 0 }}
-                          whileInView={{ height: `${h}%` }}
-                          viewport={{ once: true }}
-                          transition={{ delay: 1.0 + i * 0.07, duration: 0.6, ease: "easeOut" }}
-                        >
-                          <motion.div
-                            className="absolute inset-0 opacity-0"
-                            style={{ background: "linear-gradient(180deg, hsla(220,80%,70%,0.3), transparent)" }}
-                            whileHover={{ opacity: 1 }}
-                          />
-                        </motion.div>
-                      ))}
-                    </div>
-                    <div className="flex gap-1.5 mt-2">
-                      {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(d => (
-                        <span key={d} className="flex-1 text-center font-body text-[7px] text-white/20">{d}</span>
-                      ))}
-                    </div>
-                  </motion.div>
-
-                  {/* Revenue / Fee collection */}
-                  <motion.div
-                    className="rounded-xl border border-white/[0.05] p-4 overflow-hidden"
-                    style={{ background: "rgba(255,255,255,0.015)" }}
-                    initial={{ opacity: 0, x: 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.9, duration: 0.6 }}
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: "hsla(42,87%,55%,0.1)" }}>
-                          <DollarSign className="w-3 h-3" style={{ color: "hsl(42,87%,55%)" }} />
-                        </div>
-                        <span className="font-body text-[11px] font-bold text-white/60">Fee Collection</span>
-                      </div>
-                      <span className="font-body text-[9px] font-bold" style={{ color: "hsl(145,65%,55%)" }}>₹12.4L</span>
-                    </div>
-                    {/* Donut chart mock */}
-                    <div className="flex items-center gap-4">
-                      <div className="relative w-20 h-20 shrink-0">
-                        <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
-                          <motion.circle cx="18" cy="18" r="14" fill="none" stroke="hsla(42,87%,55%,0.15)" strokeWidth="3" />
-                          <motion.circle cx="18" cy="18" r="14" fill="none" stroke="hsl(42,87%,55%)" strokeWidth="3"
-                            strokeDasharray="88" strokeLinecap="round"
-                            initial={{ strokeDashoffset: 88 }}
-                            whileInView={{ strokeDashoffset: 88 * 0.02 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: 1.2, duration: 1.5, ease: "easeOut" }}
-                          />
-                        </svg>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="font-display text-sm font-bold text-white/80">98%</span>
-                        </div>
-                      </div>
-                      <div className="space-y-2 flex-1">
-                        {[
-                          { label: "Collected", pct: 98, color: "42, 87%, 55%" },
-                          { label: "Pending", pct: 2, color: "340, 65%, 55%" },
-                        ].map((item, i) => (
-                          <div key={item.label}>
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="font-body text-[9px] text-white/40">{item.label}</span>
-                              <span className="font-body text-[9px] font-bold text-white/50">{item.pct}%</span>
-                            </div>
-                            <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.04)" }}>
-                              <motion.div className="h-full rounded-full"
-                                style={{ background: `hsl(${item.color})` }}
-                                initial={{ width: 0 }}
-                                whileInView={{ width: `${item.pct}%` }}
-                                viewport={{ once: true }}
-                                transition={{ delay: 1.3 + i * 0.15, duration: 0.8 }}
-                              />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </motion.div>
-                </div>
-
-                {/* Recent activity table */}
-                <motion.div
-                  className="rounded-xl border border-white/[0.05] overflow-hidden"
-                  style={{ background: "rgba(255,255,255,0.015)" }}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 1.0, duration: 0.5 }}
-                >
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.04]">
-                    <div className="flex items-center gap-2">
-                      <Activity className="w-3.5 h-3.5" style={{ color: "hsla(42,87%,55%,0.6)" }} />
-                      <span className="font-body text-[11px] font-bold text-white/60">Recent Activity</span>
-                    </div>
-                    <span className="font-body text-[9px] text-white/25 cursor-pointer hover:text-white/40 transition-colors">View All →</span>
-                  </div>
-                  <div className="divide-y divide-white/[0.03]">
-                    {[
-                      { action: "Attendance marked for BCA Sem-3", time: "2 min ago", icon: Clock, color: "160, 60%, 50%" },
-                      { action: "Fee payment recorded — ₹24,000", time: "15 min ago", icon: DollarSign, color: "42, 87%, 55%" },
-                      { action: "New admission application received", time: "1 hr ago", icon: FileText, color: "220, 80%, 55%" },
-                      { action: "Notice posted: Annual Day Event", time: "3 hrs ago", icon: Bell, color: "340, 65%, 55%" },
-                    ].map((item, i) => (
-                      <motion.div
-                        key={i}
-                        className="flex items-center gap-3 px-4 py-2.5"
-                        initial={{ opacity: 0, x: -10 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 1.2 + i * 0.08, duration: 0.4 }}
-                      >
-                        <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0"
-                          style={{ background: `hsla(${item.color}, 0.08)` }}>
-                          <item.icon className="w-3 h-3" style={{ color: `hsla(${item.color}, 0.7)` }} />
-                        </div>
-                        <span className="font-body text-[10px] text-white/45 flex-1">{item.action}</span>
-                        <span className="font-body text-[8px] text-white/20 shrink-0">{item.time}</span>
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
-              </div>
+              </AnimatePresence>
             </div>
           </div>
 
-          {/* Bottom status bar */}
           <div className="flex items-center justify-between px-4 sm:px-5 py-2.5 border-t border-white/[0.04]" style={{ background: "rgba(255,255,255,0.015)" }}>
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "hsl(145, 65%, 50%)" }} />
-              <span className="font-body text-[10px] text-white/25">Sample Preview • Admin Dashboard</span>
+              <span className="font-body text-[10px] text-white/25">Sample Preview • {headerTitles[activeTab]}</span>
             </div>
             <span className="font-body text-[10px] text-white/15">Static preview — no login required</span>
           </div>
         </motion.div>
       </ScrollReveal>
 
-      {/* Caption */}
-      <motion.p
-        className="text-center mt-6 font-body text-[11px] text-white/20"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ delay: 0.5 }}
-      >
-        ✨ This is a sample preview of the admin dashboard — the actual product includes all interactive features
+      <motion.p className="text-center mt-6 font-body text-[11px] text-white/20"
+        initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.5 }}>
+        ✨ This is a sample preview — the actual product includes all interactive features
       </motion.p>
     </div>
   );
