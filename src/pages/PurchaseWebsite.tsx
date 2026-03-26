@@ -8,7 +8,7 @@ import {
   ArrowRight, Heart, Phone, Mail, ExternalLink, Crown, Layers, Lock, Eye,
   ClipboardCheck, Award, Brain, Camera, TrendingUp, CircuitBoard, Gem, Rocket,
   LayoutDashboard, Clock, DollarSign, Image, Settings, UserCheck, Activity,
-  PieChart, FileText, Search, ChevronRight
+  PieChart, FileText, Search, ChevronRight, Megaphone, User
 } from "lucide-react";
 import { motion, AnimatePresence, useMotionValue, animate, useScroll, useTransform } from "framer-motion";
 
