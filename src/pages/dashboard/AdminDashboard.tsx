@@ -472,6 +472,16 @@ export default function AdminDashboard() {
           </h2>
           <p className="font-body text-[13px] text-muted-foreground mt-1">Here's an overview of your institution.</p>
         </div>
+        <div className="flex items-center gap-2">
+          <div className="bg-card border border-border/60 rounded-xl px-4 py-2 flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="font-body text-xs text-muted-foreground">System Online</span>
+          </div>
+          <div className="bg-card border border-border/60 rounded-xl px-4 py-2 flex items-center gap-2">
+            <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="font-body text-xs text-muted-foreground">{new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span>
+          </div>
+        </div>
       </div>
 
       {/* Action Center */}
