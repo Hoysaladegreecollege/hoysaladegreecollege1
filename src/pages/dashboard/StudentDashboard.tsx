@@ -295,6 +295,28 @@ export default function StudentDashboard() {
             </div>
           )}
         </div>
+        {/* Daily Motivational Quote */}
+        <div className="mt-4 pt-4 border-t border-border/30">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center shrink-0 mt-0.5">
+              <Star className="w-4 h-4 text-secondary" />
+            </div>
+            <div>
+              <p className="font-body text-xs text-muted-foreground/60 uppercase tracking-wider mb-1">Daily Inspiration</p>
+              <p className="font-body text-sm text-muted-foreground italic leading-relaxed">
+                {[
+                  "Education is the passport to the future, for tomorrow belongs to those who prepare for it today.",
+                  "The beautiful thing about learning is that nobody can take it away from you.",
+                  "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+                  "The only way to do great work is to love what you do.",
+                  "Your education is a dress rehearsal for a life that is yours to lead.",
+                  "The expert in anything was once a beginner.",
+                  "Don't let what you cannot do interfere with what you can do.",
+                ][new Date().getDay()]}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Fee Reminders */}
