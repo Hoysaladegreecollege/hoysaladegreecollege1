@@ -519,6 +519,44 @@ export default function Index() {
         </div>
       </section>
 
+      {/* Why Choose Us */}
+      <section className="py-14 sm:py-20 bg-background relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/30 to-transparent" />
+        <div className="container px-5 sm:px-4 relative">
+          <ScrollReveal>
+            <SectionHeading title="Why Choose Hoysala?" subtitle="A legacy of excellence in education since 2019" />
+          </ScrollReveal>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+            {[
+              { icon: GraduationCap, title: "University Affiliated", desc: "Affiliated to Bangalore University (BU 26) with AICTE approval, ensuring nationally recognized degrees.", accentHsl: "42 87% 55%", delay: 0 },
+              { icon: Brain, title: "Smart Learning", desc: "Digital-first campus with AI-powered student portal, real-time attendance tracking, and online resources.", accentHsl: "215 90% 55%", delay: 80 },
+              { icon: Users, title: "Expert Faculty", desc: "Experienced professors with industry connections providing mentorship and career-focused teaching.", accentHsl: "145 65% 42%", delay: 160 },
+              { icon: BarChart3, title: "100% Placement Support", desc: "Dedicated placement cell with mock interviews, resume building, and direct industry partnerships.", accentHsl: "280 60% 55%", delay: 240 },
+              { icon: Library, title: "Rich Library", desc: "Extensive collection of books, journals, and digital resources accessible to all students.", accentHsl: "330 60% 55%", delay: 320 },
+              { icon: FlaskConical, title: "Modern Labs", desc: "State-of-the-art computer labs and practical facilities for hands-on learning experience.", accentHsl: "0 70% 58%", delay: 400 },
+            ].map((feature, i) => (
+              <ScrollReveal key={feature.title} delay={feature.delay}>
+                <div className="group relative rounded-2xl border border-border/30 bg-card/50 backdrop-blur-sm p-6 sm:p-7 hover:border-border/60 hover:shadow-xl hover:-translate-y-1 transition-all duration-500 overflow-hidden">
+                  <div className="absolute -bottom-10 -right-10 w-32 h-32 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700 blur-[50px] pointer-events-none"
+                    style={{ background: `hsla(${feature.accentHsl}, 0.12)` }} />
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent translate-x-[-100%] group-hover:translate-x-[100%] rounded-2xl pointer-events-none"
+                    style={{ transition: "transform 1s cubic-bezier(0.16,1,0.3,1)" }} />
+                  <div className="relative z-10">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-all duration-500 border border-white/[0.04]"
+                      style={{ background: `hsla(${feature.accentHsl}, 0.1)` }}>
+                      <feature.icon className="w-5 h-5 transition-all duration-500 group-hover:rotate-6"
+                        style={{ color: `hsl(${feature.accentHsl})` }} />
+                    </div>
+                    <h3 className="font-display text-base sm:text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors duration-300">{feature.title}</h3>
+                    <p className="font-body text-sm text-muted-foreground leading-relaxed">{feature.desc}</p>
+                  </div>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Courses */}
       <section className="py-14 sm:py-28 bg-background relative overflow-hidden">
         {/* Ambient glow orbs */}
