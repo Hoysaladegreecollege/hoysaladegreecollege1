@@ -35,7 +35,9 @@ Deno.serve(async (req) => {
     const { data: studentRecord } = await adminClient.from("students").select("id").eq("user_id", userId).maybeSingle();
     
     if (studentRecord) {
-      // Delete records that reference students.id
+      // Delete records that reference students.id (all FK dependencies)
+      await adminClient.from("fee_payments").delete().eq("student_id", studentRecord.id);
+      await adminClient.from("semester_fees").delete().eq("student_id", studentRecord.id);
       await adminClient.from("attendance").delete().eq("student_id", studentRecord.id);
       await adminClient.from("marks").delete().eq("student_id", studentRecord.id);
       await adminClient.from("absent_notes").delete().eq("student_id", studentRecord.id);
@@ -48,6 +50,13 @@ Deno.serve(async (req) => {
     
     // Delete study materials uploaded by this user
     await adminClient.from("study_materials").delete().eq("uploaded_by", userId);
+
+    // Delete other user-related records
+    await adminClient.from("notifications").delete().eq("user_id", userId);
+    await adminClient.from("feedback_complaints").delete().eq("user_id", userId);
+    await adminClient.from("push_subscriptions").delete().eq("user_id", userId);
+    await adminClient.from("direct_messages").delete().eq("sender_id", userId);
+    await adminClient.from("direct_messages").delete().eq("receiver_id", userId);
     
     // Delete role and profile
     await adminClient.from("user_roles").delete().eq("user_id", userId);

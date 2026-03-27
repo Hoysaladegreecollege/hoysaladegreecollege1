@@ -208,7 +208,7 @@ export default function Contact() {
         <div className="h-[1.5px] bg-gradient-to-r from-transparent via-secondary/25 to-transparent" />
         <div className="relative overflow-hidden">
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3885.1744804968147!2d77.38587!3d13.09914!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae23670957d0e5%3A0xba0e92f000ea4b9c!2sHoysala%20Degree%20College!5e0!3m2!1sen!2sin!4v1711000000000"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1942.587!2d77.3903!3d13.0991!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae23670957d0e5%3A0xba0e92f000ea4b9c!2sHoysala%20Degree%20College!5e0!3m2!1sen!2sin!4v1711000000000"
             width="100%" height="340" style={{ border: 0, display: "block" }} allowFullScreen loading="lazy"
             className="w-full opacity-90 hover:opacity-100 transition-opacity duration-500" />
           <div className="absolute top-0 left-0 right-0 h-6 bg-gradient-to-b from-background to-transparent pointer-events-none" />
