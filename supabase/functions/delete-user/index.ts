@@ -50,6 +50,13 @@ Deno.serve(async (req) => {
     
     // Delete study materials uploaded by this user
     await adminClient.from("study_materials").delete().eq("uploaded_by", userId);
+
+    // Delete other user-related records
+    await adminClient.from("notifications").delete().eq("user_id", userId);
+    await adminClient.from("feedback_complaints").delete().eq("user_id", userId);
+    await adminClient.from("push_subscriptions").delete().eq("user_id", userId);
+    await adminClient.from("direct_messages").delete().eq("sender_id", userId);
+    await adminClient.from("direct_messages").delete().eq("receiver_id", userId);
     
     // Delete role and profile
     await adminClient.from("user_roles").delete().eq("user_id", userId);
