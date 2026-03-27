@@ -82,21 +82,21 @@ export default function AdminUsers() {
       if (error) throw error;
 
       if (role === "student") {
-        const studentUpdate: any = {};
+        const studentUpdate: any = {
+          phone: phone || "",
+          parent_phone: parent_phone || "",
+          address: address || "",
+          date_of_birth: date_of_birth || null,
+          fee_remarks: fee_remarks || "",
+        };
         if (roll_number) studentUpdate.roll_number = roll_number;
         if (semester) studentUpdate.semester = parseInt(semester);
-        if (parent_phone !== undefined) studentUpdate.parent_phone = parent_phone;
-        if (phone !== undefined) studentUpdate.phone = phone;
-        if (address !== undefined) studentUpdate.address = address;
-        if (date_of_birth) studentUpdate.date_of_birth = date_of_birth;
         if (course_id) studentUpdate.course_id = course_id;
         if (total_fee !== undefined && total_fee !== "") studentUpdate.total_fee = parseFloat(total_fee) || 0;
         if (fee_paid !== undefined && fee_paid !== "") studentUpdate.fee_paid = parseFloat(fee_paid) || 0;
         if (fee_due_date) studentUpdate.fee_due_date = fee_due_date;
-        if (fee_remarks !== undefined) studentUpdate.fee_remarks = fee_remarks;
-        if (Object.keys(studentUpdate).length > 0) {
-          await supabase.from("students").update(studentUpdate).eq("user_id", userId);
-        }
+        const { error: studentError } = await supabase.from("students").update(studentUpdate).eq("user_id", userId);
+        if (studentError) throw studentError;
       } else if (role === "teacher") {
         const teacherUpdate: any = {};
         if (employee_id) teacherUpdate.employee_id = employee_id;

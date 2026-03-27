@@ -35,7 +35,9 @@ Deno.serve(async (req) => {
     const { data: studentRecord } = await adminClient.from("students").select("id").eq("user_id", userId).maybeSingle();
     
     if (studentRecord) {
-      // Delete records that reference students.id
+      // Delete records that reference students.id (all FK dependencies)
+      await adminClient.from("fee_payments").delete().eq("student_id", studentRecord.id);
+      await adminClient.from("semester_fees").delete().eq("student_id", studentRecord.id);
       await adminClient.from("attendance").delete().eq("student_id", studentRecord.id);
       await adminClient.from("marks").delete().eq("student_id", studentRecord.id);
       await adminClient.from("absent_notes").delete().eq("student_id", studentRecord.id);
