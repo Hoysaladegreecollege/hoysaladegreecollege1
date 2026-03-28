@@ -1,43 +1,47 @@
 
 
-# Implementation Plan
+## Problem Analysis
 
-## 1. Remove Auto-Scrolling from Homepage Gallery
-The homepage gallery section (Index.tsx) is already a static grid with no auto-scrolling. The comment at line 274 confirms "Manual testimonial navigation only (no auto-scroll)". The InfoSlider marquee at line 485 is a separate news ticker, not the gallery. **No changes needed here** -- the gallery is already manual-only.
+When the admin creates a student, the client-side code calls `supabase.auth.signUp()` which **switches the current session to the newly created user**. This means:
 
-However, if the intent is to also remove the InfoSlider marquee that auto-scrolls announcements below the hero, I will leave it as-is since the request specifically mentions "gallery section."
+1. Admin calls `signUp` → session changes to new student
+2. The `handle_new_user` trigger creates a skeleton student record
+3. Subsequent `update` calls to `students` and `profiles` tables **fail silently** because the current user is now the new student (not admin), and the student doesn't have admin-level RLS permissions to update profiles by user_id
+4. The phone, DOB, address, course, roll number, etc. are never saved
 
-## 2. Verify & Enhance Mock Dashboard Preview (PurchaseWebsite.tsx)
-The mock dashboard already shows: Admin Dashboard with sidebar, stat cards, weekly attendance chart, fee collection donut, and recent activity table -- all without requiring login. Changes needed:
+This is the **root cause**: `signUp` logs out the admin.
 
-- **Add more visible dashboard features**: Add a "Quick Actions" panel showing Timetable, Notices, Gallery, Applications to showcase more features
-- **Add a second mock tab view** (e.g., User Management or Attendance Hub tab content) so switching tabs actually shows different content instead of the same dashboard
-- **Ensure mobile responsiveness** of the mock preview is solid
+## Solution
 
-## 3. Fix Contact Page Map (Contact.tsx)
-**Current issue**: The Google Maps embed URL uses generic coordinates that may not properly pin the college. The `MAPS_LINK` for "Get Directions" uses an old link.
+Create a new **backend function** (`create-student`) that uses the service role to:
+1. Create the auth user (via `admin.createUser`)
+2. Wait for the trigger to fire
+3. Update the student and profile records with all details
+4. Return success without disrupting the admin's session
 
-**Changes**:
-- Update `MAPS_LINK` to the new link: `https://maps.app.goo.gl/vgj6BFejregTZTrT8`
-- Update the iframe `src` to use a proper embed URL derived from the new Google Maps link that pins Hoysala Degree College with a marker
-- Use `!1m18` place embed format so the pin is clearly visible
+Then update the client-side `addStudentMutation` to call this function instead of `signUp`.
 
-## 4. Enhance Event Detail Page (EventDetail.tsx)
-Currently functional but basic styling. Enhancements:
+## Plan
 
-- **Ultra-premium header**: Add glassmorphism event info card with gradient borders, ambient glow, and backdrop blur
-- **Enhanced carousel**: Add subtle gradient overlays on edges, refined nav button styling with glassmorphism
-- **Better thumbnail strip**: Add active indicator glow, smoother border transitions
-- **Event details section**: Premium card with gradient accent line, enhanced typography, category/date badges with glow effects
-- **Keep all existing functionality intact**: auto-scroll (4s), thumbnail auto-centering, lightbox with pinch-zoom, virtualized thumbnails
+### Step 1: Create `supabase/functions/create-student/index.ts`
+- Accept: email, password, full_name, phone, date_of_birth, roll_number, course_id, year_level, semester, admission_year, father_name, mother_name, parent_phone, address
+- Validate inputs (require email, password, full_name)
+- Use `supabaseAdmin.auth.admin.createUser()` with `email_confirm: true` (so student can log in immediately)
+- Wait briefly for the `handle_new_user` trigger
+- Update `students` table with all fields (roll_number, course_id, semester, year_level, admission_year, phone, parent_phone, father_name, mother_name, address, date_of_birth)
+- Update `profiles` table with phone
+- Verify the admin caller has admin role via JWT check
+- Return the created user ID
 
-### Files to Modify
-1. `src/pages/Contact.tsx` -- Update map link and embed URL
-2. `src/pages/EventDetail.tsx` -- Ultra-premium UI redesign
-3. `src/pages/PurchaseWebsite.tsx` -- Add more dashboard feature visibility in mock preview
+### Step 2: Update `src/pages/dashboard/admin/AdminUsers.tsx`
+- Replace `addStudentMutation` to call `supabase.functions.invoke("create-student", { body: {...} })` instead of `supabase.auth.signUp()`
+- This preserves the admin session
+- Add proper error handling for the response
+- All student details will now be reliably stored since the service role bypasses RLS
 
 ### Technical Details
-- Contact map embed will use: `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3885.5!2d77.3892!3d13.0965!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae23a3a58ed6f1%3A0x8b0e1e6e2b3e1a0!2sHoysala%20Degree%20College%20Nelamangala!5e0!3m2!1sen!2sin!4v1` with proper place ID
-- EventDetail will use framer-motion for entrance animations and glassmorphism styling matching the site's visual identity
-- Mock dashboard will add tab-specific content for User Management and Attendance tabs
+- The edge function uses `SUPABASE_SERVICE_ROLE_KEY` (already configured) for admin-level database access
+- CORS headers included for browser calls
+- JWT validation ensures only admins can invoke the function
+- `admin.createUser` with `email_confirm: true` means the student account is immediately active without email verification
 
