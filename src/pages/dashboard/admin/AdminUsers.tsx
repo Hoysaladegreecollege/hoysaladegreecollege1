@@ -141,38 +141,29 @@ export default function AdminUsers() {
     mutationFn: async () => {
       const pwCheck = validatePassword(newStudent.password);
       if (!pwCheck.valid) throw new Error(pwCheck.message);
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: newStudent.email,
-        password: newStudent.password,
-        options: {
-          data: { full_name: newStudent.full_name, role: "student" },
-          emailRedirectTo: window.location.origin,
+      const { data, error } = await supabase.functions.invoke("create-student", {
+        body: {
+          email: newStudent.email,
+          password: newStudent.password,
+          full_name: newStudent.full_name,
+          phone: newStudent.phone,
+          date_of_birth: newStudent.date_of_birth || null,
+          roll_number: newStudent.roll_number,
+          course_id: newStudent.course_id || null,
+          year_level: newStudent.year_level,
+          semester: newStudent.semester,
+          admission_year: newStudent.admission_year,
+          father_name: newStudent.father_name,
+          mother_name: newStudent.mother_name,
+          parent_phone: newStudent.parent_phone,
+          address: newStudent.address,
         },
       });
-      if (authError) throw authError;
-      if (!authData.user) throw new Error("Failed to create user");
-      await new Promise(r => setTimeout(r, 2000));
-      if (newStudent.phone) {
-        await supabase.from("profiles").update({ phone: newStudent.phone }).eq("user_id", authData.user.id);
-      }
-      const yearLevel = parseInt(newStudent.year_level) || 1;
-      const semesterVal = parseInt(newStudent.semester) || 1;
-      const updateData: any = {
-        semester: semesterVal, year_level: yearLevel,
-        admission_year: parseInt(newStudent.admission_year),
-        parent_phone: newStudent.parent_phone, father_name: newStudent.father_name,
-        mother_name: newStudent.mother_name, address: newStudent.address,
-        date_of_birth: newStudent.date_of_birth || null,
-      };
-      if (newStudent.roll_number) updateData.roll_number = newStudent.roll_number;
-      if (newStudent.course_id) updateData.course_id = newStudent.course_id;
-      if (newStudent.phone) {
-        await supabase.from("profiles").update({ phone: newStudent.phone }).eq("user_id", authData.user.id);
-      }
-      await supabase.from("students").update(updateData).eq("user_id", authData.user.id);
+      if (error) throw new Error(error.message || "Failed to create student");
+      if (data?.error) throw new Error(data.error);
     },
     onSuccess: () => {
-      toast.success("Student created! Email confirmation sent.");
+      toast.success("Student created successfully!");
       setShowAddStudent(false);
       setNewStudent({ full_name: "", email: "", password: "", phone: "", date_of_birth: "", roll_number: "", course_id: "", year_level: "1", semester: "1", academic_year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`, admission_year: new Date().getFullYear().toString(), father_name: "", mother_name: "", parent_phone: "", address: "" });
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
