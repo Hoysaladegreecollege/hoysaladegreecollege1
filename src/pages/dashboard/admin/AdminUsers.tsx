@@ -644,6 +644,12 @@ export default function AdminUsers() {
           </form>
         </DialogContent>
       </Dialog>
+        </TabsContent>
+
+        <TabsContent value="add-staff">
+          <AdminAddStaff />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
