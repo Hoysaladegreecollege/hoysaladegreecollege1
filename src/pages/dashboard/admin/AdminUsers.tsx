@@ -445,7 +445,7 @@ export default function AdminUsers() {
                   <div className="col-span-2 border-t border-border pt-3 mt-1">
                     <p className="font-body text-xs font-bold text-primary uppercase tracking-wider mb-2">💰 Fee Information</p>
                     <div className="grid grid-cols-3 gap-2">
-                      <div className="bg-primary/5 rounded-xl p-3 text-center"><p className="font-body text-[10px] text-muted-foreground">Total Fee</p><p className="font-display text-base font-bold text-foreground">₹{(viewUser.student?.total_fee || 0).toLocaleString()}</p></div>
+                      <div className="bg-primary/5 rounded-xl p-3 text-center"><p className="font-body text-[10px] text-muted-foreground">Yearly Fee</p><p className="font-display text-base font-bold text-foreground">₹{(viewUser.student?.total_fee || 0).toLocaleString()}</p></div>
                       <div className="bg-emerald-500/5 rounded-xl p-3 text-center"><p className="font-body text-[10px] text-muted-foreground">Paid</p><p className="font-display text-base font-bold text-emerald-600">₹{(viewUser.student?.fee_paid || 0).toLocaleString()}</p></div>
                       <div className="bg-destructive/5 rounded-xl p-3 text-center"><p className="font-body text-[10px] text-muted-foreground">Due</p><p className="font-display text-base font-bold text-destructive">₹{((viewUser.student?.total_fee || 0) - (viewUser.student?.fee_paid || 0)).toLocaleString()}</p></div>
                     </div>
