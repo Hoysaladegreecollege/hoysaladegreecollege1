@@ -9,7 +9,9 @@ import { Search, Trash2, Edit3, X, Save, Users, Phone, UserPlus, Eye, ArrowLeft,
 import { validatePassword, PASSWORD_REQUIREMENTS } from "@/lib/password-validation";
 import { useAuth } from "@/contexts/AuthContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import AdminAddStaff from "./AdminAddStaff";
 
 export default function AdminUsers() {
   const { user } = useAuth();
