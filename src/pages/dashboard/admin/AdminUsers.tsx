@@ -260,6 +260,10 @@ export default function AdminUsers() {
 
         <TabsContent value="users" className="space-y-5">
 
+      <Button size="sm" onClick={() => setShowAddStudent(true)} className="rounded-xl font-body">
+            <UserPlus className="w-4 h-4 mr-1" /> Add Student
+          </Button>
+
       {/* Role Filter Tabs */}
       <div className="flex flex-wrap gap-2 bg-card border border-border rounded-2xl p-3">
         {[
