@@ -1,47 +1,110 @@
+# Implementation Plan: Multi-Feature Enhancement
+
+This plan addresses 8 distinct requests. Here is every change organized by feature.
+
+---
+
+## 1. Create Teacher Accounts via Edge Function
+
+**Problem**: AdminAddStaff uses `supabase.auth.signUp()` which logs out the admin (same bug as students had).
+
+**Changes**:
+
+- **Create `supabase/functions/create-staff/index.ts**`: Similar to `create-student`, accepts role (teacher/principal), email, password, full_name, phone, employee_id, department_id, qualification, experience, subjects. Uses `admin.createUser()` with service role. Waits for `handle_new_user` trigger, then updates `teachers` table with all details. Validates caller is admin.
+- **Add to `supabase/config.toml**`: `[functions.create-staff]` with `verify_jwt = false`
+- **Update `src/pages/dashboard/admin/AdminAddStaff.tsx**`: Replace `signUp` call with `supabase.functions.invoke("create-staff", { body: {...} })` for teacher/principal creation. Keep admin pending request flow as-is.
+
+---
+
+## 2. add extra student data fields 
+
+add this things - in the students' field, add extra details like  [Aadhaar no.](https://uidai.gov.in/en/) , nationality, religion, caste, etc.
+
+---
+
+## 3. Merge Staff/Add-Staff into User Management with Tabs
+
+**Changes**:
+
+- **Update `src/pages/dashboard/admin/AdminUsers.tsx**`: Add a Tabs component at the top with two tabs: "User Management" (existing user list) and "Add Staff / Users" (embed the AddStaff form content). Use `@radix-ui/react-tabs` (already available).
+- This consolidates the two separate pages into one unified view.
+
+---
+
+## 4. Fix Popup Banner Image Cropping & Home-Page Only
+
+**Changes**:
+
+- **Update `src/components/PopupBanner.tsx**`: 
+  - Change image class from `object-cover` to `object-contain` so the full image is visible without cropping.
+  - Add route check: only show popup on `/` (home page). Use `useLocation()` from react-router-dom to check `pathname === "/"`.
+- **Update `src/components/Layout.tsx**`: No change needed since PopupBanner will handle its own route check.
+
+---
+
+## 5. Student Details as Separate Page (Not Dialog)
+
+**Changes**:
+
+- **Create `src/pages/dashboard/admin/AdminStudentDetail.tsx**`: A new full-page component at route `/dashboard/admin/users/:userId`. Shows all student details similar to the existing dialog view but as a full page, modeled after AdminStudentFeeDetail. Includes personal info, academic info, parent info, fee summary, and the new document upload section (see feature 6).
+- **Update `src/App.tsx**`: Add route `/dashboard/admin/users/:userId` with AdminRoute wrapper.
+- **Update `src/pages/dashboard/admin/AdminUsers.tsx**`: Change the Eye button for students to navigate via `<Link>` to `/dashboard/admin/users/${u.user_id}` instead of opening the dialog. Keep dialog for non-student roles.
+
+---
+
+## 6. Student Document Upload & Download
+
+**Changes**:
+
+- **Database migration**: Create `student_documents` table with columns: id (uuid), student_id (uuid), document_type (text - e.g. "10th_marks_card", "12th_marks_card", "transfer_certificate", "other"), file_name (text), file_url (text), uploaded_by (uuid), created_at (timestamptz). Add RLS: staff can manage all, students can view own.
+- **Storage**: Create a `student-documents` storage bucket (private). Add RLS policies for staff upload/download and student read-own.
+- **Integrate into AdminStudentDetail page**: Add a "Documents" section with upload buttons for each document type (10th Marks Card, 12th Marks Card, Transfer Certificate, Other). Show uploaded documents with download buttons. Admin can upload and delete documents.
+
+---
+
+## 7. Change Fee Labels to "Yearly Fee"
+
+**Changes**:
+
+- **Update `src/pages/dashboard/admin/AdminStudentFeeDetail.tsx**`: Change "Total Fee" labels to "Yearly Fee" where applicable.
+- **Update `src/pages/dashboard/admin/AdminUsers.tsx**`: Change fee labels in edit form and view dialog from "Total Fee" to "Yearly Fee".
+- **Update `src/pages/dashboard/admin/AdminFeeManagement.tsx**`: Update fee-related labels.
+- **Update `src/pages/dashboard/student/StudentFees.tsx**`: Update student-facing fee labels.
+- **Update `supabase/functions/chat/index.ts**`: Update the system prompt to clarify fees are yearly fees (e.g., "Total Fee: ₹80,000" becomes "Yearly Fee: ₹26,667/year" or clarify that the listed fees are per year).
+
+---
+
+## 8. Advanced Security Hardening
+
+**Changes**:
+
+- **Add rate limiting to edge functions**: Add IP-based rate limiting to `create-student` and the new `create-staff` functions (similar to existing chat function).
+- **Add input validation with Zod** in edge functions: Validate email format, password strength, string lengths in `create-student` and `create-staff`.
+- **Add Content Security Policy headers**: Update `index.html` with CSP meta tags to prevent XSS.
+- **Add security headers**: Add `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy` headers in `vercel.json`.
+- **Sanitize all user inputs**: Add `DOMPurify` sanitization for any rendered user content (notices, announcements, messages).
+- **Rate limit login attempts**: Add client-side rate limiting on the login page.
+- **Add CSRF protection**: Ensure all mutations include proper auth headers (already done via Supabase client).
+
+---
+
+## Technical Summary
 
 
-## Problem Analysis
+| Feature                 | Files Created                              | Files Modified                              |
+| ----------------------- | ------------------------------------------ | ------------------------------------------- |
+| Teacher edge function   | `supabase/functions/create-staff/index.ts` | `AdminAddStaff.tsx`, `config.toml`          |
+| Application photo fix   | —                                          | Storage RLS migration                       |
+| Tabs in User Management | —                                          | `AdminUsers.tsx`                            |
+| Popup banner fixes      | —                                          | `PopupBanner.tsx`                           |
+| Student detail page     | `AdminStudentDetail.tsx`                   | `App.tsx`, `AdminUsers.tsx`                 |
+| Document upload         | —                                          | `AdminStudentDetail.tsx`, migration         |
+| Yearly fee labels       | —                                          | Multiple fee pages, `chat/index.ts`         |
+| Security hardening      | —                                          | `index.html`, `vercel.json`, edge functions |
 
-When the admin creates a student, the client-side code calls `supabase.auth.signUp()` which **switches the current session to the newly created user**. This means:
 
-1. Admin calls `signUp` → session changes to new student
-2. The `handle_new_user` trigger creates a skeleton student record
-3. Subsequent `update` calls to `students` and `profiles` tables **fail silently** because the current user is now the new student (not admin), and the student doesn't have admin-level RLS permissions to update profiles by user_id
-4. The phone, DOB, address, course, roll number, etc. are never saved
+**Database migrations needed**:
 
-This is the **root cause**: `signUp` logs out the admin.
-
-## Solution
-
-Create a new **backend function** (`create-student`) that uses the service role to:
-1. Create the auth user (via `admin.createUser`)
-2. Wait for the trigger to fire
-3. Update the student and profile records with all details
-4. Return success without disrupting the admin's session
-
-Then update the client-side `addStudentMutation` to call this function instead of `signUp`.
-
-## Plan
-
-### Step 1: Create `supabase/functions/create-student/index.ts`
-- Accept: email, password, full_name, phone, date_of_birth, roll_number, course_id, year_level, semester, admission_year, father_name, mother_name, parent_phone, address
-- Validate inputs (require email, password, full_name)
-- Use `supabaseAdmin.auth.admin.createUser()` with `email_confirm: true` (so student can log in immediately)
-- Wait briefly for the `handle_new_user` trigger
-- Update `students` table with all fields (roll_number, course_id, semester, year_level, admission_year, phone, parent_phone, father_name, mother_name, address, date_of_birth)
-- Update `profiles` table with phone
-- Verify the admin caller has admin role via JWT check
-- Return the created user ID
-
-### Step 2: Update `src/pages/dashboard/admin/AdminUsers.tsx`
-- Replace `addStudentMutation` to call `supabase.functions.invoke("create-student", { body: {...} })` instead of `supabase.auth.signUp()`
-- This preserves the admin session
-- Add proper error handling for the response
-- All student details will now be reliably stored since the service role bypasses RLS
-
-### Technical Details
-- The edge function uses `SUPABASE_SERVICE_ROLE_KEY` (already configured) for admin-level database access
-- CORS headers included for browser calls
-- JWT validation ensures only admins can invoke the function
-- `admin.createUser` with `email_confirm: true` means the student account is immediately active without email verification
-
+1. Create `student_documents` table with RLS
+2. Create `student-documents` storage bucket with RLS policies
+3. Add storage policies for `admission-photos` bucket (allow public uploads)
