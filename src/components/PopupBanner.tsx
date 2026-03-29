@@ -5,6 +5,7 @@ import { X, ExternalLink } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
 export default function PopupBanner() {
+  const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
