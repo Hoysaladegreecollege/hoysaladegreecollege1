@@ -199,13 +199,13 @@ export default function AdminStudentDetail() {
           <InfoCard label="Email" value={student.profile?.email} icon={Mail} />
           <InfoCard label="Phone" value={student.profile?.phone || student.phone} icon={Phone} />
           <InfoCard label="Date of Birth" value={student.date_of_birth ? format(new Date(student.date_of_birth), "dd MMM yyyy") : ""} icon={Calendar} />
-          <InfoCard label="Gender" value={student.gender} />
-          <InfoCard label="Aadhaar No." value={student.aadhaar_number} />
-          <InfoCard label="Nationality" value={student.nationality} />
-          <InfoCard label="Religion" value={student.religion} />
-          <InfoCard label="Caste" value={student.caste} />
-          <InfoCard label="Category" value={student.category} />
-          <InfoCard label="Blood Group" value={student.blood_group} />
+          <InfoCard label="Gender" value={(student as any).gender} />
+          <InfoCard label="Aadhaar No." value={(student as any).aadhaar_number} />
+          <InfoCard label="Nationality" value={(student as any).nationality} />
+          <InfoCard label="Religion" value={(student as any).religion} />
+          <InfoCard label="Caste" value={(student as any).caste} />
+          <InfoCard label="Category" value={(student as any).category} />
+          <InfoCard label="Blood Group" value={(student as any).blood_group} />
           <InfoCard label="Address" value={student.address} icon={MapPin} />
         </div>
       </div>
