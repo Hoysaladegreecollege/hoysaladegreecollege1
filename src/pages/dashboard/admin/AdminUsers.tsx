@@ -14,6 +14,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import AdminAddStaff from "./AdminAddStaff";
 
 export default function AdminUsers() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
