@@ -70,7 +70,7 @@ add this things - in the students' field, add extra details like [Aadhaar no.](h
 - **Update `src/pages/dashboard/admin/AdminUsers.tsx**`: Change fee labels in edit form and view dialog from "Total Fee" to "Yearly Fee".
 - **Update `src/pages/dashboard/admin/AdminFeeManagement.tsx**`: Update fee-related labels.
 - **Update `src/pages/dashboard/student/StudentFees.tsx**`: Update student-facing fee labels.
-- **Update `supabase/functions/chat/index.ts**`: Update the system prompt to clarify fees are yearly fees (e.g., "Total Fee: ₹80,000" becomes "Yearly Fee: ₹80,000/year" or clarify that the listed fees are per year).
+- **Update `supabase/functions/chat/index.ts**`: Update the system prompt to clarify fees are yearly fees (e.g., "Yearly Fee: ₹80,000/yr" becomes "Yearly Fee: ₹80,000/year" or clarify that the listed fees are per year).
 
 ---
 
