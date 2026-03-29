@@ -593,7 +593,7 @@ export default function AdminUsers() {
                     <option value="principal">Principal</option>
                     <option value="admin">Admin</option>
                   </select>
-                  <button onClick={() => setViewUser(u)} className="p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary hover:scale-110 transition-all duration-200" title="View"><Eye className="w-4 h-4" /></button>
+                  <button onClick={() => u.role === "student" ? navigate(`/dashboard/admin/users/${u.user_id}`) : setViewUser(u)} className="p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary hover:scale-110 transition-all duration-200" title="View"><Eye className="w-4 h-4" /></button>
                   <button onClick={() => startEdit(u)} className="p-2 rounded-xl hover:bg-secondary/10 text-muted-foreground hover:text-secondary-foreground hover:scale-110 transition-all duration-200" title="Edit"><Edit3 className="w-4 h-4" /></button>
                   <button onClick={() => { setResetPwUser(u); setNewPassword(""); }}
                     className="p-2 rounded-xl hover:bg-amber-500/10 text-muted-foreground hover:text-amber-600 hover:scale-110 transition-all duration-200" title="Reset Password"><KeyRound className="w-4 h-4" /></button>
