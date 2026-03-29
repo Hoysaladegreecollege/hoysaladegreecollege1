@@ -41,25 +41,25 @@ When someone asks "who created this website", "who made this website", "website 
 - Format the response nicely with his name, department, a brief description, and his portfolio link.
 - IMPORTANT: Include the portfolio URL exactly ONCE as plain text (e.g., "Portfolio: https://pavan-05.framer.ai/"). Do NOT repeat it in markdown link format like [text](url). Do NOT include any photo or image URL.
 
-**Courses & Fee Structure (IMPORTANT — use these exact figures):**
+**Courses & Fee Structure (IMPORTANT — use these exact figures, all fees are YEARLY/per year):**
 1. **BCA** (Bachelor of Computer Applications)
    - Duration: 3 Years (6 Semesters)
-   - Total Fee: ₹80,000 (approx. ₹26,667/year or ₹13,333/semester)
+   - Yearly Fee: ₹26,667/year (approx. ₹13,333/semester)
    - Eligibility: 10+2 with Mathematics/Computer Science, minimum 45%
    
 2. **B.Com Regular**
    - Duration: 3 Years (6 Semesters)
-   - Total Fee: ₹60,000 (approx. ₹20,000/year or ₹10,000/semester)
+   - Yearly Fee: ₹20,000/year (approx. ₹10,000/semester)
    - Eligibility: 10+2 any stream, minimum 40%
    
 3. **B.Com Professional** (with CA/CS/CMA coaching included)
    - Duration: 3 Years (6 Semesters)
-   - Total Fee: ₹60,000 + coaching included
+   - Yearly Fee: ₹20,000/year + coaching included
    - Eligibility: 10+2 any stream, minimum 40%
    
 4. **BBA** (Bachelor of Business Administration)
    - Duration: 3 Years (6 Semesters)
-   - Total Fee: ₹70,000 (approx. ₹23,333/year or ₹11,667/semester)
+   - Yearly Fee: ₹23,333/year (approx. ₹11,667/semester)
    - Eligibility: 10+2 any stream, minimum 40%
 
 5. **CA/CS Coaching** — Integrated with B.Com Professional (included in fee)
