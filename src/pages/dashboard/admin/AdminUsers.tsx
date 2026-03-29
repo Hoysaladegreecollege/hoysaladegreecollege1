@@ -244,11 +244,21 @@ export default function AdminUsers() {
               <p className="font-body text-xs text-muted-foreground">{users.length} registered users</p>
             </div>
           </div>
-          <Button size="sm" onClick={() => setShowAddStudent(true)} className="rounded-xl font-body">
-            <UserPlus className="w-4 h-4 mr-1" /> Add Student
-          </Button>
         </div>
       </div>
+
+      {/* Tabs: User Management + Add Staff */}
+      <Tabs defaultValue="users" className="space-y-5">
+        <TabsList className="w-full justify-start bg-card border border-border rounded-2xl p-1.5 h-auto">
+          <TabsTrigger value="users" className="rounded-xl font-body text-xs font-semibold px-4 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <Users className="w-3.5 h-3.5 mr-1.5" /> User Management
+          </TabsTrigger>
+          <TabsTrigger value="add-staff" className="rounded-xl font-body text-xs font-semibold px-4 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <UserPlus className="w-3.5 h-3.5 mr-1.5" /> Add Staff / Users
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="users" className="space-y-5">
 
       {/* Role Filter Tabs */}
       <div className="flex flex-wrap gap-2 bg-card border border-border rounded-2xl p-3">
