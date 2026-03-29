@@ -114,7 +114,7 @@ export default function AdminStudentDetail() {
   const deleteDocMutation = useMutation({
     mutationFn: async (doc: any) => {
       await supabase.storage.from("student-documents").remove([doc.file_url]);
-      const { error } = await supabase.from("student_documents").delete().eq("id", doc.id);
+      const { error } = await (supabase as any).from("student_documents").delete().eq("id", doc.id);
       if (error) throw error;
     },
     onSuccess: () => {
