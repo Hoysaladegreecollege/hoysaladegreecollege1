@@ -561,7 +561,7 @@ export default function AdminUsers() {
                       <select value={editForm.semester} onChange={(e) => setEditForm({ ...editForm, semester: e.target.value })} className="h-9 text-sm rounded-xl border border-input bg-background px-3">
                         {[1,2,3,4,5,6].map(s => <option key={s} value={s}>Sem {s}</option>)}
                       </select>
-                      <Input type="number" value={editForm.total_fee} onChange={(e) => setEditForm({ ...editForm, total_fee: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Total Fee" />
+                      <Input type="number" value={editForm.total_fee} onChange={(e) => setEditForm({ ...editForm, total_fee: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Yearly Fee" />
                       <Input type="number" value={editForm.fee_paid} onChange={(e) => setEditForm({ ...editForm, fee_paid: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Fee Paid" />
                       <Input type="date" value={editForm.fee_due_date} onChange={(e) => setEditForm({ ...editForm, fee_due_date: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Fee Due Date" />
                       <Input value={editForm.fee_remarks} onChange={(e) => setEditForm({ ...editForm, fee_remarks: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Fee Remarks" />
