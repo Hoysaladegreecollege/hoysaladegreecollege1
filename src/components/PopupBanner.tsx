@@ -35,7 +35,7 @@ export default function PopupBanner() {
     }
   }, [banners]);
 
-  if (!isOpen || banners.length === 0) return null;
+  if (!isOpen || banners.length === 0 || location.pathname !== "/") return null;
 
   const banner = banners[0];
 
