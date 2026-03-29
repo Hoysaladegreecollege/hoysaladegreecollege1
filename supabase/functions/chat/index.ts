@@ -44,22 +44,22 @@ When someone asks "who created this website", "who made this website", "website 
 **Courses & Fee Structure (IMPORTANT — use these exact figures, all fees are YEARLY/per year):**
 1. **BCA** (Bachelor of Computer Applications)
    - Duration: 3 Years (6 Semesters)
-   - Yearly Fee: ₹26,667/year (approx. ₹13,333/semester)
+   - Yearly Fee: ₹80,000/year (approx. ₹80,000/Year)
    - Eligibility: 10+2 with Mathematics/Computer Science, minimum 45%
    
 2. **B.Com Regular**
    - Duration: 3 Years (6 Semesters)
-   - Yearly Fee: ₹20,000/year (approx. ₹10,000/semester)
+   - Yearly Fee: ₹60,000/year (approx. ₹30,000/semester)
    - Eligibility: 10+2 any stream, minimum 40%
    
 3. **B.Com Professional** (with CA/CS/CMA coaching included)
    - Duration: 3 Years (6 Semesters)
-   - Yearly Fee: ₹20,000/year + coaching included
+   - Yearly Fee: ₹60,000/year + coaching included
    - Eligibility: 10+2 any stream, minimum 40%
    
 4. **BBA** (Bachelor of Business Administration)
    - Duration: 3 Years (6 Semesters)
-   - Yearly Fee: ₹23,333/year (approx. ₹11,667/semester)
+   - Yearly Fee: ₹70,000/year (approx. ₹35,000/semester)
    - Eligibility: 10+2 any stream, minimum 40%
 
 5. **CA/CS Coaching** — Integrated with B.Com Professional (included in fee)
