@@ -78,7 +78,7 @@ export default function AdminStudentDetail() {
 
       const { data: urlData } = supabase.storage.from("student-documents").getPublicUrl(path);
       
-      const { error: dbError } = await supabase.from("student_documents").insert({
+      const { error: dbError } = await (supabase as any).from("student_documents").insert({
         student_id: student.id,
         document_type: docType,
         file_name: file.name,
