@@ -390,7 +390,7 @@ export default function AdminStudentFeeDetail() {
         <div class="grid-item"><div class="label">Phone</div><div class="value">${student.profile?.phone || student.phone || "—"}</div></div>
       </div></div>
       <div class="stats">
-        <div class="stat"><div class="val">₹${(student.total_fee || 0).toLocaleString()}</div><div class="lbl">Total Fee</div></div>
+        <div class="stat"><div class="val">₹${(student.total_fee || 0).toLocaleString()}</div><div class="lbl">Yearly Fee</div></div>
         <div class="stat"><div class="val" style="color:#16a34a">₹${(student.fee_paid || 0).toLocaleString()}</div><div class="lbl">Total Paid</div></div>
         <div class="stat ${due > 0 ? "due" : ""}"><div class="val" style="color:${due > 0 ? "#dc2626" : "#16a34a"}">₹${due.toLocaleString()}</div><div class="lbl">Balance Due</div></div>
         <div class="stat"><div class="val">${pctVal}%</div><div class="lbl">Collection</div></div>

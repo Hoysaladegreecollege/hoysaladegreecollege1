@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { X, ExternalLink } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 export default function PopupBanner() {
+  const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -33,7 +35,7 @@ export default function PopupBanner() {
     }
   }, [banners]);
 
-  if (!isOpen || banners.length === 0) return null;
+  if (!isOpen || banners.length === 0 || location.pathname !== "/") return null;
 
   const banner = banners[0];
 
@@ -54,7 +56,7 @@ export default function PopupBanner() {
             {banner.image_url.match(/\.(mp4|webm|mov)$/i) ? (
               <video src={banner.image_url} autoPlay muted loop className="w-full max-h-72 object-cover" />
             ) : (
-              <img src={banner.image_url} alt={banner.title} className="w-full max-h-72 object-cover" />
+              <img src={banner.image_url} alt={banner.title} className="w-full max-h-[70vh] object-contain" />
             )}
           </div>
         )}

@@ -169,7 +169,7 @@ export default function StudentFees() {
       {/* Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         {[
-          { label: summaryFilter === "all" ? "Total Fee" : `Sem ${summaryFilter} Fee`, value: `₹${summaryTotalFee.toLocaleString()}`, icon: IndianRupee, color: "text-foreground", bg: "bg-primary/5" },
+          { label: summaryFilter === "all" ? "Yearly Fee" : `Sem ${summaryFilter} Fee`, value: `₹${summaryTotalFee.toLocaleString()}`, icon: IndianRupee, color: "text-foreground", bg: "bg-primary/5" },
           { label: "Amount Paid", value: `₹${summaryPaid.toLocaleString()}`, icon: CheckCircle, color: "text-emerald-600", bg: "bg-emerald-500/5" },
           { label: "Remaining", value: summaryRemaining > 0 ? `₹${summaryRemaining.toLocaleString()}` : "✓ Cleared", icon: summaryRemaining > 0 ? AlertCircle : CheckCircle, color: summaryRemaining > 0 ? "text-destructive" : "text-emerald-600", bg: summaryRemaining > 0 ? "bg-destructive/5" : "bg-emerald-500/5" },
           { label: "Payments", value: String(summaryPaymentsCount), icon: Receipt, color: "text-primary", bg: "bg-primary/5" },

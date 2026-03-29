@@ -9,9 +9,12 @@ import { Search, Trash2, Edit3, X, Save, Users, Phone, UserPlus, Eye, ArrowLeft,
 import { validatePassword, PASSWORD_REQUIREMENTS } from "@/lib/password-validation";
 import { useAuth } from "@/contexts/AuthContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import AdminAddStaff from "./AdminAddStaff";
 
 export default function AdminUsers() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
@@ -241,11 +244,25 @@ export default function AdminUsers() {
               <p className="font-body text-xs text-muted-foreground">{users.length} registered users</p>
             </div>
           </div>
-          <Button size="sm" onClick={() => setShowAddStudent(true)} className="rounded-xl font-body">
-            <UserPlus className="w-4 h-4 mr-1" /> Add Student
-          </Button>
         </div>
       </div>
+
+      {/* Tabs: User Management + Add Staff */}
+      <Tabs defaultValue="users" className="space-y-5">
+        <TabsList className="w-full justify-start bg-card border border-border rounded-2xl p-1.5 h-auto">
+          <TabsTrigger value="users" className="rounded-xl font-body text-xs font-semibold px-4 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <Users className="w-3.5 h-3.5 mr-1.5" /> User Management
+          </TabsTrigger>
+          <TabsTrigger value="add-staff" className="rounded-xl font-body text-xs font-semibold px-4 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <UserPlus className="w-3.5 h-3.5 mr-1.5" /> Add Staff / Users
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="users" className="space-y-5">
+
+      <Button size="sm" onClick={() => setShowAddStudent(true)} className="rounded-xl font-body">
+            <UserPlus className="w-4 h-4 mr-1" /> Add Student
+          </Button>
 
       {/* Role Filter Tabs */}
       <div className="flex flex-wrap gap-2 bg-card border border-border rounded-2xl p-3">
@@ -428,7 +445,7 @@ export default function AdminUsers() {
                   <div className="col-span-2 border-t border-border pt-3 mt-1">
                     <p className="font-body text-xs font-bold text-primary uppercase tracking-wider mb-2">💰 Fee Information</p>
                     <div className="grid grid-cols-3 gap-2">
-                      <div className="bg-primary/5 rounded-xl p-3 text-center"><p className="font-body text-[10px] text-muted-foreground">Total Fee</p><p className="font-display text-base font-bold text-foreground">₹{(viewUser.student?.total_fee || 0).toLocaleString()}</p></div>
+                      <div className="bg-primary/5 rounded-xl p-3 text-center"><p className="font-body text-[10px] text-muted-foreground">Yearly Fee</p><p className="font-display text-base font-bold text-foreground">₹{(viewUser.student?.total_fee || 0).toLocaleString()}</p></div>
                       <div className="bg-emerald-500/5 rounded-xl p-3 text-center"><p className="font-body text-[10px] text-muted-foreground">Paid</p><p className="font-display text-base font-bold text-emerald-600">₹{(viewUser.student?.fee_paid || 0).toLocaleString()}</p></div>
                       <div className="bg-destructive/5 rounded-xl p-3 text-center"><p className="font-body text-[10px] text-muted-foreground">Due</p><p className="font-display text-base font-bold text-destructive">₹{((viewUser.student?.total_fee || 0) - (viewUser.student?.fee_paid || 0)).toLocaleString()}</p></div>
                     </div>
@@ -544,7 +561,7 @@ export default function AdminUsers() {
                       <select value={editForm.semester} onChange={(e) => setEditForm({ ...editForm, semester: e.target.value })} className="h-9 text-sm rounded-xl border border-input bg-background px-3">
                         {[1,2,3,4,5,6].map(s => <option key={s} value={s}>Sem {s}</option>)}
                       </select>
-                      <Input type="number" value={editForm.total_fee} onChange={(e) => setEditForm({ ...editForm, total_fee: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Total Fee" />
+                      <Input type="number" value={editForm.total_fee} onChange={(e) => setEditForm({ ...editForm, total_fee: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Yearly Fee" />
                       <Input type="number" value={editForm.fee_paid} onChange={(e) => setEditForm({ ...editForm, fee_paid: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Fee Paid" />
                       <Input type="date" value={editForm.fee_due_date} onChange={(e) => setEditForm({ ...editForm, fee_due_date: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Fee Due Date" />
                       <Input value={editForm.fee_remarks} onChange={(e) => setEditForm({ ...editForm, fee_remarks: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Fee Remarks" />
@@ -590,7 +607,7 @@ export default function AdminUsers() {
                     <option value="principal">Principal</option>
                     <option value="admin">Admin</option>
                   </select>
-                  <button onClick={() => setViewUser(u)} className="p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary hover:scale-110 transition-all duration-200" title="View"><Eye className="w-4 h-4" /></button>
+                  <button onClick={() => u.role === "student" ? navigate(`/dashboard/admin/users/${u.user_id}`) : setViewUser(u)} className="p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary hover:scale-110 transition-all duration-200" title="View"><Eye className="w-4 h-4" /></button>
                   <button onClick={() => startEdit(u)} className="p-2 rounded-xl hover:bg-secondary/10 text-muted-foreground hover:text-secondary-foreground hover:scale-110 transition-all duration-200" title="Edit"><Edit3 className="w-4 h-4" /></button>
                   <button onClick={() => { setResetPwUser(u); setNewPassword(""); }}
                     className="p-2 rounded-xl hover:bg-amber-500/10 text-muted-foreground hover:text-amber-600 hover:scale-110 transition-all duration-200" title="Reset Password"><KeyRound className="w-4 h-4" /></button>
@@ -627,6 +644,12 @@ export default function AdminUsers() {
           </form>
         </DialogContent>
       </Dialog>
+        </TabsContent>
+
+        <TabsContent value="add-staff">
+          <AdminAddStaff />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
