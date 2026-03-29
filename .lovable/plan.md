@@ -10,15 +10,15 @@ This plan addresses 8 distinct requests. Here is every change organized by featu
 
 **Changes**:
 
-- **Create `supabase/functions/create-staff/index.ts**`: Similar to `create-student`, accepts role (teacher/principal), email, password, full_name, phone, employee_id, department_id, qualification, experience, subjects. Uses `admin.createUser()` with service role. Waits for `handle_new_user` trigger, then updates `teachers` table with all details. Validates caller is admin.
-- **Add to `supabase/config.toml**`: `[functions.create-staff]` with `verify_jwt = false`
-- **Update `src/pages/dashboard/admin/AdminAddStaff.tsx**`: Replace `signUp` call with `supabase.functions.invoke("create-staff", { body: {...} })` for teacher/principal creation. Keep admin pending request flow as-is.
+- **Create `supabase/functions/create-staff/index.ts**`: Similar to `create-student`, accepts role (teacher/principal), email, password, full_name, phone, employee_id, department_id, qualification, experience, subjects. Uses `admin.createUser()`with service role. Waits for`handle_new_user`trigger, then updates`teachers` table with all details. Validates caller is admin.
+- **Add to `supabase/config.toml**`: `[functions.create-staff]`with`verify_jwt = false`
+- **Update `src/pages/dashboard/admin/AdminAddStaff.tsx**`: Replace `signUp`call with`supabase.functions.invoke("create-staff", { body: {...} })` for teacher/principal creation. Keep admin pending request flow as-is.
 
 ---
 
-## 2. add extra student data fields 
+## 2. add extra student data fields
 
-add this things - in the students' field, add extra details like  [Aadhaar no.](https://uidai.gov.in/en/) , nationality, religion, caste, etc.
+add this things - in the students' field, add extra details like [Aadhaar no.](https://uidai.gov.in/en/) , nationality, religion, caste, etc.
 
 ---
 
@@ -35,7 +35,7 @@ add this things - in the students' field, add extra details like  [Aadhaar no.](
 
 **Changes**:
 
-- **Update `src/components/PopupBanner.tsx**`: 
+- **Update `src/components/PopupBanner.tsx**`:
   - Change image class from `object-cover` to `object-contain` so the full image is visible without cropping.
   - Add route check: only show popup on `/` (home page). Use `useLocation()` from react-router-dom to check `pathname === "/"`.
 - **Update `src/components/Layout.tsx**`: No change needed since PopupBanner will handle its own route check.
@@ -48,7 +48,7 @@ add this things - in the students' field, add extra details like  [Aadhaar no.](
 
 - **Create `src/pages/dashboard/admin/AdminStudentDetail.tsx**`: A new full-page component at route `/dashboard/admin/users/:userId`. Shows all student details similar to the existing dialog view but as a full page, modeled after AdminStudentFeeDetail. Includes personal info, academic info, parent info, fee summary, and the new document upload section (see feature 6).
 - **Update `src/App.tsx**`: Add route `/dashboard/admin/users/:userId` with AdminRoute wrapper.
-- **Update `src/pages/dashboard/admin/AdminUsers.tsx**`: Change the Eye button for students to navigate via `<Link>` to `/dashboard/admin/users/${u.user_id}` instead of opening the dialog. Keep dialog for non-student roles.
+- **Update `src/pages/dashboard/admin/AdminUsers.tsx**`: Change the Eye button for students to navigate via `<Link>`to`/dashboard/admin/users/${u.user_id}` instead of opening the dialog. Keep dialog for non-student roles.
 
 ---
 
@@ -70,7 +70,7 @@ add this things - in the students' field, add extra details like  [Aadhaar no.](
 - **Update `src/pages/dashboard/admin/AdminUsers.tsx**`: Change fee labels in edit form and view dialog from "Total Fee" to "Yearly Fee".
 - **Update `src/pages/dashboard/admin/AdminFeeManagement.tsx**`: Update fee-related labels.
 - **Update `src/pages/dashboard/student/StudentFees.tsx**`: Update student-facing fee labels.
-- **Update `supabase/functions/chat/index.ts**`: Update the system prompt to clarify fees are yearly fees (e.g., "Total Fee: ₹80,000" becomes "Yearly Fee: ₹26,667/year" or clarify that the listed fees are per year).
+- **Update `supabase/functions/chat/index.ts**`: Update the system prompt to clarify fees are yearly fees (e.g., "Total Fee: ₹80,000" becomes "Yearly Fee: ₹80,000/year" or clarify that the listed fees are per year).
 
 ---
 
@@ -90,7 +90,6 @@ add this things - in the students' field, add extra details like  [Aadhaar no.](
 
 ## Technical Summary
 
-
 | Feature                 | Files Created                              | Files Modified                              |
 | ----------------------- | ------------------------------------------ | ------------------------------------------- |
 | Teacher edge function   | `supabase/functions/create-staff/index.ts` | `AdminAddStaff.tsx`, `config.toml`          |
@@ -101,7 +100,6 @@ add this things - in the students' field, add extra details like  [Aadhaar no.](
 | Document upload         | —                                          | `AdminStudentDetail.tsx`, migration         |
 | Yearly fee labels       | —                                          | Multiple fee pages, `chat/index.ts`         |
 | Security hardening      | —                                          | `index.html`, `vercel.json`, edge functions |
-
 
 **Database migrations needed**:
 

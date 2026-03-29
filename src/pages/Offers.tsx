@@ -5,8 +5,9 @@ import SEOHead from "@/components/SEOHead";
 const offers = [
   {
     title: "BCA – Industry Aligned Courses",
-    description: "Bachelor of Computer Applications with placement readiness, data analytics, and career development modules.",
-    fee: "₹80,000/-",
+    description:
+      "Bachelor of Computer Applications with placement readiness, data analytics, and career development modules.",
+    fee: "₹80,000/yr",
     icon: GraduationCap,
     pdf: "/downloads/BCA.pdf",
     color: "from-blue-500/20 to-cyan-500/20",
@@ -15,7 +16,8 @@ const offers = [
   },
   {
     title: "BBA – Industry Aligned Courses",
-    description: "Bachelor of Business Administration with placement readiness, data analytics, and career development focus.",
+    description:
+      "Bachelor of Business Administration with placement readiness, data analytics, and career development focus.",
     fee: "₹70,000/-",
     icon: Briefcase,
     pdf: "/downloads/BBA.pdf",
@@ -25,7 +27,8 @@ const offers = [
   },
   {
     title: "B.Com – Industry Aligned Courses",
-    description: "Bachelor of Commerce with industry-aligned semester-wise curriculum, placement training, and data analytics.",
+    description:
+      "Bachelor of Commerce with industry-aligned semester-wise curriculum, placement training, and data analytics.",
     fee: "₹60,000/-",
     icon: BookOpen,
     pdf: "/downloads/BCOM.pdf",
@@ -40,7 +43,10 @@ export default function Offers() {
 
   return (
     <>
-      <SEOHead title="Offers | Hoysala Degree College" description="Explore industry-aligned course offerings at Hoysala Degree College – BCA, BBA, B.Com with placement support." />
+      <SEOHead
+        title="Offers | Hoysala Degree College"
+        description="Explore industry-aligned course offerings at Hoysala Degree College – BCA, BBA, B.Com with placement support."
+      />
 
       {/* PDF Preview Modal */}
       {previewPdf && (
@@ -48,10 +54,17 @@ export default function Offers() {
           <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={() => setPreviewPdf(null)} />
           <div className="relative w-full max-w-5xl h-[85vh] rounded-3xl overflow-hidden border border-border/40 shadow-2xl bg-card animate-in zoom-in-95 duration-300">
             <div className="absolute top-4 right-4 z-10 flex gap-2">
-              <a href={previewPdf} download className="px-4 py-2 rounded-xl bg-primary/20 text-primary text-sm font-medium hover:bg-primary/30 transition-all duration-300 flex items-center gap-2 backdrop-blur-sm border border-primary/20">
+              <a
+                href={previewPdf}
+                download
+                className="px-4 py-2 rounded-xl bg-primary/20 text-primary text-sm font-medium hover:bg-primary/30 transition-all duration-300 flex items-center gap-2 backdrop-blur-sm border border-primary/20"
+              >
                 <Download className="w-4 h-4" /> Download
               </a>
-              <button onClick={() => setPreviewPdf(null)} className="w-10 h-10 rounded-xl bg-card/80 backdrop-blur-sm border border-border/40 text-foreground/70 hover:text-foreground hover:bg-card transition-all duration-300 flex items-center justify-center text-lg font-medium">
+              <button
+                onClick={() => setPreviewPdf(null)}
+                className="w-10 h-10 rounded-xl bg-card/80 backdrop-blur-sm border border-border/40 text-foreground/70 hover:text-foreground hover:bg-card transition-all duration-300 flex items-center justify-center text-lg font-medium"
+              >
                 ✕
               </button>
             </div>
@@ -72,7 +85,8 @@ export default function Offers() {
               Our <span className="text-primary">Offers</span>
             </h1>
             <p className="text-muted-foreground max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
-              Explore our industry-aligned degree programs designed to prepare you for a successful career. Click on any course to view the detailed brochure.
+              Explore our industry-aligned degree programs designed to prepare you for a successful career. Click on any
+              course to view the detailed brochure.
             </p>
           </div>
 
@@ -86,13 +100,17 @@ export default function Offers() {
                   className={`group relative rounded-3xl border ${offer.border} bg-card/60 backdrop-blur-sm p-6 sm:p-8 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover:border-primary/30 overflow-hidden`}
                 >
                   {/* Gradient overlay */}
-                  <div className={`absolute inset-0 bg-gradient-to-br ${offer.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl`} />
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${offer.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl`}
+                  />
                   {/* Shimmer */}
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
 
                   <div className="relative z-10">
                     {/* Icon */}
-                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${offer.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500`}>
+                    <div
+                      className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${offer.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500`}
+                    >
                       <Icon className={`w-7 h-7 ${offer.iconColor}`} strokeWidth={1.5} />
                     </div>
 
@@ -100,9 +118,7 @@ export default function Offers() {
                     <h3 className="font-display text-lg sm:text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors duration-300">
                       {offer.title}
                     </h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                      {offer.description}
-                    </p>
+                    <p className="text-muted-foreground text-sm leading-relaxed mb-4">{offer.description}</p>
 
                     {/* Fee Badge */}
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 border border-primary/20 mb-6">
@@ -113,7 +129,7 @@ export default function Offers() {
                     {/* Actions */}
                     <div className="flex gap-3">
                       <button
-                        onClick={() => window.open(offer.pdf, '_blank', 'noopener,noreferrer')}
+                        onClick={() => window.open(offer.pdf, "_blank", "noopener,noreferrer")}
                         className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-primary/10 hover:bg-primary/20 text-primary text-sm font-semibold transition-all duration-300 border border-primary/20 hover:border-primary/30 active:scale-[0.97]"
                       >
                         <Eye className="w-4 h-4" /> View
