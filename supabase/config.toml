@@ -38,3 +38,6 @@ verify_jwt = false
 
 [functions.create-student]
 verify_jwt = false
+
+[functions.create-staff]
+verify_jwt = false

@@ -73,40 +73,44 @@ export default function AdminAddStaff() {
         return "admin_pending";
       }
 
-      // For approved admin or teacher/principal, create the account
+      // For approved admin or teacher/principal, create the account via edge function
       const pwCheck = validatePassword(form.password);
       if (!pwCheck.valid) throw new Error(pwCheck.message);
 
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: form.email,
-        password: form.password,
-        options: {
-          data: { full_name: form.full_name, role: selectedRole },
-          emailRedirectTo: window.location.origin,
-        },
-      });
-      if (authError) throw authError;
-      if (!authData.user) throw new Error("Failed to create user");
-
-      // Wait for trigger to create profile & role records
-      await new Promise((r) => setTimeout(r, 2500));
-
-      // Update profile phone
-      if (form.phone) {
-        await supabase.from("profiles").update({ phone: form.phone }).eq("user_id", authData.user.id);
-      }
-
-      // For teachers, update teacher record with extra info
-      if (selectedRole === "teacher") {
-        const updateData: any = {};
-        if (form.department_id) updateData.department_id = form.department_id;
-        if (form.employee_id) updateData.employee_id = form.employee_id;
-        if (form.qualification) updateData.qualification = form.qualification;
-        if (form.experience) updateData.experience = form.experience;
-        if (form.subjects) updateData.subjects = form.subjects.split(",").map((s) => s.trim()).filter(Boolean);
-        if (Object.keys(updateData).length > 0) {
-          await supabase.from("teachers").update(updateData).eq("user_id", authData.user.id);
+      if (selectedRole === "admin" && isApproved) {
+        // Admin creation still uses signUp since handle_new_user handles it
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: form.email,
+          password: form.password,
+          options: {
+            data: { full_name: form.full_name, role: "admin" },
+            emailRedirectTo: window.location.origin,
+          },
+        });
+        if (authError) throw authError;
+        if (!authData.user) throw new Error("Failed to create user");
+        await new Promise((r) => setTimeout(r, 2500));
+        if (form.phone) {
+          await supabase.from("profiles").update({ phone: form.phone }).eq("user_id", authData.user.id);
         }
+      } else {
+        // Teacher/Principal creation via edge function (preserves admin session)
+        const { data, error } = await supabase.functions.invoke("create-staff", {
+          body: {
+            role: selectedRole,
+            email: form.email,
+            password: form.password,
+            full_name: form.full_name,
+            phone: form.phone,
+            employee_id: form.employee_id || undefined,
+            department_id: form.department_id || undefined,
+            qualification: form.qualification || undefined,
+            experience: form.experience || undefined,
+            subjects: form.subjects || undefined,
+          },
+        });
+        if (error) throw new Error(error.message || "Failed to create staff");
+        if (data?.error) throw new Error(data.error);
       }
       return "created";
     },

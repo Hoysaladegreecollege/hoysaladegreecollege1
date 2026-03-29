@@ -56,7 +56,7 @@ export default function PopupBanner() {
             {banner.image_url.match(/\.(mp4|webm|mov)$/i) ? (
               <video src={banner.image_url} autoPlay muted loop className="w-full max-h-72 object-cover" />
             ) : (
-              <img src={banner.image_url} alt={banner.title} className="w-full max-h-72 object-cover" />
+              <img src={banner.image_url} alt={banner.title} className="w-full max-h-[70vh] object-contain" />
             )}
           </div>
         )}
