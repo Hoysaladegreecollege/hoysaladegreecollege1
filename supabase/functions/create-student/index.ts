@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
     if (callerRole?.role !== "admin") throw new Error("Only admin can create students");
 
     const body = await req.json();
-    const { email, password, full_name, phone, date_of_birth, roll_number, course_id, year_level, semester, admission_year, father_name, mother_name, parent_phone, address } = body;
+    const { email, password, full_name, phone, date_of_birth, roll_number, course_id, year_level, semester, admission_year, father_name, mother_name, parent_phone, address, aadhaar_number, nationality, religion, caste, category, blood_group, gender } = body;
 
     if (!email || !password || !full_name) throw new Error("Email, password, and full name are required");
 
