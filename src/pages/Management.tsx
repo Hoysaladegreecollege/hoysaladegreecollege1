@@ -4,23 +4,30 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { Crown, Shield, BookOpen, GraduationCap, Building2, Landmark } from "lucide-react";
 import { LucideIcon } from "lucide-react";
 
+import ramakrishnappaImg from "@/assets/management/ramakrishnappa.jpeg";
+import gopalImg from "@/assets/management/gopal.jpeg";
+import sureshImg from "@/assets/management/suresh.jpeg";
+import jyothiImg from "@/assets/management/jyothi.jpeg";
+import gowrishankarImg from "@/assets/management/gowrishankar.jpeg";
+import annapurnaImg from "@/assets/management/annapurna.jpeg";
+
 interface Member {
   name: string;
   qualification: string;
   role: string;
-  emoji: string;
+  photo: string;
   icon: LucideIcon;
   accent: string;
   isTop?: boolean;
 }
 
 const committee: Member[] = [
-  { name: "Dr. Ramakrishnappa T", qualification: "M.Sc, Ph.D, Post Doc.", role: "President", emoji: "👔", icon: Crown, accent: "45 80% 55%", isTop: true },
-  { name: "Sri Suresh B.V", qualification: "", role: "Treasurer", emoji: "💰", icon: Shield, accent: "160 60% 45%" },
-  { name: "Smt Jyothi N", qualification: "", role: "Secretary", emoji: "📋", icon: BookOpen, accent: "280 60% 55%" },
-  { name: "Prof. Gowrishankar K.V", qualification: "M.Sc, Trustee – Principal of Hoysala PU College", role: "Trustee", emoji: "🏛️", icon: Landmark, accent: "200 70% 50%" },
-  { name: "Sri Gopal H.R", qualification: "M.Sc, M.Ed, TET, KSET, Ph.D – Principal of Hoysala Degree College", role: "Principal", emoji: "🎓", icon: GraduationCap, accent: "340 65% 55%", isTop: true },
-  { name: "Smt Annapurna T", qualification: "MA, B.Ed", role: "Trustee", emoji: "🏛️", icon: Building2, accent: "25 70% 50%" },
+  { name: "Dr. Ramakrishnappa T", qualification: "M.Sc, Ph.D, Post Doc.", role: "President", photo: ramakrishnappaImg, icon: Crown, accent: "45 80% 55%", isTop: true },
+  { name: "Sri Suresh B.V", qualification: "", role: "Treasurer", photo: sureshImg, icon: Shield, accent: "160 60% 45%" },
+  { name: "Smt Jyothi N", qualification: "", role: "Secretary", photo: jyothiImg, icon: BookOpen, accent: "280 60% 55%" },
+  { name: "Prof. Gowrishankar K.V", qualification: "M.Sc, Trustee – Principal of Hoysala PU College", role: "Trustee", photo: gowrishankarImg, icon: Landmark, accent: "200 70% 50%" },
+  { name: "Sri Gopal H.R", qualification: "M.Sc, M.Ed, TET, KSET, Ph.D – Principal of Hoysala Degree College", role: "Principal", photo: gopalImg, icon: GraduationCap, accent: "340 65% 55%", isTop: true },
+  { name: "Smt Annapurna T", qualification: "MA, B.Ed", role: "Trustee", photo: annapurnaImg, icon: Building2, accent: "25 70% 50%" },
 ];
 
 const topMembers = committee.filter(m => m.isTop);
