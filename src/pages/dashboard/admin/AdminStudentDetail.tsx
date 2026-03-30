@@ -123,12 +123,22 @@ export default function AdminStudentDetail() {
         date_of_birth: form.date_of_birth || null,
         father_name: form.father_name || "",
         mother_name: form.mother_name || "",
-        roll_number: form.roll_number || "",
         semester: parseInt(form.semester) || 1,
         year_level: parseInt(form.year_level) || 1,
         admission_year: parseInt(form.admission_year) || null,
         course_id: form.course_id || null,
+        gender: form.gender || "",
+        aadhaar_number: form.aadhaar_number || "",
+        nationality: form.nationality || "",
+        religion: form.religion || "",
+        caste: form.caste || "",
+        category: form.category || "",
+        blood_group: form.blood_group || "",
       };
+      // Only update roll_number if it changed to avoid unique constraint errors
+      if (form.roll_number && form.roll_number !== student?.roll_number) {
+        studentUpdate.roll_number = form.roll_number;
+      }
       const { error: studentError } = await supabase.from("students").update(studentUpdate).eq("user_id", userId!);
       if (studentError) throw studentError;
     },
