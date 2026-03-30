@@ -46,7 +46,20 @@ serve(async (req) => {
       });
     }
 
-    const { studentEmail, studentName, rollNumber, courseName, dueAmount, dueDate, message } = await req.json();
+    // HTML escape helper to prevent injection in email templates
+    function escapeHtml(str: string): string {
+      if (!str) return "";
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
+    const body = await req.json();
+    const studentEmail = body.studentEmail;
+    const studentName = escapeHtml(body.studentName || "");
+    const rollNumber = escapeHtml(body.rollNumber || "");
+    const courseName = escapeHtml(body.courseName || "");
+    const dueAmount = body.dueAmount;
+    const dueDate = escapeHtml(body.dueDate || "");
+    const message = escapeHtml(body.message || "");
 
     if (!studentEmail || !studentName) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {

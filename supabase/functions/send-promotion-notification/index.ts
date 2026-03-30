@@ -70,10 +70,17 @@ Deno.serve(async (req) => {
         });
       }
 
+      // HTML escape helper
+      function escapeHtml(str: string): string {
+        if (!str) return "";
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+      }
+
       let notified = 0;
       for (const student of students) {
         const profile = profiles?.find(p => p.user_id === student.user_id);
         if (!profile?.email) continue;
+        const safeName = escapeHtml(profile.full_name || "Student");
 
         try {
           await fetch("https://api.resend.com/emails", {
