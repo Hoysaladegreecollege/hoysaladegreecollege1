@@ -47,6 +47,13 @@ export type Database = {
             foreignKeyName: "absent_notes_student_id_fkey"
             columns: ["student_id"]
             isOneToOne: false
+            referencedRelation: "student_peers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "absent_notes_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
             referencedRelation: "students"
             referencedColumns: ["id"]
           },
@@ -322,6 +329,13 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "student_peers"
             referencedColumns: ["id"]
           },
           {
@@ -717,6 +731,13 @@ export type Database = {
             foreignKeyName: "fee_payments_student_id_fkey"
             columns: ["student_id"]
             isOneToOne: false
+            referencedRelation: "student_peers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fee_payments_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
             referencedRelation: "students"
             referencedColumns: ["id"]
           },
@@ -891,6 +912,13 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "marks_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "student_peers"
             referencedColumns: ["id"]
           },
           {
@@ -1220,6 +1248,13 @@ export type Database = {
             foreignKeyName: "semester_fees_student_id_fkey"
             columns: ["student_id"]
             isOneToOne: false
+            referencedRelation: "student_peers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "semester_fees_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
             referencedRelation: "students"
             referencedColumns: ["id"]
           },
@@ -1254,6 +1289,13 @@ export type Database = {
           uploaded_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "student_documents_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "student_peers"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "student_documents_student_id_fkey"
             columns: ["student_id"]
@@ -1562,7 +1604,28 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      student_peers: {
+        Row: {
+          avatar_url: string | null
+          course_id: string | null
+          full_name: string | null
+          id: string | null
+          is_active: boolean | null
+          roll_number: string | null
+          semester: number | null
+          user_id: string | null
+          year_level: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "students_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       get_application_status: {
