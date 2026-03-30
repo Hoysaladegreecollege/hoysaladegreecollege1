@@ -52,6 +52,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const userProfile = await fetchProfile(session.user.id);
             setProfile(userProfile);
 
+            // AndroidBridge: notify Android app of logged-in user
+            if ((window as any).AndroidBridge && session.user.email) {
+              try { (window as any).AndroidBridge.onStudentLoggedIn(session.user.email); } catch {}
+            }
+
             // Consume pending student registration info from localStorage
             const pendingRaw = localStorage.getItem("hdc_pending_student_info");
             if (pendingRaw && userRole === "student") {
