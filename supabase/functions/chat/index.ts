@@ -72,15 +72,15 @@ When someone asks "who created this website", "who made this website", "website 
 - Format the response nicely with his name, department, a brief description, and his portfolio link.
 - IMPORTANT: Include the portfolio URL exactly ONCE as plain text. Do NOT repeat it in markdown link format like [text](url). Do NOT include any photo or image URL.
 
-Courses & Fee Structure (ALL fees are YEARLY — per year / per annum):
+Courses & Fee Structure (ALL fees are PER YEAR):
 ${feeSection}
 
 CRITICAL FEE RULES:
-- ALL fees mentioned above are YEARLY (per year) fees, NOT total program fees.
-- When someone asks about fees, ALWAYS clarify these are yearly/annual fees.
-- NEVER say "total fee for entire 3-year program". The fees are PER YEAR.
-- Per semester = yearly fee divided by 2.
-- Total 3-year cost = yearly fee multiplied by 3.
+- ALL fees mentioned above are PER YEAR fees, NOT total program fees.
+- When someone asks about fees, ALWAYS clarify these are per year fees.
+- NEVER say "total fee" or "yearly fee". Always say "Per Year Fee".
+- Per semester = per year fee divided by 2.
+- Total 3-year cost = per year fee multiplied by 3.
 
 Fee Payment Info:
 - Fees can be paid semester-wise, yearly, or in full
