@@ -162,6 +162,13 @@ export default function AdminUsers() {
           mother_name: newStudent.mother_name,
           parent_phone: newStudent.parent_phone,
           address: newStudent.address,
+          aadhaar_number: newStudent.aadhaar_number,
+          nationality: newStudent.nationality,
+          religion: newStudent.religion,
+          caste: newStudent.caste,
+          category: newStudent.category,
+          blood_group: newStudent.blood_group,
+          gender: newStudent.gender,
         },
       });
       if (error) throw new Error(error.message || "Failed to create student");
