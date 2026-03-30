@@ -134,6 +134,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
+    // AndroidBridge: notify Android app of logout
+    if ((window as any).AndroidBridge) {
+      try { (window as any).AndroidBridge.onStudentLoggedOut(); } catch {}
+    }
     localStorage.removeItem("hdc_remember");
     sessionStorage.removeItem("hdc_remember");
     await supabase.auth.signOut();
