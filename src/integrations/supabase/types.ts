@@ -47,13 +47,6 @@ export type Database = {
             foreignKeyName: "absent_notes_student_id_fkey"
             columns: ["student_id"]
             isOneToOne: false
-            referencedRelation: "student_peers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "absent_notes_student_id_fkey"
-            columns: ["student_id"]
-            isOneToOne: false
             referencedRelation: "students"
             referencedColumns: ["id"]
           },
@@ -329,13 +322,6 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "courses"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "attendance_student_id_fkey"
-            columns: ["student_id"]
-            isOneToOne: false
-            referencedRelation: "student_peers"
             referencedColumns: ["id"]
           },
           {
@@ -731,13 +717,6 @@ export type Database = {
             foreignKeyName: "fee_payments_student_id_fkey"
             columns: ["student_id"]
             isOneToOne: false
-            referencedRelation: "student_peers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fee_payments_student_id_fkey"
-            columns: ["student_id"]
-            isOneToOne: false
             referencedRelation: "students"
             referencedColumns: ["id"]
           },
@@ -912,13 +891,6 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "courses"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "marks_student_id_fkey"
-            columns: ["student_id"]
-            isOneToOne: false
-            referencedRelation: "student_peers"
             referencedColumns: ["id"]
           },
           {
@@ -1248,13 +1220,6 @@ export type Database = {
             foreignKeyName: "semester_fees_student_id_fkey"
             columns: ["student_id"]
             isOneToOne: false
-            referencedRelation: "student_peers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "semester_fees_student_id_fkey"
-            columns: ["student_id"]
-            isOneToOne: false
             referencedRelation: "students"
             referencedColumns: ["id"]
           },
@@ -1289,13 +1254,6 @@ export type Database = {
           uploaded_by?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "student_documents_student_id_fkey"
-            columns: ["student_id"]
-            isOneToOne: false
-            referencedRelation: "student_peers"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "student_documents_student_id_fkey"
             columns: ["student_id"]
@@ -1604,28 +1562,7 @@ export type Database = {
       }
     }
     Views: {
-      student_peers: {
-        Row: {
-          avatar_url: string | null
-          course_id: string | null
-          full_name: string | null
-          id: string | null
-          is_active: boolean | null
-          roll_number: string | null
-          semester: number | null
-          user_id: string | null
-          year_level: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "students_course_id_fkey"
-            columns: ["course_id"]
-            isOneToOne: false
-            referencedRelation: "courses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
       get_application_status: {
@@ -1656,6 +1593,20 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      get_student_peers: {
+        Args: { _user_id: string }
+        Returns: {
+          avatar_url: string
+          course_id: string
+          email: string
+          full_name: string
+          id: string
+          roll_number: string
+          semester: number
+          user_id: string
+          year_level: number
+        }[]
       }
       get_user_role: {
         Args: { _user_id: string }
