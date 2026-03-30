@@ -221,13 +221,13 @@ export default function AdminStudentDetail() {
   const feeRemaining = Math.max(0, totalFee - feePaid);
   const pct = totalFee > 0 ? Math.round((feePaid / totalFee) * 100) : 0;
 
-  const EditField = ({ label, fieldKey, type = "text", options }: { label: string; fieldKey: string; type?: string; options?: { value: string; label: string }[] }) => (
+  const renderEditField = (label: string, fieldKey: string, type = "text", options?: { value: string; label: string }[]) => (
     <div className="bg-muted/30 rounded-xl p-3.5">
       <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider mb-1.5">{label}</p>
       {options ? (
         <select
           value={editForm[fieldKey] || ""}
-          onChange={(e) => setEditForm({ ...editForm, [fieldKey]: e.target.value })}
+          onChange={(e) => setEditForm(prev => ({ ...prev, [fieldKey]: e.target.value }))}
           className="w-full h-8 text-sm rounded-lg border border-input bg-background px-2 font-body"
         >
           <option value="">Select...</option>
@@ -237,7 +237,7 @@ export default function AdminStudentDetail() {
         <Input
           type={type}
           value={editForm[fieldKey] || ""}
-          onChange={(e) => setEditForm({ ...editForm, [fieldKey]: e.target.value })}
+          onChange={(e) => setEditForm(prev => ({ ...prev, [fieldKey]: e.target.value }))}
           className="h-8 text-sm rounded-lg"
         />
       )}
@@ -328,25 +328,25 @@ export default function AdminStudentDetail() {
         </h3>
         {editing ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            <EditField label="Full Name" fieldKey="full_name" />
-            <EditField label="Phone" fieldKey="phone" type="tel" />
-            <EditField label="Date of Birth" fieldKey="date_of_birth" type="date" />
-            <EditField label="Gender" fieldKey="gender" options={[
+            {renderEditField("Full Name", "full_name")}
+            {renderEditField("Phone", "phone", "tel")}
+            {renderEditField("Date of Birth", "date_of_birth", "date")}
+            {renderEditField("Gender", "gender", "text", [
               { value: "Male", label: "Male" }, { value: "Female", label: "Female" }, { value: "Other", label: "Other" },
-            ]} />
-            <EditField label="Aadhaar No." fieldKey="aadhaar_number" />
-            <EditField label="Nationality" fieldKey="nationality" />
-            <EditField label="Religion" fieldKey="religion" />
-            <EditField label="Caste" fieldKey="caste" />
-            <EditField label="Category" fieldKey="category" options={[
+            ])}
+            {renderEditField("Aadhaar No.", "aadhaar_number")}
+            {renderEditField("Nationality", "nationality")}
+            {renderEditField("Religion", "religion")}
+            {renderEditField("Caste", "caste")}
+            {renderEditField("Category", "category", "text", [
               { value: "General", label: "General" }, { value: "OBC", label: "OBC" }, { value: "SC", label: "SC" }, { value: "ST", label: "ST" },
-            ]} />
-            <EditField label="Blood Group" fieldKey="blood_group" options={[
+            ])}
+            {renderEditField("Blood Group", "blood_group", "text", [
               { value: "A+", label: "A+" }, { value: "A-", label: "A-" }, { value: "B+", label: "B+" }, { value: "B-", label: "B-" },
               { value: "O+", label: "O+" }, { value: "O-", label: "O-" }, { value: "AB+", label: "AB+" }, { value: "AB-", label: "AB-" },
-            ]} />
+            ])}
             <div className="col-span-2">
-              <EditField label="Address" fieldKey="address" />
+              {renderEditField("Address", "address")}
             </div>
           </div>
         ) : (
@@ -374,11 +374,11 @@ export default function AdminStudentDetail() {
         </h3>
         {editing ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            <EditField label="Course" fieldKey="course_id" options={courses.map((c: any) => ({ value: c.id, label: `${c.name} (${c.code})` }))} />
-            <EditField label="Roll Number" fieldKey="roll_number" />
-            <EditField label="Semester" fieldKey="semester" type="number" />
-            <EditField label="Year Level" fieldKey="year_level" type="number" />
-            <EditField label="Admission Year" fieldKey="admission_year" type="number" />
+            {renderEditField("Course", "course_id", "text", courses.map((c: any) => ({ value: c.id, label: `${c.name} (${c.code})` })))}
+            {renderEditField("Roll Number", "roll_number")}
+            {renderEditField("Semester", "semester", "number")}
+            {renderEditField("Year Level", "year_level", "number")}
+            {renderEditField("Admission Year", "admission_year", "number")}
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -399,9 +399,9 @@ export default function AdminStudentDetail() {
         </h3>
         {editing ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            <EditField label="Father's Name" fieldKey="father_name" />
-            <EditField label="Mother's Name" fieldKey="mother_name" />
-            <EditField label="Parent Phone" fieldKey="parent_phone" type="tel" />
+            {renderEditField("Father's Name", "father_name")}
+            {renderEditField("Mother's Name", "mother_name")}
+            {renderEditField("Parent Phone", "parent_phone", "tel")}
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
