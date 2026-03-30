@@ -399,9 +399,9 @@ export default function AdminStudentDetail() {
         </h3>
         {editing ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            <EditField label="Father's Name" fieldKey="father_name" />
-            <EditField label="Mother's Name" fieldKey="mother_name" />
-            <EditField label="Parent Phone" fieldKey="parent_phone" type="tel" />
+            {renderEditField("Father's Name", "father_name")}
+            {renderEditField("Mother's Name", "mother_name")}
+            {renderEditField("Parent Phone", "parent_phone", "tel")}
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
