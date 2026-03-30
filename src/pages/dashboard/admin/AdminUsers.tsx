@@ -35,6 +35,8 @@ export default function AdminUsers() {
     academic_year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`,
     admission_year: new Date().getFullYear().toString(),
     father_name: "", mother_name: "", parent_phone: "", address: "",
+    aadhaar_number: "", nationality: "Indian", religion: "", caste: "",
+    category: "", blood_group: "", gender: "",
   });
 
   const { data: users = [], isLoading } = useQuery({
