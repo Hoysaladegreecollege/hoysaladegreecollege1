@@ -7,8 +7,9 @@ import { toast } from "sonner";
 import {
   ArrowLeft, User, BookOpen, Phone, Mail, MapPin, Calendar, GraduationCap,
   Upload, Download, Trash2, FileText, IndianRupee, CheckCircle, AlertCircle, Eye,
-  Edit3, Save, X
+  Edit3, Save, X, Award
 } from "lucide-react";
+import { generateStudyCertificate } from "@/lib/generate-study-certificate";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -291,6 +292,26 @@ export default function AdminStudentDetail() {
                 </Button>
               </>
             )}
+            <Button size="sm" variant="outline" className="rounded-xl font-body text-xs" onClick={() => {
+              const currentYear = new Date().getFullYear();
+              const academicYear = `${currentYear - 1}-${String(currentYear).slice(2)}`;
+              generateStudyCertificate({
+                fullName: student.profile?.full_name || "",
+                fatherName: student.father_name || "",
+                courseName: student.courses?.name || "",
+                semester: student.semester || 1,
+                rollNumber: student.roll_number || "",
+                gender: (student as any).gender || "",
+                aadhaarNumber: (student as any).aadhaar_number || "",
+                dateOfBirth: student.date_of_birth || "",
+                nationality: (student as any).nationality || "",
+                caste: (student as any).caste || "",
+                category: (student as any).category || "",
+                academicYear,
+              });
+            }}>
+              <Award className="w-3.5 h-3.5 mr-1" /> Study Certificate
+            </Button>
             <Link to={`/dashboard/admin/fees/${student.id}`}>
               <Button size="sm" variant="outline" className="rounded-xl font-body text-xs">
                 <IndianRupee className="w-3.5 h-3.5 mr-1" /> Fee Report
