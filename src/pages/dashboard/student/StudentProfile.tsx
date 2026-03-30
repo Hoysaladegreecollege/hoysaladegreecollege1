@@ -210,7 +210,7 @@ export default function StudentProfile() {
     { icon: Calendar, label: "Admission Year", value: student?.admission_year },
     { icon: Calendar, label: "Date of Birth", value: student?.date_of_birth, editKey: "date_of_birth", type: "date" },
     { icon: Phone, label: "Phone", value: (student as any)?.phone || profile?.phone || "-", editKey: "phone" },
-    { icon: Phone, label: "Parent Phone", value: student?.parent_phone || "-", editKey: "parent_phone" },
+    { icon: Phone, label: "Parent Phone", value: student?.parent_phone || "-" },
     { icon: User, label: "Father's Name", value: student?.father_name || "-", editKey: "father_name" },
     { icon: User, label: "Mother's Name", value: student?.mother_name || "-", editKey: "mother_name" },
     { icon: MapPin, label: "Address", value: student?.address || "-", editKey: "address" },
