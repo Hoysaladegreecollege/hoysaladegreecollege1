@@ -135,10 +135,28 @@ export default function AdminStudentDetail() {
         category: form.category || "",
         blood_group: form.blood_group || "",
       };
-      // Only update roll_number if it changed to avoid unique constraint errors
-      if (form.roll_number && form.roll_number !== student?.roll_number) {
-        studentUpdate.roll_number = form.roll_number;
+
+      const nextRoll = (form.roll_number || "").trim();
+      const currentRoll = (student?.roll_number || "").trim();
+      const rollChanged = nextRoll.length > 0 && nextRoll !== currentRoll;
+
+      // Only update roll_number when changed, and ensure it's unique first
+      if (rollChanged) {
+        const { data: existingRoll, error: rollCheckError } = await supabase
+          .from("students")
+          .select("id")
+          .eq("roll_number", nextRoll)
+          .neq("user_id", userId!)
+          .limit(1);
+
+        if (rollCheckError) throw rollCheckError;
+        if (existingRoll && existingRoll.length > 0) {
+          throw new Error(`Roll number \"${nextRoll}\" already exists. Please use a unique roll number.`);
+        }
+
+        studentUpdate.roll_number = nextRoll;
       }
+
       const { error: studentError } = await supabase.from("students").update(studentUpdate).eq("user_id", userId!);
       if (studentError) throw studentError;
     },
@@ -147,7 +165,14 @@ export default function AdminStudentDetail() {
       qc.invalidateQueries({ queryKey: ["admin-student-detail", userId] });
       setEditing(false);
     },
-    onError: (e: any) => toast.error("Update failed: " + e.message),
+    onError: (e: any) => {
+      const msg = typeof e?.message === "string" ? e.message : "Update failed";
+      if (msg.includes("students_roll_number_key") || msg.includes("duplicate key value")) {
+        toast.error("Roll number already exists. Keep the current roll number or enter a unique one.");
+        return;
+      }
+      toast.error("Update failed: " + msg);
+    },
   });
 
   const uploadDocument = async (docType: string, file: File) => {
