@@ -318,6 +318,7 @@ export default function StudentProfile() {
             </div>
           ))}
         </div>
+      </div>
 
       {/* Documents Section */}
       <div className="relative overflow-hidden bg-card border border-border/40 rounded-3xl p-6 sm:p-8">
