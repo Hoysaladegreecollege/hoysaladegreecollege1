@@ -435,7 +435,7 @@ export default function AdminFeeManagement() {
       const due = (s.total_fee || 0) - (s.fee_paid || 0);
       return [s.profile?.full_name || "", s.roll_number, s.courses?.name || "", s.semester, s.total_fee || 0, s.fee_paid || 0, due, s.fee_due_date || "", s.profile?.phone || "", s.fee_remarks || ""].map(v => `"${v}"`).join(",");
     });
-    const header = "Name,Roll No,Course,Semester,Total Fee,Fee Paid,Fee Due,Due Date,Phone,Remarks";
+    const header = "Name,Roll No,Course,Semester,Yearly Fee,Fee Paid,Fee Due,Due Date,Phone,Remarks";
     const csv = [header, ...rows].join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `fee_report_${new Date().toISOString().split("T")[0]}.csv`; a.click();
