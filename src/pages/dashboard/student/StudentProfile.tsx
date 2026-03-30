@@ -1,7 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { User, Phone, MapPin, Calendar, BookOpen, Hash, Camera, Upload, Sparkles, Shield, Fingerprint, Trash2, Edit3, Save, X } from "lucide-react";
+import { User, Phone, MapPin, Calendar, BookOpen, Hash, Camera, Upload, Sparkles, Shield, Fingerprint, Trash2, Edit3, Save, X, FileText, Download } from "lucide-react";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
