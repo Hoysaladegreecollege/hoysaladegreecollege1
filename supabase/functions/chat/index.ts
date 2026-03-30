@@ -30,13 +30,13 @@ function buildSystemPrompt(courseFeeData: any[]): string {
       const fee = c.fee ? c.fee.replace(/[^0-9]/g, "") : "";
       const yearlyFee = fee ? parseInt(fee) : 0;
       const semesterFee = yearlyFee ? Math.round(yearlyFee / 2) : 0;
-      return `- ${c.name} (${c.code}): Yearly Fee ₹${yearlyFee.toLocaleString("en-IN")}/year, ₹${semesterFee.toLocaleString("en-IN")}/semester. Duration: ${c.duration || "3 Years"}. Eligibility: ${c.eligibility || "10+2 pass"}`;
+      return `- ${c.name} (${c.code}): Per Year Fee ₹${yearlyFee.toLocaleString("en-IN")}/-, Per Semester ₹${semesterFee.toLocaleString("en-IN")}/-. Duration: ${c.duration || "3 Years"}. Eligibility: ${c.eligibility || "10+2 pass"}`;
     }).join("\n");
   } else {
-    feeSection = `- BCA (Bachelor of Computer Applications): Yearly Fee ₹80,000/year, ₹40,000/semester. Duration: 3 Years (6 Semesters). Eligibility: 10+2 with Mathematics/Computer Science, minimum 45%
-- B.Com Regular: Yearly Fee ₹60,000/year, ₹30,000/semester. Duration: 3 Years (6 Semesters). Eligibility: 10+2 any stream, minimum 40%
-- B.Com Professional (with CA/CS/CMA coaching included): Yearly Fee ₹60,000/year (coaching included), ₹30,000/semester. Duration: 3 Years (6 Semesters). Eligibility: 10+2 any stream, minimum 40%
-- BBA (Bachelor of Business Administration): Yearly Fee ₹70,000/year, ₹35,000/semester. Duration: 3 Years (6 Semesters). Eligibility: 10+2 any stream, minimum 40%
+    feeSection = `- BCA (Bachelor of Computer Applications): Per Year Fee ₹80,000/-, Per Semester ₹40,000/-. Duration: 3 Years (6 Semesters). Eligibility: 10+2 with Mathematics/Computer Science, minimum 45%
+- B.Com Regular: Per Year Fee ₹60,000/-, Per Semester ₹30,000/-. Duration: 3 Years (6 Semesters). Eligibility: 10+2 any stream, minimum 40%
+- B.Com Professional (with CA/CS/CMA coaching included): Per Year Fee ₹60,000/- (coaching included), Per Semester ₹30,000/-. Duration: 3 Years (6 Semesters). Eligibility: 10+2 any stream, minimum 40%
+- BBA (Bachelor of Business Administration): Per Year Fee ₹70,000/-, Per Semester ₹35,000/-. Duration: 3 Years (6 Semesters). Eligibility: 10+2 any stream, minimum 40%
 - CA/CS Coaching: Integrated with B.Com Professional (included in fee)`;
   }
 
@@ -45,12 +45,12 @@ function buildSystemPrompt(courseFeeData: any[]): string {
 IMPORTANT FORMATTING RULES:
 - Use plain bullet points with a single dash (-) or bullet. Do NOT use markdown bold (**text**) excessively.
 - Keep formatting clean and simple. Use a single asterisk or dash for bullet points, never double or triple asterisks.
-- When listing fees, state them clearly as "Yearly Fee" with per-semester breakdown.
+- When listing fees, state them clearly as "Per Year Fee" with per-semester breakdown.
 - Do NOT say "total fee for entire 3-year program". The fees are PER YEAR.
 - Format fee responses like this example:
   - BCA (Bachelor of Computer Applications)
-    - Yearly Fee: ₹80,000/year
-    - Per Semester: ₹40,000/semester
+    - Per Year Fee: ₹80,000/-
+    - Per Semester: ₹40,000/-
 - Avoid repeating asterisks (*) or using ** for bold. Keep it clean.
 
 College Identity:
@@ -72,15 +72,15 @@ When someone asks "who created this website", "who made this website", "website 
 - Format the response nicely with his name, department, a brief description, and his portfolio link.
 - IMPORTANT: Include the portfolio URL exactly ONCE as plain text. Do NOT repeat it in markdown link format like [text](url). Do NOT include any photo or image URL.
 
-Courses & Fee Structure (ALL fees are YEARLY — per year / per annum):
+Courses & Fee Structure (ALL fees are PER YEAR):
 ${feeSection}
 
 CRITICAL FEE RULES:
-- ALL fees mentioned above are YEARLY (per year) fees, NOT total program fees.
-- When someone asks about fees, ALWAYS clarify these are yearly/annual fees.
-- NEVER say "total fee for entire 3-year program". The fees are PER YEAR.
-- Per semester = yearly fee divided by 2.
-- Total 3-year cost = yearly fee multiplied by 3.
+- ALL fees mentioned above are PER YEAR fees, NOT total program fees.
+- When someone asks about fees, ALWAYS clarify these are per year fees.
+- NEVER say "total fee" or "yearly fee". Always say "Per Year Fee".
+- Per semester = per year fee divided by 2.
+- Total 3-year cost = per year fee multiplied by 3.
 
 Fee Payment Info:
 - Fees can be paid semester-wise, yearly, or in full
