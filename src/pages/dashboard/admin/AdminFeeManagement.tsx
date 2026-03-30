@@ -491,7 +491,7 @@ export default function AdminFeeManagement() {
   };
 
   const statCards = [
-    { label: "Total Fees", value: `₹${totalFees.toLocaleString()}`, icon: IndianRupee, gradient: "from-[hsl(var(--primary))]/15 to-[hsl(var(--primary))]/5", iconBg: "bg-primary/15", iconColor: "text-primary", borderColor: "border-primary/15", glow: "group-hover:shadow-[0_0_40px_hsl(var(--primary)/0.1)]" },
+    { label: "Yearly Fees", value: `₹${totalFees.toLocaleString()}`, icon: IndianRupee, gradient: "from-[hsl(var(--primary))]/15 to-[hsl(var(--primary))]/5", iconBg: "bg-primary/15", iconColor: "text-primary", borderColor: "border-primary/15", glow: "group-hover:shadow-[0_0_40px_hsl(var(--primary)/0.1)]" },
     { label: "Collected", value: `₹${totalPaid.toLocaleString()}`, icon: CheckCircle, gradient: "from-emerald-500/15 to-emerald-500/5", iconBg: "bg-emerald-500/15", iconColor: "text-emerald-400", borderColor: "border-emerald-500/15", glow: "group-hover:shadow-[0_0_40px_hsl(142_70%_45%/0.1)]" },
     { label: "Pending", value: `₹${totalDue.toLocaleString()}`, icon: AlertCircle, gradient: "from-red-500/15 to-red-500/5", iconBg: "bg-red-500/15", iconColor: "text-red-400", borderColor: "border-red-500/15", glow: "group-hover:shadow-[0_0_40px_hsl(0_84%_60%/0.1)]" },
     { label: "Collection Rate", value: `${collectionRate}%`, icon: TrendingUp, gradient: "from-blue-500/15 to-blue-500/5", iconBg: "bg-blue-500/15", iconColor: "text-blue-400", borderColor: "border-blue-500/15", glow: "group-hover:shadow-[0_0_40px_hsl(217_72%_55%/0.1)]" },
