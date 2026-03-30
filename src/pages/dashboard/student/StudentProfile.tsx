@@ -367,6 +367,9 @@ export default function StudentProfile() {
         )}
       </div>
 
+      <div className="relative overflow-hidden bg-card border border-border/40 rounded-3xl p-6 sm:p-8">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-9 h-9 rounded-xl bg-primary/8 border border-primary/10 flex items-center justify-center">
             <Fingerprint className="w-4 h-4 text-primary" />
           </div>
           <div>
