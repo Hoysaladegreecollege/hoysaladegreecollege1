@@ -225,7 +225,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </header>
 
-        {isSupported && !isSubscribed && !pushBannerDismissed && role === 'student' && (
+        {isSupported && !isSubscribed && !pushBannerDismissed && (
           <div className="mx-4 sm:mx-6 lg:mx-8 mt-4 flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/20 animate-fade-in">
             <BellRing className="w-5 h-5 text-primary shrink-0" />
             <p className="font-body text-xs text-foreground flex-1">
