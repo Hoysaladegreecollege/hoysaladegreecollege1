@@ -170,7 +170,7 @@ export default function AdminUsers() {
     onSuccess: () => {
       toast.success("Student created successfully!");
       setShowAddStudent(false);
-      setNewStudent({ full_name: "", email: "", password: "", phone: "", date_of_birth: "", roll_number: "", course_id: "", year_level: "1", semester: "1", academic_year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`, admission_year: new Date().getFullYear().toString(), father_name: "", mother_name: "", parent_phone: "", address: "" });
+      setNewStudent({ full_name: "", email: "", password: "", phone: "", date_of_birth: "", roll_number: "", course_id: "", year_level: "1", semester: "1", academic_year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`, admission_year: new Date().getFullYear().toString(), father_name: "", mother_name: "", parent_phone: "", address: "", aadhaar_number: "", nationality: "Indian", religion: "", caste: "", category: "", blood_group: "", gender: "" });
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
     },
     onError: (e: any) => toast.error(e.message),
