@@ -1,4 +1,5 @@
 import jsPDF from "jspdf";
+import { formatAadhaar } from "@/lib/format-aadhaar";
 import collegeLogo from "@/assets/college-logo.png";
 import saiBabaImg from "@/assets/sai-baba.png";
 

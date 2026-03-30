@@ -10,6 +10,7 @@ import {
   Edit3, Save, X, Award
 } from "lucide-react";
 import { generateStudyCertificate } from "@/lib/generate-study-certificate";
+import { formatAadhaar } from "@/lib/format-aadhaar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

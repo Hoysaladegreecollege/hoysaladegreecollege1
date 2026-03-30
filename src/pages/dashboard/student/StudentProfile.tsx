@@ -6,6 +6,7 @@ import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { formatAadhaar } from "@/lib/format-aadhaar";
 
 const base64UrlToUint8Array = (value: string) => {
   const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
