@@ -30,7 +30,7 @@ function buildSystemPrompt(courseFeeData: any[]): string {
       const fee = c.fee ? c.fee.replace(/[^0-9]/g, "") : "";
       const yearlyFee = fee ? parseInt(fee) : 0;
       const semesterFee = yearlyFee ? Math.round(yearlyFee / 2) : 0;
-      return `- ${c.name} (${c.code}): Yearly Fee ₹${yearlyFee.toLocaleString("en-IN")}/year, ₹${semesterFee.toLocaleString("en-IN")}/semester. Duration: ${c.duration || "3 Years"}. Eligibility: ${c.eligibility || "10+2 pass"}`;
+      return `- ${c.name} (${c.code}): Per Year Fee ₹${yearlyFee.toLocaleString("en-IN")}/-, Per Semester ₹${semesterFee.toLocaleString("en-IN")}/-. Duration: ${c.duration || "3 Years"}. Eligibility: ${c.eligibility || "10+2 pass"}`;
     }).join("\n");
   } else {
     feeSection = `- BCA (Bachelor of Computer Applications): Per Year Fee ₹80,000/-, Per Semester ₹40,000/-. Duration: 3 Years (6 Semesters). Eligibility: 10+2 with Mathematics/Computer Science, minimum 45%
