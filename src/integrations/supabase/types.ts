@@ -1265,10 +1265,14 @@ export type Database = {
       }
       students: {
         Row: {
+          aadhaar_number: string | null
           academic_year_id: string | null
           address: string | null
           admission_year: number | null
           avatar_url: string | null
+          blood_group: string | null
+          caste: string | null
+          category: string | null
           course_id: string | null
           created_at: string
           date_of_birth: string | null
@@ -1276,11 +1280,14 @@ export type Database = {
           fee_due_date: string | null
           fee_paid: number | null
           fee_remarks: string | null
+          gender: string | null
           id: string
           is_active: boolean | null
           mother_name: string | null
+          nationality: string | null
           parent_phone: string | null
           phone: string | null
+          religion: string | null
           roll_number: string
           semester: number | null
           total_fee: number | null
@@ -1288,10 +1295,14 @@ export type Database = {
           year_level: number | null
         }
         Insert: {
+          aadhaar_number?: string | null
           academic_year_id?: string | null
           address?: string | null
           admission_year?: number | null
           avatar_url?: string | null
+          blood_group?: string | null
+          caste?: string | null
+          category?: string | null
           course_id?: string | null
           created_at?: string
           date_of_birth?: string | null
@@ -1299,11 +1310,14 @@ export type Database = {
           fee_due_date?: string | null
           fee_paid?: number | null
           fee_remarks?: string | null
+          gender?: string | null
           id?: string
           is_active?: boolean | null
           mother_name?: string | null
+          nationality?: string | null
           parent_phone?: string | null
           phone?: string | null
+          religion?: string | null
           roll_number: string
           semester?: number | null
           total_fee?: number | null
@@ -1311,10 +1325,14 @@ export type Database = {
           year_level?: number | null
         }
         Update: {
+          aadhaar_number?: string | null
           academic_year_id?: string | null
           address?: string | null
           admission_year?: number | null
           avatar_url?: string | null
+          blood_group?: string | null
+          caste?: string | null
+          category?: string | null
           course_id?: string | null
           created_at?: string
           date_of_birth?: string | null
@@ -1322,11 +1340,14 @@ export type Database = {
           fee_due_date?: string | null
           fee_paid?: number | null
           fee_remarks?: string | null
+          gender?: string | null
           id?: string
           is_active?: boolean | null
           mother_name?: string | null
+          nationality?: string | null
           parent_phone?: string | null
           phone?: string | null
+          religion?: string | null
           roll_number?: string
           semester?: number | null
           total_fee?: number | null
