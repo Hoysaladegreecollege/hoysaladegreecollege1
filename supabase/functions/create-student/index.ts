@@ -77,6 +77,13 @@ Deno.serve(async (req) => {
       semester: parseInt(semester) || 1,
       year_level: parseInt(year_level) || 1,
       admission_year: parseInt(admission_year) || new Date().getFullYear(),
+      aadhaar_number: aadhaar_number || "",
+      nationality: nationality || "Indian",
+      religion: religion || "",
+      caste: caste || "",
+      category: category || "",
+      blood_group: blood_group || "",
+      gender: gender || "",
     };
     if (roll_number) studentUpdate.roll_number = roll_number;
     if (course_id) studentUpdate.course_id = course_id;

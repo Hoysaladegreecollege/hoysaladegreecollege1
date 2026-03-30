@@ -22,7 +22,7 @@ export default function AdminUsers() {
   const [courseFilter, setCourseFilter] = useState("All");
   const [semesterFilter, setSemesterFilter] = useState("All");
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({ full_name: "", phone: "", roll_number: "", semester: "", parent_phone: "", address: "", date_of_birth: "", course_id: "", total_fee: "", fee_paid: "", fee_due_date: "", fee_remarks: "", employee_id: "", department_id: "", qualification: "", experience: "", subjects: "" });
+  const [editForm, setEditForm] = useState({ full_name: "", phone: "", roll_number: "", semester: "", parent_phone: "", address: "", date_of_birth: "", course_id: "", total_fee: "", fee_paid: "", fee_due_date: "", fee_remarks: "", employee_id: "", department_id: "", qualification: "", experience: "", subjects: "", aadhaar_number: "", nationality: "", religion: "", caste: "", category: "", blood_group: "", gender: "" });
   const [editingRole, setEditingRole] = useState<string>("student");
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [viewUser, setViewUser] = useState<any>(null);

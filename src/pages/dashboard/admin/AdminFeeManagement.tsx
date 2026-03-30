@@ -449,7 +449,7 @@ export default function AdminFeeManagement() {
       const due = (s.total_fee || 0) - (s.fee_paid || 0);
       return [s.profile?.full_name || "", s.roll_number, s.courses?.name || "", s.semester, s.total_fee || 0, s.fee_paid || 0, due, s.fee_due_date || "", s.profile?.phone || "", s.parent_phone || ""].map(v => `"${v}"`).join(",");
     });
-    const csv = ["Name,Roll No,Course,Semester,Total Fee,Paid,Due,Due Date,Phone,Parent Phone", ...rows].join("\n");
+    const csv = ["Name,Roll No,Course,Semester,Yearly Fee,Paid,Due,Due Date,Phone,Parent Phone", ...rows].join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `fee_defaulters_${new Date().toISOString().split("T")[0]}.csv`; a.click();
     toast.success("Defaulters report exported!");
