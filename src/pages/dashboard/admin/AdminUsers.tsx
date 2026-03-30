@@ -617,6 +617,22 @@ export default function AdminUsers() {
                       <Input type="date" value={editForm.fee_due_date} onChange={(e) => setEditForm({ ...editForm, fee_due_date: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Fee Due Date" />
                       <Input value={editForm.fee_remarks} onChange={(e) => setEditForm({ ...editForm, fee_remarks: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Fee Remarks" />
                       <Input value={editForm.address} onChange={(e) => setEditForm({ ...editForm, address: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Address" />
+                      <Input value={editForm.aadhaar_number} onChange={(e) => setEditForm({ ...editForm, aadhaar_number: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Aadhaar No." />
+                      <Input value={editForm.nationality} onChange={(e) => setEditForm({ ...editForm, nationality: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Nationality" />
+                      <Input value={editForm.religion} onChange={(e) => setEditForm({ ...editForm, religion: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Religion" />
+                      <Input value={editForm.caste} onChange={(e) => setEditForm({ ...editForm, caste: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Caste" />
+                      <select value={editForm.category} onChange={(e) => setEditForm({ ...editForm, category: e.target.value })} className="h-9 text-sm rounded-xl border border-input bg-background px-3">
+                        <option value="">Category</option>
+                        <option value="General">General</option><option value="OBC">OBC</option><option value="SC">SC</option><option value="ST">ST</option><option value="Other">Other</option>
+                      </select>
+                      <select value={editForm.blood_group} onChange={(e) => setEditForm({ ...editForm, blood_group: e.target.value })} className="h-9 text-sm rounded-xl border border-input bg-background px-3">
+                        <option value="">Blood Group</option>
+                        <option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="AB+">AB+</option><option value="AB-">AB-</option><option value="O+">O+</option><option value="O-">O-</option>
+                      </select>
+                      <select value={editForm.gender} onChange={(e) => setEditForm({ ...editForm, gender: e.target.value })} className="h-9 text-sm rounded-xl border border-input bg-background px-3">
+                        <option value="">Gender</option>
+                        <option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option>
+                      </select>
                     </>
                   ) : null}
                 </div>
