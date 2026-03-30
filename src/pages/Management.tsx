@@ -107,8 +107,8 @@ export default function Management() {
                     <div className="h-0.5 w-full" style={{ background: `linear-gradient(90deg, transparent, hsl(${m.accent} / 0.6), transparent)` }} />
                     <div className="p-6 text-center">
                       <div className="relative mx-auto mb-4">
-                        <div className="w-20 h-20 rounded-full mx-auto flex items-center justify-center text-3xl group-hover:scale-110 transition-transform duration-300" style={{ background: `linear-gradient(135deg, hsl(${m.accent} / 0.1), hsl(${m.accent} / 0.03))`, border: `1px solid hsl(${m.accent} / 0.15)` }}>
-                          {m.emoji}
+                        <div className="w-20 h-20 rounded-full mx-auto overflow-hidden group-hover:scale-110 transition-transform duration-300" style={{ border: `1px solid hsl(${m.accent} / 0.15)` }}>
+                          <img src={m.photo} alt={m.name} className="w-full h-full object-cover" />
                         </div>
                         <div className="absolute -bottom-1 right-1/2 translate-x-6 w-7 h-7 rounded-lg flex items-center justify-center border border-border/50 bg-card shadow">
                           <Icon className="w-3 h-3" style={{ color: `hsl(${m.accent})` }} />
