@@ -328,25 +328,25 @@ export default function AdminStudentDetail() {
         </h3>
         {editing ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            <EditField label="Full Name" fieldKey="full_name" />
-            <EditField label="Phone" fieldKey="phone" type="tel" />
-            <EditField label="Date of Birth" fieldKey="date_of_birth" type="date" />
-            <EditField label="Gender" fieldKey="gender" options={[
+            {renderEditField("Full Name", "full_name")}
+            {renderEditField("Phone", "phone", "tel")}
+            {renderEditField("Date of Birth", "date_of_birth", "date")}
+            {renderEditField("Gender", "gender", "text", [
               { value: "Male", label: "Male" }, { value: "Female", label: "Female" }, { value: "Other", label: "Other" },
-            ]} />
-            <EditField label="Aadhaar No." fieldKey="aadhaar_number" />
-            <EditField label="Nationality" fieldKey="nationality" />
-            <EditField label="Religion" fieldKey="religion" />
-            <EditField label="Caste" fieldKey="caste" />
-            <EditField label="Category" fieldKey="category" options={[
+            ])}
+            {renderEditField("Aadhaar No.", "aadhaar_number")}
+            {renderEditField("Nationality", "nationality")}
+            {renderEditField("Religion", "religion")}
+            {renderEditField("Caste", "caste")}
+            {renderEditField("Category", "category", "text", [
               { value: "General", label: "General" }, { value: "OBC", label: "OBC" }, { value: "SC", label: "SC" }, { value: "ST", label: "ST" },
-            ]} />
-            <EditField label="Blood Group" fieldKey="blood_group" options={[
+            ])}
+            {renderEditField("Blood Group", "blood_group", "text", [
               { value: "A+", label: "A+" }, { value: "A-", label: "A-" }, { value: "B+", label: "B+" }, { value: "B-", label: "B-" },
               { value: "O+", label: "O+" }, { value: "O-", label: "O-" }, { value: "AB+", label: "AB+" }, { value: "AB-", label: "AB-" },
-            ]} />
+            ])}
             <div className="col-span-2">
-              <EditField label="Address" fieldKey="address" />
+              {renderEditField("Address", "address")}
             </div>
           </div>
         ) : (
