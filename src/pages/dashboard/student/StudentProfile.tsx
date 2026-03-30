@@ -6,6 +6,7 @@ import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { formatAadhaar } from "@/lib/format-aadhaar";
 
 const base64UrlToUint8Array = (value: string) => {
   const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
@@ -214,7 +215,7 @@ export default function StudentProfile() {
     { icon: User, label: "Father's Name", value: student?.father_name || "-", editKey: "father_name" },
     { icon: User, label: "Mother's Name", value: student?.mother_name || "-", editKey: "mother_name" },
     { icon: MapPin, label: "Address", value: student?.address || "-", editKey: "address" },
-    { icon: Shield, label: "Aadhaar No.", value: (student as any)?.aadhaar_number || "-" },
+    { icon: Shield, label: "Aadhaar No.", value: formatAadhaar((student as any)?.aadhaar_number) },
     { icon: User, label: "Gender", value: (student as any)?.gender || "-" },
     { icon: User, label: "Nationality", value: (student as any)?.nationality || "-" },
     { icon: User, label: "Religion", value: (student as any)?.religion || "-" },

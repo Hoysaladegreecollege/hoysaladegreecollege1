@@ -1,4 +1,5 @@
 import jsPDF from "jspdf";
+import { formatAadhaar } from "@/lib/format-aadhaar";
 import collegeLogo from "@/assets/college-logo.png";
 import saiBabaImg from "@/assets/sai-baba.png";
 
@@ -188,7 +189,7 @@ export async function generateStudyCertificate(data: StudentData) {
   doc.line(m + 10, y - 4, pw - m - 10, y - 4);
 
   const details = [
-    { label: "Aadhar No", value: data.aadhaarNumber || "________________" },
+    { label: "Aadhar No", value: formatAadhaar(data.aadhaarNumber) !== "-" ? formatAadhaar(data.aadhaarNumber) : "________________" },
     { label: "Date of Birth", value: data.dateOfBirth || "________________" },
     { label: "Nationality", value: data.nationality || "________________" },
     { label: "Caste", value: data.caste || "________________" },

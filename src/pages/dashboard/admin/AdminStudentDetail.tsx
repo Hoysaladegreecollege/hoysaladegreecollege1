@@ -10,6 +10,7 @@ import {
   Edit3, Save, X, Award
 } from "lucide-react";
 import { generateStudyCertificate } from "@/lib/generate-study-certificate";
+import { formatAadhaar } from "@/lib/format-aadhaar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +34,8 @@ export default function AdminStudentDetail() {
   const [uploading, setUploading] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState<Record<string, string>>({});
+  const [generatingCert, setGeneratingCert] = useState(false);
+  const [certProgress, setCertProgress] = useState(0);
 
   const { data: student, isLoading } = useQuery({
     queryKey: ["admin-student-detail", userId],
@@ -290,7 +293,28 @@ export default function AdminStudentDetail() {
   );
 
   return (
-    <div className="space-y-5 animate-fade-in">
+    <div className="space-y-5 animate-fade-in relative">
+      {/* Certificate Generation Loading Overlay */}
+      {generatingCert && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+          <div className="bg-card border border-border rounded-2xl p-8 shadow-2xl max-w-sm w-full mx-4 text-center space-y-5">
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto">
+              <Award className="w-8 h-8 text-primary animate-pulse" />
+            </div>
+            <div>
+              <h3 className="font-display text-lg font-bold text-foreground">Generating Certificate</h3>
+              <p className="font-body text-sm text-muted-foreground mt-1">Please wait while the study certificate is being prepared...</p>
+            </div>
+            <div className="w-full bg-muted rounded-full h-2.5 overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${certProgress}%` }}
+              />
+            </div>
+            <p className="font-body text-xs text-muted-foreground">{certProgress}% complete</p>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div className="relative overflow-hidden bg-gradient-to-r from-primary/10 via-card to-secondary/10 border border-border rounded-2xl p-5 sm:p-6">
         <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/8 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
@@ -327,25 +351,43 @@ export default function AdminStudentDetail() {
                 </Button>
               </>
             )}
-            <Button size="sm" variant="outline" className="rounded-xl font-body text-xs" onClick={() => {
-              const currentYear = new Date().getFullYear();
-              const academicYear = `${currentYear - 1}-${String(currentYear).slice(2)}`;
-              generateStudyCertificate({
-                fullName: student.profile?.full_name || "",
-                fatherName: student.father_name || "",
-                courseName: student.courses?.name || "",
-                semester: student.semester || 1,
-                rollNumber: student.roll_number || "",
-                gender: (student as any).gender || "",
-                aadhaarNumber: (student as any).aadhaar_number || "",
-                dateOfBirth: student.date_of_birth || "",
-                nationality: (student as any).nationality || "",
-                caste: (student as any).caste || "",
-                category: (student as any).category || "",
-                academicYear,
-              });
+            <Button size="sm" variant="outline" className="rounded-xl font-body text-xs" disabled={generatingCert} onClick={async () => {
+              setGeneratingCert(true);
+              setCertProgress(0);
+              try {
+                // Simulate progress stages
+                setCertProgress(15);
+                await new Promise(r => setTimeout(r, 200));
+                setCertProgress(35);
+                const currentYear = new Date().getFullYear();
+                const academicYear = `${currentYear - 1}-${String(currentYear).slice(2)}`;
+                setCertProgress(55);
+                await new Promise(r => setTimeout(r, 200));
+                setCertProgress(75);
+                await generateStudyCertificate({
+                  fullName: student.profile?.full_name || "",
+                  fatherName: student.father_name || "",
+                  courseName: student.courses?.name || "",
+                  semester: student.semester || 1,
+                  rollNumber: student.roll_number || "",
+                  gender: (student as any).gender || "",
+                  aadhaarNumber: (student as any).aadhaar_number || "",
+                  dateOfBirth: student.date_of_birth || "",
+                  nationality: (student as any).nationality || "",
+                  caste: (student as any).caste || "",
+                  category: (student as any).category || "",
+                  academicYear,
+                });
+                setCertProgress(100);
+                await new Promise(r => setTimeout(r, 400));
+              } catch (e: any) {
+                toast.error("Certificate generation failed: " + e.message);
+              } finally {
+                setGeneratingCert(false);
+                setCertProgress(0);
+              }
             }}>
-              <Award className="w-3.5 h-3.5 mr-1" /> Study Certificate
+              <Award className="w-3.5 h-3.5 mr-1" /> {generatingCert ? "Generating..." : "Study Certificate"}
             </Button>
             <Link to={`/dashboard/admin/fees/${student.id}`}>
               <Button size="sm" variant="outline" className="rounded-xl font-body text-xs">
@@ -391,7 +433,7 @@ export default function AdminStudentDetail() {
             <InfoCard label="Phone" value={student.profile?.phone || student.phone} icon={Phone} />
             <InfoCard label="Date of Birth" value={student.date_of_birth ? format(new Date(student.date_of_birth), "dd MMM yyyy") : ""} icon={Calendar} />
             <InfoCard label="Gender" value={(student as any).gender} />
-            <InfoCard label="Aadhaar No." value={(student as any).aadhaar_number} />
+            <InfoCard label="Aadhaar No." value={formatAadhaar((student as any).aadhaar_number)} />
             <InfoCard label="Nationality" value={(student as any).nationality} />
             <InfoCard label="Religion" value={(student as any).religion} />
             <InfoCard label="Caste" value={(student as any).caste} />
