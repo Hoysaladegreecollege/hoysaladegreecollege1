@@ -1594,6 +1594,20 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      get_student_peers: {
+        Args: { _user_id: string }
+        Returns: {
+          avatar_url: string
+          course_id: string
+          email: string
+          full_name: string
+          id: string
+          roll_number: string
+          semester: number
+          user_id: string
+          year_level: number
+        }[]
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]

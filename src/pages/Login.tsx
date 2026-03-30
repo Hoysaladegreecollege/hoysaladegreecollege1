@@ -309,9 +309,14 @@ export default function Login() {
                       if (!credential) { toast.error("Authentication cancelled"); setLoading(false); return; }
 
                       const rawId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+                      
+                      const assertionResponse = credential.response as AuthenticatorAssertionResponse;
+                      const clientDataJSON = btoa(String.fromCharCode(...new Uint8Array(assertionResponse.clientDataJSON))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+                      const authenticatorData = btoa(String.fromCharCode(...new Uint8Array(assertionResponse.authenticatorData))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+                      const signature = btoa(String.fromCharCode(...new Uint8Array(assertionResponse.signature))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
 
                       const { data: authData, error: authErr } = await supabase.functions.invoke("passkey-authenticate", {
-                        body: { action: "authenticate", credentialId: rawId },
+                        body: { action: "authenticate", credentialId: rawId, clientDataJSON, authenticatorData, signature },
                       });
 
                       if (authErr || authData?.error) { toast.error(authErr?.message || authData?.error); setLoading(false); return; }

@@ -78,15 +78,15 @@ export default function StudentMessages() {
     queryKey: ["student-msg-students", user?.id],
     queryFn: async () => {
       if (!user) return [];
-      const { data: studentRows } = await supabase.from("students").select("id, user_id, roll_number, course_id").eq("is_active", true).neq("user_id", user.id);
-      if (!studentRows?.length) return [];
-      const userIds = studentRows.map((s) => s.user_id);
-      const { data: profiles } = await supabase.from("profiles").select("user_id, full_name, email").in("user_id", userIds);
-      const profileMap = Object.fromEntries((profiles || []).map((p) => [p.user_id, p]));
-      return studentRows.map((s) => ({
-        ...s,
-        name: profileMap[s.user_id]?.full_name || s.roll_number,
-        email: profileMap[s.user_id]?.email || "",
+      const { data: peers } = await supabase.rpc("get_student_peers", { _user_id: user.id });
+      if (!peers?.length) return [];
+      return peers.map((s: any) => ({
+        id: s.id,
+        user_id: s.user_id,
+        roll_number: s.roll_number,
+        course_id: s.course_id,
+        name: s.full_name || s.roll_number,
+        email: s.email || "",
         role: "student" as const,
       }));
     },
