@@ -374,11 +374,11 @@ export default function AdminStudentDetail() {
         </h3>
         {editing ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            <EditField label="Course" fieldKey="course_id" options={courses.map((c: any) => ({ value: c.id, label: `${c.name} (${c.code})` }))} />
-            <EditField label="Roll Number" fieldKey="roll_number" />
-            <EditField label="Semester" fieldKey="semester" type="number" />
-            <EditField label="Year Level" fieldKey="year_level" type="number" />
-            <EditField label="Admission Year" fieldKey="admission_year" type="number" />
+            {renderEditField("Course", "course_id", "text", courses.map((c: any) => ({ value: c.id, label: `${c.name} (${c.code})` })))}
+            {renderEditField("Roll Number", "roll_number")}
+            {renderEditField("Semester", "semester", "number")}
+            {renderEditField("Year Level", "year_level", "number")}
+            {renderEditField("Admission Year", "admission_year", "number")}
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
