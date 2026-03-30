@@ -46,7 +46,23 @@ serve(async (req) => {
       });
     }
 
-    const { studentEmail, studentName, receiptNumber, amount, paymentMethod, courseName, rollNumber, remarks, date, semester } = await req.json();
+    // HTML escape helper to prevent injection in email templates
+    function escapeHtml(str: string): string {
+      if (!str) return "";
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
+    const body = await req.json();
+    const studentEmail = body.studentEmail;
+    const studentName = escapeHtml(body.studentName || "");
+    const receiptNumber = escapeHtml(body.receiptNumber || "");
+    const amount = body.amount;
+    const paymentMethod = escapeHtml(body.paymentMethod || "Cash");
+    const courseName = escapeHtml(body.courseName || "");
+    const rollNumber = escapeHtml(body.rollNumber || "");
+    const remarks = escapeHtml(body.remarks || "");
+    const date = escapeHtml(body.date || new Date().toLocaleDateString());
+    const semester = body.semester;
 
     if (!studentEmail || !amount || !receiptNumber) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {

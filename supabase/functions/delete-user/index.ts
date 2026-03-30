@@ -5,10 +5,33 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Rate limiter - 5 delete requests per minute per IP
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT = 5;
+const RATE_WINDOW_MS = 60_000;
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return false;
+  }
+  entry.count++;
+  return entry.count > RATE_LIMIT;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
+    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    if (isRateLimited(clientIp)) {
+      return new Response(JSON.stringify({ error: "Too many requests. Please wait." }), {
+        status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("No auth header");
 
@@ -29,6 +52,7 @@ Deno.serve(async (req) => {
 
     const { userId } = await req.json();
     if (!userId) throw new Error("userId required");
+    if (typeof userId !== "string" || userId.length > 36) throw new Error("Invalid userId");
     if (userId === caller.id) throw new Error("Cannot delete yourself");
 
     // Get student record ID first (FK references use students.id, not user_id)
@@ -41,6 +65,7 @@ Deno.serve(async (req) => {
       await adminClient.from("attendance").delete().eq("student_id", studentRecord.id);
       await adminClient.from("marks").delete().eq("student_id", studentRecord.id);
       await adminClient.from("absent_notes").delete().eq("student_id", studentRecord.id);
+      await adminClient.from("student_documents").delete().eq("student_id", studentRecord.id);
       // Delete student record
       await adminClient.from("students").delete().eq("id", studentRecord.id);
     }
@@ -57,6 +82,8 @@ Deno.serve(async (req) => {
     await adminClient.from("push_subscriptions").delete().eq("user_id", userId);
     await adminClient.from("direct_messages").delete().eq("sender_id", userId);
     await adminClient.from("direct_messages").delete().eq("receiver_id", userId);
+    await adminClient.from("passkeys").delete().eq("user_id", userId);
+    await adminClient.from("activity_logs").delete().eq("user_id", userId);
     
     // Delete role and profile
     await adminClient.from("user_roles").delete().eq("user_id", userId);
@@ -74,7 +101,7 @@ Deno.serve(async (req) => {
     const msg = error.message || "";
     const safeMessage = msg.includes("Cannot delete yourself")
       ? "Cannot delete yourself"
-      : msg.includes("userId required")
+      : msg.includes("userId required") || msg.includes("Invalid userId")
       ? "User ID is required"
       : msg.includes("Unauthorized") || msg.includes("No auth header")
       ? "Unauthorized"

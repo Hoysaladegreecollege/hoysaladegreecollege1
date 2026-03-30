@@ -70,10 +70,17 @@ Deno.serve(async (req) => {
         });
       }
 
+      // HTML escape helper
+      function escapeHtml(str: string): string {
+        if (!str) return "";
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+      }
+
       let notified = 0;
       for (const student of students) {
         const profile = profiles?.find(p => p.user_id === student.user_id);
         if (!profile?.email) continue;
+        const safeName = escapeHtml(profile.full_name || "Student");
 
         try {
           await fetch("https://api.resend.com/emails", {
@@ -98,7 +105,7 @@ Deno.serve(async (req) => {
                       <p style="color:rgba(255,255,255,0.5);margin:8px 0 0;font-size:13px;">Hoysala Degree College</p>
                     </div>
                     <div style="padding:32px;">
-                      <p style="font-size:16px;color:#1a202c;">Dear <strong>${profile.full_name}</strong>,</p>
+                      <p style="font-size:16px;color:#1a202c;">Dear <strong>${safeName}</strong>,</p>
                       <p style="font-size:15px;color:#4a5568;line-height:1.7;">
                         Congratulations! You have been <strong style="color:#16a34a;">promoted</strong> from 
                         <strong>Semester ${fromSemester}</strong> to <strong>Semester ${toSemester}</strong>.

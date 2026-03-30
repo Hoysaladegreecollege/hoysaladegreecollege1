@@ -31,7 +31,17 @@ Deno.serve(async (req) => {
       throw new Error("Insufficient permissions");
     }
 
-    const { email, fullName, applicationNumber, status } = await req.json();
+    // HTML escape helper to prevent injection in email templates
+    function escapeHtml(str: string): string {
+      if (!str) return "";
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
+    const body = await req.json();
+    const email = body.email;
+    const fullName = escapeHtml(body.fullName || "");
+    const applicationNumber = escapeHtml(body.applicationNumber || "");
+    const status = body.status;
 
     if (!email || !fullName || !applicationNumber || !status) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {

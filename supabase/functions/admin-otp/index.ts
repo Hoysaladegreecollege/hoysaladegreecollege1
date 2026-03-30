@@ -5,13 +5,39 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
-function generateOTP(): string {
-  const chars = '0123456789';
-  let otp = '';
-  for (let i = 0; i < 6; i++) {
-    otp += chars[Math.floor(Math.random() * chars.length)];
+// Rate limiter - 5 OTP requests per minute per IP (critical for brute force prevention)
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT = 5;
+const RATE_WINDOW_MS = 60_000;
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return false;
   }
-  return otp;
+  entry.count++;
+  return entry.count > RATE_LIMIT;
+}
+
+// Cryptographically secure OTP generation
+function generateOTP(): string {
+  const array = new Uint8Array(4);
+  crypto.getRandomValues(array);
+  // Convert to 6-digit number
+  const num = ((array[0] << 24) | (array[1] << 16) | (array[2] << 8) | array[3]) >>> 0;
+  return String(num % 1000000).padStart(6, '0');
+}
+
+// HTML escape to prevent injection in email templates
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 Deno.serve(async (req) => {
@@ -20,6 +46,13 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    if (isRateLimited(clientIp)) {
+      return new Response(JSON.stringify({ error: "Too many requests. Please wait." }), {
+        status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("Unauthorized");
 
@@ -47,12 +80,14 @@ Deno.serve(async (req) => {
 
     const { action, request_id, otp_code } = await req.json();
 
+    // Validate inputs
+    if (!action || typeof action !== "string") throw new Error("Invalid action");
+    if (!request_id || typeof request_id !== "string" || request_id.length > 36) throw new Error("Invalid request");
+
     if (action === "send_otp") {
-      // Generate OTP and store it, then send email to all OTHER admins
       const otp = generateOTP();
       const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 min
 
-      // Update the request with OTP
       const { error: updateErr } = await adminClient
         .from("pending_admin_requests")
         .update({ otp_code: otp, otp_expires_at: expiresAt })
@@ -60,7 +95,6 @@ Deno.serve(async (req) => {
 
       if (updateErr) throw new Error("Failed to set OTP");
 
-      // Get the request details
       const { data: request } = await adminClient
         .from("pending_admin_requests")
         .select("*")
@@ -80,13 +114,11 @@ Deno.serve(async (req) => {
         .filter(id => id !== request.requester_id);
 
       if (adminUserIds.length === 0) {
-        // No other admins - allow self-approval for first admin
         return new Response(JSON.stringify({ success: true, self_approve: true, otp }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
 
-      // Get admin emails
       const { data: adminProfiles } = await adminClient
         .from("profiles")
         .select("email, full_name")
@@ -95,8 +127,12 @@ Deno.serve(async (req) => {
       const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
       if (!RESEND_API_KEY) throw new Error("Email service not configured");
 
-      // Send OTP email to all other admins
+      // Sanitize user-provided data before embedding in HTML
+      const safeName = escapeHtml(request.full_name || "");
+      const safeEmail = escapeHtml(request.email || "");
+
       for (const admin of (adminProfiles || [])) {
+        const safeAdminName = escapeHtml(admin.full_name || "");
         await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: {
@@ -119,14 +155,14 @@ Deno.serve(async (req) => {
                   <p style="color:rgba(255,255,255,0.7);margin:10px 0 0;font-size:14px;">Two-Factor Authentication</p>
                 </div>
                 <div style="padding:40px 32px;">
-                  <p style="font-size:16px;color:#1a202c;">Dear <strong>${admin.full_name}</strong>,</p>
+                  <p style="font-size:16px;color:#1a202c;">Dear <strong>${safeAdminName}</strong>,</p>
                   <p style="font-size:15px;color:#4a5568;line-height:1.7;">
                     An existing admin has requested to create a <strong style="color:#dc2626;">new Admin account</strong>. Your approval is needed.
                   </p>
                   <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin:20px 0;">
                     <p style="margin:0 0 8px;font-size:13px;font-weight:600;color:#64748b;">NEW ADMIN DETAILS</p>
-                    <p style="margin:0;font-size:15px;color:#1a202c;"><strong>Name:</strong> ${request.full_name}</p>
-                    <p style="margin:4px 0 0;font-size:15px;color:#1a202c;"><strong>Email:</strong> ${request.email}</p>
+                    <p style="margin:0;font-size:15px;color:#1a202c;"><strong>Name:</strong> ${safeName}</p>
+                    <p style="margin:4px 0 0;font-size:15px;color:#1a202c;"><strong>Email:</strong> ${safeEmail}</p>
                   </div>
                   <div style="background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #f59e0b;border-radius:16px;padding:24px;margin:24px 0;text-align:center;">
                     <p style="margin:0 0 8px;font-size:12px;color:#92400e;letter-spacing:1px;text-transform:uppercase;font-weight:600;">Your Approval OTP Code</p>
@@ -153,7 +189,10 @@ Deno.serve(async (req) => {
     }
 
     if (action === "verify_otp") {
-      // Verify OTP and mark request as approved
+      if (!otp_code || typeof otp_code !== "string" || otp_code.length !== 6) {
+        throw new Error("Invalid OTP format");
+      }
+
       const { data: request } = await adminClient
         .from("pending_admin_requests")
         .select("*")
@@ -168,9 +207,16 @@ Deno.serve(async (req) => {
         throw new Error("OTP has expired. Please request a new one.");
       }
 
-      if (request.otp_code !== otp_code) {
-        throw new Error("Invalid OTP code");
+      // Constant-time comparison to prevent timing attacks
+      const encoder = new TextEncoder();
+      const a = encoder.encode(request.otp_code);
+      const b = encoder.encode(otp_code);
+      if (a.length !== b.length) throw new Error("Invalid OTP code");
+      let mismatch = 0;
+      for (let i = 0; i < a.length; i++) {
+        mismatch |= a[i] ^ b[i];
       }
+      if (mismatch !== 0) throw new Error("Invalid OTP code");
 
       // Mark as approved
       const { error: approveErr } = await adminClient
