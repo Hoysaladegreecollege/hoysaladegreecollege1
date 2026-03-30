@@ -33,10 +33,10 @@ function buildSystemPrompt(courseFeeData: any[]): string {
       return `- ${c.name} (${c.code}): Yearly Fee ₹${yearlyFee.toLocaleString("en-IN")}/year, ₹${semesterFee.toLocaleString("en-IN")}/semester. Duration: ${c.duration || "3 Years"}. Eligibility: ${c.eligibility || "10+2 pass"}`;
     }).join("\n");
   } else {
-    feeSection = `- BCA (Bachelor of Computer Applications): Yearly Fee ₹80,000/year, ₹40,000/semester. Duration: 3 Years (6 Semesters). Eligibility: 10+2 with Mathematics/Computer Science, minimum 45%
-- B.Com Regular: Yearly Fee ₹60,000/year, ₹30,000/semester. Duration: 3 Years (6 Semesters). Eligibility: 10+2 any stream, minimum 40%
-- B.Com Professional (with CA/CS/CMA coaching included): Yearly Fee ₹60,000/year (coaching included), ₹30,000/semester. Duration: 3 Years (6 Semesters). Eligibility: 10+2 any stream, minimum 40%
-- BBA (Bachelor of Business Administration): Yearly Fee ₹70,000/year, ₹35,000/semester. Duration: 3 Years (6 Semesters). Eligibility: 10+2 any stream, minimum 40%
+    feeSection = `- BCA (Bachelor of Computer Applications): Per Year Fee ₹80,000/-, Per Semester ₹40,000/-. Duration: 3 Years (6 Semesters). Eligibility: 10+2 with Mathematics/Computer Science, minimum 45%
+- B.Com Regular: Per Year Fee ₹60,000/-, Per Semester ₹30,000/-. Duration: 3 Years (6 Semesters). Eligibility: 10+2 any stream, minimum 40%
+- B.Com Professional (with CA/CS/CMA coaching included): Per Year Fee ₹60,000/- (coaching included), Per Semester ₹30,000/-. Duration: 3 Years (6 Semesters). Eligibility: 10+2 any stream, minimum 40%
+- BBA (Bachelor of Business Administration): Per Year Fee ₹70,000/-, Per Semester ₹35,000/-. Duration: 3 Years (6 Semesters). Eligibility: 10+2 any stream, minimum 40%
 - CA/CS Coaching: Integrated with B.Com Professional (included in fee)`;
   }
 
