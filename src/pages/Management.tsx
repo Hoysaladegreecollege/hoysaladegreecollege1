@@ -4,23 +4,30 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { Crown, Shield, BookOpen, GraduationCap, Building2, Landmark } from "lucide-react";
 import { LucideIcon } from "lucide-react";
 
+import ramakrishnappaImg from "@/assets/management/ramakrishnappa.jpeg";
+import gopalImg from "@/assets/management/gopal.jpeg";
+import sureshImg from "@/assets/management/suresh.jpeg";
+import jyothiImg from "@/assets/management/jyothi.jpeg";
+import gowrishankarImg from "@/assets/management/gowrishankar.jpeg";
+import annapurnaImg from "@/assets/management/annapurna.jpeg";
+
 interface Member {
   name: string;
   qualification: string;
   role: string;
-  emoji: string;
+  photo: string;
   icon: LucideIcon;
   accent: string;
   isTop?: boolean;
 }
 
 const committee: Member[] = [
-  { name: "Dr. Ramakrishnappa T", qualification: "M.Sc, Ph.D, Post Doc.", role: "President", emoji: "👔", icon: Crown, accent: "45 80% 55%", isTop: true },
-  { name: "Sri Suresh B.V", qualification: "", role: "Treasurer", emoji: "💰", icon: Shield, accent: "160 60% 45%" },
-  { name: "Smt Jyothi N", qualification: "", role: "Secretary", emoji: "📋", icon: BookOpen, accent: "280 60% 55%" },
-  { name: "Prof. Gowrishankar K.V", qualification: "M.Sc, Trustee – Principal of Hoysala PU College", role: "Trustee", emoji: "🏛️", icon: Landmark, accent: "200 70% 50%" },
-  { name: "Sri Gopal H.R", qualification: "M.Sc, M.Ed, TET, KSET, Ph.D – Principal of Hoysala Degree College", role: "Principal", emoji: "🎓", icon: GraduationCap, accent: "340 65% 55%", isTop: true },
-  { name: "Smt Annapurna T", qualification: "MA, B.Ed", role: "Trustee", emoji: "🏛️", icon: Building2, accent: "25 70% 50%" },
+  { name: "Dr. Ramakrishnappa T", qualification: "M.Sc, Ph.D, Post Doc.", role: "President", photo: ramakrishnappaImg, icon: Crown, accent: "45 80% 55%", isTop: true },
+  { name: "Sri Suresh B.V", qualification: "", role: "Treasurer", photo: sureshImg, icon: Shield, accent: "160 60% 45%" },
+  { name: "Smt Jyothi N", qualification: "", role: "Secretary", photo: jyothiImg, icon: BookOpen, accent: "280 60% 55%" },
+  { name: "Prof. Gowrishankar K.V", qualification: "M.Sc, Trustee – Principal of Hoysala PU College", role: "Trustee", photo: gowrishankarImg, icon: Landmark, accent: "200 70% 50%" },
+  { name: "Sri Gopal H.R", qualification: "M.Sc, M.Ed, TET, KSET, Ph.D – Principal of Hoysala Degree College", role: "Principal", photo: gopalImg, icon: GraduationCap, accent: "340 65% 55%", isTop: true },
+  { name: "Smt Annapurna T", qualification: "MA, B.Ed", role: "Trustee", photo: annapurnaImg, icon: Building2, accent: "25 70% 50%" },
 ];
 
 const topMembers = committee.filter(m => m.isTop);
@@ -64,8 +71,8 @@ export default function Management() {
                     <div className="p-8 flex flex-col items-center text-center">
                       {/* Avatar circle */}
                       <div className="relative mb-5">
-                        <div className="w-28 h-28 rounded-full flex items-center justify-center text-5xl border-2 group-hover:scale-105 transition-transform duration-500" style={{ borderColor: `hsl(${m.accent} / 0.3)`, background: `linear-gradient(135deg, hsl(${m.accent} / 0.08), hsl(${m.accent} / 0.02))` }}>
-                          {m.emoji}
+                        <div className="w-28 h-28 rounded-full overflow-hidden border-2 group-hover:scale-105 transition-transform duration-500" style={{ borderColor: `hsl(${m.accent} / 0.3)` }}>
+                          <img src={m.photo} alt={m.name} className="w-full h-full object-cover" />
                         </div>
                         <div className="absolute -bottom-1 -right-1 w-9 h-9 rounded-xl flex items-center justify-center border border-border/60 bg-card shadow-lg">
                           <Icon className="w-4 h-4" style={{ color: `hsl(${m.accent})` }} />
@@ -100,8 +107,8 @@ export default function Management() {
                     <div className="h-0.5 w-full" style={{ background: `linear-gradient(90deg, transparent, hsl(${m.accent} / 0.6), transparent)` }} />
                     <div className="p-6 text-center">
                       <div className="relative mx-auto mb-4">
-                        <div className="w-20 h-20 rounded-full mx-auto flex items-center justify-center text-3xl group-hover:scale-110 transition-transform duration-300" style={{ background: `linear-gradient(135deg, hsl(${m.accent} / 0.1), hsl(${m.accent} / 0.03))`, border: `1px solid hsl(${m.accent} / 0.15)` }}>
-                          {m.emoji}
+                        <div className="w-20 h-20 rounded-full mx-auto overflow-hidden group-hover:scale-110 transition-transform duration-300" style={{ border: `1px solid hsl(${m.accent} / 0.15)` }}>
+                          <img src={m.photo} alt={m.name} className="w-full h-full object-cover" />
                         </div>
                         <div className="absolute -bottom-1 right-1/2 translate-x-6 w-7 h-7 rounded-lg flex items-center justify-center border border-border/50 bg-card shadow">
                           <Icon className="w-3 h-3" style={{ color: `hsl(${m.accent})` }} />
