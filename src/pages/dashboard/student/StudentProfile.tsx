@@ -1,7 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { User, Phone, MapPin, Calendar, BookOpen, Hash, Camera, Upload, Sparkles, Shield, Fingerprint, Trash2, Edit3, Save, X } from "lucide-react";
+import { User, Phone, MapPin, Calendar, BookOpen, Hash, Camera, Upload, Sparkles, Shield, Fingerprint, Trash2, Edit3, Save, X, FileText, Download } from "lucide-react";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -53,6 +53,15 @@ export default function StudentProfile() {
       return data || [];
     },
     enabled: !!user,
+  });
+
+  const { data: documents = [] } = useQuery({
+    queryKey: ["student-documents", student?.id],
+    queryFn: async () => {
+      const { data } = await (supabase as any).from("student_documents").select("*").eq("student_id", student!.id).order("created_at", { ascending: false });
+      return data || [];
+    },
+    enabled: !!student?.id,
   });
 
   const uploadAvatarMutation = useMutation({
@@ -309,6 +318,54 @@ export default function StudentProfile() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Documents Section */}
+      <div className="relative overflow-hidden bg-card border border-border/40 rounded-3xl p-6 sm:p-8">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-9 h-9 rounded-xl bg-primary/8 border border-primary/10 flex items-center justify-center">
+            <FileText className="w-4 h-4 text-primary" />
+          </div>
+          <div>
+            <h3 className="font-body text-xs font-bold text-muted-foreground uppercase tracking-[0.15em]">My Documents</h3>
+            <p className="font-body text-[10px] text-muted-foreground mt-0.5">Documents uploaded by the college</p>
+          </div>
+        </div>
+        {documents.length > 0 ? (
+          <div className="space-y-2">
+            {documents.map((doc: any) => (
+              <div key={doc.id} className="flex items-center justify-between p-3 rounded-2xl bg-muted/30 border border-border/20">
+                <div className="flex items-center gap-3 min-w-0">
+                  <FileText className="w-4 h-4 text-primary shrink-0" />
+                  <div className="min-w-0">
+                    <p className="font-body text-sm text-foreground truncate">{doc.file_name}</p>
+                    <p className="font-body text-[10px] text-muted-foreground">
+                      {doc.document_type?.replace(/_/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase())} · {new Date(doc.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm" className="rounded-xl font-body text-xs shrink-0" onClick={async () => {
+                  try {
+                    const { data, error } = await supabase.storage.from("student-documents").download(doc.file_url);
+                    if (error) throw error;
+                    const url = URL.createObjectURL(data);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = doc.file_name;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  } catch (e: any) {
+                    toast.error("Download failed: " + e.message);
+                  }
+                }}>
+                  <Download className="w-3 h-3 mr-1.5" /> Download
+                </Button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="font-body text-sm text-muted-foreground/60">No documents uploaded yet.</p>
+        )}
       </div>
 
       <div className="relative overflow-hidden bg-card border border-border/40 rounded-3xl p-6 sm:p-8">
