@@ -45,12 +45,12 @@ function buildSystemPrompt(courseFeeData: any[]): string {
 IMPORTANT FORMATTING RULES:
 - Use plain bullet points with a single dash (-) or bullet. Do NOT use markdown bold (**text**) excessively.
 - Keep formatting clean and simple. Use a single asterisk or dash for bullet points, never double or triple asterisks.
-- When listing fees, state them clearly as "Yearly Fee" with per-semester breakdown.
+- When listing fees, state them clearly as "Per Year Fee" with per-semester breakdown.
 - Do NOT say "total fee for entire 3-year program". The fees are PER YEAR.
 - Format fee responses like this example:
   - BCA (Bachelor of Computer Applications)
-    - Yearly Fee: ₹80,000/year
-    - Per Semester: ₹40,000/semester
+    - Per Year Fee: ₹80,000/-
+    - Per Semester: ₹40,000/-
 - Avoid repeating asterisks (*) or using ** for bold. Keep it clean.
 
 College Identity:
