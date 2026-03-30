@@ -63,9 +63,21 @@ export default function NotificationCenter() {
   useEffect(() => {
     if (unread > prevCountRef.current && prevCountRef.current >= 0) {
       if ("vibrate" in navigator) navigator.vibrate([100, 50, 100]);
+
+      // Forward new notifications to Android app via bridge
+      if ((window as any).AndroidBridge) {
+        try {
+          const latest = notifications.filter((n: any) => !n.is_read).slice(0, unread - prevCountRef.current);
+          for (const n of latest) {
+            (window as any).AndroidBridge.onNotificationReceived?.(
+              JSON.stringify({ title: n.title, message: n.message, type: n.type, link: n.link })
+            );
+          }
+        } catch {}
+      }
     }
     prevCountRef.current = unread;
-  }, [unread]);
+  }, [unread, notifications]);
 
   const markRead = useMutation({
     mutationFn: async (id: string) => {
