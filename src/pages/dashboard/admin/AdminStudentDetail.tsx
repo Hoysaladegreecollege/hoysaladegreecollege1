@@ -34,6 +34,8 @@ export default function AdminStudentDetail() {
   const [uploading, setUploading] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState<Record<string, string>>({});
+  const [generatingCert, setGeneratingCert] = useState(false);
+  const [certProgress, setCertProgress] = useState(0);
 
   const { data: student, isLoading } = useQuery({
     queryKey: ["admin-student-detail", userId],
