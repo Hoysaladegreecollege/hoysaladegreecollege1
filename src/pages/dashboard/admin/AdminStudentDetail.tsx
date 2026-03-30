@@ -7,8 +7,9 @@ import { toast } from "sonner";
 import {
   ArrowLeft, User, BookOpen, Phone, Mail, MapPin, Calendar, GraduationCap,
   Upload, Download, Trash2, FileText, IndianRupee, CheckCircle, AlertCircle, Eye,
-  Edit3, Save, X
+  Edit3, Save, X, Award
 } from "lucide-react";
+import { generateStudyCertificate } from "@/lib/generate-study-certificate";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
