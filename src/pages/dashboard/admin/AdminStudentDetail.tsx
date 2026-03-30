@@ -221,13 +221,13 @@ export default function AdminStudentDetail() {
   const feeRemaining = Math.max(0, totalFee - feePaid);
   const pct = totalFee > 0 ? Math.round((feePaid / totalFee) * 100) : 0;
 
-  const EditField = ({ label, fieldKey, type = "text", options }: { label: string; fieldKey: string; type?: string; options?: { value: string; label: string }[] }) => (
+  const renderEditField = (label: string, fieldKey: string, type = "text", options?: { value: string; label: string }[]) => (
     <div className="bg-muted/30 rounded-xl p-3.5">
       <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider mb-1.5">{label}</p>
       {options ? (
         <select
           value={editForm[fieldKey] || ""}
-          onChange={(e) => setEditForm({ ...editForm, [fieldKey]: e.target.value })}
+          onChange={(e) => setEditForm(prev => ({ ...prev, [fieldKey]: e.target.value }))}
           className="w-full h-8 text-sm rounded-lg border border-input bg-background px-2 font-body"
         >
           <option value="">Select...</option>
@@ -237,7 +237,7 @@ export default function AdminStudentDetail() {
         <Input
           type={type}
           value={editForm[fieldKey] || ""}
-          onChange={(e) => setEditForm({ ...editForm, [fieldKey]: e.target.value })}
+          onChange={(e) => setEditForm(prev => ({ ...prev, [fieldKey]: e.target.value }))}
           className="h-8 text-sm rounded-lg"
         />
       )}
