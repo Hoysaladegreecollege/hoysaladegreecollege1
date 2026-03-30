@@ -747,7 +747,7 @@ export default function AdminFeeManagement() {
               <tr className="border-b border-border/40 bg-muted/20">
                 <th className="text-left font-body text-[11px] font-semibold text-muted-foreground p-4 uppercase tracking-wider">Student</th>
                 <th className="text-left font-body text-[11px] font-semibold text-muted-foreground p-4 uppercase tracking-wider">Course</th>
-                <th className="text-right font-body text-[11px] font-semibold text-muted-foreground p-4 uppercase tracking-wider">Total Fee</th>
+                <th className="text-right font-body text-[11px] font-semibold text-muted-foreground p-4 uppercase tracking-wider">Yearly Fee</th>
                 <th className="text-right font-body text-[11px] font-semibold text-muted-foreground p-4 uppercase tracking-wider">Paid</th>
                 <th className="text-right font-body text-[11px] font-semibold text-muted-foreground p-4 uppercase tracking-wider">Due</th>
                 <th className="text-center font-body text-[11px] font-semibold text-muted-foreground p-4 uppercase tracking-wider">Due Date</th>
