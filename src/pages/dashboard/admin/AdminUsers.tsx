@@ -190,6 +190,8 @@ export default function AdminUsers() {
         roll_number: "", semester: "", parent_phone: "", address: "",
         date_of_birth: "", course_id: "", total_fee: "", fee_paid: "",
         fee_due_date: "", fee_remarks: "",
+        aadhaar_number: "", nationality: "", religion: "", caste: "",
+        category: "", blood_group: "", gender: "",
       });
     } else {
       setEditForm({
