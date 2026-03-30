@@ -82,7 +82,7 @@ export default function AdminUsers() {
   });
 
   const updateProfileMutation = useMutation({
-    mutationFn: async ({ userId, role, full_name, phone, roll_number, semester, parent_phone, address, date_of_birth, course_id, total_fee, fee_paid, fee_due_date, fee_remarks, employee_id, department_id, qualification, experience, subjects }: any) => {
+    mutationFn: async ({ userId, role, full_name, phone, roll_number, semester, parent_phone, address, date_of_birth, course_id, total_fee, fee_paid, fee_due_date, fee_remarks, employee_id, department_id, qualification, experience, subjects, aadhaar_number, nationality, religion, caste, category, blood_group, gender }: any) => {
       const { error } = await supabase.from("profiles").update({ full_name, phone }).eq("user_id", userId);
       if (error) throw error;
 
