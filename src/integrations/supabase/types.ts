@@ -1225,6 +1225,44 @@ export type Database = {
           },
         ]
       }
+      student_documents: {
+        Row: {
+          created_at: string
+          document_type: string
+          file_name: string
+          file_url: string
+          id: string
+          student_id: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          document_type?: string
+          file_name?: string
+          file_url?: string
+          id?: string
+          student_id: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          document_type?: string
+          file_name?: string
+          file_url?: string
+          id?: string
+          student_id?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_documents_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       students: {
         Row: {
           academic_year_id: string | null
