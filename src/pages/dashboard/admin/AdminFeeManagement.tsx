@@ -435,7 +435,7 @@ export default function AdminFeeManagement() {
       const due = (s.total_fee || 0) - (s.fee_paid || 0);
       return [s.profile?.full_name || "", s.roll_number, s.courses?.name || "", s.semester, s.total_fee || 0, s.fee_paid || 0, due, s.fee_due_date || "", s.profile?.phone || "", s.fee_remarks || ""].map(v => `"${v}"`).join(",");
     });
-    const header = "Name,Roll No,Course,Semester,Total Fee,Fee Paid,Fee Due,Due Date,Phone,Remarks";
+    const header = "Name,Roll No,Course,Semester,Yearly Fee,Fee Paid,Fee Due,Due Date,Phone,Remarks";
     const csv = [header, ...rows].join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `fee_report_${new Date().toISOString().split("T")[0]}.csv`; a.click();
@@ -449,7 +449,7 @@ export default function AdminFeeManagement() {
       const due = (s.total_fee || 0) - (s.fee_paid || 0);
       return [s.profile?.full_name || "", s.roll_number, s.courses?.name || "", s.semester, s.total_fee || 0, s.fee_paid || 0, due, s.fee_due_date || "", s.profile?.phone || "", s.parent_phone || ""].map(v => `"${v}"`).join(",");
     });
-    const csv = ["Name,Roll No,Course,Semester,Total Fee,Paid,Due,Due Date,Phone,Parent Phone", ...rows].join("\n");
+    const csv = ["Name,Roll No,Course,Semester,Yearly Fee,Paid,Due,Due Date,Phone,Parent Phone", ...rows].join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `fee_defaulters_${new Date().toISOString().split("T")[0]}.csv`; a.click();
     toast.success("Defaulters report exported!");
@@ -491,7 +491,7 @@ export default function AdminFeeManagement() {
   };
 
   const statCards = [
-    { label: "Total Fees", value: `₹${totalFees.toLocaleString()}`, icon: IndianRupee, gradient: "from-[hsl(var(--primary))]/15 to-[hsl(var(--primary))]/5", iconBg: "bg-primary/15", iconColor: "text-primary", borderColor: "border-primary/15", glow: "group-hover:shadow-[0_0_40px_hsl(var(--primary)/0.1)]" },
+    { label: "Yearly Fees", value: `₹${totalFees.toLocaleString()}`, icon: IndianRupee, gradient: "from-[hsl(var(--primary))]/15 to-[hsl(var(--primary))]/5", iconBg: "bg-primary/15", iconColor: "text-primary", borderColor: "border-primary/15", glow: "group-hover:shadow-[0_0_40px_hsl(var(--primary)/0.1)]" },
     { label: "Collected", value: `₹${totalPaid.toLocaleString()}`, icon: CheckCircle, gradient: "from-emerald-500/15 to-emerald-500/5", iconBg: "bg-emerald-500/15", iconColor: "text-emerald-400", borderColor: "border-emerald-500/15", glow: "group-hover:shadow-[0_0_40px_hsl(142_70%_45%/0.1)]" },
     { label: "Pending", value: `₹${totalDue.toLocaleString()}`, icon: AlertCircle, gradient: "from-red-500/15 to-red-500/5", iconBg: "bg-red-500/15", iconColor: "text-red-400", borderColor: "border-red-500/15", glow: "group-hover:shadow-[0_0_40px_hsl(0_84%_60%/0.1)]" },
     { label: "Collection Rate", value: `${collectionRate}%`, icon: TrendingUp, gradient: "from-blue-500/15 to-blue-500/5", iconBg: "bg-blue-500/15", iconColor: "text-blue-400", borderColor: "border-blue-500/15", glow: "group-hover:shadow-[0_0_40px_hsl(217_72%_55%/0.1)]" },

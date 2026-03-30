@@ -700,7 +700,7 @@ export default function AdminStudentFeeDetail() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           {
-            label: "TOTAL FEE",
+            label: "YEARLY FEE",
             value: `₹${totalFee.toLocaleString()}`,
             icon: IndianRupee,
             gradient: "from-primary/15 to-primary/5",

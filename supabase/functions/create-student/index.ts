@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
     if (callerRole?.role !== "admin") throw new Error("Only admin can create students");
 
     const body = await req.json();
-    const { email, password, full_name, phone, date_of_birth, roll_number, course_id, year_level, semester, admission_year, father_name, mother_name, parent_phone, address } = body;
+    const { email, password, full_name, phone, date_of_birth, roll_number, course_id, year_level, semester, admission_year, father_name, mother_name, parent_phone, address, aadhaar_number, nationality, religion, caste, category, blood_group, gender } = body;
 
     if (!email || !password || !full_name) throw new Error("Email, password, and full name are required");
 
@@ -77,6 +77,13 @@ Deno.serve(async (req) => {
       semester: parseInt(semester) || 1,
       year_level: parseInt(year_level) || 1,
       admission_year: parseInt(admission_year) || new Date().getFullYear(),
+      aadhaar_number: aadhaar_number || "",
+      nationality: nationality || "Indian",
+      religion: religion || "",
+      caste: caste || "",
+      category: category || "",
+      blood_group: blood_group || "",
+      gender: gender || "",
     };
     if (roll_number) studentUpdate.roll_number = roll_number;
     if (course_id) studentUpdate.course_id = course_id;

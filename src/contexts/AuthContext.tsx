@@ -52,6 +52,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const userProfile = await fetchProfile(session.user.id);
             setProfile(userProfile);
 
+            // AndroidBridge: notify Android app of logged-in user
+            if ((window as any).AndroidBridge && session.user.email) {
+              try { (window as any).AndroidBridge.onStudentLoggedIn(session.user.email); } catch {}
+            }
+
             // Consume pending student registration info from localStorage
             const pendingRaw = localStorage.getItem("hdc_pending_student_info");
             if (pendingRaw && userRole === "student") {
@@ -129,6 +134,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
+    // AndroidBridge: notify Android app of logout
+    if ((window as any).AndroidBridge) {
+      try { (window as any).AndroidBridge.onStudentLoggedOut(); } catch {}
+    }
     localStorage.removeItem("hdc_remember");
     sessionStorage.removeItem("hdc_remember");
     await supabase.auth.signOut();

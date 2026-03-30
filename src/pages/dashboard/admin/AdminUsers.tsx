@@ -22,7 +22,7 @@ export default function AdminUsers() {
   const [courseFilter, setCourseFilter] = useState("All");
   const [semesterFilter, setSemesterFilter] = useState("All");
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({ full_name: "", phone: "", roll_number: "", semester: "", parent_phone: "", address: "", date_of_birth: "", course_id: "", total_fee: "", fee_paid: "", fee_due_date: "", fee_remarks: "", employee_id: "", department_id: "", qualification: "", experience: "", subjects: "" });
+  const [editForm, setEditForm] = useState({ full_name: "", phone: "", roll_number: "", semester: "", parent_phone: "", address: "", date_of_birth: "", course_id: "", total_fee: "", fee_paid: "", fee_due_date: "", fee_remarks: "", employee_id: "", department_id: "", qualification: "", experience: "", subjects: "", aadhaar_number: "", nationality: "", religion: "", caste: "", category: "", blood_group: "", gender: "" });
   const [editingRole, setEditingRole] = useState<string>("student");
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [viewUser, setViewUser] = useState<any>(null);
@@ -35,6 +35,8 @@ export default function AdminUsers() {
     academic_year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`,
     admission_year: new Date().getFullYear().toString(),
     father_name: "", mother_name: "", parent_phone: "", address: "",
+    aadhaar_number: "", nationality: "Indian", religion: "", caste: "",
+    category: "", blood_group: "", gender: "",
   });
 
   const { data: users = [], isLoading } = useQuery({
@@ -80,7 +82,7 @@ export default function AdminUsers() {
   });
 
   const updateProfileMutation = useMutation({
-    mutationFn: async ({ userId, role, full_name, phone, roll_number, semester, parent_phone, address, date_of_birth, course_id, total_fee, fee_paid, fee_due_date, fee_remarks, employee_id, department_id, qualification, experience, subjects }: any) => {
+    mutationFn: async ({ userId, role, full_name, phone, roll_number, semester, parent_phone, address, date_of_birth, course_id, total_fee, fee_paid, fee_due_date, fee_remarks, employee_id, department_id, qualification, experience, subjects, aadhaar_number, nationality, religion, caste, category, blood_group, gender }: any) => {
       const { error } = await supabase.from("profiles").update({ full_name, phone }).eq("user_id", userId);
       if (error) throw error;
 
@@ -98,6 +100,14 @@ export default function AdminUsers() {
         if (total_fee !== undefined && total_fee !== "") studentUpdate.total_fee = parseFloat(total_fee) || 0;
         if (fee_paid !== undefined && fee_paid !== "") studentUpdate.fee_paid = parseFloat(fee_paid) || 0;
         if (fee_due_date) studentUpdate.fee_due_date = fee_due_date;
+        // Extra fields
+        if (aadhaar_number !== undefined) studentUpdate.aadhaar_number = aadhaar_number;
+        if (nationality !== undefined) studentUpdate.nationality = nationality;
+        if (religion !== undefined) studentUpdate.religion = religion;
+        if (caste !== undefined) studentUpdate.caste = caste;
+        if (category !== undefined) studentUpdate.category = category;
+        if (blood_group !== undefined) studentUpdate.blood_group = blood_group;
+        if (gender !== undefined) studentUpdate.gender = gender;
         const { error: studentError } = await supabase.from("students").update(studentUpdate).eq("user_id", userId);
         if (studentError) throw studentError;
       } else if (role === "teacher") {
@@ -160,6 +170,13 @@ export default function AdminUsers() {
           mother_name: newStudent.mother_name,
           parent_phone: newStudent.parent_phone,
           address: newStudent.address,
+          aadhaar_number: newStudent.aadhaar_number,
+          nationality: newStudent.nationality,
+          religion: newStudent.religion,
+          caste: newStudent.caste,
+          category: newStudent.category,
+          blood_group: newStudent.blood_group,
+          gender: newStudent.gender,
         },
       });
       if (error) throw new Error(error.message || "Failed to create student");
@@ -168,7 +185,7 @@ export default function AdminUsers() {
     onSuccess: () => {
       toast.success("Student created successfully!");
       setShowAddStudent(false);
-      setNewStudent({ full_name: "", email: "", password: "", phone: "", date_of_birth: "", roll_number: "", course_id: "", year_level: "1", semester: "1", academic_year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`, admission_year: new Date().getFullYear().toString(), father_name: "", mother_name: "", parent_phone: "", address: "" });
+      setNewStudent({ full_name: "", email: "", password: "", phone: "", date_of_birth: "", roll_number: "", course_id: "", year_level: "1", semester: "1", academic_year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`, admission_year: new Date().getFullYear().toString(), father_name: "", mother_name: "", parent_phone: "", address: "", aadhaar_number: "", nationality: "Indian", religion: "", caste: "", category: "", blood_group: "", gender: "" });
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
     },
     onError: (e: any) => toast.error(e.message),
@@ -188,6 +205,8 @@ export default function AdminUsers() {
         roll_number: "", semester: "", parent_phone: "", address: "",
         date_of_birth: "", course_id: "", total_fee: "", fee_paid: "",
         fee_due_date: "", fee_remarks: "",
+        aadhaar_number: "", nationality: "", religion: "", caste: "",
+        category: "", blood_group: "", gender: "",
       });
     } else {
       setEditForm({
@@ -198,6 +217,13 @@ export default function AdminUsers() {
         total_fee: String(u.student?.total_fee || ""), fee_paid: String(u.student?.fee_paid || ""),
         fee_due_date: u.student?.fee_due_date || "", fee_remarks: u.student?.fee_remarks || "",
         employee_id: "", department_id: "", qualification: "", experience: "", subjects: "",
+        aadhaar_number: (u.student as any)?.aadhaar_number || "",
+        nationality: (u.student as any)?.nationality || "",
+        religion: (u.student as any)?.religion || "",
+        caste: (u.student as any)?.caste || "",
+        category: (u.student as any)?.category || "",
+        blood_group: (u.student as any)?.blood_group || "",
+        gender: (u.student as any)?.gender || "",
       });
     }
   };
@@ -330,7 +356,32 @@ export default function AdminUsers() {
             <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Student Phone</label><input value={newStudent.phone} onChange={(e) => setNewStudent({ ...newStudent, phone: e.target.value })} className={inputClass} /></div>
             <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Date of Birth</label><input type="date" value={newStudent.date_of_birth} onChange={(e) => setNewStudent({ ...newStudent, date_of_birth: e.target.value })} className={inputClass} /></div>
             <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Roll Number</label><input value={newStudent.roll_number} onChange={(e) => setNewStudent({ ...newStudent, roll_number: e.target.value })} placeholder="Auto-generated if empty" className={inputClass} /></div>
-
+            <div>
+              <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Gender</label>
+              <select value={newStudent.gender} onChange={(e) => setNewStudent({ ...newStudent, gender: e.target.value })} className={inputClass}>
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option>
+              </select>
+            </div>
+            <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Aadhaar No.</label><input value={newStudent.aadhaar_number} onChange={(e) => setNewStudent({ ...newStudent, aadhaar_number: e.target.value })} placeholder="12-digit Aadhaar" maxLength={12} className={inputClass} /></div>
+            <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Nationality</label><input value={newStudent.nationality} onChange={(e) => setNewStudent({ ...newStudent, nationality: e.target.value })} className={inputClass} /></div>
+            <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Religion</label><input value={newStudent.religion} onChange={(e) => setNewStudent({ ...newStudent, religion: e.target.value })} className={inputClass} /></div>
+            <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Caste</label><input value={newStudent.caste} onChange={(e) => setNewStudent({ ...newStudent, caste: e.target.value })} className={inputClass} /></div>
+            <div>
+              <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Category</label>
+              <select value={newStudent.category} onChange={(e) => setNewStudent({ ...newStudent, category: e.target.value })} className={inputClass}>
+                <option value="">Select Category</option>
+                <option value="General">General</option><option value="OBC">OBC</option><option value="SC">SC</option><option value="ST">ST</option><option value="Other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Blood Group</label>
+              <select value={newStudent.blood_group} onChange={(e) => setNewStudent({ ...newStudent, blood_group: e.target.value })} className={inputClass}>
+                <option value="">Select</option>
+                <option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option>
+                <option value="AB+">AB+</option><option value="AB-">AB-</option><option value="O+">O+</option><option value="O-">O-</option>
+              </select>
+            </div>
             <div className="sm:col-span-2 mt-1">
               <div className="flex items-center gap-2 py-2 border-b border-border mb-1">
                 <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-[10px]">2</span>
@@ -566,6 +617,22 @@ export default function AdminUsers() {
                       <Input type="date" value={editForm.fee_due_date} onChange={(e) => setEditForm({ ...editForm, fee_due_date: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Fee Due Date" />
                       <Input value={editForm.fee_remarks} onChange={(e) => setEditForm({ ...editForm, fee_remarks: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Fee Remarks" />
                       <Input value={editForm.address} onChange={(e) => setEditForm({ ...editForm, address: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Address" />
+                      <Input value={editForm.aadhaar_number} onChange={(e) => setEditForm({ ...editForm, aadhaar_number: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Aadhaar No." />
+                      <Input value={editForm.nationality} onChange={(e) => setEditForm({ ...editForm, nationality: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Nationality" />
+                      <Input value={editForm.religion} onChange={(e) => setEditForm({ ...editForm, religion: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Religion" />
+                      <Input value={editForm.caste} onChange={(e) => setEditForm({ ...editForm, caste: e.target.value })} className="h-9 text-sm rounded-xl" placeholder="Caste" />
+                      <select value={editForm.category} onChange={(e) => setEditForm({ ...editForm, category: e.target.value })} className="h-9 text-sm rounded-xl border border-input bg-background px-3">
+                        <option value="">Category</option>
+                        <option value="General">General</option><option value="OBC">OBC</option><option value="SC">SC</option><option value="ST">ST</option><option value="Other">Other</option>
+                      </select>
+                      <select value={editForm.blood_group} onChange={(e) => setEditForm({ ...editForm, blood_group: e.target.value })} className="h-9 text-sm rounded-xl border border-input bg-background px-3">
+                        <option value="">Blood Group</option>
+                        <option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="AB+">AB+</option><option value="AB-">AB-</option><option value="O+">O+</option><option value="O-">O-</option>
+                      </select>
+                      <select value={editForm.gender} onChange={(e) => setEditForm({ ...editForm, gender: e.target.value })} className="h-9 text-sm rounded-xl border border-input bg-background px-3">
+                        <option value="">Gender</option>
+                        <option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option>
+                      </select>
                     </>
                   ) : null}
                 </div>
