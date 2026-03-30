@@ -1608,6 +1608,32 @@ export type Database = {
           year_level: number
         }[]
       }
+      get_students_for_teacher: {
+        Args: never
+        Returns: {
+          academic_year_id: string
+          address: string
+          admission_year: number
+          avatar_url: string
+          blood_group: string
+          category: string
+          course_id: string
+          created_at: string
+          date_of_birth: string
+          father_name: string
+          gender: string
+          id: string
+          is_active: boolean
+          mother_name: string
+          nationality: string
+          parent_phone: string
+          phone: string
+          roll_number: string
+          semester: number
+          user_id: string
+          year_level: number
+        }[]
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
