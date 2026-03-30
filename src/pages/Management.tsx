@@ -71,8 +71,8 @@ export default function Management() {
                     <div className="p-8 flex flex-col items-center text-center">
                       {/* Avatar circle */}
                       <div className="relative mb-5">
-                        <div className="w-28 h-28 rounded-full flex items-center justify-center text-5xl border-2 group-hover:scale-105 transition-transform duration-500" style={{ borderColor: `hsl(${m.accent} / 0.3)`, background: `linear-gradient(135deg, hsl(${m.accent} / 0.08), hsl(${m.accent} / 0.02))` }}>
-                          {m.emoji}
+                        <div className="w-28 h-28 rounded-full overflow-hidden border-2 group-hover:scale-105 transition-transform duration-500" style={{ borderColor: `hsl(${m.accent} / 0.3)` }}>
+                          <img src={m.photo} alt={m.name} className="w-full h-full object-cover" />
                         </div>
                         <div className="absolute -bottom-1 -right-1 w-9 h-9 rounded-xl flex items-center justify-center border border-border/60 bg-card shadow-lg">
                           <Icon className="w-4 h-4" style={{ color: `hsl(${m.accent})` }} />
