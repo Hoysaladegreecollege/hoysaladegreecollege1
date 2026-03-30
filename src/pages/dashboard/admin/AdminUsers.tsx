@@ -356,7 +356,32 @@ export default function AdminUsers() {
             <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Student Phone</label><input value={newStudent.phone} onChange={(e) => setNewStudent({ ...newStudent, phone: e.target.value })} className={inputClass} /></div>
             <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Date of Birth</label><input type="date" value={newStudent.date_of_birth} onChange={(e) => setNewStudent({ ...newStudent, date_of_birth: e.target.value })} className={inputClass} /></div>
             <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Roll Number</label><input value={newStudent.roll_number} onChange={(e) => setNewStudent({ ...newStudent, roll_number: e.target.value })} placeholder="Auto-generated if empty" className={inputClass} /></div>
-
+            <div>
+              <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Gender</label>
+              <select value={newStudent.gender} onChange={(e) => setNewStudent({ ...newStudent, gender: e.target.value })} className={inputClass}>
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option>
+              </select>
+            </div>
+            <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Aadhaar No.</label><input value={newStudent.aadhaar_number} onChange={(e) => setNewStudent({ ...newStudent, aadhaar_number: e.target.value })} placeholder="12-digit Aadhaar" maxLength={12} className={inputClass} /></div>
+            <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Nationality</label><input value={newStudent.nationality} onChange={(e) => setNewStudent({ ...newStudent, nationality: e.target.value })} className={inputClass} /></div>
+            <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Religion</label><input value={newStudent.religion} onChange={(e) => setNewStudent({ ...newStudent, religion: e.target.value })} className={inputClass} /></div>
+            <div><label className="font-body text-xs font-semibold text-foreground block mb-1.5">Caste</label><input value={newStudent.caste} onChange={(e) => setNewStudent({ ...newStudent, caste: e.target.value })} className={inputClass} /></div>
+            <div>
+              <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Category</label>
+              <select value={newStudent.category} onChange={(e) => setNewStudent({ ...newStudent, category: e.target.value })} className={inputClass}>
+                <option value="">Select Category</option>
+                <option value="General">General</option><option value="OBC">OBC</option><option value="SC">SC</option><option value="ST">ST</option><option value="Other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label className="font-body text-xs font-semibold text-foreground block mb-1.5">Blood Group</label>
+              <select value={newStudent.blood_group} onChange={(e) => setNewStudent({ ...newStudent, blood_group: e.target.value })} className={inputClass}>
+                <option value="">Select</option>
+                <option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option>
+                <option value="AB+">AB+</option><option value="AB-">AB-</option><option value="O+">O+</option><option value="O-">O-</option>
+              </select>
+            </div>
             <div className="sm:col-span-2 mt-1">
               <div className="flex items-center gap-2 py-2 border-b border-border mb-1">
                 <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-[10px]">2</span>
