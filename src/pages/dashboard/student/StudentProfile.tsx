@@ -299,7 +299,7 @@ export default function StudentProfile() {
                   <Input
                     type={(f as any).type || "text"}
                     value={editForm[f.editKey] || ""}
-                    onChange={(e) => setEditForm({ ...editForm, [f.editKey!]: e.target.value })}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, [f.editKey!]: e.target.value }))}
                     className="h-8 text-sm rounded-xl mt-1"
                   />
                 ) : (
