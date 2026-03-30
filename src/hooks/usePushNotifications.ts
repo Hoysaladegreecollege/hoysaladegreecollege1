@@ -36,8 +36,20 @@ export function usePushNotifications() {
   }, []);
 
   useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').then((reg) => {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      console.warn('Push notifications not supported in this browser');
+      return;
+    }
+
+    // Check secure context
+    if (!window.isSecureContext) {
+      console.warn('Push notifications require HTTPS (secure context)');
+      return;
+    }
+
+    navigator.serviceWorker.register('/sw.js')
+      .then((reg) => {
+        console.log('Service Worker registered successfully');
         setSwRegistration(reg);
         reg.pushManager.getSubscription().then((sub: PushSubscription | null) => {
           if (sub) {
@@ -58,7 +70,7 @@ export function usePushNotifications() {
                       p256dh: subJson.keys?.p256dh || '',
                       auth: subJson.keys?.auth || '',
                     }).then(() => {
-                      console.log('Push subscription re-saved to DB');
+                      console.log('Push subscription saved to DB');
                     });
                   }
                 });
@@ -77,8 +89,9 @@ export function usePushNotifications() {
                 endpoint: subJson.endpoint as string,
                 p256dh: subJson.keys?.p256dh || '',
                 auth: subJson.keys?.auth || '',
-              });
-            }).catch(() => {
+              }).then(() => console.log('Re-subscribed to push notifications'));
+            }).catch((err) => {
+              console.error('Auto re-subscribe failed:', err);
               setIsSubscribed(false);
               localStorage.removeItem('hdc_push_subscribed');
             });
@@ -87,10 +100,10 @@ export function usePushNotifications() {
             localStorage.removeItem('hdc_push_subscribed');
           }
         });
-      }).catch((err: any) => {
-        console.error('SW registration failed:', err);
+      })
+      .catch((err: any) => {
+        console.error('Service Worker registration failed:', err);
       });
-    }
   }, [user]);
 
   const subscribe = useCallback(async () => {
