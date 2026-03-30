@@ -391,7 +391,7 @@ export default function AdminStudentDetail() {
             <InfoCard label="Phone" value={student.profile?.phone || student.phone} icon={Phone} />
             <InfoCard label="Date of Birth" value={student.date_of_birth ? format(new Date(student.date_of_birth), "dd MMM yyyy") : ""} icon={Calendar} />
             <InfoCard label="Gender" value={(student as any).gender} />
-            <InfoCard label="Aadhaar No." value={(student as any).aadhaar_number} />
+            <InfoCard label="Aadhaar No." value={formatAadhaar((student as any).aadhaar_number)} />
             <InfoCard label="Nationality" value={(student as any).nationality} />
             <InfoCard label="Religion" value={(student as any).religion} />
             <InfoCard label="Caste" value={(student as any).caste} />
