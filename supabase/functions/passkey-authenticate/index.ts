@@ -1,4 +1,3 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -22,7 +21,7 @@ function getRpId(req: Request, supabaseUrl: string): string {
   try { return new URL(supabaseUrl).hostname; } catch { return "localhost"; }
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
@@ -30,7 +29,8 @@ serve(async (req) => {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabaseAdmin = createClient(supabaseUrl, serviceKey);
 
-    const { action, credentialId, email } = await req.json();
+    const body = await req.json();
+    const { action, credentialId, email } = body;
     const rpId = getRpId(req, supabaseUrl);
 
     if (action === "get-options") {
@@ -60,19 +60,25 @@ serve(async (req) => {
     }
 
     if (action === "authenticate") {
-      const { data: passkey } = await supabaseAdmin.from("passkeys")
+      if (!credentialId) {
+        return new Response(JSON.stringify({ error: "Missing credentialId" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+
+      const { data: passkey, error: passKeyError } = await supabaseAdmin.from("passkeys")
         .select("*")
         .eq("credential_id", credentialId)
         .single();
 
-      if (!passkey) {
+      if (passKeyError || !passkey) {
+        console.error("Passkey lookup error:", passKeyError);
         return new Response(JSON.stringify({ error: "Passkey not found. Please register a passkey first." }), { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
 
-      await supabaseAdmin.from("passkeys").update({ counter: passkey.counter + 1 }).eq("id", passkey.id);
+      await supabaseAdmin.from("passkeys").update({ counter: (passkey.counter || 0) + 1 }).eq("id", passkey.id);
 
-      const { data: userData } = await supabaseAdmin.auth.admin.getUserById(passkey.user_id);
-      if (!userData?.user?.email) {
+      const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(passkey.user_id);
+      if (userError || !userData?.user?.email) {
+        console.error("User lookup error:", userError);
         return new Response(JSON.stringify({ error: "User not found" }), { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
 
@@ -82,6 +88,7 @@ serve(async (req) => {
       });
 
       if (linkError) {
+        console.error("Magic link error:", linkError);
         return new Response(JSON.stringify({ error: linkError.message }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
 
@@ -94,8 +101,8 @@ serve(async (req) => {
     }
 
     return new Response(JSON.stringify({ error: "Invalid action" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-  } catch (err) {
+  } catch (err: any) {
     console.error("passkey-authenticate error:", err);
-    return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ error: err?.message || "Internal server error" }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 });

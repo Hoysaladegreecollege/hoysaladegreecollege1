@@ -1102,7 +1102,7 @@ export default function AdminFeeManagement() {
               <div className="flex gap-1.5 p-1 bg-muted/20 rounded-xl border border-border/30">
                 <button onClick={() => setFeeEditMode("total")}
                   className={`flex-1 py-2.5 rounded-lg font-body text-xs font-semibold transition-all duration-300 ${feeEditMode === "total" ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" : "text-muted-foreground hover:text-foreground"}`}>
-                  Total Fee
+                  Yearly Fee
                 </button>
                 <button onClick={() => setFeeEditMode("semester")}
                   className={`flex-1 py-2.5 rounded-lg font-body text-xs font-semibold transition-all duration-300 ${feeEditMode === "semester" ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" : "text-muted-foreground hover:text-foreground"}`}>
@@ -1112,9 +1112,9 @@ export default function AdminFeeManagement() {
 
               {feeEditMode === "total" ? (
                 <div>
-                  <label className="font-body text-[11px] font-semibold block mb-1.5 uppercase tracking-wider text-muted-foreground">Total Fee (₹)</label>
+                  <label className="font-body text-[11px] font-semibold block mb-1.5 uppercase tracking-wider text-muted-foreground">Yearly Fee (₹)</label>
                   <input type="number" value={feeEditForm.total_fee} onChange={e => setFeeEditForm({ ...feeEditForm, total_fee: e.target.value })}
-                    className={inputClass} placeholder="Total fee amount" />
+                    className={inputClass} placeholder="Yearly fee amount" />
                 </div>
               ) : (
                 <div className="space-y-3">

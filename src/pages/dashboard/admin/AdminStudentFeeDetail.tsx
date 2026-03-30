@@ -1267,7 +1267,7 @@ export default function AdminStudentFeeDetail() {
                 onClick={() => setEditMode("total")}
                 className={`flex-1 py-2.5 rounded-lg font-body text-xs font-semibold transition-all duration-200 ${editMode === "total" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
               >
-                Total Fee
+                Yearly Fee
               </button>
               <button
                 onClick={() => setEditMode("semester")}
@@ -1278,7 +1278,7 @@ export default function AdminStudentFeeDetail() {
             </div>
             {editMode === "total" ? (
               <div>
-                <label className="font-body text-xs text-muted-foreground mb-1.5 block">Total Fee (₹)</label>
+                <label className="font-body text-xs text-muted-foreground mb-1.5 block">Yearly Fee (₹)</label>
                 <input
                   value={editForm.total_fee}
                   onChange={(e) => setEditForm((f) => ({ ...f, total_fee: e.target.value }))}
@@ -1289,7 +1289,7 @@ export default function AdminStudentFeeDetail() {
             ) : (
               <div className="space-y-3">
                 <p className="font-body text-xs text-muted-foreground">
-                  Set fee for each semester. Total fee auto-calculates.
+                  Set fee for each semester. Yearly fee auto-calculates.
                 </p>
                 <div className="grid grid-cols-2 gap-3">
                   {[1, 2, 3, 4, 5, 6].map((sem) => (
