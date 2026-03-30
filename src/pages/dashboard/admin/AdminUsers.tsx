@@ -202,6 +202,13 @@ export default function AdminUsers() {
         total_fee: String(u.student?.total_fee || ""), fee_paid: String(u.student?.fee_paid || ""),
         fee_due_date: u.student?.fee_due_date || "", fee_remarks: u.student?.fee_remarks || "",
         employee_id: "", department_id: "", qualification: "", experience: "", subjects: "",
+        aadhaar_number: (u.student as any)?.aadhaar_number || "",
+        nationality: (u.student as any)?.nationality || "",
+        religion: (u.student as any)?.religion || "",
+        caste: (u.student as any)?.caste || "",
+        category: (u.student as any)?.category || "",
+        blood_group: (u.student as any)?.blood_group || "",
+        gender: (u.student as any)?.gender || "",
       });
     }
   };
