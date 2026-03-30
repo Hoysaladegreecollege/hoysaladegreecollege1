@@ -330,25 +330,43 @@ export default function AdminStudentDetail() {
                 </Button>
               </>
             )}
-            <Button size="sm" variant="outline" className="rounded-xl font-body text-xs" onClick={() => {
-              const currentYear = new Date().getFullYear();
-              const academicYear = `${currentYear - 1}-${String(currentYear).slice(2)}`;
-              generateStudyCertificate({
-                fullName: student.profile?.full_name || "",
-                fatherName: student.father_name || "",
-                courseName: student.courses?.name || "",
-                semester: student.semester || 1,
-                rollNumber: student.roll_number || "",
-                gender: (student as any).gender || "",
-                aadhaarNumber: (student as any).aadhaar_number || "",
-                dateOfBirth: student.date_of_birth || "",
-                nationality: (student as any).nationality || "",
-                caste: (student as any).caste || "",
-                category: (student as any).category || "",
-                academicYear,
-              });
+            <Button size="sm" variant="outline" className="rounded-xl font-body text-xs" disabled={generatingCert} onClick={async () => {
+              setGeneratingCert(true);
+              setCertProgress(0);
+              try {
+                // Simulate progress stages
+                setCertProgress(15);
+                await new Promise(r => setTimeout(r, 200));
+                setCertProgress(35);
+                const currentYear = new Date().getFullYear();
+                const academicYear = `${currentYear - 1}-${String(currentYear).slice(2)}`;
+                setCertProgress(55);
+                await new Promise(r => setTimeout(r, 200));
+                setCertProgress(75);
+                await generateStudyCertificate({
+                  fullName: student.profile?.full_name || "",
+                  fatherName: student.father_name || "",
+                  courseName: student.courses?.name || "",
+                  semester: student.semester || 1,
+                  rollNumber: student.roll_number || "",
+                  gender: (student as any).gender || "",
+                  aadhaarNumber: (student as any).aadhaar_number || "",
+                  dateOfBirth: student.date_of_birth || "",
+                  nationality: (student as any).nationality || "",
+                  caste: (student as any).caste || "",
+                  category: (student as any).category || "",
+                  academicYear,
+                });
+                setCertProgress(100);
+                await new Promise(r => setTimeout(r, 400));
+              } catch (e: any) {
+                toast.error("Certificate generation failed: " + e.message);
+              } finally {
+                setGeneratingCert(false);
+                setCertProgress(0);
+              }
             }}>
-              <Award className="w-3.5 h-3.5 mr-1" /> Study Certificate
+              <Award className="w-3.5 h-3.5 mr-1" /> {generatingCert ? "Generating..." : "Study Certificate"}
             </Button>
             <Link to={`/dashboard/admin/fees/${student.id}`}>
               <Button size="sm" variant="outline" className="rounded-xl font-body text-xs">
