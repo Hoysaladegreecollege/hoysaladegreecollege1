@@ -55,6 +55,15 @@ export default function StudentProfile() {
     enabled: !!user,
   });
 
+  const { data: documents = [] } = useQuery({
+    queryKey: ["student-documents", student?.id],
+    queryFn: async () => {
+      const { data } = await (supabase as any).from("student_documents").select("*").eq("student_id", student!.id).order("created_at", { ascending: false });
+      return data || [];
+    },
+    enabled: !!student?.id,
+  });
+
   const uploadAvatarMutation = useMutation({
     mutationFn: async (file: File) => {
       setUploading(true);
