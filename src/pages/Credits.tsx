@@ -60,7 +60,7 @@ export default function Credits() {
             </a>
           </div>
 
-          <p className="font-body text-[10px] text-muted-foreground/40 mt-6">Starting at ₹35,000 • Full source code • Lifetime ownership</p>
+          <p className="font-body text-[10px] text-muted-foreground/40 mt-6">Starting at ₹49,999 • Full source code • Lifetime ownership</p>
         </div>
       </div>
     </div>,

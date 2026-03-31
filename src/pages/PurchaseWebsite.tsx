@@ -1200,7 +1200,7 @@ export default function PurchaseWebsite() {
                   <p className="font-body text-white/30 text-sm mb-8">Everything included — no hidden costs</p>
 
                   <div className="flex items-baseline justify-center gap-2 mb-10">
-                    <span className="font-display text-5xl sm:text-6xl font-bold" style={{ background: "linear-gradient(135deg, hsl(42,90%,68%), hsl(38,92%,50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", filter: "drop-shadow(0 0 30px hsla(42,87%,55%,0.2))" }}>₹35,000</span>
+                    <span className="font-display text-5xl sm:text-6xl font-bold" style={{ background: "linear-gradient(135deg, hsl(42,90%,68%), hsl(38,92%,50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", filter: "drop-shadow(0 0 30px hsla(42,87%,55%,0.2))" }}>₹49,999</span>
                     <span className="font-body text-white/25 text-sm">one-time</span>
                   </div>
 
