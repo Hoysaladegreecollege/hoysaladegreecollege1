@@ -16,6 +16,7 @@ import ScrollToTop from "./ScrollToTop";
 import NotificationBadge from "./NotificationBadge";
 import NotificationCenter from "./NotificationCenter";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { useFcmToken } from "@/hooks/useFcmToken";
 
 interface NavItem { label: string; path: string; icon: React.ElementType; }
 
@@ -78,6 +79,7 @@ const adminNav: NavItem[] = [
   { label: "Roles", path: "/dashboard/admin/roles", icon: Shield },
   { label: "Reports & Export", path: "/dashboard/admin/reports", icon: Download },
   { label: "Alumni", path: "/dashboard/admin/alumni", icon: GraduationCap },
+  { label: "Broadcast", path: "/dashboard/admin/broadcast", icon: BellRing },
   { label: "Settings", path: "/dashboard/admin/settings", icon: Settings },
 ];
 
@@ -87,6 +89,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { isSubscribed, isSupported, subscribe, isLoading: pushLoading } = usePushNotifications();
+  useFcmToken();
   const [pushBannerDismissed, setPushBannerDismissed] = useState(() => {
     return localStorage.getItem('hdc_push_banner_dismissed') === '1';
   });

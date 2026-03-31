@@ -441,6 +441,7 @@ export default function AdminDashboard() {
     { icon: Shield, label: "Roles", desc: "Role distribution", path: "/dashboard/admin/roles", color: "bg-violet-500/10", iconColor: "text-violet-500" },
     { icon: Settings, label: "Settings", desc: "System health", path: "/dashboard/admin/settings", color: "bg-slate-500/10", iconColor: "text-slate-500" },
     { icon: GraduationCap, label: "Alumni", desc: "Success stories", path: "/dashboard/admin/alumni", color: "bg-lime-500/10", iconColor: "text-lime-500" },
+    { icon: Bell, label: "Broadcast", desc: "Send notifications", path: "/dashboard/admin/broadcast", color: "bg-yellow-500/10", iconColor: "text-yellow-500" },
   ];
 
   // Semester chart data

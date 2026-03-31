@@ -66,6 +66,27 @@ export async function notifyStudents({
     } catch (pushErr) {
       console.error("Push notification failed (non-critical):", pushErr);
     }
+
+    // Send FCM notifications to Android devices
+    try {
+      const fcmNotifications = perStudentPush || students.map((s) => ({
+        user_id: s.user_id,
+        title,
+        body: message,
+        url: link || '/dashboard/student',
+      }));
+
+      if (fcmNotifications.length > 0) {
+        const { error: fcmError } = await supabase.functions.invoke('send-fcm-notification', {
+          body: { notifications: fcmNotifications },
+        });
+        if (fcmError) {
+          console.error('FCM notification error:', fcmError);
+        }
+      }
+    } catch (fcmErr) {
+      console.error("FCM notification failed (non-critical):", fcmErr);
+    }
   } catch (err) {
     console.error("Failed to notify students:", err);
   }
