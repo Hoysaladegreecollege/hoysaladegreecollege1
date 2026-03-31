@@ -3,12 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   User, Phone, MapPin, Calendar, BookOpen, Hash, Camera, Upload, Sparkles,
-  Shield, Fingerprint, Trash2, Edit3, Save, X, FileText, Download
+  Shield, Fingerprint, Trash2, FileText, Download
 } from "lucide-react";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { formatAadhaar } from "@/lib/format-aadhaar";
 
 const base64UrlToUint8Array = (value: string) => {
@@ -30,8 +29,6 @@ export default function StudentProfile() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [registeringPasskey, setRegisteringPasskey] = useState(false);
-  const [editing, setEditing] = useState(false);
-  const [editForm, setEditForm] = useState<Record<string, string>>({});
 
   const { data: student } = useQuery({
     queryKey: ["student-record", user?.id],
@@ -89,45 +86,6 @@ export default function StudentProfile() {
     onError: (e: any) => { toast.error(e.message); setUploading(false); },
   });
 
-  const updateProfileMutation = useMutation({
-    mutationFn: async (form: Record<string, string>) => {
-      const { error: profileError } = await supabase.from("profiles").update({
-        full_name: form.full_name || "",
-        phone: form.phone || "",
-      }).eq("user_id", user!.id);
-      if (profileError) throw profileError;
-      const studentUpdate: any = {
-        phone: form.phone || "",
-        parent_phone: form.parent_phone || "",
-        address: form.address || "",
-        date_of_birth: form.date_of_birth || null,
-        father_name: form.father_name || "",
-        mother_name: form.mother_name || "",
-      };
-      const { error: studentError } = await supabase.from("students").update(studentUpdate).eq("user_id", user!.id);
-      if (studentError) throw studentError;
-    },
-    onSuccess: () => {
-      toast.success("Profile updated!");
-      queryClient.invalidateQueries({ queryKey: ["student-record", user?.id] });
-      setEditing(false);
-    },
-    onError: (e: any) => toast.error(e.message),
-  });
-
-  const startEditing = () => {
-    setEditForm({
-      full_name: profile?.full_name || "",
-      phone: (student as any)?.phone || profile?.phone || "",
-      parent_phone: student?.parent_phone || "",
-      address: student?.address || "",
-      date_of_birth: student?.date_of_birth || "",
-      father_name: student?.father_name || "",
-      mother_name: student?.mother_name || "",
-    });
-    setEditing(true);
-  };
-
   const handleRegisterPasskey = async () => {
     if (!window.PublicKeyCredential) { toast.error("Passkeys are not supported on this device/browser"); return; }
     try {
@@ -178,17 +136,17 @@ export default function StudentProfile() {
   };
 
   const fields = [
-    { icon: User, label: "Full Name", value: profile?.full_name, editKey: "full_name" },
+    { icon: User, label: "Full Name", value: profile?.full_name },
     { icon: Hash, label: "Roll Number", value: student?.roll_number },
     { icon: BookOpen, label: "Course", value: student?.courses?.name },
     { icon: Calendar, label: "Semester", value: student?.semester ? `Semester ${student.semester}` : "-" },
     { icon: Calendar, label: "Admission Year", value: student?.admission_year },
-    { icon: Calendar, label: "Date of Birth", value: student?.date_of_birth, editKey: "date_of_birth", type: "date" },
-    { icon: Phone, label: "Phone", value: (student as any)?.phone || profile?.phone || "-", editKey: "phone" },
-    { icon: Phone, label: "Parent Phone", value: student?.parent_phone || "-", editKey: "parent_phone" },
-    { icon: User, label: "Father's Name", value: student?.father_name || "-", editKey: "father_name" },
-    { icon: User, label: "Mother's Name", value: student?.mother_name || "-", editKey: "mother_name" },
-    { icon: MapPin, label: "Address", value: student?.address || "-", editKey: "address" },
+    { icon: Calendar, label: "Date of Birth", value: student?.date_of_birth },
+    { icon: Phone, label: "Phone", value: (student as any)?.phone || profile?.phone || "-" },
+    { icon: Phone, label: "Parent Phone", value: student?.parent_phone || "-" },
+    { icon: User, label: "Father's Name", value: student?.father_name || "-" },
+    { icon: User, label: "Mother's Name", value: student?.mother_name || "-" },
+    { icon: MapPin, label: "Address", value: student?.address || "-" },
     { icon: Shield, label: "Aadhaar No.", value: formatAadhaar((student as any)?.aadhaar_number) },
     { icon: User, label: "Gender", value: (student as any)?.gender || "-" },
     { icon: User, label: "Nationality", value: (student as any)?.nationality || "-" },
@@ -204,30 +162,14 @@ export default function StudentProfile() {
     <div className="space-y-6">
       <div className="relative overflow-hidden bg-card border border-border/40 rounded-3xl p-6 sm:p-8">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.06] via-transparent to-secondary/[0.04]" />
-        <div className="relative flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-              <User className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <h2 className="font-display text-xl font-bold text-foreground">My Profile</h2>
-              <p className="font-body text-xs text-muted-foreground mt-0.5">View and edit your details</p>
-            </div>
+        <div className="relative flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+            <User className="w-5 h-5 text-primary" />
           </div>
-          {!editing ? (
-            <Button variant="outline" size="sm" className="rounded-2xl font-body text-xs" onClick={startEditing}>
-              <Edit3 className="w-3 h-3 mr-1.5" /> Edit Profile
-            </Button>
-          ) : (
-            <div className="flex gap-2">
-              <Button size="sm" className="rounded-2xl font-body text-xs" disabled={updateProfileMutation.isPending} onClick={() => updateProfileMutation.mutate(editForm)}>
-                <Save className="w-3 h-3 mr-1.5" /> {updateProfileMutation.isPending ? "Saving..." : "Save"}
-              </Button>
-              <Button variant="outline" size="sm" className="rounded-2xl font-body text-xs" onClick={() => setEditing(false)}>
-                <X className="w-3 h-3" />
-              </Button>
-            </div>
-          )}
+          <div>
+            <h2 className="font-display text-xl font-bold text-foreground">My Profile</h2>
+            <p className="font-body text-xs text-muted-foreground mt-0.5">Your personal details</p>
+          </div>
         </div>
       </div>
 
@@ -274,16 +216,7 @@ export default function StudentProfile() {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="font-body text-[10px] text-muted-foreground uppercase tracking-[0.1em]">{f.label}</p>
-                {editing && f.editKey ? (
-                  <Input
-                    type={(f as any).type || "text"}
-                    value={editForm[f.editKey] || ""}
-                    onChange={(e) => setEditForm(prev => ({ ...prev, [f.editKey!]: e.target.value }))}
-                    className="h-8 text-sm rounded-xl mt-1"
-                  />
-                ) : (
-                  <p className="font-body text-sm font-semibold text-foreground mt-0.5">{f.value || "-"}</p>
-                )}
+                <p className="font-body text-sm font-semibold text-foreground mt-0.5">{f.value || "-"}</p>
               </div>
             </div>
           ))}
