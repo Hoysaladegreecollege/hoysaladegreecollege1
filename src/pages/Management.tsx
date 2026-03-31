@@ -71,11 +71,11 @@ export default function Management() {
                     <div className="p-8 flex flex-col items-center text-center">
                       {/* Avatar circle */}
                       <div className="relative mb-5">
-                        <div className="w-28 h-28 rounded-full overflow-hidden border-2 group-hover:scale-105 transition-transform duration-500" style={{ borderColor: `hsl(${m.accent} / 0.3)` }}>
-                          <img src={m.photo} alt={m.name} className="w-full h-full object-cover" />
+                        <div className="w-36 h-36 md:w-40 md:h-40 rounded-full overflow-hidden border-[3px] transition-all duration-500 group-hover:scale-110 group-hover:shadow-2xl" style={{ borderColor: `hsl(${m.accent} / 0.4)`, boxShadow: `0 0 0 0 hsl(${m.accent} / 0)` }}>
+                          <img src={m.photo} alt={m.name} className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-110" />
                         </div>
-                        <div className="absolute -bottom-1 -right-1 w-9 h-9 rounded-xl flex items-center justify-center border border-border/60 bg-card shadow-lg">
-                          <Icon className="w-4 h-4" style={{ color: `hsl(${m.accent})` }} />
+                        <div className="absolute -bottom-1.5 -right-1.5 w-10 h-10 rounded-xl flex items-center justify-center border border-border/60 bg-card shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
+                          <Icon className="w-4.5 h-4.5" style={{ color: `hsl(${m.accent})` }} />
                         </div>
                       </div>
 
@@ -107,11 +107,11 @@ export default function Management() {
                     <div className="h-0.5 w-full" style={{ background: `linear-gradient(90deg, transparent, hsl(${m.accent} / 0.6), transparent)` }} />
                     <div className="p-6 text-center">
                       <div className="relative mx-auto mb-4">
-                        <div className="w-20 h-20 rounded-full mx-auto overflow-hidden group-hover:scale-110 transition-transform duration-300" style={{ border: `1px solid hsl(${m.accent} / 0.15)` }}>
-                          <img src={m.photo} alt={m.name} className="w-full h-full object-cover" />
+                        <div className="w-28 h-28 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-full mx-auto overflow-hidden transition-all duration-500 group-hover:scale-115 group-hover:shadow-xl" style={{ border: `2px solid hsl(${m.accent} / 0.25)` }}>
+                          <img src={m.photo} alt={m.name} className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-110" />
                         </div>
-                        <div className="absolute -bottom-1 right-1/2 translate-x-6 w-7 h-7 rounded-lg flex items-center justify-center border border-border/50 bg-card shadow">
-                          <Icon className="w-3 h-3" style={{ color: `hsl(${m.accent})` }} />
+                        <div className="absolute -bottom-1 right-1/2 translate-x-7 w-8 h-8 rounded-lg flex items-center justify-center border border-border/50 bg-card shadow transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
+                          <Icon className="w-3.5 h-3.5" style={{ color: `hsl(${m.accent})` }} />
                         </div>
                       </div>
 
