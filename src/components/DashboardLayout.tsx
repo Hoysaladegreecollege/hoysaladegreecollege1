@@ -16,6 +16,7 @@ import ScrollToTop from "./ScrollToTop";
 import NotificationBadge from "./NotificationBadge";
 import NotificationCenter from "./NotificationCenter";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { useFcmToken } from "@/hooks/useFcmToken";
 
 interface NavItem { label: string; path: string; icon: React.ElementType; }
 
