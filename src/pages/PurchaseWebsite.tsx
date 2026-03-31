@@ -13,7 +13,7 @@ import {
 import { motion, AnimatePresence, useMotionValue, animate, useScroll, useTransform } from "framer-motion";
 
 /* ── Slot Machine ── */
-const PRICE_CHARS = ["₹", "3", "5", ",", "0", "0", "0"];
+const PRICE_CHARS = ["₹", "4", "9", ",", "9", "9", "9"];
 const DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 const SPECIAL_CHARS = ["₹", ","];
 
