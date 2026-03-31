@@ -71,11 +71,11 @@ export default function Management() {
                     <div className="p-8 flex flex-col items-center text-center">
                       {/* Avatar circle */}
                       <div className="relative mb-5">
-                        <div className="w-28 h-28 rounded-full overflow-hidden border-2 group-hover:scale-105 transition-transform duration-500" style={{ borderColor: `hsl(${m.accent} / 0.3)` }}>
-                          <img src={m.photo} alt={m.name} className="w-full h-full object-cover" />
+                        <div className="w-36 h-36 md:w-40 md:h-40 rounded-full overflow-hidden border-[3px] transition-all duration-500 group-hover:scale-110 group-hover:shadow-2xl" style={{ borderColor: `hsl(${m.accent} / 0.4)`, boxShadow: `0 0 0 0 hsl(${m.accent} / 0)` }}>
+                          <img src={m.photo} alt={m.name} className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-110" />
                         </div>
-                        <div className="absolute -bottom-1 -right-1 w-9 h-9 rounded-xl flex items-center justify-center border border-border/60 bg-card shadow-lg">
-                          <Icon className="w-4 h-4" style={{ color: `hsl(${m.accent})` }} />
+                        <div className="absolute -bottom-1.5 -right-1.5 w-10 h-10 rounded-xl flex items-center justify-center border border-border/60 bg-card shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
+                          <Icon className="w-4.5 h-4.5" style={{ color: `hsl(${m.accent})` }} />
                         </div>
                       </div>
 
