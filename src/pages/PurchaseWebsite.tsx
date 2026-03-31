@@ -823,7 +823,7 @@ export default function PurchaseWebsite() {
 
   return (
     <div className="min-h-screen relative" style={{ background: "linear-gradient(180deg, #050608 0%, #07080c 30%, #0a0c14 60%, #050608 100%)" }}>
-      <SEOHead title="Get This Website — College Management System | ₹35,000" description="Purchase this premium college management website with multi-role dashboards, attendance, fees, admissions and more. Built by Pavan A." canonical="/purchase" />
+      <SEOHead title="Get This Website — College Management System | ₹49,999" description="Purchase this premium college management website with multi-role dashboards, attendance, fees, admissions and more. Built by Pavan A." canonical="/purchase" />
 
       {/* Floating ambient particles */}
       {[...Array(16)].map((_, i) => (
