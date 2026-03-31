@@ -72,35 +72,66 @@ function StatCard({ label, value, suffix = "", icon: Icon, color, delay = 0 }: a
   );
 }
 
-// Study streak tracker (localStorage)
-function useStudyStreak() {
+// Study streak tracker (database-backed)
+function useStudyStreak(userId: string | undefined) {
   const [streak, setStreak] = useState(0);
   const [lastDate, setLastDate] = useState("");
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    const saved = localStorage.getItem("hdc_study_streak");
-    if (saved) {
-      const { streak: s, lastDate: d } = JSON.parse(saved);
-      const today = new Date().toISOString().split("T")[0];
-      const diff = differenceInDays(new Date(today), new Date(d));
-      if (diff === 0) { setStreak(s); setLastDate(d); }
-      else if (diff === 1) { setStreak(s); setLastDate(d); }
-      else { setStreak(0); setLastDate(""); }
-    }
-  }, []);
-  const logStudy = () => {
+    if (!userId) return;
+    const fetchStreak = async () => {
+      const { data } = await supabase
+        .from("study_streaks")
+        .select("streak, last_date")
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (data) {
+        const today = new Date().toISOString().split("T")[0];
+        const diff = differenceInDays(new Date(today), new Date(data.last_date));
+        if (diff <= 1) {
+          setStreak(data.streak);
+          setLastDate(data.last_date);
+        } else {
+          // Streak broken — reset in DB
+          setStreak(0);
+          setLastDate("");
+          await supabase.from("study_streaks").update({ streak: 0, last_date: today, updated_at: new Date().toISOString() }).eq("user_id", userId);
+        }
+      }
+      setLoading(false);
+    };
+    fetchStreak();
+  }, [userId]);
+
+  const logStudy = async () => {
+    if (!userId) return;
     const today = new Date().toISOString().split("T")[0];
     const diff = lastDate ? differenceInDays(new Date(today), new Date(lastDate)) : 2;
     const newStreak = diff <= 1 ? (today === lastDate ? streak : streak + 1) : 1;
-    setStreak(newStreak); setLastDate(today);
-    localStorage.setItem("hdc_study_streak", JSON.stringify({ streak: newStreak, lastDate: today }));
+    setStreak(newStreak);
+    setLastDate(today);
+
+    const { data: existing } = await supabase
+      .from("study_streaks")
+      .select("id")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (existing) {
+      await supabase.from("study_streaks").update({ streak: newStreak, last_date: today, updated_at: new Date().toISOString() }).eq("user_id", userId);
+    } else {
+      await supabase.from("study_streaks").insert({ user_id: userId, streak: newStreak, last_date: today });
+    }
   };
+
   const isLoggedToday = lastDate === new Date().toISOString().split("T")[0];
   return { streak, logStudy, isLoggedToday };
 }
 
 export default function StudentDashboard() {
   const { profile, user } = useAuth();
-  const { streak, logStudy, isLoggedToday } = useStudyStreak();
+  const { streak, logStudy, isLoggedToday } = useStudyStreak(user?.id);
 
   const { data, isLoading: statsLoading } = useQuery({
     queryKey: ["student-dashboard-stats", user?.id],

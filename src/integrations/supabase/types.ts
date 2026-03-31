@@ -1412,6 +1412,30 @@ export type Database = {
           },
         ]
       }
+      study_streaks: {
+        Row: {
+          id: string
+          last_date: string
+          streak: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          last_date?: string
+          streak?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          last_date?: string
+          streak?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       teachers: {
         Row: {
           created_at: string
