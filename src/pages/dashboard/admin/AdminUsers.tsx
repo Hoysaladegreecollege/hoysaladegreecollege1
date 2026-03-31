@@ -716,6 +716,11 @@ export default function AdminUsers() {
       </Dialog>
         </TabsContent>
 
+        {/* Students Tab */}
+        <TabsContent value="students" className="space-y-5">
+          <StudentsDirectory users={users} courses={courses} isLoading={isLoading} navigate={navigate} />
+        </TabsContent>
+
         <TabsContent value="add-staff">
           <AdminAddStaff />
         </TabsContent>
