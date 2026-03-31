@@ -273,11 +273,14 @@ export default function AdminUsers() {
         </div>
       </div>
 
-      {/* Tabs: User Management + Add Staff */}
+      {/* Tabs: User Management + Students + Add Staff */}
       <Tabs defaultValue="users" className="space-y-5">
-        <TabsList className="w-full justify-start bg-card border border-border rounded-2xl p-1.5 h-auto">
+        <TabsList className="w-full justify-start bg-card border border-border rounded-2xl p-1.5 h-auto flex-wrap">
           <TabsTrigger value="users" className="rounded-xl font-body text-xs font-semibold px-4 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <Users className="w-3.5 h-3.5 mr-1.5" /> User Management
+          </TabsTrigger>
+          <TabsTrigger value="students" className="rounded-xl font-body text-xs font-semibold px-4 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <GraduationCap className="w-3.5 h-3.5 mr-1.5" /> Students
           </TabsTrigger>
           <TabsTrigger value="add-staff" className="rounded-xl font-body text-xs font-semibold px-4 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <UserPlus className="w-3.5 h-3.5 mr-1.5" /> Add Staff / Users
