@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { formatAadhaar } from "@/lib/format-aadhaar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -12,6 +13,199 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Link, useNavigate } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import AdminAddStaff from "./AdminAddStaff";
+import { Badge } from "@/components/ui/badge";
+
+/* ── Students Directory Sub-Component ── */
+function StudentsDirectory({ users, courses, isLoading, navigate }: { users: any[]; courses: any[]; isLoading: boolean; navigate: any }) {
+  const [search, setSearch] = useState("");
+  const [courseFilter, setCourseFilter] = useState("All");
+  const [semesterFilter, setSemesterFilter] = useState("All");
+  const [genderFilter, setGenderFilter] = useState("All");
+  const [sortBy, setSortBy] = useState<"name" | "roll" | "semester" | "recent">("name");
+
+  const students = useMemo(() => {
+    return users.filter((u: any) => u.role === "student" && u.student);
+  }, [users]);
+
+  const filtered = useMemo(() => {
+    let list = students.filter((u: any) => {
+      const name = (u.full_name || "").toLowerCase();
+      const email = (u.email || "").toLowerCase();
+      const roll = (u.student?.roll_number || "").toLowerCase();
+      const matchSearch = name.includes(search.toLowerCase()) || email.includes(search.toLowerCase()) || roll.includes(search.toLowerCase());
+      const matchCourse = courseFilter === "All" || u.student?.course_id === courseFilter;
+      const matchSemester = semesterFilter === "All" || u.student?.semester === parseInt(semesterFilter);
+      const matchGender = genderFilter === "All" || (u.student?.gender || "").toLowerCase() === genderFilter.toLowerCase();
+      return matchSearch && matchCourse && matchSemester && matchGender;
+    });
+    list.sort((a: any, b: any) => {
+      if (sortBy === "name") return (a.full_name || "").localeCompare(b.full_name || "");
+      if (sortBy === "roll") return (a.student?.roll_number || "").localeCompare(b.student?.roll_number || "");
+      if (sortBy === "semester") return (a.student?.semester || 0) - (b.student?.semester || 0);
+      if (sortBy === "recent") return new Date(b.student?.created_at || 0).getTime() - new Date(a.student?.created_at || 0).getTime();
+      return 0;
+    });
+    return list;
+  }, [students, search, courseFilter, semesterFilter, genderFilter, sortBy]);
+
+  const courseStats = useMemo(() => {
+    const map: Record<string, number> = {};
+    students.forEach((u: any) => {
+      const cName = u.student?.courses?.code || "Unassigned";
+      map[cName] = (map[cName] || 0) + 1;
+    });
+    return map;
+  }, [students]);
+
+  const selectClass = "border border-border rounded-xl px-3 py-2 font-body text-xs bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all";
+
+  return (
+    <div className="space-y-5">
+      {/* Stats Row */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="relative overflow-hidden bg-card border border-border rounded-2xl p-4">
+          <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
+          <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">Total Students</p>
+          <p className="font-display text-2xl font-bold text-foreground mt-1">{students.length}</p>
+        </div>
+        {Object.entries(courseStats).slice(0, 3).map(([code, count]) => (
+          <div key={code} className="relative overflow-hidden bg-card border border-border rounded-2xl p-4">
+            <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">{code}</p>
+            <p className="font-display text-2xl font-bold text-foreground mt-1">{count}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Filters & Search */}
+      <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input placeholder="Search by name, email, or roll number..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 rounded-xl text-sm" />
+          </div>
+          <select value={courseFilter} onChange={(e) => setCourseFilter(e.target.value)} className={selectClass}>
+            <option value="All">All Courses</option>
+            {courses.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+          <select value={semesterFilter} onChange={(e) => setSemesterFilter(e.target.value)} className={selectClass}>
+            <option value="All">All Semesters</option>
+            {[1,2,3,4,5,6].map(s => <option key={s} value={String(s)}>Semester {s}</option>)}
+          </select>
+          <select value={genderFilter} onChange={(e) => setGenderFilter(e.target.value)} className={selectClass}>
+            <option value="All">All Genders</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+          <select value={sortBy} onChange={(e) => setSortBy(e.target.value as any)} className={selectClass}>
+            <option value="name">Sort: Name</option>
+            <option value="roll">Sort: Roll No</option>
+            <option value="semester">Sort: Semester</option>
+            <option value="recent">Sort: Recent</option>
+          </select>
+        </div>
+        <p className="font-body text-[10px] text-muted-foreground">{filtered.length} student{filtered.length !== 1 ? "s" : ""} found</p>
+      </div>
+
+      {/* Student Cards Grid */}
+      {isLoading ? (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1,2,3,4,5,6].map(i => (
+            <div key={i} className="bg-card border border-border rounded-2xl p-5 animate-pulse">
+              <div className="flex items-center gap-3">
+                <Skeleton className="w-14 h-14 rounded-2xl shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-2/3 rounded-lg" />
+                  <Skeleton className="h-3 w-1/2 rounded-lg" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filtered.map((u: any, idx: number) => {
+            const feeStatus = (u.student?.total_fee || 0) > 0
+              ? ((u.student?.fee_paid || 0) >= (u.student?.total_fee || 0) ? "paid" : "pending")
+              : "na";
+            return (
+              <div
+                key={u.id}
+                onClick={() => navigate(`/dashboard/admin/users/${u.user_id}`)}
+                className="relative overflow-hidden bg-card border border-border rounded-2xl p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group animate-fade-in"
+                style={{ animationDelay: `${idx * 40}ms` }}
+              >
+                {/* Ambient glow */}
+                <div className="absolute top-0 right-0 w-24 h-24 bg-primary/[0.04] rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/0 via-primary/40 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                {/* Header: Avatar + Name */}
+                <div className="relative flex items-start gap-3.5">
+                  {u.student?.avatar_url ? (
+                    <img src={u.student.avatar_url} alt={u.full_name} className="w-14 h-14 rounded-2xl object-cover border-2 border-primary/15 shrink-0 group-hover:scale-105 transition-transform duration-300" />
+                  ) : (
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-300 border border-primary/10">
+                      <span className="font-display text-lg font-bold text-primary">{(u.full_name || "?")[0].toUpperCase()}</span>
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-body text-sm font-bold text-foreground truncate">{u.full_name || "—"}</h4>
+                    <p className="font-body text-[11px] text-muted-foreground truncate">{u.email}</p>
+                    <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                      {u.student?.courses?.code && (
+                        <span className="text-[9px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-body font-semibold">{u.student.courses.code}</span>
+                      )}
+                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-body">Sem {u.student?.semester || "?"}</span>
+                      {feeStatus === "paid" && <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 font-body font-semibold">Fee Paid</span>}
+                      {feeStatus === "pending" && <span className="text-[9px] px-2 py-0.5 rounded-full bg-destructive/10 text-destructive font-body font-semibold">Fee Due</span>}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Details Grid */}
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  <div className="bg-muted/30 rounded-xl px-3 py-2">
+                    <p className="font-body text-[9px] text-muted-foreground uppercase tracking-wider">Roll No</p>
+                    <p className="font-body text-xs font-semibold text-foreground">{u.student?.roll_number || "—"}</p>
+                  </div>
+                  <div className="bg-muted/30 rounded-xl px-3 py-2">
+                    <p className="font-body text-[9px] text-muted-foreground uppercase tracking-wider">Year</p>
+                    <p className="font-body text-xs font-semibold text-foreground">{u.student?.year_level ? `${u.student.year_level}${["st","nd","rd"][u.student.year_level-1]||"th"} Year` : "—"}</p>
+                  </div>
+                  <div className="bg-muted/30 rounded-xl px-3 py-2">
+                    <p className="font-body text-[9px] text-muted-foreground uppercase tracking-wider">Phone</p>
+                    <p className="font-body text-xs font-semibold text-foreground truncate">{u.phone || u.student?.phone || "—"}</p>
+                  </div>
+                  <div className="bg-muted/30 rounded-xl px-3 py-2">
+                    <p className="font-body text-[9px] text-muted-foreground uppercase tracking-wider">Gender</p>
+                    <p className="font-body text-xs font-semibold text-foreground">{u.student?.gender || "—"}</p>
+                  </div>
+                </div>
+
+                {/* Footer: Quick actions */}
+                <div className="mt-3 flex items-center justify-between">
+                  <p className="font-body text-[9px] text-muted-foreground">
+                    {u.student?.admission_year ? `Admitted ${u.student.admission_year}` : ""}
+                  </p>
+                  <div className="flex items-center gap-1">
+                    <Eye className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
+                    <span className="font-body text-[9px] text-muted-foreground group-hover:text-primary transition-colors">View Details</span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {!isLoading && filtered.length === 0 && (
+        <div className="text-center py-16">
+          <GraduationCap className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
+          <p className="font-body text-sm text-muted-foreground">No students found matching your filters.</p>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function AdminUsers() {
   const navigate = useNavigate();
@@ -273,11 +467,14 @@ export default function AdminUsers() {
         </div>
       </div>
 
-      {/* Tabs: User Management + Add Staff */}
+      {/* Tabs: User Management + Students + Add Staff */}
       <Tabs defaultValue="users" className="space-y-5">
-        <TabsList className="w-full justify-start bg-card border border-border rounded-2xl p-1.5 h-auto">
+        <TabsList className="w-full justify-start bg-card border border-border rounded-2xl p-1.5 h-auto flex-wrap">
           <TabsTrigger value="users" className="rounded-xl font-body text-xs font-semibold px-4 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <Users className="w-3.5 h-3.5 mr-1.5" /> User Management
+          </TabsTrigger>
+          <TabsTrigger value="students" className="rounded-xl font-body text-xs font-semibold px-4 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <GraduationCap className="w-3.5 h-3.5 mr-1.5" /> Students
           </TabsTrigger>
           <TabsTrigger value="add-staff" className="rounded-xl font-body text-xs font-semibold px-4 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <UserPlus className="w-3.5 h-3.5 mr-1.5" /> Add Staff / Users
@@ -711,6 +908,11 @@ export default function AdminUsers() {
           </form>
         </DialogContent>
       </Dialog>
+        </TabsContent>
+
+        {/* Students Tab */}
+        <TabsContent value="students" className="space-y-5">
+          <StudentsDirectory users={users} courses={courses} isLoading={isLoading} navigate={navigate} />
         </TabsContent>
 
         <TabsContent value="add-staff">
