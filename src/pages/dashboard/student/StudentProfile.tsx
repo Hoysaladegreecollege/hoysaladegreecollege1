@@ -3,8 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   User, Phone, MapPin, Calendar, BookOpen, Hash, Camera, Upload, Sparkles,
-  Shield, Fingerprint, Trash2, Edit3, Save, X, FileText, Download,
-  Heart, Globe, Users, CreditCard, Droplets, Award, GraduationCap
+  Shield, Fingerprint, Trash2, Edit3, Save, X, FileText, Download
 } from "lucide-react";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
@@ -45,19 +44,6 @@ export default function StudentProfile() {
       return data;
     },
     enabled: !!user,
-  });
-
-  const { data: attendance } = useQuery({
-    queryKey: ["student-attendance-stats", user?.id],
-    queryFn: async () => {
-      if (!student?.id) return null;
-      const { data } = await supabase.from("attendance").select("status").eq("student_id", student.id);
-      if (!data || data.length === 0) return null;
-      const total = data.length;
-      const present = data.filter(a => a.status === "present").length;
-      return { total, present, percentage: Math.round((present / total) * 100) };
-    },
-    enabled: !!student?.id,
   });
 
   const { data: passkeys, refetch: refetchPasskeys } = useQuery({
@@ -191,199 +177,124 @@ export default function StudentProfile() {
     refetchPasskeys();
   };
 
-  const avatarUrl = (student as any)?.avatar_url;
-  const initials = (profile?.full_name || "S").split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2);
-
-  const feeStatus = (student?.total_fee || 0) > 0
-    ? ((student?.fee_paid || 0) >= (student?.total_fee || 0) ? "Paid" : "Pending")
-    : "N/A";
-
-  const academicFields = [
+  const fields = [
+    { icon: User, label: "Full Name", value: profile?.full_name, editKey: "full_name" },
     { icon: Hash, label: "Roll Number", value: student?.roll_number },
     { icon: BookOpen, label: "Course", value: student?.courses?.name },
-    { icon: GraduationCap, label: "Semester", value: student?.semester ? `Semester ${student.semester}` : "-" },
+    { icon: Calendar, label: "Semester", value: student?.semester ? `Semester ${student.semester}` : "-" },
     { icon: Calendar, label: "Admission Year", value: student?.admission_year },
-    { icon: Award, label: "Year Level", value: student?.year_level ? `${student.year_level}${["st","nd","rd"][student.year_level-1]||"th"} Year` : "-" },
-  ];
-
-  const personalFields = [
     { icon: Calendar, label: "Date of Birth", value: student?.date_of_birth, editKey: "date_of_birth", type: "date" },
-    { icon: User, label: "Gender", value: (student as any)?.gender || "-" },
-    { icon: Droplets, label: "Blood Group", value: (student as any)?.blood_group || "-" },
-    { icon: Globe, label: "Nationality", value: (student as any)?.nationality || "-" },
-    { icon: Heart, label: "Religion", value: (student as any)?.religion || "-" },
-    { icon: Users, label: "Category", value: (student as any)?.category || "-" },
-    { icon: Users, label: "Caste", value: (student as any)?.caste || "-" },
-  ];
-
-  const contactFields = [
     { icon: Phone, label: "Phone", value: (student as any)?.phone || profile?.phone || "-", editKey: "phone" },
     { icon: Phone, label: "Parent Phone", value: student?.parent_phone || "-", editKey: "parent_phone" },
     { icon: User, label: "Father's Name", value: student?.father_name || "-", editKey: "father_name" },
     { icon: User, label: "Mother's Name", value: student?.mother_name || "-", editKey: "mother_name" },
     { icon: MapPin, label: "Address", value: student?.address || "-", editKey: "address" },
+    { icon: Shield, label: "Aadhaar No.", value: formatAadhaar((student as any)?.aadhaar_number) },
+    { icon: User, label: "Gender", value: (student as any)?.gender || "-" },
+    { icon: User, label: "Nationality", value: (student as any)?.nationality || "-" },
+    { icon: User, label: "Religion", value: (student as any)?.religion || "-" },
+    { icon: User, label: "Category", value: (student as any)?.category || "-" },
+    { icon: User, label: "Blood Group", value: (student as any)?.blood_group || "-" },
   ];
 
-  const identityFields = [
-    { icon: CreditCard, label: "Aadhaar No.", value: formatAadhaar((student as any)?.aadhaar_number) },
-  ];
-
-  const sectionColors = [
-    { accent: "from-blue-500/10 to-blue-500/5", border: "border-blue-500/10", iconBg: "bg-blue-500/10", iconColor: "text-blue-500" },
-    { accent: "from-emerald-500/10 to-emerald-500/5", border: "border-emerald-500/10", iconBg: "bg-emerald-500/10", iconColor: "text-emerald-500" },
-    { accent: "from-amber-500/10 to-amber-500/5", border: "border-amber-500/10", iconBg: "bg-amber-500/10", iconColor: "text-amber-500" },
-    { accent: "from-purple-500/10 to-purple-500/5", border: "border-purple-500/10", iconBg: "bg-purple-500/10", iconColor: "text-purple-500" },
-  ];
-
-  const renderField = (f: any, sectionColor: any, canEdit = false) => (
-    <div key={f.label} className={`flex items-start gap-3 p-4 rounded-[1.25rem] bg-gradient-to-br ${sectionColor.accent} border ${sectionColor.border} backdrop-blur-sm hover:scale-[1.02] transition-transform duration-300`}>
-      <div className={`w-10 h-10 rounded-xl ${sectionColor.iconBg} flex items-center justify-center shrink-0`}>
-        <f.icon className={`w-4.5 h-4.5 ${sectionColor.iconColor}`} />
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="font-body text-[10px] text-muted-foreground uppercase tracking-[0.12em] font-semibold">{f.label}</p>
-        {editing && canEdit && f.editKey ? (
-          <Input
-            type={f.type || "text"}
-            value={editForm[f.editKey] || ""}
-            onChange={(e) => setEditForm(prev => ({ ...prev, [f.editKey!]: e.target.value }))}
-            className="h-8 text-sm rounded-xl mt-1 bg-background/80"
-          />
-        ) : (
-          <p className="font-body text-sm font-semibold text-foreground mt-0.5 break-words">{f.value || "-"}</p>
-        )}
-      </div>
-    </div>
-  );
+  const avatarUrl = (student as any)?.avatar_url;
+  const initials = (profile?.full_name || "S").split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2);
 
   return (
-    <div className="space-y-6 pb-8">
-      {/* ── Hero Section ── */}
-      <div className="relative overflow-hidden rounded-[2rem] border border-border/40">
-        {/* Gradient backdrop */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-card to-secondary/10" />
-        {/* Ambient glow orbs */}
-        <div className="absolute top-10 left-10 w-40 h-40 bg-primary/10 rounded-full blur-[80px] animate-pulse" />
-        <div className="absolute bottom-5 right-10 w-32 h-32 bg-secondary/10 rounded-full blur-[60px]" />
-        {/* Shimmer sweep */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent -skew-x-12 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
-
-        <div className="relative p-6 sm:p-10">
-          <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8">
-            {/* Avatar with glow ring */}
-            <div className="relative group">
-              <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-primary/30 to-secondary/20 blur-xl scale-110 opacity-60" />
-              {avatarUrl ? (
-                <img src={avatarUrl} alt={profile?.full_name} className="relative w-36 h-36 sm:w-40 sm:h-40 rounded-[2rem] object-cover border-4 border-card shadow-2xl" />
-              ) : (
-                <div className="relative w-36 h-36 sm:w-40 sm:h-40 rounded-[2rem] bg-gradient-to-br from-primary/25 to-primary/10 flex items-center justify-center border-4 border-card shadow-2xl">
-                  <span className="font-display text-5xl font-bold text-primary">{initials}</span>
-                </div>
-              )}
-              <button onClick={() => fileInputRef.current?.click()} className="absolute inset-0 rounded-[2rem] bg-foreground/40 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center cursor-pointer backdrop-blur-sm">
-                <Camera className="w-10 h-10 text-white drop-shadow-lg" />
-              </button>
-              {/* Verified badge */}
-              <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-xl bg-primary flex items-center justify-center border-4 border-card shadow-lg">
-                <Sparkles className="w-4 h-4 text-primary-foreground" />
-              </div>
+    <div className="space-y-6">
+      <div className="relative overflow-hidden bg-card border border-border/40 rounded-3xl p-6 sm:p-8">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.06] via-transparent to-secondary/[0.04]" />
+        <div className="relative flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+              <User className="w-5 h-5 text-primary" />
             </div>
+            <div>
+              <h2 className="font-display text-xl font-bold text-foreground">My Profile</h2>
+              <p className="font-body text-xs text-muted-foreground mt-0.5">View and edit your details</p>
+            </div>
+          </div>
+          {!editing ? (
+            <Button variant="outline" size="sm" className="rounded-2xl font-body text-xs" onClick={startEditing}>
+              <Edit3 className="w-3 h-3 mr-1.5" /> Edit Profile
+            </Button>
+          ) : (
+            <div className="flex gap-2">
+              <Button size="sm" className="rounded-2xl font-body text-xs" disabled={updateProfileMutation.isPending} onClick={() => updateProfileMutation.mutate(editForm)}>
+                <Save className="w-3 h-3 mr-1.5" /> {updateProfileMutation.isPending ? "Saving..." : "Save"}
+              </Button>
+              <Button variant="outline" size="sm" className="rounded-2xl font-body text-xs" onClick={() => setEditing(false)}>
+                <X className="w-3 h-3" />
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
 
-            {/* Info */}
-            <div className="text-center sm:text-left flex-1">
-              <h2 className="font-display text-3xl sm:text-4xl font-bold text-foreground tracking-tight">{profile?.full_name || "Student"}</h2>
-              <p className="font-body text-base text-primary font-semibold mt-1">{student?.courses?.name || "No course assigned"}</p>
-              {student?.roll_number && <p className="font-body text-xs text-muted-foreground mt-0.5">Roll No: {student.roll_number}</p>}
-
-              {/* Quick Stat Pills */}
-              <div className="flex flex-wrap items-center gap-2.5 mt-5 justify-center sm:justify-start">
-                {attendance && (
-                  <div className={`px-4 py-2 rounded-2xl border backdrop-blur-md font-body text-xs font-semibold ${
-                    attendance.percentage >= 75
-                      ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600"
-                      : "bg-destructive/10 border-destructive/20 text-destructive"
-                  }`}>
-                    📊 Attendance: {attendance.percentage}%
-                  </div>
-                )}
-                <div className={`px-4 py-2 rounded-2xl border backdrop-blur-md font-body text-xs font-semibold ${
-                  feeStatus === "Paid"
-                    ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600"
-                    : feeStatus === "Pending"
-                    ? "bg-amber-500/10 border-amber-500/20 text-amber-600"
-                    : "bg-muted border-border text-muted-foreground"
-                }`}>
-                  💰 Fee: {feeStatus}
-                </div>
-                {student?.semester && (
-                  <div className="px-4 py-2 rounded-2xl bg-primary/10 border border-primary/20 backdrop-blur-md font-body text-xs font-semibold text-primary">
-                    📚 Semester {student.semester}
-                  </div>
-                )}
+      <div className="relative overflow-hidden bg-card border border-border/40 rounded-3xl p-6 sm:p-8">
+        <div className="relative flex flex-col sm:flex-row items-center gap-6">
+          <div className="relative group">
+            {avatarUrl ? (
+              <img src={avatarUrl} alt={profile?.full_name} className="w-32 h-32 rounded-3xl object-cover border-2 border-primary/20" />
+            ) : (
+              <div className="w-32 h-32 rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center border-2 border-primary/20">
+                <span className="font-display text-3xl font-bold text-primary">{initials}</span>
               </div>
-
-              {/* Actions */}
-              <div className="mt-5 flex flex-wrap gap-2 justify-center sm:justify-start">
-                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) uploadAvatarMutation.mutate(file);
-                }} />
-                <Button variant="outline" size="sm" className="rounded-2xl font-body text-xs backdrop-blur-sm" disabled={uploading} onClick={() => fileInputRef.current?.click()}>
-                  {uploading ? "Uploading..." : <><Upload className="w-3 h-3 mr-1.5" /> {avatarUrl ? "Change Photo" : "Upload Photo"}</>}
-                </Button>
-                {!editing ? (
-                  <Button variant="outline" size="sm" className="rounded-2xl font-body text-xs backdrop-blur-sm" onClick={startEditing}>
-                    <Edit3 className="w-3 h-3 mr-1.5" /> Edit Profile
-                  </Button>
-                ) : (
-                  <>
-                    <Button size="sm" className="rounded-2xl font-body text-xs" disabled={updateProfileMutation.isPending} onClick={() => updateProfileMutation.mutate(editForm)}>
-                      <Save className="w-3 h-3 mr-1.5" /> {updateProfileMutation.isPending ? "Saving..." : "Save"}
-                    </Button>
-                    <Button variant="outline" size="sm" className="rounded-2xl font-body text-xs" onClick={() => setEditing(false)}>
-                      <X className="w-3 h-3" />
-                    </Button>
-                  </>
-                )}
-              </div>
+            )}
+            <button onClick={() => fileInputRef.current?.click()} className="absolute inset-0 rounded-3xl bg-foreground/50 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+              <Camera className="w-8 h-8 text-white" />
+            </button>
+            <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-xl bg-primary flex items-center justify-center border-2 border-card">
+              <Sparkles className="w-3.5 h-3.5 text-primary-foreground" />
+            </div>
+          </div>
+          <div className="text-center sm:text-left flex-1">
+            <h3 className="font-display text-2xl font-bold text-foreground">{profile?.full_name || "Student"}</h3>
+            <p className="font-body text-sm text-primary font-semibold mt-1">{student?.courses?.name || "No course assigned"}</p>
+            <div className="mt-4">
+              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) uploadAvatarMutation.mutate(file);
+              }} />
+              <Button variant="outline" size="sm" className="rounded-2xl font-body text-xs" disabled={uploading} onClick={() => fileInputRef.current?.click()}>
+                {uploading ? "Uploading..." : <><Upload className="w-3 h-3 mr-1.5" /> {avatarUrl ? "Change Photo" : "Upload Photo"}</>}
+              </Button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── Info Sections ── */}
-      {[
-        { title: "Academic Details", icon: GraduationCap, fields: academicFields, colorIdx: 0, editable: false },
-        { title: "Personal Details", icon: User, fields: personalFields, colorIdx: 1, editable: true },
-        { title: "Contact Details", icon: Phone, fields: contactFields, colorIdx: 2, editable: true },
-        { title: "Identity", icon: CreditCard, fields: identityFields, colorIdx: 3, editable: false },
-      ].map((section, sIdx) => (
-        <div
-          key={section.title}
-          className="relative overflow-hidden bg-card/80 backdrop-blur-xl border border-border/40 rounded-[2rem] p-6 sm:p-8 animate-fade-in"
-          style={{ animationDelay: `${(sIdx + 1) * 100}ms` }}
-        >
-          {/* Section shimmer */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent opacity-0 hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
-          <div className="relative">
-            <div className="flex items-center gap-3 mb-5">
-              <div className={`w-10 h-10 rounded-xl ${sectionColors[section.colorIdx].iconBg} flex items-center justify-center`}>
-                <section.icon className={`w-5 h-5 ${sectionColors[section.colorIdx].iconColor}`} />
+      <div className="relative overflow-hidden bg-card border border-border/40 rounded-3xl p-6 sm:p-8">
+        <h3 className="font-body text-xs font-bold text-muted-foreground uppercase tracking-[0.15em] mb-5">Personal Information</h3>
+        <div className="grid sm:grid-cols-2 gap-3">
+          {fields.map((f) => (
+            <div key={f.label} className="flex items-start gap-3 p-4 rounded-2xl bg-muted/30 border border-border/20">
+              <div className="w-9 h-9 rounded-xl bg-primary/8 border border-primary/10 flex items-center justify-center shrink-0">
+                <f.icon className="w-4 h-4 text-primary" />
               </div>
-              <h3 className="font-body text-xs font-bold text-muted-foreground uppercase tracking-[0.15em]">{section.title}</h3>
+              <div className="min-w-0 flex-1">
+                <p className="font-body text-[10px] text-muted-foreground uppercase tracking-[0.1em]">{f.label}</p>
+                {editing && f.editKey ? (
+                  <Input
+                    type={(f as any).type || "text"}
+                    value={editForm[f.editKey] || ""}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, [f.editKey!]: e.target.value }))}
+                    className="h-8 text-sm rounded-xl mt-1"
+                  />
+                ) : (
+                  <p className="font-body text-sm font-semibold text-foreground mt-0.5">{f.value || "-"}</p>
+                )}
+              </div>
             </div>
-            <div className="grid sm:grid-cols-2 gap-3">
-              {section.fields.map(f => renderField(f, sectionColors[section.colorIdx], section.editable))}
-            </div>
-          </div>
+          ))}
         </div>
-      ))}
+      </div>
 
-      {/* ── Documents Section ── */}
-      <div className="relative overflow-hidden bg-card/80 backdrop-blur-xl border border-border/40 rounded-[2rem] p-6 sm:p-8 animate-fade-in" style={{ animationDelay: "500ms" }}>
+      {/* Documents Section */}
+      <div className="relative overflow-hidden bg-card border border-border/40 rounded-3xl p-6 sm:p-8">
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center">
-            <FileText className="w-5 h-5 text-rose-500" />
+          <div className="w-9 h-9 rounded-xl bg-primary/8 border border-primary/10 flex items-center justify-center">
+            <FileText className="w-4 h-4 text-primary" />
           </div>
           <div>
             <h3 className="font-body text-xs font-bold text-muted-foreground uppercase tracking-[0.15em]">My Documents</h3>
@@ -391,21 +302,19 @@ export default function StudentProfile() {
           </div>
         </div>
         {documents.length > 0 ? (
-          <div className="grid sm:grid-cols-2 gap-3">
+          <div className="space-y-2">
             {documents.map((doc: any) => (
-              <div key={doc.id} className="flex items-center justify-between p-4 rounded-[1.25rem] bg-gradient-to-br from-rose-500/5 to-rose-500/[0.02] border border-rose-500/10 hover:scale-[1.02] transition-transform duration-300">
+              <div key={doc.id} className="flex items-center justify-between p-3 rounded-2xl bg-muted/30 border border-border/20">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center shrink-0">
-                    <FileText className="w-4 h-4 text-rose-500" />
-                  </div>
+                  <FileText className="w-4 h-4 text-primary shrink-0" />
                   <div className="min-w-0">
-                    <p className="font-body text-sm font-semibold text-foreground truncate">{doc.file_name}</p>
+                    <p className="font-body text-sm text-foreground truncate">{doc.file_name}</p>
                     <p className="font-body text-[10px] text-muted-foreground">
                       {doc.document_type?.replace(/_/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase())} · {new Date(doc.created_at).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
-                <Button variant="outline" size="sm" className="rounded-xl font-body text-xs shrink-0 ml-2" onClick={async () => {
+                <Button variant="outline" size="sm" className="rounded-xl font-body text-xs shrink-0" onClick={async () => {
                   try {
                     const { data, error } = await supabase.storage.from("student-documents").download(doc.file_url);
                     if (error) throw error;
@@ -425,14 +334,13 @@ export default function StudentProfile() {
         )}
       </div>
 
-      {/* ── Passkey / Security Section ── */}
-      <div className="relative overflow-hidden bg-card/80 backdrop-blur-xl border border-border/40 rounded-[2rem] p-6 sm:p-8 animate-fade-in" style={{ animationDelay: "600ms" }}>
+      <div className="relative overflow-hidden bg-card border border-border/40 rounded-3xl p-6 sm:p-8">
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center">
-            <Shield className="w-5 h-5 text-cyan-500" />
+          <div className="w-9 h-9 rounded-xl bg-primary/8 border border-primary/10 flex items-center justify-center">
+            <Fingerprint className="w-4 h-4 text-primary" />
           </div>
           <div>
-            <h3 className="font-body text-xs font-bold text-muted-foreground uppercase tracking-[0.15em]">Security & Passkeys</h3>
+            <h3 className="font-body text-xs font-bold text-muted-foreground uppercase tracking-[0.15em]">Passkey / Biometric Login</h3>
             <p className="font-body text-[10px] text-muted-foreground mt-0.5">Sign in with fingerprint, face, or screen lock</p>
           </div>
         </div>
@@ -440,18 +348,14 @@ export default function StudentProfile() {
         {passkeys && passkeys.length > 0 && (
           <div className="space-y-2 mb-4">
             {passkeys.map((pk: any) => (
-              <div key={pk.id} className="flex items-center justify-between p-4 rounded-[1.25rem] bg-gradient-to-br from-cyan-500/5 to-cyan-500/[0.02] border border-cyan-500/10">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-cyan-500/10 flex items-center justify-center">
-                    <Fingerprint className="w-4 h-4 text-cyan-500" />
-                  </div>
-                  <div>
-                    <span className="font-body text-sm font-semibold text-foreground">{pk.name || "My Passkey"}</span>
-                    <p className="font-body text-[10px] text-muted-foreground">{new Date(pk.created_at).toLocaleDateString()}</p>
-                  </div>
+              <div key={pk.id} className="flex items-center justify-between p-3 rounded-2xl bg-muted/30 border border-border/20">
+                <div className="flex items-center gap-2">
+                  <Fingerprint className="w-4 h-4 text-primary" />
+                  <span className="font-body text-sm text-foreground">{pk.name || "My Passkey"}</span>
+                  <span className="font-body text-[10px] text-muted-foreground">{new Date(pk.created_at).toLocaleDateString()}</span>
                 </div>
-                <button onClick={() => handleDeletePasskey(pk.id)} className="p-2 rounded-xl hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">
-                  <Trash2 className="w-4 h-4" />
+                <button onClick={() => handleDeletePasskey(pk.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">
+                  <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
             ))}
@@ -461,7 +365,7 @@ export default function StudentProfile() {
         <Button variant="outline" size="sm" className="rounded-2xl font-body text-xs" disabled={registeringPasskey} onClick={handleRegisterPasskey}>
           {registeringPasskey ? "Registering..." : <><Fingerprint className="w-3 h-3 mr-1.5" /> Register Passkey</>}
         </Button>
-        <p className="font-body text-[10px] text-muted-foreground/60 mt-3 leading-relaxed">
+        <p className="font-body text-[10px] text-muted-foreground/60 mt-2.5 leading-relaxed">
           ⚠️ Passkeys are bound to the domain where registered. A passkey created here (<span className="font-semibold text-muted-foreground/80">{window.location.hostname}</span>) will only work on this same domain.
         </p>
       </div>
