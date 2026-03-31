@@ -219,9 +219,11 @@ export default function Footer() {
             Made with <Heart className="w-3 h-3 fill-current text-secondary" /> 
             <span className="hidden sm:inline">ಶ್ರೀಶಿರಡಿ ಸಾಯಿ ಎಜುಕೇಷನಲ್ ಟ್ರಸ್ಟ್ (ರಿ.)</span>
           </span>
-          <Link to="/credits" className="transition-all duration-300 flex items-center gap-1 group text-secondary/50 hover:text-secondary">
-            <Sparkles className="w-3 h-3" />
-            Website Credits
+          <Link to="/credits" className="relative transition-all duration-300 flex items-center gap-1.5 group text-secondary hover:text-secondary animate-pulse hover:animate-none">
+            <span className="absolute -inset-x-2 -inset-y-1 rounded-full bg-secondary/10 blur-md pointer-events-none" />
+            <Sparkles className="w-3.5 h-3.5 relative z-10" />
+            <span className="relative z-10 font-semibold text-xs tracking-wide">Website Credits</span>
+            <span className="absolute -inset-x-3 -inset-y-1.5 rounded-full border border-secondary/20 pointer-events-none animate-[ping_3s_ease-in-out_infinite]" />
           </Link>
         </div>
       </div>

@@ -13,7 +13,7 @@ import {
 import { motion, AnimatePresence, useMotionValue, animate, useScroll, useTransform } from "framer-motion";
 
 /* ── Slot Machine ── */
-const PRICE_CHARS = ["₹", "3", "5", ",", "0", "0", "0"];
+const PRICE_CHARS = ["₹", "4", "9", ",", "9", "9", "9"];
 const DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 const SPECIAL_CHARS = ["₹", ","];
 
@@ -823,7 +823,7 @@ export default function PurchaseWebsite() {
 
   return (
     <div className="min-h-screen relative" style={{ background: "linear-gradient(180deg, #050608 0%, #07080c 30%, #0a0c14 60%, #050608 100%)" }}>
-      <SEOHead title="Get This Website — College Management System | ₹35,000" description="Purchase this premium college management website with multi-role dashboards, attendance, fees, admissions and more. Built by Pavan A." canonical="/purchase" />
+      <SEOHead title="Get This Website — College Management System | ₹49,999" description="Purchase this premium college management website with multi-role dashboards, attendance, fees, admissions and more. Built by Pavan A." canonical="/purchase" />
 
       {/* Floating ambient particles */}
       {[...Array(16)].map((_, i) => (
@@ -1200,7 +1200,7 @@ export default function PurchaseWebsite() {
                   <p className="font-body text-white/30 text-sm mb-8">Everything included — no hidden costs</p>
 
                   <div className="flex items-baseline justify-center gap-2 mb-10">
-                    <span className="font-display text-5xl sm:text-6xl font-bold" style={{ background: "linear-gradient(135deg, hsl(42,90%,68%), hsl(38,92%,50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", filter: "drop-shadow(0 0 30px hsla(42,87%,55%,0.2))" }}>₹35,000</span>
+                    <span className="font-display text-5xl sm:text-6xl font-bold" style={{ background: "linear-gradient(135deg, hsl(42,90%,68%), hsl(38,92%,50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", filter: "drop-shadow(0 0 30px hsla(42,87%,55%,0.2))" }}>₹49,999</span>
                     <span className="font-body text-white/25 text-sm">one-time</span>
                   </div>
 
