@@ -28,7 +28,7 @@ export default function TeacherStudents() {
     queryFn: async () => {
       let q = supabase
         .from("students")
-        .select("*, courses(name, code)")
+        .select("id, user_id, roll_number, course_id, semester, admission_year, date_of_birth, is_active, year_level, academic_year_id, phone, address, parent_phone, avatar_url, father_name, mother_name, gender, courses(name, code)")
         .eq("is_active", true)
         .order("roll_number");
       if (courseFilter !== "all") q = q.eq("course_id", courseFilter);
