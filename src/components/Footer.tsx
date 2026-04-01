@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { MapPin, Phone, Mail, Facebook, Twitter, Instagram, Youtube, ArrowUpRight, Heart, ArrowUp, Sparkles, GraduationCap } from "lucide-react";
 import collegeLogo from "@/assets/college-logo.png";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 const MAPS_LINK = "https://maps.app.goo.gl/nqvvEX7kgB7wQVKb7";
 
@@ -26,6 +26,68 @@ const socials = [
   { Icon: Instagram, label: "Instagram", hsl: "330, 70%, 55%" },
   { Icon: Youtube, label: "YouTube", hsl: "0, 75%, 55%" },
 ];
+
+interface Ripple {
+  id: number;
+  x: number;
+  y: number;
+}
+
+function RippleCreditsLink() {
+  const [ripples, setRipples] = useState<Ripple[]>([]);
+  const linkRef = useRef<HTMLAnchorElement>(null);
+  const nextId = useRef(0);
+
+  const addRipple = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+    const el = linkRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const id = nextId.current++;
+    setRipples((prev) => [...prev, { id, x, y }]);
+    setTimeout(() => setRipples((prev) => prev.filter((r) => r.id !== id)), 900);
+  }, []);
+
+  return (
+    <Link
+      ref={linkRef}
+      to="/credits"
+      onClick={addRipple}
+      onMouseEnter={addRipple}
+      className="relative transition-all duration-500 flex items-center gap-1.5 group text-secondary hover:text-secondary/80 overflow-hidden rounded-full px-3 py-1.5 -mx-3 -my-1.5"
+    >
+      {/* Ripple elements */}
+      {ripples.map((r) => (
+        <span
+          key={r.id}
+          className="absolute rounded-full pointer-events-none animate-[ripple-expand_0.9s_ease-out_forwards]"
+          style={{
+            left: r.x,
+            top: r.y,
+            width: 4,
+            height: 4,
+            marginLeft: -2,
+            marginTop: -2,
+            background: "radial-gradient(circle, hsl(var(--secondary) / 0.35), hsl(var(--secondary) / 0.08) 60%, transparent 70%)",
+          }}
+        />
+      ))}
+
+      {/* Ambient glow */}
+      <span className="absolute -inset-x-2 -inset-y-1 rounded-full bg-secondary/[0.06] blur-md pointer-events-none transition-all duration-700 group-hover:-inset-x-4 group-hover:-inset-y-2.5 group-hover:bg-secondary/[0.12] group-hover:blur-xl" />
+
+      {/* Icon */}
+      <Sparkles className="w-3.5 h-3.5 relative z-10 opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300" />
+
+      {/* Text */}
+      <span className="relative z-10 font-semibold text-xs tracking-wide">Website Credits</span>
+
+      {/* Expanding border ring */}
+      <span className="absolute -inset-x-1 -inset-y-0.5 rounded-full border border-secondary/10 pointer-events-none transition-all duration-700 group-hover:-inset-x-3 group-hover:-inset-y-2 group-hover:border-secondary/25" />
+    </Link>
+  );
+}
 
 export default function Footer() {
   const [showTop, setShowTop] = useState(false);
@@ -219,12 +281,7 @@ export default function Footer() {
             Made with <Heart className="w-3 h-3 fill-current text-secondary" /> 
             <span className="hidden sm:inline">ಶ್ರೀಶಿರಡಿ ಸಾಯಿ ಎಜುಕೇಷನಲ್ ಟ್ರಸ್ಟ್ (ರಿ.)</span>
           </span>
-          <Link to="/credits" className="relative transition-all duration-500 flex items-center gap-1.5 group text-secondary hover:text-secondary/80">
-            <span className="absolute -inset-x-2 -inset-y-1 rounded-full bg-secondary/[0.06] blur-md pointer-events-none transition-all duration-700 group-hover:-inset-x-4 group-hover:-inset-y-2.5 group-hover:bg-secondary/[0.12] group-hover:blur-xl" />
-            <Sparkles className="w-3.5 h-3.5 relative z-10 opacity-70 group-hover:opacity-100 transition-opacity duration-300" />
-            <span className="relative z-10 font-semibold text-xs tracking-wide">Website Credits</span>
-            <span className="absolute -inset-x-3 -inset-y-1.5 rounded-full border border-secondary/10 pointer-events-none transition-all duration-700 group-hover:-inset-x-5 group-hover:-inset-y-2.5 group-hover:border-secondary/25" />
-          </Link>
+          <RippleCreditsLink />
         </div>
       </div>
 

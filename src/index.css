@@ -946,3 +946,14 @@ html {
   0%, 100% { top: -2px; }
   50% { top: 100%; }
 }
+
+@keyframes ripple-expand {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(60);
+    opacity: 0;
+  }
+}
