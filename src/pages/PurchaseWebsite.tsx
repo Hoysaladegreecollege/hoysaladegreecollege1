@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import SEOHead from "@/components/SEOHead";
 import ScrollReveal from "@/components/ScrollReveal";
 import { Link } from "react-router-dom";
@@ -10,7 +10,108 @@ import {
   LayoutDashboard, Clock, DollarSign, Image, Settings, UserCheck, Activity,
   PieChart, FileText, Search, ChevronRight, Megaphone, User
 } from "lucide-react";
-import { motion, AnimatePresence, useMotionValue, animate, useScroll, useTransform } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, animate, useScroll, useTransform, useSpring, useInView } from "framer-motion";
+
+/* ── 3D Tilt Card Wrapper ── */
+function Tilt3DCard({ children, className = "", intensity = 15 }: { children: React.ReactNode; className?: string; intensity?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const rotateX = useMotionValue(0);
+  const rotateY = useMotionValue(0);
+  const smoothX = useSpring(rotateX, { stiffness: 150, damping: 20 });
+  const smoothY = useSpring(rotateY, { stiffness: 150, damping: 20 });
+
+  const handleMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    rotateX.set(-y * intensity);
+    rotateY.set(x * intensity);
+  }, [intensity]);
+
+  const handleLeave = useCallback(() => {
+    rotateX.set(0);
+    rotateY.set(0);
+  }, []);
+
+  return (
+    <motion.div
+      ref={ref}
+      className={className}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      style={{ rotateX: smoothX, rotateY: smoothY, transformPerspective: 800, transformStyle: "preserve-3d" }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/* ── Staggered Text Reveal ── */
+function StaggeredText({ text, className = "", delay = 0 }: { text: string; className?: string; delay?: number }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
+  const words = text.split(" ");
+  return (
+    <span ref={ref} className={className}>
+      {words.map((word, i) => (
+        <span key={i} className="inline-block overflow-hidden mr-[0.3em]">
+          <motion.span
+            className="inline-block"
+            initial={{ y: "110%", opacity: 0, rotateX: -80 }}
+            animate={isInView ? { y: 0, opacity: 1, rotateX: 0 } : {}}
+            transition={{ delay: delay + i * 0.06, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {word}
+          </motion.span>
+        </span>
+      ))}
+    </span>
+  );
+}
+
+/* ── Parallax Section Wrapper ── */
+function ParallaxSection({ children, className = "", speed = 0.15 }: { children: React.ReactNode; className?: string; speed?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const y = useTransform(scrollYProgress, [0, 1], [80 * speed, -80 * speed]);
+  return (
+    <div ref={ref} className={`relative ${className}`}>
+      <motion.div style={{ y }}>
+        {children}
+      </motion.div>
+    </div>
+  );
+}
+
+/* ── Magnetic Hover Button ── */
+function MagneticButton({ children, className = "", ...props }: React.ComponentProps<typeof motion.div>) {
+  const ref = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const smoothX = useSpring(x, { stiffness: 200, damping: 15 });
+  const smoothY = useSpring(y, { stiffness: 200, damping: 15 });
+
+  return (
+    <motion.div
+      ref={ref}
+      className={className}
+      style={{ x: smoothX, y: smoothY }}
+      onMouseMove={(e) => {
+        const el = ref.current;
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        x.set((e.clientX - rect.left - rect.width / 2) * 0.15);
+        y.set((e.clientY - rect.top - rect.height / 2) * 0.15);
+      }}
+      onMouseLeave={() => { x.set(0); y.set(0); }}
+      {...props}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
 /* ── Slot Machine ── */
 const PRICE_CHARS = ["₹", "4", "9", ",", "9", "9", "9"];
@@ -861,12 +962,18 @@ export default function PurchaseWebsite() {
             </motion.div>
 
             {/* Main headline */}
-            <h1 className="font-display text-[2.5rem] sm:text-6xl lg:text-[5rem] font-bold text-white leading-[1.05] tracking-[-0.03em] max-w-5xl mx-auto">
-              The Complete{" "}
+            <h1 className="font-display text-[2.5rem] sm:text-6xl lg:text-[5rem] font-bold text-white leading-[1.05] tracking-[-0.03em] max-w-5xl mx-auto" style={{ perspective: "600px" }}>
+              <StaggeredText text="The Complete" delay={0.2} />
+              {" "}
               <span className="relative inline-block">
-                <span style={{ background: "linear-gradient(135deg, hsl(42,90%,68%), hsl(38,92%,55%), hsl(42,80%,50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                <motion.span 
+                  style={{ background: "linear-gradient(135deg, hsl(42,90%,68%), hsl(38,92%,55%), hsl(42,80%,50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", display: "inline-block" }}
+                  initial={{ opacity: 0, scale: 0.8, rotateX: -40 }}
+                  animate={{ opacity: 1, scale: 1, rotateX: 0 }}
+                  transition={{ delay: 0.6, duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                >
                   College Platform
-                </span>
+                </motion.span>
                 <motion.span 
                   className="absolute -bottom-1 left-0 right-0 h-[2px] rounded-full"
                   style={{ background: "linear-gradient(90deg, transparent, hsl(42,87%,55%), transparent)" }}
@@ -875,7 +982,7 @@ export default function PurchaseWebsite() {
                 />
               </span>
               <br className="hidden sm:block" />
-              Your Institution Deserves
+              <StaggeredText text="Your Institution Deserves" delay={0.5} />
             </h1>
 
             <p className="font-body text-white/35 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto mt-7 leading-relaxed">
@@ -1030,8 +1137,9 @@ export default function PurchaseWebsite() {
                 <CircuitBoard className="w-3.5 h-3.5" style={{ color: "hsla(42,87%,55%,0.6)" }} />
                 <span className="font-body text-[10px] font-bold tracking-[0.2em] uppercase text-white/40">Feature Arsenal</span>
               </div>
-              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
-                <span style={{ color: "hsl(42, 87%, 55%)" }}>18+</span> Powerful Features
+              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white" style={{ perspective: "500px" }}>
+                <span style={{ color: "hsl(42, 87%, 55%)" }}>18+</span>{" "}
+                <StaggeredText text="Powerful Features" />
               </h2>
               <p className="font-body text-white/30 text-sm mt-4 max-w-lg mx-auto leading-relaxed">Everything you need to run a modern educational institution — built, tested, and production-ready.</p>
             </div>
@@ -1040,26 +1148,33 @@ export default function PurchaseWebsite() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 max-w-5xl mx-auto">
             {allFeatures.map((f, i) => (
               <ScrollReveal key={f.title} delay={i * 40}>
-                <motion.div 
-                  className="group relative p-6 rounded-2xl border border-white/[0.05] overflow-hidden"
-                  style={{ background: "rgba(255,255,255,0.015)" }}
-                  whileHover={{ y: -4, borderColor: "rgba(255,255,255,0.1)" }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                    style={{ background: `linear-gradient(135deg, hsla(${f.color}, 0.07), transparent 60%)` }} />
-                  <div className="absolute top-0 left-0 right-0 h-px scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"
-                    style={{ background: `linear-gradient(90deg, hsla(${f.color}, 0.6), transparent)` }} />
-                  
-                  <div className="relative z-10">
-                    <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4 border border-white/[0.06] group-hover:scale-110 group-hover:rotate-3 transition-all duration-300"
-                      style={{ background: `hsla(${f.color}, 0.08)` }}>
-                      <f.icon className="w-5 h-5" style={{ color: `hsla(${f.color}, 0.85)` }} />
+                <Tilt3DCard intensity={12}>
+                  <motion.div 
+                    className="group relative p-6 rounded-2xl border border-white/[0.05] overflow-hidden"
+                    style={{ background: "rgba(255,255,255,0.015)" }}
+                    whileHover={{ y: -4, borderColor: "rgba(255,255,255,0.1)", boxShadow: `0 20px 60px -15px hsla(${f.color}, 0.15)` }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                      style={{ background: `linear-gradient(135deg, hsla(${f.color}, 0.07), transparent 60%)` }} />
+                    <div className="absolute top-0 left-0 right-0 h-px scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"
+                      style={{ background: `linear-gradient(90deg, hsla(${f.color}, 0.6), transparent)` }} />
+                    
+                    {/* 3D floating icon */}
+                    <div className="relative z-10" style={{ transformStyle: "preserve-3d" }}>
+                      <motion.div 
+                        className="w-11 h-11 rounded-xl flex items-center justify-center mb-4 border border-white/[0.06]"
+                        style={{ background: `hsla(${f.color}, 0.08)`, transform: "translateZ(30px)" }}
+                        whileHover={{ scale: 1.15, rotate: 6 }}
+                        transition={{ type: "spring", stiffness: 300 }}
+                      >
+                        <f.icon className="w-5 h-5" style={{ color: `hsla(${f.color}, 0.85)` }} />
+                      </motion.div>
+                      <h3 className="font-display text-sm font-bold text-white/90 mb-1.5" style={{ transform: "translateZ(20px)" }}>{f.title}</h3>
+                      <p className="font-body text-xs text-white/30 leading-relaxed" style={{ transform: "translateZ(10px)" }}>{f.desc}</p>
                     </div>
-                    <h3 className="font-display text-sm font-bold text-white/90 mb-1.5">{f.title}</h3>
-                    <p className="font-body text-xs text-white/30 leading-relaxed">{f.desc}</p>
-                  </div>
-                </motion.div>
+                  </motion.div>
+                </Tilt3DCard>
               </ScrollReveal>
             ))}
           </div>
@@ -1078,7 +1193,9 @@ export default function PurchaseWebsite() {
                 <Layers className="w-3.5 h-3.5" style={{ color: "hsla(42,87%,55%,0.6)" }} />
                 <span className="font-body text-[10px] font-bold tracking-[0.2em] uppercase text-white/40">Role-Based</span>
               </div>
-              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white">Dashboard Previews</h2>
+              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white" style={{ perspective: "500px" }}>
+                <StaggeredText text="Dashboard Previews" />
+              </h2>
               <p className="font-body text-white/30 text-sm mt-4">Three powerful dashboards tailored for every role in the institution</p>
             </div>
           </ScrollReveal>
@@ -1086,26 +1203,40 @@ export default function PurchaseWebsite() {
           <div className="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
             {dashboardPreviews.map((d, i) => (
               <ScrollReveal key={d.role} delay={i * 120}>
-                <motion.div 
-                  className="group relative rounded-2xl border border-white/[0.05] overflow-hidden"
-                  style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01))", boxShadow: "0 25px 70px -25px rgba(0,0,0,0.5)" }}
-                  whileHover={{ y: -6, borderColor: "rgba(255,255,255,0.12)" }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="h-[2px] w-full" style={{ background: `linear-gradient(90deg, transparent, hsla(${d.color}, 0.5), transparent)` }} />
-                  <div className="p-7 sm:p-8">
-                    <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300 inline-block">{d.emoji}</div>
-                    <h3 className="font-display text-lg font-bold text-white mb-5">{d.role}</h3>
-                    <div className="space-y-3">
-                      {d.features.map((f) => (
-                        <div key={f} className="flex items-center gap-2.5">
-                          <CheckCircle className="w-3.5 h-3.5 shrink-0" style={{ color: `hsla(${d.color}, 0.7)` }} />
-                          <span className="font-body text-xs text-white/45">{f}</span>
+                <ParallaxSection speed={0.08 + i * 0.04}>
+                  <Tilt3DCard intensity={10}>
+                    <motion.div 
+                      className="group relative rounded-2xl border border-white/[0.05] overflow-hidden"
+                      style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01))", boxShadow: "0 25px 70px -25px rgba(0,0,0,0.5)" }}
+                      whileHover={{ y: -6, borderColor: "rgba(255,255,255,0.12)", boxShadow: `0 30px 80px -20px hsla(${d.color}, 0.15)` }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="h-[2px] w-full" style={{ background: `linear-gradient(90deg, transparent, hsla(${d.color}, 0.5), transparent)` }} />
+                      <div className="p-7 sm:p-8" style={{ transformStyle: "preserve-3d" }}>
+                        <motion.div 
+                          className="text-5xl mb-4 inline-block"
+                          style={{ transform: "translateZ(40px)" }}
+                          whileHover={{ scale: 1.2, rotate: [0, -10, 10, 0] }}
+                          transition={{ duration: 0.5 }}
+                        >{d.emoji}</motion.div>
+                        <h3 className="font-display text-lg font-bold text-white mb-5" style={{ transform: "translateZ(25px)" }}>{d.role}</h3>
+                        <div className="space-y-3" style={{ transform: "translateZ(15px)" }}>
+                          {d.features.map((f, fi) => (
+                            <motion.div key={f} className="flex items-center gap-2.5"
+                              initial={{ opacity: 0, x: -15 }}
+                              whileInView={{ opacity: 1, x: 0 }}
+                              viewport={{ once: true }}
+                              transition={{ delay: 0.1 + fi * 0.05, duration: 0.4 }}
+                            >
+                              <CheckCircle className="w-3.5 h-3.5 shrink-0" style={{ color: `hsla(${d.color}, 0.7)` }} />
+                              <span className="font-body text-xs text-white/45">{f}</span>
+                            </motion.div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
+                      </div>
+                    </motion.div>
+                  </Tilt3DCard>
+                </ParallaxSection>
               </ScrollReveal>
             ))}
           </div>
@@ -1177,10 +1308,11 @@ export default function PurchaseWebsite() {
         <div className="container px-4 relative">
           <ScrollReveal>
             <div className="max-w-xl mx-auto">
+              <Tilt3DCard intensity={8}>
               <motion.div 
                 className="relative rounded-3xl border overflow-hidden"
                 style={{ borderColor: "hsla(42,87%,55%,0.18)", background: "linear-gradient(160deg, rgba(198,167,94,0.05), rgba(12,14,20,0.98) 40%)", boxShadow: "0 50px 120px -30px rgba(0,0,0,0.6), 0 0 80px rgba(198,167,94,0.05)" }}
-                whileHover={{ boxShadow: "0 50px 120px -30px rgba(0,0,0,0.6), 0 0 100px rgba(198,167,94,0.08)" }}
+                whileHover={{ boxShadow: "0 50px 120px -30px rgba(0,0,0,0.6), 0 0 120px rgba(198,167,94,0.1)" }}
                 transition={{ duration: 0.5 }}
               >
                 <div className="h-[2px]" style={{ background: "linear-gradient(90deg, transparent, hsl(42 87% 55% / 0.7), transparent)" }} />
@@ -1238,6 +1370,7 @@ export default function PurchaseWebsite() {
                   </motion.a>
                 </div>
               </motion.div>
+              </Tilt3DCard>
             </div>
           </ScrollReveal>
         </div>
