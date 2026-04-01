@@ -1137,8 +1137,9 @@ export default function PurchaseWebsite() {
                 <CircuitBoard className="w-3.5 h-3.5" style={{ color: "hsla(42,87%,55%,0.6)" }} />
                 <span className="font-body text-[10px] font-bold tracking-[0.2em] uppercase text-white/40">Feature Arsenal</span>
               </div>
-              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
-                <span style={{ color: "hsl(42, 87%, 55%)" }}>18+</span> Powerful Features
+              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white" style={{ perspective: "500px" }}>
+                <span style={{ color: "hsl(42, 87%, 55%)" }}>18+</span>{" "}
+                <StaggeredText text="Powerful Features" />
               </h2>
               <p className="font-body text-white/30 text-sm mt-4 max-w-lg mx-auto leading-relaxed">Everything you need to run a modern educational institution — built, tested, and production-ready.</p>
             </div>
