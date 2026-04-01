@@ -1308,10 +1308,11 @@ export default function PurchaseWebsite() {
         <div className="container px-4 relative">
           <ScrollReveal>
             <div className="max-w-xl mx-auto">
+              <Tilt3DCard intensity={8}>
               <motion.div 
                 className="relative rounded-3xl border overflow-hidden"
                 style={{ borderColor: "hsla(42,87%,55%,0.18)", background: "linear-gradient(160deg, rgba(198,167,94,0.05), rgba(12,14,20,0.98) 40%)", boxShadow: "0 50px 120px -30px rgba(0,0,0,0.6), 0 0 80px rgba(198,167,94,0.05)" }}
-                whileHover={{ boxShadow: "0 50px 120px -30px rgba(0,0,0,0.6), 0 0 100px rgba(198,167,94,0.08)" }}
+                whileHover={{ boxShadow: "0 50px 120px -30px rgba(0,0,0,0.6), 0 0 120px rgba(198,167,94,0.1)" }}
                 transition={{ duration: 0.5 }}
               >
                 <div className="h-[2px]" style={{ background: "linear-gradient(90deg, transparent, hsl(42 87% 55% / 0.7), transparent)" }} />
