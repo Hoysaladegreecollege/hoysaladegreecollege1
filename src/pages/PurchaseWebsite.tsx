@@ -1341,11 +1341,21 @@ export default function PurchaseWebsite() {
                       "Complete source code ownership",
                       "All 18+ features included",
                       "Multi-role dashboard system",
+                      "3 years free domain (.com/.in)",
+                      "3 years free cloud hosting",
+                      "25 GB free cloud storage",
+                      "End-to-end daily website analytics",
+                      "1 year free maintenance & support",
                       "Database setup & configuration",
                       "Free deployment assistance",
-                      "1 month free support",
                       "Custom branding & logo setup",
                       "Mobile-responsive design",
+                      "SSL certificate included",
+                      "SEO optimization setup",
+                      "Push notifications system",
+                      "Automated database backups",
+                      "99.9% uptime guarantee",
+                      "Priority bug fixes",
                     ].map((item, i) => (
                       <motion.div key={item} className="flex items-center gap-3"
                         initial={{ opacity: 0, x: -10 }}
