@@ -1370,6 +1370,7 @@ export default function PurchaseWebsite() {
                   </motion.a>
                 </div>
               </motion.div>
+              </Tilt3DCard>
             </div>
           </ScrollReveal>
         </div>
