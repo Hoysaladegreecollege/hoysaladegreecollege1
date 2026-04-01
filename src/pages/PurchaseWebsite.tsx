@@ -986,7 +986,7 @@ export default function PurchaseWebsite() {
             </h1>
 
             <p className="font-body text-white/35 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto mt-7 leading-relaxed">
-              Multi-role dashboards, attendance, marks, fees, admissions, messaging, gallery, AI chatbot — <span className="text-white/55 font-medium">everything built and ready to deploy.</span>
+              Multi-role dashboards, attendance, marks, fees, admissions, messaging, gallery, AI chatbot — <span className="text-white/55 font-medium">everything built and ready to deploy.</span> Includes <span className="text-white/55 font-medium">3 years free domain, hosting, analytics & 1 year maintenance.</span>
             </p>
 
             {/* Trust badges */}
@@ -1329,7 +1329,7 @@ export default function PurchaseWebsite() {
                   </motion.div>
 
                   <h3 className="font-display text-2xl sm:text-3xl font-bold text-white mb-2">Complete Website Package</h3>
-                  <p className="font-body text-white/30 text-sm mb-8">Everything included — no hidden costs</p>
+                  <p className="font-body text-white/30 text-sm mb-8">Everything included — domain, hosting, analytics & maintenance</p>
 
                   <div className="flex items-baseline justify-center gap-2 mb-10">
                     <span className="font-display text-5xl sm:text-6xl font-bold" style={{ background: "linear-gradient(135deg, hsl(42,90%,68%), hsl(38,92%,50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", filter: "drop-shadow(0 0 30px hsla(42,87%,55%,0.2))" }}>₹49,999</span>
@@ -1341,11 +1341,21 @@ export default function PurchaseWebsite() {
                       "Complete source code ownership",
                       "All 18+ features included",
                       "Multi-role dashboard system",
+                      "3 years free domain (.com/.in)",
+                      "3 years free cloud hosting",
+                      "25 GB free cloud storage",
+                      "End-to-end daily website analytics",
+                      "1 year free maintenance & support",
                       "Database setup & configuration",
                       "Free deployment assistance",
-                      "1 month free support",
                       "Custom branding & logo setup",
                       "Mobile-responsive design",
+                      "SSL certificate included",
+                      "SEO optimization setup",
+                      "Push notifications system",
+                      "Automated database backups",
+                      "99.9% uptime guarantee",
+                      "Priority bug fixes",
                     ].map((item, i) => (
                       <motion.div key={item} className="flex items-center gap-3"
                         initial={{ opacity: 0, x: -10 }}
