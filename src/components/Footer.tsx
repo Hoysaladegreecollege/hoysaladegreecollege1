@@ -80,8 +80,11 @@ function RippleCreditsLink() {
       {/* Icon */}
       <Sparkles className="w-3.5 h-3.5 relative z-10 opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300" />
 
-      {/* Text */}
-      <span className="relative z-10 font-semibold text-xs tracking-wide">Website Credits</span>
+      {/* Text with shimmer */}
+      <span className="relative z-10 font-semibold text-xs tracking-wide overflow-hidden">
+        Website Credits
+        <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000 ease-in-out pointer-events-none" />
+      </span>
 
       {/* Expanding border ring */}
       <span className="absolute -inset-x-1 -inset-y-0.5 rounded-full border border-secondary/10 pointer-events-none transition-all duration-700 group-hover:-inset-x-3 group-hover:-inset-y-2 group-hover:border-secondary/25" />
