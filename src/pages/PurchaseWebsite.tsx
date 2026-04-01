@@ -986,7 +986,7 @@ export default function PurchaseWebsite() {
             </h1>
 
             <p className="font-body text-white/35 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto mt-7 leading-relaxed">
-              Multi-role dashboards, attendance, marks, fees, admissions, messaging, gallery, AI chatbot — <span className="text-white/55 font-medium">everything built and ready to deploy.</span>
+              Multi-role dashboards, attendance, marks, fees, admissions, messaging, gallery, AI chatbot — <span className="text-white/55 font-medium">everything built and ready to deploy.</span> Includes <span className="text-white/55 font-medium">3 years free domain, hosting, analytics & 1 year maintenance.</span>
             </p>
 
             {/* Trust badges */}
