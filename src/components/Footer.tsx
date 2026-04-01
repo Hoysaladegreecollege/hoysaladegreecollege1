@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { MapPin, Phone, Mail, Facebook, Twitter, Instagram, Youtube, ArrowUpRight, Heart, ArrowUp, Sparkles, GraduationCap } from "lucide-react";
 import collegeLogo from "@/assets/college-logo.png";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 const MAPS_LINK = "https://maps.app.goo.gl/nqvvEX7kgB7wQVKb7";
 
