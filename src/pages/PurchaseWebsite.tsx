@@ -1193,7 +1193,9 @@ export default function PurchaseWebsite() {
                 <Layers className="w-3.5 h-3.5" style={{ color: "hsla(42,87%,55%,0.6)" }} />
                 <span className="font-body text-[10px] font-bold tracking-[0.2em] uppercase text-white/40">Role-Based</span>
               </div>
-              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white">Dashboard Previews</h2>
+              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white" style={{ perspective: "500px" }}>
+                <StaggeredText text="Dashboard Previews" />
+              </h2>
               <p className="font-body text-white/30 text-sm mt-4">Three powerful dashboards tailored for every role in the institution</p>
             </div>
           </ScrollReveal>
