@@ -962,12 +962,18 @@ export default function PurchaseWebsite() {
             </motion.div>
 
             {/* Main headline */}
-            <h1 className="font-display text-[2.5rem] sm:text-6xl lg:text-[5rem] font-bold text-white leading-[1.05] tracking-[-0.03em] max-w-5xl mx-auto">
-              The Complete{" "}
+            <h1 className="font-display text-[2.5rem] sm:text-6xl lg:text-[5rem] font-bold text-white leading-[1.05] tracking-[-0.03em] max-w-5xl mx-auto" style={{ perspective: "600px" }}>
+              <StaggeredText text="The Complete" delay={0.2} />
+              {" "}
               <span className="relative inline-block">
-                <span style={{ background: "linear-gradient(135deg, hsl(42,90%,68%), hsl(38,92%,55%), hsl(42,80%,50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                <motion.span 
+                  style={{ background: "linear-gradient(135deg, hsl(42,90%,68%), hsl(38,92%,55%), hsl(42,80%,50%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", display: "inline-block" }}
+                  initial={{ opacity: 0, scale: 0.8, rotateX: -40 }}
+                  animate={{ opacity: 1, scale: 1, rotateX: 0 }}
+                  transition={{ delay: 0.6, duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                >
                   College Platform
-                </span>
+                </motion.span>
                 <motion.span 
                   className="absolute -bottom-1 left-0 right-0 h-[2px] rounded-full"
                   style={{ background: "linear-gradient(90deg, transparent, hsl(42,87%,55%), transparent)" }}
@@ -976,7 +982,7 @@ export default function PurchaseWebsite() {
                 />
               </span>
               <br className="hidden sm:block" />
-              Your Institution Deserves
+              <StaggeredText text="Your Institution Deserves" delay={0.5} />
             </h1>
 
             <p className="font-body text-white/35 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto mt-7 leading-relaxed">
