@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import SEOHead from "@/components/SEOHead";
 import ScrollReveal from "@/components/ScrollReveal";
 import { Link } from "react-router-dom";
@@ -10,7 +10,108 @@ import {
   LayoutDashboard, Clock, DollarSign, Image, Settings, UserCheck, Activity,
   PieChart, FileText, Search, ChevronRight, Megaphone, User
 } from "lucide-react";
-import { motion, AnimatePresence, useMotionValue, animate, useScroll, useTransform } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, animate, useScroll, useTransform, useSpring, useInView } from "framer-motion";
+
+/* ── 3D Tilt Card Wrapper ── */
+function Tilt3DCard({ children, className = "", intensity = 15 }: { children: React.ReactNode; className?: string; intensity?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const rotateX = useMotionValue(0);
+  const rotateY = useMotionValue(0);
+  const smoothX = useSpring(rotateX, { stiffness: 150, damping: 20 });
+  const smoothY = useSpring(rotateY, { stiffness: 150, damping: 20 });
+
+  const handleMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    rotateX.set(-y * intensity);
+    rotateY.set(x * intensity);
+  }, [intensity]);
+
+  const handleLeave = useCallback(() => {
+    rotateX.set(0);
+    rotateY.set(0);
+  }, []);
+
+  return (
+    <motion.div
+      ref={ref}
+      className={className}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      style={{ rotateX: smoothX, rotateY: smoothY, transformPerspective: 800, transformStyle: "preserve-3d" }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/* ── Staggered Text Reveal ── */
+function StaggeredText({ text, className = "", delay = 0 }: { text: string; className?: string; delay?: number }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
+  const words = text.split(" ");
+  return (
+    <span ref={ref} className={className}>
+      {words.map((word, i) => (
+        <span key={i} className="inline-block overflow-hidden mr-[0.3em]">
+          <motion.span
+            className="inline-block"
+            initial={{ y: "110%", opacity: 0, rotateX: -80 }}
+            animate={isInView ? { y: 0, opacity: 1, rotateX: 0 } : {}}
+            transition={{ delay: delay + i * 0.06, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {word}
+          </motion.span>
+        </span>
+      ))}
+    </span>
+  );
+}
+
+/* ── Parallax Section Wrapper ── */
+function ParallaxSection({ children, className = "", speed = 0.15 }: { children: React.ReactNode; className?: string; speed?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const y = useTransform(scrollYProgress, [0, 1], [80 * speed, -80 * speed]);
+  return (
+    <div ref={ref} className={`relative ${className}`}>
+      <motion.div style={{ y }}>
+        {children}
+      </motion.div>
+    </div>
+  );
+}
+
+/* ── Magnetic Hover Button ── */
+function MagneticButton({ children, className = "", ...props }: React.ComponentProps<typeof motion.div>) {
+  const ref = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const smoothX = useSpring(x, { stiffness: 200, damping: 15 });
+  const smoothY = useSpring(y, { stiffness: 200, damping: 15 });
+
+  return (
+    <motion.div
+      ref={ref}
+      className={className}
+      style={{ x: smoothX, y: smoothY }}
+      onMouseMove={(e) => {
+        const el = ref.current;
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        x.set((e.clientX - rect.left - rect.width / 2) * 0.15);
+        y.set((e.clientY - rect.top - rect.height / 2) * 0.15);
+      }}
+      onMouseLeave={() => { x.set(0); y.set(0); }}
+      {...props}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
 /* ── Slot Machine ── */
 const PRICE_CHARS = ["₹", "4", "9", ",", "9", "9", "9"];
