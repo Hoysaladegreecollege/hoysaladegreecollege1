@@ -192,7 +192,68 @@ function FloatingParticle({ delay, x, size }: { delay: number; x: string; size: 
   );
 }
 
-/* ── Animated Counter ── */
+/* ── Countdown Timer ── */
+function CountdownTimer() {
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  useEffect(() => {
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + 7);
+    endDate.setHours(23, 59, 59, 999);
+    const savedEnd = typeof window !== "undefined" ? localStorage.getItem("offer-end") : null;
+    const target = savedEnd ? new Date(savedEnd) : endDate;
+    if (!savedEnd) localStorage.setItem("offer-end", endDate.toISOString());
+
+    const tick = () => {
+      const diff = Math.max(0, target.getTime() - Date.now());
+      setTimeLeft({
+        days: Math.floor(diff / 86400000),
+        hours: Math.floor((diff % 86400000) / 3600000),
+        minutes: Math.floor((diff % 3600000) / 60000),
+        seconds: Math.floor((diff % 60000) / 1000),
+      });
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const units = [
+    { label: "Days", value: timeLeft.days },
+    { label: "Hours", value: timeLeft.hours },
+    { label: "Minutes", value: timeLeft.minutes },
+    { label: "Seconds", value: timeLeft.seconds },
+  ];
+
+  return (
+    <div className="max-w-xl mx-auto text-center">
+      <motion.div
+        className="relative rounded-2xl border overflow-hidden px-6 py-6 sm:px-8 sm:py-7"
+        style={{ borderColor: "hsla(0,75%,55%,0.15)", background: "linear-gradient(135deg, rgba(220,60,60,0.04), rgba(12,14,20,0.98))" }}
+        initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+      >
+        <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, hsla(0,75%,55%,0.4), transparent)" }} />
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <Clock className="w-4 h-4" style={{ color: "hsl(0,75%,60%)" }} />
+          <span className="font-body text-xs font-bold tracking-[0.15em] uppercase" style={{ color: "hsl(0,75%,60%)" }}>Limited Time Offer — Ends Soon</span>
+        </div>
+        <div className="flex justify-center gap-3 sm:gap-5">
+          {units.map((u) => (
+            <div key={u.label} className="flex flex-col items-center">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl border border-white/[0.08] flex items-center justify-center" style={{ background: "rgba(255,255,255,0.03)" }}>
+                <span className="font-display text-2xl sm:text-3xl font-bold text-white/90">{String(u.value).padStart(2, "0")}</span>
+              </div>
+              <span className="font-body text-[9px] text-white/25 mt-1.5 uppercase tracking-wider">{u.label}</span>
+            </div>
+          ))}
+        </div>
+        <p className="font-body text-[10px] text-white/20 mt-4">Get <span className="font-bold text-white/40">₹49,999</span> pricing before it goes up</p>
+      </motion.div>
+    </div>
+  );
+}
+
+
 function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
   const [inView, setInView] = useState(false);
