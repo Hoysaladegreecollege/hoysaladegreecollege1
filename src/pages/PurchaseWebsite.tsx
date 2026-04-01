@@ -1200,26 +1200,40 @@ export default function PurchaseWebsite() {
           <div className="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
             {dashboardPreviews.map((d, i) => (
               <ScrollReveal key={d.role} delay={i * 120}>
-                <motion.div 
-                  className="group relative rounded-2xl border border-white/[0.05] overflow-hidden"
-                  style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01))", boxShadow: "0 25px 70px -25px rgba(0,0,0,0.5)" }}
-                  whileHover={{ y: -6, borderColor: "rgba(255,255,255,0.12)" }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="h-[2px] w-full" style={{ background: `linear-gradient(90deg, transparent, hsla(${d.color}, 0.5), transparent)` }} />
-                  <div className="p-7 sm:p-8">
-                    <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300 inline-block">{d.emoji}</div>
-                    <h3 className="font-display text-lg font-bold text-white mb-5">{d.role}</h3>
-                    <div className="space-y-3">
-                      {d.features.map((f) => (
-                        <div key={f} className="flex items-center gap-2.5">
-                          <CheckCircle className="w-3.5 h-3.5 shrink-0" style={{ color: `hsla(${d.color}, 0.7)` }} />
-                          <span className="font-body text-xs text-white/45">{f}</span>
+                <ParallaxSection speed={0.08 + i * 0.04}>
+                  <Tilt3DCard intensity={10}>
+                    <motion.div 
+                      className="group relative rounded-2xl border border-white/[0.05] overflow-hidden"
+                      style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01))", boxShadow: "0 25px 70px -25px rgba(0,0,0,0.5)" }}
+                      whileHover={{ y: -6, borderColor: "rgba(255,255,255,0.12)", boxShadow: `0 30px 80px -20px hsla(${d.color}, 0.15)` }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="h-[2px] w-full" style={{ background: `linear-gradient(90deg, transparent, hsla(${d.color}, 0.5), transparent)` }} />
+                      <div className="p-7 sm:p-8" style={{ transformStyle: "preserve-3d" }}>
+                        <motion.div 
+                          className="text-5xl mb-4 inline-block"
+                          style={{ transform: "translateZ(40px)" }}
+                          whileHover={{ scale: 1.2, rotate: [0, -10, 10, 0] }}
+                          transition={{ duration: 0.5 }}
+                        >{d.emoji}</motion.div>
+                        <h3 className="font-display text-lg font-bold text-white mb-5" style={{ transform: "translateZ(25px)" }}>{d.role}</h3>
+                        <div className="space-y-3" style={{ transform: "translateZ(15px)" }}>
+                          {d.features.map((f, fi) => (
+                            <motion.div key={f} className="flex items-center gap-2.5"
+                              initial={{ opacity: 0, x: -15 }}
+                              whileInView={{ opacity: 1, x: 0 }}
+                              viewport={{ once: true }}
+                              transition={{ delay: 0.1 + fi * 0.05, duration: 0.4 }}
+                            >
+                              <CheckCircle className="w-3.5 h-3.5 shrink-0" style={{ color: `hsla(${d.color}, 0.7)` }} />
+                              <span className="font-body text-xs text-white/45">{f}</span>
+                            </motion.div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
+                      </div>
+                    </motion.div>
+                  </Tilt3DCard>
+                </ParallaxSection>
               </ScrollReveal>
             ))}
           </div>
