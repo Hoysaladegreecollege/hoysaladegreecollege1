@@ -1147,26 +1147,33 @@ export default function PurchaseWebsite() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 max-w-5xl mx-auto">
             {allFeatures.map((f, i) => (
               <ScrollReveal key={f.title} delay={i * 40}>
-                <motion.div 
-                  className="group relative p-6 rounded-2xl border border-white/[0.05] overflow-hidden"
-                  style={{ background: "rgba(255,255,255,0.015)" }}
-                  whileHover={{ y: -4, borderColor: "rgba(255,255,255,0.1)" }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                    style={{ background: `linear-gradient(135deg, hsla(${f.color}, 0.07), transparent 60%)` }} />
-                  <div className="absolute top-0 left-0 right-0 h-px scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"
-                    style={{ background: `linear-gradient(90deg, hsla(${f.color}, 0.6), transparent)` }} />
-                  
-                  <div className="relative z-10">
-                    <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4 border border-white/[0.06] group-hover:scale-110 group-hover:rotate-3 transition-all duration-300"
-                      style={{ background: `hsla(${f.color}, 0.08)` }}>
-                      <f.icon className="w-5 h-5" style={{ color: `hsla(${f.color}, 0.85)` }} />
+                <Tilt3DCard intensity={12}>
+                  <motion.div 
+                    className="group relative p-6 rounded-2xl border border-white/[0.05] overflow-hidden"
+                    style={{ background: "rgba(255,255,255,0.015)" }}
+                    whileHover={{ y: -4, borderColor: "rgba(255,255,255,0.1)", boxShadow: `0 20px 60px -15px hsla(${f.color}, 0.15)` }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                      style={{ background: `linear-gradient(135deg, hsla(${f.color}, 0.07), transparent 60%)` }} />
+                    <div className="absolute top-0 left-0 right-0 h-px scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"
+                      style={{ background: `linear-gradient(90deg, hsla(${f.color}, 0.6), transparent)` }} />
+                    
+                    {/* 3D floating icon */}
+                    <div className="relative z-10" style={{ transformStyle: "preserve-3d" }}>
+                      <motion.div 
+                        className="w-11 h-11 rounded-xl flex items-center justify-center mb-4 border border-white/[0.06]"
+                        style={{ background: `hsla(${f.color}, 0.08)`, transform: "translateZ(30px)" }}
+                        whileHover={{ scale: 1.15, rotate: 6 }}
+                        transition={{ type: "spring", stiffness: 300 }}
+                      >
+                        <f.icon className="w-5 h-5" style={{ color: `hsla(${f.color}, 0.85)` }} />
+                      </motion.div>
+                      <h3 className="font-display text-sm font-bold text-white/90 mb-1.5" style={{ transform: "translateZ(20px)" }}>{f.title}</h3>
+                      <p className="font-body text-xs text-white/30 leading-relaxed" style={{ transform: "translateZ(10px)" }}>{f.desc}</p>
                     </div>
-                    <h3 className="font-display text-sm font-bold text-white/90 mb-1.5">{f.title}</h3>
-                    <p className="font-body text-xs text-white/30 leading-relaxed">{f.desc}</p>
-                  </div>
-                </motion.div>
+                  </motion.div>
+                </Tilt3DCard>
               </ScrollReveal>
             ))}
           </div>
