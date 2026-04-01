@@ -220,10 +220,10 @@ export default function Footer() {
             <span className="hidden sm:inline">ಶ್ರೀಶಿರಡಿ ಸಾಯಿ ಎಜುಕೇಷನಲ್ ಟ್ರಸ್ಟ್ (ರಿ.)</span>
           </span>
           <Link to="/credits" className="relative transition-all duration-500 flex items-center gap-1.5 group text-secondary hover:text-secondary/80">
-            <span className="absolute -inset-x-2 -inset-y-1 rounded-full bg-secondary/[0.06] blur-md pointer-events-none" />
+            <span className="absolute -inset-x-2 -inset-y-1 rounded-full bg-secondary/[0.06] blur-md pointer-events-none transition-all duration-700 group-hover:-inset-x-4 group-hover:-inset-y-2.5 group-hover:bg-secondary/[0.12] group-hover:blur-xl" />
             <Sparkles className="w-3.5 h-3.5 relative z-10 opacity-70 group-hover:opacity-100 transition-opacity duration-300" />
             <span className="relative z-10 font-semibold text-xs tracking-wide">Website Credits</span>
-            <span className="absolute -inset-x-3 -inset-y-1.5 rounded-full border border-secondary/10 pointer-events-none animate-[pulse_4s_ease-in-out_infinite]" />
+            <span className="absolute -inset-x-3 -inset-y-1.5 rounded-full border border-secondary/10 pointer-events-none transition-all duration-700 group-hover:-inset-x-5 group-hover:-inset-y-2.5 group-hover:border-secondary/25" />
           </Link>
         </div>
       </div>
