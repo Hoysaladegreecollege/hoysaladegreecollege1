@@ -91,6 +91,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { isSubscribed, isSupported, subscribe, isLoading: pushLoading } = usePushNotifications();
   useFcmToken();
+  useNativePush();
   const [pushBannerDismissed, setPushBannerDismissed] = useState(() => {
     return localStorage.getItem('hdc_push_banner_dismissed') === '1';
   });
