@@ -17,6 +17,7 @@ import NotificationBadge from "./NotificationBadge";
 import NotificationCenter from "./NotificationCenter";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useFcmToken } from "@/hooks/useFcmToken";
+import { useNativePush } from "@/hooks/useNativePush";
 
 interface NavItem { label: string; path: string; icon: React.ElementType; }
 
