@@ -1,5 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { BookOpen, Clock, BarChart3, Bell, Calendar, TrendingUp, CheckCircle, XCircle, Megaphone, ArrowRight, Sparkles, Upload, User, GraduationCap, FileText, Award, IndianRupee, Wallet, AlertTriangle, Target, Flame, Calculator, Timer, Star, Zap, Trophy } from "lucide-react";
+import { BookOpen, Clock, BarChart3, Bell, Calendar, TrendingUp, CheckCircle, XCircle, Megaphone, ArrowRight, Sparkles, Upload, User, GraduationCap, FileText, Award, IndianRupee, Wallet, AlertTriangle, Target, Flame, Calculator, Timer, Star, Zap, Trophy, Bot } from "lucide-react";
 import BirthdayPopup from "@/components/BirthdayPopup";
 import SEOHead from "@/components/SEOHead";
 import { useQuery } from "@tanstack/react-query";
@@ -776,6 +776,17 @@ export default function StudentDashboard() {
           )}
         </div>
       </div>
+      {/* Consensus AI Chatbot FAB */}
+      <a
+        href="https://consensus.app/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 active:scale-95 transition-all duration-300"
+        aria-label="Open AI Research Assistant"
+        style={{ animation: "chatbot-float 4.5s ease-in-out infinite" }}
+      >
+        <Bot className="w-6 h-6" />
+      </a>
     </div>
   );
 }
