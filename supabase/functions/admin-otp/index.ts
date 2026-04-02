@@ -25,9 +25,17 @@ function isRateLimited(ip: string): boolean {
 function generateOTP(): string {
   const array = new Uint8Array(4);
   crypto.getRandomValues(array);
-  // Convert to 6-digit number
   const num = ((array[0] << 24) | (array[1] << 16) | (array[2] << 8) | array[3]) >>> 0;
   return String(num % 1000000).padStart(6, '0');
+}
+
+// Hash OTP using SHA-256 before storing
+async function hashOTP(otp: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(otp);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 // HTML escape to prevent injection in email templates
@@ -86,11 +94,13 @@ Deno.serve(async (req) => {
 
     if (action === "send_otp") {
       const otp = generateOTP();
+      const otpHash = await hashOTP(otp);
       const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 min
 
+      // Store only the hash, never the plaintext OTP
       const { error: updateErr } = await adminClient
         .from("pending_admin_requests")
-        .update({ otp_code: otp, otp_expires_at: expiresAt })
+        .update({ otp_code: otpHash, otp_expires_at: expiresAt })
         .eq("id", request_id);
 
       if (updateErr) throw new Error("Failed to set OTP");
@@ -207,10 +217,13 @@ Deno.serve(async (req) => {
         throw new Error("OTP has expired. Please request a new one.");
       }
 
-      // Constant-time comparison to prevent timing attacks
+      // Hash the submitted OTP and compare with stored hash
+      const submittedHash = await hashOTP(otp_code);
+
+      // Constant-time comparison on hashes to prevent timing attacks
       const encoder = new TextEncoder();
       const a = encoder.encode(request.otp_code);
-      const b = encoder.encode(otp_code);
+      const b = encoder.encode(submittedHash);
       if (a.length !== b.length) throw new Error("Invalid OTP code");
       let mismatch = 0;
       for (let i = 0; i < a.length; i++) {
@@ -218,7 +231,7 @@ Deno.serve(async (req) => {
       }
       if (mismatch !== 0) throw new Error("Invalid OTP code");
 
-      // Mark as approved
+      // Mark as approved and clear OTP hash
       const { error: approveErr } = await adminClient
         .from("pending_admin_requests")
         .update({
