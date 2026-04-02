@@ -17,6 +17,7 @@ import NotificationBadge from "./NotificationBadge";
 import NotificationCenter from "./NotificationCenter";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useFcmToken } from "@/hooks/useFcmToken";
+import { useNativePush } from "@/hooks/useNativePush";
 
 interface NavItem { label: string; path: string; icon: React.ElementType; }
 
@@ -90,6 +91,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { isSubscribed, isSupported, subscribe, isLoading: pushLoading } = usePushNotifications();
   useFcmToken();
+  useNativePush();
   const [pushBannerDismissed, setPushBannerDismissed] = useState(() => {
     return localStorage.getItem('hdc_push_banner_dismissed') === '1';
   });
