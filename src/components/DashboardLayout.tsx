@@ -11,7 +11,6 @@ import {
 import collegeLogo from "@/assets/college-logo.png";
 import { useState, useEffect } from "react";
 import PageLoader from "./PageLoader";
-import StudentChatBot from "./StudentChatBot";
 import DarkModeToggle from "./DarkModeToggle";
 import ScrollToTop from "./ScrollToTop";
 import NotificationBadge from "./NotificationBadge";
@@ -251,7 +250,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
           <div className="max-w-7xl mx-auto animate-fade-in">{children}</div>
         </main>
-        {role === "student" && <StudentChatBot />}
       </div>
     </div>
   );
