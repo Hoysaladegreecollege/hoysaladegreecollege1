@@ -11,6 +11,7 @@ import {
 import collegeLogo from "@/assets/college-logo.png";
 import { useState, useEffect } from "react";
 import PageLoader from "./PageLoader";
+import StudentChatBot from "./StudentChatBot";
 import DarkModeToggle from "./DarkModeToggle";
 import ScrollToTop from "./ScrollToTop";
 import NotificationBadge from "./NotificationBadge";
