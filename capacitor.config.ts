@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.bf45966f1aa14ed286cdabc540ba6fab',
+  appId: 'com.hoysala.app',
   appName: 'HDC Portal',
   webDir: 'dist',
   server: {
