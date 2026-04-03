@@ -227,7 +227,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <NotificationCenter />
             <DarkModeToggle />
             <Link
-              to="/"
+              to="/home"
               className="font-body text-[12px] text-muted-foreground hover:text-foreground transition-colors duration-200 px-3 py-1.5 rounded-lg hover:bg-muted flex items-center gap-1.5"
             >
               <ExternalLink className="w-3 h-3" />
