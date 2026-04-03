@@ -234,11 +234,17 @@ export default function TeacherAttendance() {
                     <p className="font-body text-sm font-semibold text-foreground truncate">{s.profile?.full_name || "Unnamed"}</p>
                     <p className="font-body text-xs text-muted-foreground">{s.roll_number}</p>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
+                   <div className="flex items-center gap-2 shrink-0">
                     {(s.phone || s.parent_phone) && (
-                      <a href={`tel:${s.parent_phone || s.phone}`} className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary/8 text-primary text-[10px] font-body font-semibold hover:bg-primary/15 transition-colors">
-                        <Phone className="w-3 h-3" /> Call Parent
-                      </a>
+                      <>
+                        <a href={`tel:${s.parent_phone || s.phone}`} className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary/8 text-primary text-[10px] font-body font-semibold hover:bg-primary/15 transition-colors">
+                          <Phone className="w-3 h-3" /> Call
+                        </a>
+                        <a href={`sms:${s.parent_phone || s.phone}?body=${encodeURIComponent(`Dear Parent, your ward ${s.profile?.full_name || s.roll_number} was marked absent on ${date} for ${subject || "class"}. — Hoysala Degree College`)}`}
+                          className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-secondary/10 text-secondary-foreground text-[10px] font-body font-semibold hover:bg-secondary/20 transition-colors">
+                          <MessageSquare className="w-3 h-3" /> SMS
+                        </a>
+                      </>
                     )}
                     <span className="px-2 py-0.5 rounded-full bg-destructive/10 text-destructive text-[10px] font-bold">Absent</span>
                   </div>
