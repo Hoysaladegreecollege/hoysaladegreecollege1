@@ -148,8 +148,8 @@ export default function TeacherAttendance() {
         const statusText = status === "present" ? "Present" : "Absent";
         return {
           user_id: student?.user_id || "",
-          title: `📋 Attendance - ${subject}`,
-          body: `${name} — ${statusText} ${emoji} (${date})`,
+          title: `${name} — ${statusText} ${emoji}`,
+          body: `📋 ${subject} • ${date} • Semester ${activeSemester}${activeCourse ? ` • ${activeCourse.name}` : ""}`,
           url: "/dashboard/student/attendance",
         };
       }).filter(n => n.user_id);
