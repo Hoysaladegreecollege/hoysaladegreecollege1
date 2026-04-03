@@ -1252,6 +1252,41 @@ export type Database = {
           },
         ]
       }
+      student_badges: {
+        Row: {
+          badge_description: string
+          badge_name: string
+          badge_type: string
+          earned_at: string
+          id: string
+          student_id: string
+        }
+        Insert: {
+          badge_description?: string
+          badge_name: string
+          badge_type: string
+          earned_at?: string
+          id?: string
+          student_id: string
+        }
+        Update: {
+          badge_description?: string
+          badge_name?: string
+          badge_type?: string
+          earned_at?: string
+          id?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_badges_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student_documents: {
         Row: {
           created_at: string
