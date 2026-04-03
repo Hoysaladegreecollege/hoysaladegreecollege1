@@ -33,6 +33,7 @@ const studentNav: NavItem[] = [
   { label: "Materials", path: "/dashboard/student/materials", icon: BookOpen },
   { label: "Messages", path: "/dashboard/student/messages", icon: MessageSquare },
   { label: "Gamification", path: "/dashboard/student/gamification", icon: Gamepad2 },
+  { label: "Feedback", path: "/dashboard/student/feedback", icon: FileText },
 ];
 
 const teacherNav: NavItem[] = [
