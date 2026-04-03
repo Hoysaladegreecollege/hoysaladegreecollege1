@@ -255,6 +255,11 @@ function AnimatedStat({
 }
 
 export default function Index() {
+  // In native app, redirect to login page instead of showing homepage
+  if (Capacitor.isNativePlatform()) {
+    return <Navigate to="/login" replace />;
+  }
+
   const [testimonialIndex, setTestimonialIndex] = useState(0);
   const testimonialRef = useRef<NodeJS.Timeout | null>(null);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
