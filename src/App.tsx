@@ -144,6 +144,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <NotificationPermissionGate />
           <Routes>
             {/* Public pages */}
             <Route element={<Layout />}>
