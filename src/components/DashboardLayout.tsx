@@ -113,6 +113,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const currentPage = navItems.find(item => location.pathname === item.path)?.label || roleLabel + " Dashboard";
 
   return (
+    <PullToRefresh>
     <div className="min-h-screen flex bg-muted/30 dark:bg-background">
       <ScrollToTop />
       <PageLoader />
