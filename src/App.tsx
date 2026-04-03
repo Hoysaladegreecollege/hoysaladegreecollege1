@@ -146,7 +146,8 @@ const App = () => (
           <Routes>
             {/* Public pages */}
             <Route element={<Layout />}>
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<SuspenseWrap><Login /></SuspenseWrap>} />
+              <Route path="/home" element={<Index />} />
               <Route path="/about" element={<SuspenseWrap><About /></SuspenseWrap>} />
               <Route path="/courses" element={<SuspenseWrap><Courses /></SuspenseWrap>} />
               <Route path="/admissions" element={<SuspenseWrap><Admissions /></SuspenseWrap>} />
