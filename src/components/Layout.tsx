@@ -6,22 +6,25 @@ import PageLoader from "./PageLoader";
 import PageTransition from "./PageTransition";
 import PopupBanner from "./PopupBanner";
 import ScrollToTop from "./ScrollToTop";
+import PullToRefresh from "./PullToRefresh";
 
 export default function Layout() {
   return (
-    <div className="min-h-screen flex flex-col">
-      <ScrollToTop />
-      <PageLoader />
-      <PopupBanner />
-      <Navbar />
-      <main className="flex-1">
-        <PageTransition>
-          <Outlet />
-        </PageTransition>
-      </main>
-      <Footer />
-      <ChatBot />
-    </div>
+    <PullToRefresh>
+      <div className="min-h-screen flex flex-col">
+        <ScrollToTop />
+        <PageLoader />
+        <PopupBanner />
+        <Navbar />
+        <main className="flex-1">
+          <PageTransition>
+            <Outlet />
+          </PageTransition>
+        </main>
+        <Footer />
+        <ChatBot />
+      </div>
+    </PullToRefresh>
   );
 }
 
