@@ -1,54 +1,77 @@
-# Plan: Admin Dashboard Features + Ultra-Premium Student Profile
+# Advanced Features Plan
 
 ## Overview
 
-completely redesign the Student Profile page with an ultra-premium, Apple-inspired aesthetic featuring glassmorphism, ambient glows, and elevated visual hierarchy.
+Add 7 high-impact, practical features across the public website and dashboards. No charts, no chat systems, no data visualizations -- purely functional utilities.
 
 ---
 
-## Part 1 - In the user management make sure that create a another tab called students in the tab a page sould be opend and in that all the students details should be shown and also make sure that the make ui design to ultra premium and arrnage the students in the proper responsive way and also make sure that add a filter  and search section on the top and below that show the student data's and also add important usefull features to this page.
+## Features
+
+### 2. Student Feedback System (Student Dashboard)
+
+- New sidebar link "Feedback" pointing to `/dashboard/student/feedback`
+- Route already has `StudentFeedback.tsx` component built but **not wired into routes or sidebar nav**
+- Wire it up: add route in `App.tsx`, add nav item in `DashboardLayout.tsx`
+
+### 3. Admin Activity Log Page (Admin Dashboard)
+
+- New page `/dashboard/admin/activity-log` 
+- Create `activity_logs` table migration (if not exists) to track admin actions (user created, role changed, notice posted, etc.)
+- Display a filterable, searchable timeline of recent admin actions
+- Add sidebar nav link with `Activity` icon
+
+### 4. Admin Feedback Management (Admin Dashboard)
+
+- New page `/dashboard/admin/feedback` to view and respond to student feedback/complaints
+- Uses existing `feedback_complaints` table (already has RLS for staff)
+- Filter by status (pending/in_review/resolved/rejected), respond inline
+- Add sidebar nav link
+
+### 6. Website FAQ / Help Section (Public Website)
+
+- New `/faq` public page with accordion-based frequently asked questions
+- Categories: Admissions, Fees, Exams, Campus Life, Technical Support
+- Hardcoded content -- no database needed
+- Add to Navbar under "Other" dropdown
+
+### 7. Teacher Quick Absent SMS/Call Link (Teacher Dashboard)
+
+- On teacher attendance page, after marking a student absent, show a "Notify Parent" button
+- Opens `tel:` or `sms:` link with the parent's phone number pre-filled from the `students` table
+- No external API needed -- uses native device capabilities
 
 ---
 
-## Part 2: Ultra-Premium Student Profile Redesign
+## Technical Details
 
-### Design System
+### Database Changes
 
-- Full-bleed gradient hero banner behind the avatar section with ambient glow orbs
-- Glassmorphism card layers (backdrop-blur-xl, semi-transparent backgrounds)
-- Rounded-[2rem] corners on all cards
-- Shimmer sweep overlays on the profile hero card
-- Staggered entrance animations for each info section
-- Premium icon treatments with colored gradient backgrounds per field category
+- **Migration**: Create `activity_logs` table if it doesn't already exist (columns: id, user_id, action, entity_type, entity_id, details jsonb, created_at) with RLS for admin-only access
+- No other schema changes needed -- `feedback_complaints` and `student_badges` tables already exist
 
-### Layout Changes
+### Files to Create
 
-**Hero Section** — Large cover-style banner:
 
-- Full-width gradient backdrop with floating ambient particles (CSS only)
-- Large avatar (160px) with ring glow effect and verified badge
-- Name, course, roll number, semester displayed prominently
-- Quick-stat pills: Attendance %, Fee Status, Semester
+| File                                             | Purpose             |
+| ------------------------------------------------ | ------------------- |
+| &nbsp;                                           | &nbsp;              |
+| `src/pages/dashboard/admin/AdminActivityLog.tsx` | Activity log viewer |
+| `src/pages/dashboard/admin/AdminFeedback.tsx`    | Feedback management |
+| `src/pages/FAQ.tsx`                              | Public FAQ page     |
 
-**Personal Info Section** — Grouped into categories:
 
-- "Academic Details" group (Roll, Course, Semester, Admission Year)
-- "Personal Details" group (DOB, Gender, Blood Group, Nationality, Religion, Category)
-- "Contact Details" group (Phone, Parent Phone, Father/Mother Name, Address)
-- "Identity" group (Aadhaar)
-- Each group gets a distinct accent color and section header
+### Files to Edit
 
-**Documents Section** — Premium file cards with file-type icons and hover lift
 
-**Passkey Section** — Compact security card with shield iconography
+| File                                                | Change                                                                    |
+| --------------------------------------------------- | ------------------------------------------------------------------------- |
+| `src/App.tsx`                                       | Add routes for certificate, feedback (student & admin), activity log, FAQ |
+| `src/components/DashboardLayout.tsx`                | Add sidebar nav items for new pages                                       |
+| `src/components/Navbar.tsx`                         | Add FAQ to "Other" dropdown                                               |
+| `src/pages/dashboard/teacher/TeacherAttendance.tsx` | Add "Notify Parent" button after marking absent                           |
 
-### Technical Details
 
-**Files to edit:**
+### No External Dependencies
 
-1. `src/pages/dashboard/AdminDashboard.tsx` — Add 5-6 new widget queries and UI sections
-2. `src/pages/dashboard/student/StudentProfile.tsx` — Complete UI redesign with ultra-premium styling
-
-**No database changes needed** — all new widgets use existing tables (students, attendance, marks, admission_seats, fee_payments).
-
-**No new dependencies** — uses existing Recharts, Lucide icons, and Tailwind utilities.
+All features use existing UI components (accordion, cards, badges, buttons) and existing database tables.
