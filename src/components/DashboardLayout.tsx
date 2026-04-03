@@ -6,7 +6,7 @@ import {
   BarChart3, Settings, Award, Image, Megaphone, Shield,
   UserCog, Menu, X, Mail, Trophy, UserCheck,
   DollarSign, Book, ArrowUpCircle, Cake, ImagePlus, ChevronLeft, ExternalLink,
-  BellRing, Monitor, Armchair, Download, MessageSquare, Activity
+  BellRing, Monitor, Armchair, Download, MessageSquare, Activity, Gamepad2
 } from "lucide-react";
 import collegeLogo from "@/assets/college-logo.png";
 import { useState, useEffect } from "react";
@@ -32,6 +32,7 @@ const studentNav: NavItem[] = [
   { label: "Announcements", path: "/dashboard/student/announcements", icon: Megaphone },
   { label: "Materials", path: "/dashboard/student/materials", icon: BookOpen },
   { label: "Messages", path: "/dashboard/student/messages", icon: MessageSquare },
+  { label: "Gamification", path: "/dashboard/student/gamification", icon: Gamepad2 },
 ];
 
 const teacherNav: NavItem[] = [
