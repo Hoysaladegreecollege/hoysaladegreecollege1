@@ -13,6 +13,7 @@ import { useState, useEffect } from "react";
 import PageLoader from "./PageLoader";
 import DarkModeToggle from "./DarkModeToggle";
 import ScrollToTop from "./ScrollToTop";
+import PullToRefresh from "./PullToRefresh";
 import NotificationBadge from "./NotificationBadge";
 import NotificationCenter from "./NotificationCenter";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
@@ -112,6 +113,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const currentPage = navItems.find(item => location.pathname === item.path)?.label || roleLabel + " Dashboard";
 
   return (
+    <PullToRefresh>
     <div className="min-h-screen flex bg-muted/30 dark:bg-background">
       <ScrollToTop />
       <PageLoader />
@@ -256,5 +258,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </main>
       </div>
     </div>
+    </PullToRefresh>
   );
 }
