@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
+import { Capacitor } from "@capacitor/core";
 import { createPortal } from "react-dom";
 import SEOHead from "@/components/SEOHead";
 import {
