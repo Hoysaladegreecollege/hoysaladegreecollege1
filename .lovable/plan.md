@@ -70,8 +70,3 @@ Add 7 high-impact, practical features across the public website and dashboards. 
 | `src/components/DashboardLayout.tsx`                | Add sidebar nav items for new pages                                       |
 | `src/components/Navbar.tsx`                         | Add FAQ to "Other" dropdown                                               |
 | `src/pages/dashboard/teacher/TeacherAttendance.tsx` | Add "Notify Parent" button after marking absent                           |
-
-
-### No External Dependencies
-
-All features use existing UI components (accordion, cards, badges, buttons) and existing database tables.
