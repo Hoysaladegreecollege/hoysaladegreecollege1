@@ -43,6 +43,7 @@ const Placements = lazy(() => import("./pages/Placements"));
 const CampusPage = lazy(() => import("./pages/Campus"));
 const Alumni = lazy(() => import("./pages/Alumni"));
 const PurchaseWebsite = lazy(() => import("./pages/PurchaseWebsite"));
+const FAQ = lazy(() => import("./pages/FAQ"));
 
 // Lazy load student dashboard
 const StudentDashboard = lazy(() => import("./pages/dashboard/StudentDashboard"));
@@ -56,6 +57,7 @@ const StudentAnnouncements = lazy(() => import("./pages/dashboard/student/Studen
 const StudentFees = lazy(() => import("./pages/dashboard/student/StudentFees"));
 const StudentMessages = lazy(() => import("./pages/dashboard/student/StudentMessages"));
 const StudentGamification = lazy(() => import("./pages/dashboard/student/StudentGamification"));
+const StudentFeedback = lazy(() => import("./pages/dashboard/student/StudentFeedback"));
 
 // Lazy load teacher dashboard
 const TeacherDashboard = lazy(() => import("./pages/dashboard/TeacherDashboard"));
@@ -110,6 +112,8 @@ const AdminDepartmentsAndSeats = lazy(() => import("./pages/dashboard/admin/Admi
 const AdminReports = lazy(() => import("./pages/dashboard/admin/AdminReports"));
 const AdminAlumni = lazy(() => import("./pages/dashboard/admin/AdminAlumni"));
 const AdminNotificationBroadcast = lazy(() => import("./pages/dashboard/admin/AdminNotificationBroadcast"));
+const AdminActivityLog = lazy(() => import("./pages/dashboard/admin/AdminActivityLog"));
+const AdminFeedback = lazy(() => import("./pages/dashboard/admin/AdminFeedback"));
 
 const queryClient = new QueryClient();
 
@@ -169,6 +173,7 @@ const App = () => (
               <Route path="/campus" element={<SuspenseWrap><CampusPage /></SuspenseWrap>} />
               <Route path="/alumni" element={<SuspenseWrap><Alumni /></SuspenseWrap>} />
               <Route path="/purchase" element={<SuspenseWrap><PurchaseWebsite /></SuspenseWrap>} />
+              <Route path="/faq" element={<SuspenseWrap><FAQ /></SuspenseWrap>} />
             </Route>
 
             <Route path="/login" element={<SuspenseWrap><Login /></SuspenseWrap>} />
@@ -194,6 +199,7 @@ const App = () => (
             <Route path="/dashboard/student/fees" element={<StudentRoute><StudentFees /></StudentRoute>} />
             <Route path="/dashboard/student/messages" element={<StudentRoute><StudentMessages /></StudentRoute>} />
             <Route path="/dashboard/student/gamification" element={<StudentRoute><StudentGamification /></StudentRoute>} />
+            <Route path="/dashboard/student/feedback" element={<StudentRoute><StudentFeedback /></StudentRoute>} />
 
             {/* Teacher */}
             <Route path="/dashboard/teacher" element={<TeacherRoute><TeacherDashboard /></TeacherRoute>} />
@@ -249,6 +255,8 @@ const App = () => (
             <Route path="/dashboard/admin/reports" element={<AdminRoute><AdminReports /></AdminRoute>} />
             <Route path="/dashboard/admin/alumni" element={<AdminRoute><AdminAlumni /></AdminRoute>} />
             <Route path="/dashboard/admin/broadcast" element={<AdminRoute><AdminNotificationBroadcast /></AdminRoute>} />
+            <Route path="/dashboard/admin/activity-log" element={<AdminRoute><AdminActivityLog /></AdminRoute>} />
+            <Route path="/dashboard/admin/feedback" element={<AdminRoute><AdminFeedback /></AdminRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

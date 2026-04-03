@@ -30,6 +30,7 @@ const otherDropdown = [
   { label: "Question Bank", path: "/previous-year-papers", icon: BookOpen, desc: "Previous year papers" },
   { label: "Achievements", path: "/achievements", icon: TrendingUp, desc: "Top rankers & awards" },
   { label: "Notices", path: "/notices", icon: FileText, desc: "Important announcements" },
+  { label: "FAQ / Help", path: "/faq", icon: FileText, desc: "Frequently asked questions" },
 ];
 
 const navLinks = [

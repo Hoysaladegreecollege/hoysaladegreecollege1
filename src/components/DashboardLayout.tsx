@@ -33,6 +33,7 @@ const studentNav: NavItem[] = [
   { label: "Materials", path: "/dashboard/student/materials", icon: BookOpen },
   { label: "Messages", path: "/dashboard/student/messages", icon: MessageSquare },
   { label: "Gamification", path: "/dashboard/student/gamification", icon: Gamepad2 },
+  { label: "Feedback", path: "/dashboard/student/feedback", icon: FileText },
 ];
 
 const teacherNav: NavItem[] = [
@@ -82,6 +83,8 @@ const adminNav: NavItem[] = [
   { label: "Reports & Export", path: "/dashboard/admin/reports", icon: Download },
   { label: "Alumni", path: "/dashboard/admin/alumni", icon: GraduationCap },
   { label: "Broadcast", path: "/dashboard/admin/broadcast", icon: BellRing },
+  { label: "Activity Log", path: "/dashboard/admin/activity-log", icon: Activity },
+  { label: "Feedback", path: "/dashboard/admin/feedback", icon: MessageSquare },
   { label: "Settings", path: "/dashboard/admin/settings", icon: Settings },
 ];
 
