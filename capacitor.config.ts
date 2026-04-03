@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'HDC Portal',
   webDir: 'dist',
   server: {
-    url: 'https://bf45966f-1aa1-4ed2-86cd-abc540ba6fab.lovableproject.com?forceHideBadge=true',
+    url: 'https://hoysaladegreecollege1.lovable.app',
     cleartext: true,
   },
   plugins: {
