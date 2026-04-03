@@ -7,10 +7,13 @@ import confetti from "canvas-confetti";
 
 import GamificationHeader from "@/components/gamification/GamificationHeader";
 import LevelProgress from "@/components/gamification/LevelProgress";
+import DailyCheckIn from "@/components/gamification/DailyCheckIn";
 import PointsBreakdown from "@/components/gamification/PointsBreakdown";
 import BadgesGrid, { BADGE_DEFINITIONS } from "@/components/gamification/BadgesGrid";
 import LeaderboardSection from "@/components/gamification/LeaderboardSection";
 import StreakDisplay from "@/components/gamification/StreakDisplay";
+import WeeklyChallenges from "@/components/gamification/WeeklyChallenges";
+import AchievementTimeline from "@/components/gamification/AchievementTimeline";
 import FloatingPoints, { useFloatingPoints } from "@/components/gamification/FloatingPoints";
 
 export default function StudentGamification() {
@@ -19,7 +22,6 @@ export default function StudentGamification() {
   const { notifications, showPoints } = useFloatingPoints();
   const [newlyEarned, setNewlyEarned] = useState<string[]>([]);
   const prevLevel = useRef(0);
-  const prevBadgeCount = useRef(0);
 
   // Fetch student record
   const { data: student } = useQuery({
@@ -68,7 +70,7 @@ export default function StudentGamification() {
     queryFn: async () => {
       const { data } = await supabase
         .from("study_streaks")
-        .select("streak")
+        .select("streak, last_date")
         .eq("user_id", user!.id)
         .maybeSingle();
       return data;
@@ -122,7 +124,7 @@ export default function StudentGamification() {
 
         return {
           id: s.id,
-          name: profile?.full_name || "Unknown",
+          name: profile?.full_name || s.roll_number || "Student",
           avatar: profile?.avatar_url,
           course: (s as any).courses?.code || "",
           totalPoints: attPoints + marksPoints + badgePoints,
@@ -157,6 +159,21 @@ export default function StudentGamification() {
       else current = 0;
     });
     return max;
+  })();
+
+  // Perfect week: 7 consecutive present days
+  const perfectWeek = (() => {
+    if (!attendanceData) return false;
+    let consecutive = 0;
+    for (const a of attendanceData) {
+      if (a.status === "present") {
+        consecutive++;
+        if (consecutive >= 7) return true;
+      } else {
+        consecutive = 0;
+      }
+    }
+    return false;
   })();
 
   const currentRank = leaderboard.findIndex(l => l.isCurrentUser) + 1;
@@ -206,6 +223,7 @@ export default function StudentGamification() {
       [longestStreak >= 30, "attendance_hero", "Attendance Hero", "Never missed a class for 30+ records"],
       [streak >= 7, "bookworm", "Bookworm", "Logged study streak 7+ days"],
       [streak >= 14, "streak_master", "Streak Master", "Maintained a 14+ day study streak"],
+      [perfectWeek, "perfect_week", "Perfect Week", "100% attendance for 7 consecutive days"],
     ];
 
     checks.forEach(([condition, type, name, desc]) => {
@@ -235,8 +253,21 @@ export default function StudentGamification() {
         streak={streak}
         pointsToNext={totalPoints % 500}
       />
+      <DailyCheckIn
+        streak={streak}
+        lastDate={streakData?.last_date || null}
+        onCheckedIn={() => queryClient.invalidateQueries({ queryKey: ["gamification-streak"] })}
+      />
       <StreakDisplay streak={streak} attendancePct={attendancePct} avgMarks={avgMarks} longestStreak={longestStreak} />
+      <WeeklyChallenges
+        attendancePct={attendancePct}
+        presentCount={presentCount}
+        avgMarks={avgMarks}
+        streak={streak}
+        totalMarksEntries={marksData?.length || 0}
+      />
       <PointsBreakdown items={pointsBreakdownItems} />
+      <AchievementTimeline earnedBadges={earnedBadges} totalPoints={totalPoints} />
       <BadgesGrid earnedBadges={earnedBadges} newlyEarned={newlyEarned} />
       <LeaderboardSection leaderboard={leaderboard} loading={leaderboardLoading} />
     </div>
