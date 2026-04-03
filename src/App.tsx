@@ -8,6 +8,7 @@ import { lazy, Suspense } from "react";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardRedirect from "./components/DashboardRedirect";
+import NotificationPermissionGate from "./components/NotificationPermissionGate";
 import DashboardLayout from "./components/DashboardLayout";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
