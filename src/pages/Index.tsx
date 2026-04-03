@@ -330,6 +330,11 @@ export default function Index() {
   const totalSlides = Math.ceil(testimonials.length / 2);
   const currentTestimonials = testimonials.slice(testimonialIndex * 2, testimonialIndex * 2 + 2);
 
+  // In native app, redirect to login page instead of showing homepage
+  if (Capacitor.isNativePlatform()) {
+    return <Navigate to="/login" replace />;
+  }
+
   return (
     <div className="page-enter">
       <SEOHead
