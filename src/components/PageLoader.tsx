@@ -8,15 +8,7 @@ export default function PageLoader() {
   const [showSplash, setShowSplash] = useState(false);
 
   useEffect(() => {
-    const isInitial = !sessionStorage.getItem("hdc-loaded");
-    if (isInitial) {
-      sessionStorage.setItem("hdc-loaded", "1");
-      setShowSplash(true);
-      // Detect slow connections for shorter splash
-      const conn = (navigator as any).connection;
-      const isSlow = conn && (conn.effectiveType === "2g" || conn.effectiveType === "slow-2g" || conn.saveData);
-      setTimeout(() => setShowSplash(false), isSlow ? 2000 : 3500);
-    }
+    // Skip splash screen entirely — content loads immediately
   }, []);
 
   useEffect(() => {
