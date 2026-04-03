@@ -4,10 +4,6 @@ const config: CapacitorConfig = {
   appId: 'com.hoysala.app',
   appName: 'HDC Portal',
   webDir: 'dist',
-  server: {
-    // Start the app on the login page in native builds
-    url: undefined as any,
-  },
   plugins: {
     PushNotifications: {
       presentationOptions: ['badge', 'sound', 'alert'],
