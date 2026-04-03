@@ -4,12 +4,6 @@ const config: CapacitorConfig = {
   appId: 'com.hoysala.app',
   appName: 'HDC Portal',
   webDir: 'dist',
-  // For production: app loads from local built files (no Chrome redirect)
-  // For development/hot-reload, uncomment the server block below:
-  // server: {
-  //   url: 'https://hoysaladegreecollege1.lovable.app',
-  //   cleartext: true,
-  // },
   plugins: {
     PushNotifications: {
       presentationOptions: ['badge', 'sound', 'alert'],
