@@ -112,6 +112,8 @@ const AdminDepartmentsAndSeats = lazy(() => import("./pages/dashboard/admin/Admi
 const AdminReports = lazy(() => import("./pages/dashboard/admin/AdminReports"));
 const AdminAlumni = lazy(() => import("./pages/dashboard/admin/AdminAlumni"));
 const AdminNotificationBroadcast = lazy(() => import("./pages/dashboard/admin/AdminNotificationBroadcast"));
+const AdminActivityLog = lazy(() => import("./pages/dashboard/admin/AdminActivityLog"));
+const AdminFeedback = lazy(() => import("./pages/dashboard/admin/AdminFeedback"));
 
 const queryClient = new QueryClient();
 
