@@ -19,6 +19,7 @@ import NotificationCenter from "./NotificationCenter";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useFcmToken } from "@/hooks/useFcmToken";
 import { useNativePush } from "@/hooks/useNativePush";
+import NotificationPermissionGate from "./NotificationPermissionGate";
 
 interface NavItem { label: string; path: string; icon: React.ElementType; }
 
@@ -115,6 +116,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <PullToRefresh>
     <div className="min-h-screen flex bg-muted/30 dark:bg-background">
+      <NotificationPermissionGate />
       <ScrollToTop />
       <PageLoader />
 
