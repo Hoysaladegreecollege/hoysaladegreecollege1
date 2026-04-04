@@ -1,18 +1,20 @@
 import { useState, useEffect } from "react";
-import { Bell, ShieldAlert } from "lucide-react";
+import { Bell, ShieldAlert, Settings, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { Capacitor } from "@capacitor/core";
 
 /**
  * Full-screen modal that forces logged-in users to enable notifications.
- * Dismissible only after granting permission or if notifications aren't supported.
+ * On native apps, redirects to app notification settings when denied.
  */
 export default function NotificationPermissionGate() {
   const { user } = useAuth();
   const { permission, isSubscribed, isSupported, subscribe, isLoading } = usePushNotifications();
   const [dismissed, setDismissed] = useState(false);
   const [requesting, setRequesting] = useState(false);
+  const isNative = Capacitor.isNativePlatform();
 
   // Reset dismissed state when user changes
   useEffect(() => {
@@ -30,14 +32,24 @@ export default function NotificationPermissionGate() {
     return null;
   }
 
-  // If permission was denied, show a different message
   const isDenied = permission === "denied";
 
   const handleAllow = async () => {
     setRequesting(true);
     await subscribe();
     setRequesting(false);
-    // If granted, component will unmount via the condition above
+  };
+
+  const handleOpenSettings = async () => {
+    try {
+      const { NativeSettings, AndroidSettings, IOSSettings } = await import("capacitor-native-settings");
+      await NativeSettings.open({
+        optionAndroid: AndroidSettings.AppNotification,
+        optionIOS: IOSSettings.App,
+      });
+    } catch (err) {
+      console.error("Failed to open native settings:", err);
+    }
   };
 
   return (
@@ -61,14 +73,40 @@ export default function NotificationPermissionGate() {
           </h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
             {isDenied
-              ? "You've blocked notifications. Please go to your browser settings and allow notifications for this site to receive important updates about attendance, marks, and announcements."
+              ? isNative
+                ? "Notifications are turned off for this app. Tap below to open your phone's settings and enable notifications to receive important updates."
+                : "You've blocked notifications. Please go to your browser settings and allow notifications for this site to receive important updates about attendance, marks, and announcements."
               : "Stay updated with real-time alerts for attendance, marks, announcements, and more. Allow notifications to never miss important updates."}
           </p>
         </div>
 
+        {/* Feature highlights */}
+        {!isDenied && (
+          <div className="space-y-2 px-2">
+            {[
+              { icon: "📋", text: "Attendance alerts when marked" },
+              { icon: "📊", text: "Marks & results updates" },
+              { icon: "📢", text: "Important announcements" },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-2.5 text-xs text-muted-foreground">
+                <span className="text-sm">{item.icon}</span>
+                <span>{item.text}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Actions */}
         <div className="space-y-2.5">
-          {!isDenied && (
+          {isDenied && isNative ? (
+            <Button
+              onClick={handleOpenSettings}
+              className="w-full h-12 text-base font-semibold rounded-xl gap-2"
+            >
+              <Settings className="w-4 h-4" />
+              Open App Settings
+            </Button>
+          ) : !isDenied ? (
             <Button
               onClick={handleAllow}
               disabled={isLoading || requesting}
@@ -83,7 +121,17 @@ export default function NotificationPermissionGate() {
                 </>
               )}
             </Button>
+          ) : null}
+
+          {isDenied && !isNative && (
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50 border border-border">
+              <Smartphone className="w-4 h-4 text-muted-foreground shrink-0" />
+              <p className="text-[11px] text-muted-foreground leading-snug">
+                Click the lock/info icon in your browser's address bar → Site settings → Allow notifications
+              </p>
+            </div>
           )}
+
           <Button
             variant="ghost"
             onClick={() => setDismissed(true)}
