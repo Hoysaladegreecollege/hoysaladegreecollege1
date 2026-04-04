@@ -170,7 +170,7 @@ export default function DownloadPage() {
                   </div>
                   <div className="w-px h-8 bg-white/[0.06]" />
                   <div className="flex flex-col items-center gap-1">
-                    <span className="text-white/90 text-lg font-display font-bold">6 MB</span>
+                    <span className="text-white/90 text-lg font-display font-bold">50 MB</span>
                     <span className="text-white/35 text-[10px] font-body font-semibold tracking-wider uppercase">App Size</span>
                   </div>
                 </div>
