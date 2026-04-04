@@ -170,7 +170,7 @@ export default function DownloadPage() {
                   </div>
                   <div className="w-px h-8 bg-white/[0.06]" />
                   <div className="flex flex-col items-center gap-1">
-                    <span className="text-white/90 text-lg font-display font-bold">6 MB</span>
+                    <span className="text-white/90 text-lg font-display font-bold">50 MB</span>
                     <span className="text-white/35 text-[10px] font-body font-semibold tracking-wider uppercase">App Size</span>
                   </div>
                 </div>
@@ -198,7 +198,7 @@ export default function DownloadPage() {
 
                 <p className="text-white/20 text-[11px] font-body mt-5 flex items-center justify-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/60" />
-                  APK file • Requires Android 6.0+ • Free
+                  APK file • Requires Android 8.0+ • Free
                 </p>
 
                 {/* Install Web App Button */}
@@ -371,7 +371,7 @@ export default function DownloadPage() {
                 <span>•</span>
                 <span>Free Forever</span>
                 <span>•</span>
-                <span>Android 6.0+</span>
+                <span>Android 8.0+</span>
               </div>
             </div>
           </ScrollReveal>
