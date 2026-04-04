@@ -24,7 +24,7 @@ export default function WeeklyChallenges({ attendancePct, presentCount, avgMarks
     {
       id: "attend_5",
       title: "Attendance Champion",
-      description: "Attend 5 classes this week",
+      description: "Attend 5 days college this week",
       target: 5,
       current: Math.min(presentCount, 5),
       reward: 50,
