@@ -84,8 +84,8 @@ export default function DownloadPage() {
   const handleDownload = () => {
     setShowThankYou(true);
     const link = document.createElement("a");
-    link.href = "/downloads/HDC_Portal.apk";
-    link.download = "HDC_Portal.apk";
+    link.href = "/downloads/HDC-APP.apk";
+    link.download = "HDC-APP.apk";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
