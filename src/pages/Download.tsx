@@ -371,7 +371,7 @@ export default function DownloadPage() {
                 <span>•</span>
                 <span>Free Forever</span>
                 <span>•</span>
-                <span>Android 6.0+</span>
+                <span>Android 8.0+</span>
               </div>
             </div>
           </ScrollReveal>
