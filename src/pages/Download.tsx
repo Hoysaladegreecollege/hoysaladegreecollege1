@@ -198,7 +198,7 @@ export default function DownloadPage() {
 
                 <p className="text-white/20 text-[11px] font-body mt-5 flex items-center justify-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/60" />
-                  APK file • Requires Android 6.0+ • Free
+                  APK file • Requires Android 8.0+ • Free
                 </p>
 
                 {/* Install Web App Button */}
